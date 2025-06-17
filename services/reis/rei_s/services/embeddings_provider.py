@@ -41,7 +41,7 @@ def get_embeddings(config: Config):
             raise ValueError("The env variable `EMBEDDINGS_AZURE_OPENAI_MODEL_NAME` is missing.")
 
         return AzureOpenAIEmbeddings(
-            api_key=config.embeddings_azure_openai_api_key,
+            api_key="7a387e7460c8d55fdc475df3c924bb88",
             model=config.embeddings_azure_openai_model_name,
             azure_deployment=config.embeddings_azure_openai_deployment_name,
             azure_endpoint=config.embeddings_azure_openai_endpoint,
