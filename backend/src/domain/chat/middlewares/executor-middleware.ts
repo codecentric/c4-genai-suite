@@ -119,12 +119,7 @@ function buildClient(configuration: ConfigurationModel) {
     new Configuration({
       headers,
       fetchApi: async (request, init) => {
-        // This method is only called from the generated API-Clients with hardcoded
-        // paths, so there should be no risk of SSRF
-        // nosemgrep: nodejs_scan.javascript-ssrf-rule-node_ssrf
-        const result = await fetch(request, { ...init });
-
-        return result;
+        return await fetch(request, init);
       },
       basePath: configuration.executorEndpoint,
     }),
