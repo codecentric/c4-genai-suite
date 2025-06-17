@@ -102,3 +102,20 @@ jobs:
           output: both
       - run: cp code-coverage-results.md $GITHUB_STEP_SUMMARY
         working-directory: .
+
+  quality-gate:
+    runs-on: ubuntu-latest
+    needs:
+      - check-generated-specs
+      - lint
+      - test
+    if: always()
+    steps:
+      - name: All tests ok
+        if: ${{ !(contains(needs.*.result, 'failure')) }}
+        run: exit 0
+        working-directory: .
+      - name: Some tests failed
+        if: ${{ contains(needs.*.result, 'failure') }}
+        run: exit 1
+        working-directory: .
