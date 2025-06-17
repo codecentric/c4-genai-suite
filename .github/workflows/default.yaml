@@ -1,0 +1,21 @@
+name: Hack quality gate
+
+# You were probably wondering, why there are "quality-gate" jobs littered all over
+# our workflows. The reason is, that we want GitHub's automerge to wait for all
+# triggered checks to pass. Unfortunately we found only one way, where we need to
+# specify the name of the required job. So we introduced a "quality-gate" job,
+# that waits for all jobs of the workflow.
+# This workflow is for PRs to be mergable if there are no other workflows triggered.
+# If you know of a better way we would be very glad to know it, too. 🙏
+
+permissions: {}
+
+on:
+  push:
+
+jobs:
+  quality-gate:
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - run: exit 0
