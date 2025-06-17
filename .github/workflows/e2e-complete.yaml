@@ -1,7 +1,6 @@
 name: E2E Tests with expensive and Stress Tests
 permissions:
   contents: read
-  pull-requests: write
   packages: write
 
 on:
