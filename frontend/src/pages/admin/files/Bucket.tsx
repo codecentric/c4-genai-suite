@@ -13,7 +13,7 @@ interface BucketProps {
 
 export const Bucket = memo(({ bucket, onDelete, onUpdate }: BucketProps) => {
   return (
-    <li className="group flex items-center !px-0">
+    <li className="group flex items-center rounded-lg px-2 py-1 hover:bg-gray-100 focus:font-semibold">
       <TransientNavLink to={`/admin/files/${bucket.id}`} className="text-normal block min-w-0 grow truncate text-ellipsis">
         {/*{bucket.isDefault && <div className="badge badge-primary mr-2 truncate font-normal">{texts.common.userBucketBadge}</div>}*/}
 
@@ -29,7 +29,7 @@ export const Bucket = memo(({ bucket, onDelete, onUpdate }: BucketProps) => {
       <Menu>
         <Menu.Target>
           <ActionIcon className="opacity-0 group-hover:opacity-100" variant="subtle" data-testid={'more-actions'}>
-            <IconDots size={14} />
+            <IconDots size={16} />
           </ActionIcon>
         </Menu.Target>
 

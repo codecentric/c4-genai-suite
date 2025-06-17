@@ -1,9 +1,10 @@
+import { IconPlus } from '@tabler/icons-react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { BucketDto, useApi } from 'src/api';
-import { Icon, Page } from 'src/components';
+import { Page } from 'src/components';
 import { useEventCallback, useTransientNavigate } from 'src/hooks';
 import { buildError } from 'src/lib';
 import { texts } from 'src/texts';
@@ -62,16 +63,16 @@ export function BucketsPage() {
             <h3 className="grow text-xl">{texts.files.buckets}</h3>
 
             <button className="btn btn-square btn-sm text-sm" onClick={() => setToCreate(true)}>
-              <Icon icon="plus" size={16} />
+              <IconPlus size={16} />
             </button>
           </div>
 
-          <div className="grow overflow-y-auto p-8 pt-4">
-            <ul aria-labelledby={texts.files.buckets} className="nav-menu nav-menu-dotted">
+          <div className="grow overflow-y-auto p-4 pt-4">
+            <div className="nav-menu flex flex-col">
               {buckets.map((bucket) => (
                 <Bucket key={bucket.id} bucket={bucket} onDelete={deleting.mutate} onUpdate={setToUpdate} />
               ))}
-            </ul>
+            </div>
 
             {buckets.length === 0 && isFetched && <div className="pt-4 text-sm text-gray-400">{texts.files.bucketsEmpty}</div>}
           </div>
