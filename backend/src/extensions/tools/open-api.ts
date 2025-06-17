@@ -1,9 +1,7 @@
-import * as https from 'https';
 import { StructuredTool } from '@langchain/core/tools';
 import { Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { addMilliseconds, addYears } from 'date-fns';
-import { default as nodeFetch, RequestInfo, RequestInit } from 'node-fetch';
 import { MoreThan } from 'typeorm';
 import { z } from 'zod';
 import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from 'src/domain/chat';
@@ -110,16 +108,12 @@ export class OpenApiExtension implements Extension {
       new Configuration({
         headers,
         fetchApi: async (request, init) => {
-          const agent = new https.Agent({
-            // Default behavior: certificates are validated
-          });
-
           // This method is only called from the generated API-Clients with hardcoded
           // paths, so there should be no risk of SSRF
           // nosemgrep: nodejs_scan.javascript-ssrf-rule-node_ssrf
-          const result = await nodeFetch(request as RequestInfo, { ...init, agent } as RequestInit);
+          const result = await fetch(request, { ...init });
 
-          return result as unknown as Response;
+          return result;
         },
         basePath: configuration.endpoint,
       }),

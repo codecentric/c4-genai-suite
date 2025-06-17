@@ -1,9 +1,7 @@
-import * as https from 'https';
 import { mapChatMessagesToStoredMessages } from '@langchain/core/messages';
 import { Injectable } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { isString } from 'class-validator';
-import { default as nodeFetch, RequestInfo, RequestInit } from 'node-fetch';
 import { ConfigurationModel } from 'src/domain/extensions';
 import { User } from 'src/domain/users';
 import { InternalError } from 'src/lib';
@@ -121,16 +119,12 @@ function buildClient(configuration: ConfigurationModel) {
     new Configuration({
       headers,
       fetchApi: async (request, init) => {
-        const agent = new https.Agent({
-          // Certificate validation is enabled by default
-        });
-
         // This method is only called from the generated API-Clients with hardcoded
         // paths, so there should be no risk of SSRF
         // nosemgrep: nodejs_scan.javascript-ssrf-rule-node_ssrf
-        const result = await nodeFetch(request as RequestInfo, { ...init, agent } as RequestInit);
+        const result = await fetch(request, { ...init });
 
-        return result as unknown as Response;
+        return result;
       },
       basePath: configuration.executorEndpoint,
     }),
