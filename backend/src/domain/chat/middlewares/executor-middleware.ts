@@ -122,7 +122,7 @@ function buildClient(configuration: ConfigurationModel) {
       headers,
       fetchApi: async (request, init) => {
         const agent = new https.Agent({
-          rejectUnauthorized: false,
+          // Certificate validation is enabled by default
         });
 
         // This method is only called from the generated API-Clients with hardcoded
