@@ -118,9 +118,6 @@ function buildClient(configuration: ConfigurationModel) {
   const api = new ChatApi(
     new Configuration({
       headers,
-      fetchApi: async (request, init) => {
-        return await fetch(request, init);
-      },
       basePath: configuration.executorEndpoint,
     }),
   );

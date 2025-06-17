@@ -107,9 +107,6 @@ export class OpenApiExtension implements Extension {
     const api = new ToolsApi(
       new Configuration({
         headers,
-        fetchApi: async (request, init) => {
-          return await fetch(request, { ...init });
-        },
         basePath: configuration.endpoint,
       }),
     );
