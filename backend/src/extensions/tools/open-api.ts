@@ -111,7 +111,7 @@ export class OpenApiExtension implements Extension {
         headers,
         fetchApi: async (request, init) => {
           const agent = new https.Agent({
-            rejectUnauthorized: false,
+            // Default behavior: certificates are validated
           });
 
           // This method is only called from the generated API-Clients with hardcoded
