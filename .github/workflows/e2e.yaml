@@ -1,4 +1,8 @@
 name: E2E Tests
+permissions:
+  contents: read
+  pull-requests: write
+  packages: write
 
 on:
   push:
@@ -44,6 +48,8 @@ jobs:
 
   lint:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

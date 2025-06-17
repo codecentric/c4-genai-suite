@@ -6,7 +6,7 @@ on:
 defaults:
   run:
     working-directory: services/reis
-    
+
 jobs:
   test-stress:
     runs-on: ubuntu-latest
