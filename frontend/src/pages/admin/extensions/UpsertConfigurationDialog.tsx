@@ -1,6 +1,7 @@
 import { Button, Flex, Portal, Switch, Textarea, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useMutation } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 import z from 'zod';
 import { ConfigurationDto, UpsertConfigurationDto, useApi } from 'src/api';
 import { FormAlert, MAX_SUGGESTIONS, Modal } from 'src/components';
@@ -35,14 +36,16 @@ interface UpsertConfigurationDialogProps {
 
 export function UpsertConfigurationDialog(props: UpsertConfigurationDialogProps) {
   const { onCreate, onUpdate, onClose, target } = props;
+  const navigate = useNavigate();
 
   const api = useApi();
 
   const creating = useMutation({
     mutationFn: (request: UpsertConfigurationDto) => api.extensions.postConfiguration(request),
-    onSuccess: (response) => {
+    onSuccess: async (response) => {
       onCreate(response);
       onClose();
+      await navigate(`/admin/assistants/${response.id}?add-extension=true`);
     },
   });
 

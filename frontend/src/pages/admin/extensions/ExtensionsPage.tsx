@@ -3,7 +3,7 @@ import { IconPlus } from '@tabler/icons-react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useApi } from 'src/api';
 import { BucketDto, ExtensionDto } from 'src/api/generated';
@@ -23,7 +23,19 @@ export function ExtensionsPage() {
 
   const configurationParam = useParams<'id'>();
   const configurationId = +configurationParam.id!;
-  const [toCreate, setToCreate] = useState<boolean>();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const toCreate = searchParams.get('add-extension') === 'true';
+
+  const setToCreate = (value: boolean) => {
+    const newParams = new URLSearchParams(searchParams);
+    if (value) {
+      newParams.set('add-extension', 'true');
+    } else {
+      newParams.delete('add-extension');
+    }
+    setSearchParams(newParams);
+  };
   const [toUpdate, setToUpdate] = useState<ExtensionDto | null>();
   const { extensions, specs, removeExtension, setExtension, setExtensions } = useExtensionsStore();
 
