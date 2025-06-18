@@ -128,7 +128,13 @@ export function ExtensionsPage() {
         <div className="flex flex-col gap-2">
           <h3 className="text-xl">{texts.extensions.typeModels}</h3>
 
-          {numModels === 0 && isFetched && <Alert text={texts.extensions.warningNoModel} />}
+          {numModels === 0 && isFetched && (
+            <Alert text={texts.extensions.warningNoModel}>
+              <Button color="red" variant="light" size="compact-xs" mt="sm" onClick={() => setToCreate(true)}>
+                {texts.extensions.add}
+              </Button>
+            </Alert>
+          )}
 
           {numModels > 1 && isFetched && <Alert text={texts.extensions.warningTooManyModels} />}
 
