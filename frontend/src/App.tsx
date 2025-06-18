@@ -20,7 +20,7 @@ import { InAppDocsProvider } from './components/InAppDocsProvider';
 import { MantineThemeProvider } from './components/MantineThemeProvider';
 import { RouteWhenLoggedOut } from './components/RouteWhenLoggedOut';
 import { AdminPage } from './pages/admin/AdminPage';
-import { ChatPage } from './pages/chat/ChatPage';
+import { ChatOrWelcomePage } from './pages/chat/ChatOrWelcomePage';
 import { LoginPage } from './pages/login/LoginPage';
 import { i18next } from './texts/i18n';
 
@@ -61,7 +61,7 @@ export function App() {
                           path="/chat/*"
                           element={
                             <RouteWhenPrivate>
-                              <ChatPage />
+                              <ChatOrWelcomePage />
                             </RouteWhenPrivate>
                           }
                         />
