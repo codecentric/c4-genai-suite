@@ -16,18 +16,3 @@ jobs:
         uses: actions/dependency-review-action@v4
         with:
           config-file: './.github/dependency-review-config.yaml'
-
-  quality-gate:
-    runs-on: ubuntu-latest
-    needs:
-      - dependency-review
-    if: always()
-    steps:
-      - name: All tests ok
-        if: ${{ !(contains(needs.*.result, 'failure')) }}
-        run: exit 0
-        working-directory: .
-      - name: Some tests failed
-        if: ${{ contains(needs.*.result, 'failure') }}
-        run: exit 1
-        working-directory: .

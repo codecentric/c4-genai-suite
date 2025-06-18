@@ -34,19 +34,3 @@ jobs:
           diff README_original.md README.md
           diff values_original.schema.json values.schema.json
         working-directory: helm-chart
-
-  quality-gate:
-    runs-on: ubuntu-latest
-    needs:
-      - unittest
-      - verify-readme-and-schema-are-up-tp-date
-    if: always()
-    steps:
-      - name: All tests ok
-        if: ${{ !(contains(needs.*.result, 'failure')) }}
-        run: exit 0
-        working-directory: .
-      - name: Some tests failed
-        if: ${{ contains(needs.*.result, 'failure') }}
-        run: exit 1
-        working-directory: .
