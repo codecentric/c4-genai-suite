@@ -1,17 +1,47 @@
+import { UseMutationResult } from '@tanstack/react-query';
 import { screen } from '@testing-library/react';
 import { addDays, startOfDay } from 'date-fns';
 import { describe, expect, it, vi } from 'vitest';
 import { ConversationDto } from 'src/api';
 import { render } from 'src/pages/admin/test-utils';
-import { Conversations } from 'src/pages/chat/Conversations';
-import { useAIConversation } from 'src/pages/chat/state';
+import { useStateOfConversations } from 'src/pages/chat/state';
+import { ConversationItems } from './ConversationItems';
 
 vi.mock('src/api', () => ({
   useApi: () => ({}),
 }));
 
+function mockMutation<TData = unknown, TVariables = void>(): UseMutationResult<TData, Error, TVariables, unknown> {
+  return {
+    data: undefined,
+    error: null,
+    isError: false,
+    isIdle: true,
+    isPaused: false,
+    isSuccess: false,
+    status: 'idle',
+    mutate: vi.fn(),
+    mutateAsync: vi.fn(),
+    reset: vi.fn(),
+    variables: undefined,
+    context: undefined,
+    failureCount: 0,
+    failureReason: null,
+    isPending: false,
+    submittedAt: 0,
+  };
+}
+
 vi.mock('src/pages/chat/state', () => ({
-  useAIConversation: vi.fn(),
+  useStateOfSelectedConversationId: vi.fn(),
+  useStateOfConversations: vi.fn(),
+  useListOfChats: vi.fn(),
+  useStateMutateRenameConversation: mockMutation,
+  useStateMutateRemoveConversation: mockMutation,
+  useMutateNewConversation: vi.fn(),
+  useStateMutateRemoveAllConversations: mockMutation,
+  useStateMutateDuplicateConversation: mockMutation,
+  useStateOfConversationEmptiness: vi.fn(),
 }));
 
 describe('Conversations', () => {
@@ -26,16 +56,9 @@ describe('Conversations', () => {
   ];
 
   it('should render conversations components sorted by date', () => {
-    vi.mocked(useAIConversation).mockImplementation(() => ({
-      conversations: mockedConversations,
-      removeConversation: vi.fn(),
-      setConversation: vi.fn(),
-      setConversations: vi.fn(),
-      sendMessage: vi.fn(),
-      refetch: vi.fn(),
-    }));
+    vi.mocked(useStateOfConversations).mockImplementation(() => mockedConversations);
 
-    render(<Conversations onConversationDeleted={() => undefined} selectedConversationId={null} />);
+    render(<ConversationItems />);
 
     const todayElement = screen.getByText('Today');
     const previous7DaysElement = screen.getByText('Previous 7 Days');

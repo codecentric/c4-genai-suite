@@ -1,36 +1,20 @@
 import { ActionIcon, Select, SelectProps, Text } from '@mantine/core';
 import { IconSettings } from '@tabler/icons-react';
-import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
-import { ConfigurationDto, ConversationDto, UpdateConversationDto, useApi } from 'src/api';
+import { ConfigurationDto, ConversationDto } from 'src/api';
 import { ConfigurationUserValuesModal } from 'src/pages/chat/conversation/ConfigurationUserValuesModal';
 import { isMobile } from 'src/pages/utils';
+import { useStateMutateConversation } from '../state';
 
 interface ConfigurationProps {
   conversation: ConversationDto;
   configuration: ConfigurationDto;
   configurations: ConfigurationDto[];
   canEditConfiguration?: boolean;
-  onConversationChange: (conversation: ConversationDto) => void;
 }
 
-export const Configuration = ({
-  canEditConfiguration,
-  conversation,
-  configuration,
-  configurations,
-  onConversationChange,
-}: ConfigurationProps) => {
-  const api = useApi();
-
-  const updating = useMutation({
-    mutationFn: (request: UpdateConversationDto) => {
-      return api.conversations.patchConversation(conversation.id, request);
-    },
-    onSuccess: (result) => {
-      onConversationChange(result);
-    },
-  });
+export const Configuration = ({ canEditConfiguration, conversation, configuration, configurations }: ConfigurationProps) => {
+  const updateConversation = useStateMutateConversation(conversation.id);
 
   const [showModal, setShowModal] = useState(false);
 
@@ -52,7 +36,7 @@ export const Configuration = ({
         radius={'md'}
         comboboxProps={{ radius: 'md' }}
         renderOption={renderSelectOption}
-        onChange={(value) => value && updating.mutate({ configurationId: +value })}
+        onChange={(value) => value && updateConversation.mutate({ configurationId: +value })}
         value={configuration?.id + ''}
         data={configurations.map((c) => ({ value: c.id + '', label: c.name }))}
         disabled={!canEditConfiguration}

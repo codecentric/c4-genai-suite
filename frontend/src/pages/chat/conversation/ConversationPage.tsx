@@ -3,14 +3,13 @@ import { IconArrowDown } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useMemo } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { useNavigate, useParams } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import { FileDto, ResponseError, useApi } from 'src/api';
+import { useParams } from 'react-router-dom';
+import { FileDto, useApi } from 'src/api';
 import { useEventCallback, useTheme } from 'src/hooks';
 import { cn } from 'src/lib';
 import { texts } from 'src/texts';
 import { useScrollToBottom } from '../../../hooks/useScrollToBottom';
-import { useAIConversation, useChatStore } from '../state';
+import { useChatStream, useStateOfConversation, useStateOfIsAiWritting, useStateOfMessages } from '../state';
 import { useChatDropzone } from '../useChatDropzone';
 import { ChatHistory } from './ChatHistory';
 import { ChatInput } from './ChatInput';
@@ -21,66 +20,31 @@ import { DragAndDropLayout } from './DragAndDropLayout/DragAndDropLayout';
 const transformMimeTypes = (mimeTypes: string[]) => Object.fromEntries(mimeTypes.map((type) => [type, []]));
 
 interface ConversationPageProps {
+  textareaRef: React.RefObject<HTMLTextAreaElement>;
   onConfigurationSelected: (configurationId: number) => void;
-  onConversationSelected: (conversationId: number) => void;
   selectedConfigurationId: number;
   selectDocument: (conversationId: number, messageId: number, documentUri: string) => void;
 }
 
 export function ConversationPage(props: ConversationPageProps) {
-  const { onConversationSelected, selectedConfigurationId, onConfigurationSelected, selectDocument } = props;
-  const api = useApi();
+  const { textareaRef, selectedConfigurationId, onConfigurationSelected, selectDocument} = props;
 
-  const { theme } = useTheme();
+  const api = useApi();
   const conversationParam = useParams<'id'>();
   const conversationId = +conversationParam.id!;
-  const { conversation, messages, isAiWritting, setConversation, setMessages } = useChatStore();
-  const { canScrollToBottom, scrollToBottom, containerRef } = useScrollToBottom([conversation.id], [messages]);
-  const { sendMessage } = useAIConversation();
-  const navigate = useNavigate();
+  const { sendMessage, isConversationLoading } = useChatStream(conversationId);
+  const conversation = useStateOfConversation();
+  const messages = useStateOfMessages();
+  const isAiWritting = useStateOfIsAiWritting();
 
-  const { data: loadedConversationAndMessages, error } = useQuery({
-    queryKey: ['conversation', conversationId],
-    queryFn: async () => {
-      return {
-        conversation: await api.conversations.getConversation(conversationId),
-        messages: await api.conversations.getMessages(conversationId),
-      };
-    },
-    refetchOnWindowFocus: false,
-    retry: (failureCount, error: ResponseError) =>
-      // if we receive 404 or 403 from the server, then don't retry. Otherwise retry 3 times (default behavior).
-      error?.response?.status !== 404 && error?.response?.status !== 403 && failureCount < 3,
-  });
-  useEffect(() => {
-    if (error) {
-      if (error.response.status === 403) {
-        toast.error(texts.chat.noAccessToConversation);
-        void navigate('/chat');
-      } else if (error.response.status === 404) {
-        toast.error(texts.chat.conversationNotFound);
-        void navigate('/chat');
-      } else {
-        toast.error(`${texts.chat.errorLoadingMessagesOrConversation} ${texts.common.reloadAndTryAgain}`);
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [error]);
+  const { theme } = useTheme();
+  const { canScrollToBottom, scrollToBottom, containerRef } = useScrollToBottom([conversation.id], [messages]);
 
   const { data: loadedConfigurations } = useQuery({
     queryKey: ['enabled-configurations'],
     queryFn: () => api.extensions.getConfigurations(true),
     refetchOnWindowFocus: false,
   });
-
-  useEffect(() => {
-    if (loadedConversationAndMessages) {
-      setMessages(loadedConversationAndMessages.messages.items);
-      setConversation(loadedConversationAndMessages.conversation);
-      onConversationSelected(loadedConversationAndMessages.conversation.id);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loadedConversationAndMessages, setConversation]);
 
   const configurations = useMemo(() => {
     return loadedConfigurations?.items || [];
@@ -124,10 +88,7 @@ export function ConversationPage(props: ConversationPageProps) {
     noClick: true,
   });
 
-  const isConversationLoading =
-    !conversation || conversation.id !== conversationId || conversation.id !== loadedConversationAndMessages?.conversation.id;
-  const showRateThisConversation =
-    loadedConversationAndMessages && !loadedConversationAndMessages?.conversation?.rating && messages.length > 10;
+  const showRateThisConversation = !isConversationLoading && !conversation.rating && messages.length > 10;
   const showScrollToBottomButton = canScrollToBottom && !isAiWritting;
   return (
     <div className={'relative mx-auto flex flex-col pb-2'} style={{ height: 'calc(100vh - 48px)' }} {...getRootProps()}>
@@ -144,7 +105,6 @@ export function ConversationPage(props: ConversationPageProps) {
           conversation={conversation}
           configuration={configuration}
           configurations={configurations}
-          onConversationChange={setConversation}
         />
       </div>
       {isConversationLoading ? (
@@ -178,6 +138,7 @@ export function ConversationPage(props: ConversationPageProps) {
               )}
             >
               <ChatInput
+                textareaRef={textareaRef}
                 conversationId={conversation.id}
                 configuration={configuration}
                 isDisabled={isAiWritting}
@@ -202,7 +163,7 @@ export function ConversationPage(props: ConversationPageProps) {
                   showRateThisConversation ? 'fade-in opacity-100 delay-200' : 'hidden opacity-0',
                 )}
               >
-                <ConversationRating key={conversationId} conversation={loadedConversationAndMessages.conversation} />
+                <ConversationRating key={conversationId} conversation={conversation} />
               </div>
             </div>
           </div>
