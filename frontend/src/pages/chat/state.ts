@@ -1,5 +1,7 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { Observable } from 'rxjs';
 import { create } from 'zustand';
 import {
@@ -7,12 +9,19 @@ import {
   ConversationDto,
   FileDto,
   MessageDto,
+  MessageDtoRatingEnum,
+  ResponseError,
   SourceDto,
   StreamEventDto,
   StreamMessageSavedDtoMessageTypeEnum,
   StreamUIRequestDto,
+  UpdateConversationDto,
   useApi,
 } from 'src/api';
+import { useTransientContext, useTransientNavigate } from 'src/hooks';
+import { buildError } from 'src/lib';
+import { texts } from 'src/texts';
+import { useUserBucket } from './useUserBucket';
 
 type MessageMetaInfoState = {
   toolsInUse: Record<string, 'Started' | 'Completed'>;
@@ -31,16 +40,164 @@ const getMessagePlaceholderId = (messageType: StreamMessageSavedDtoMessageTypeEn
 
 export type ChatMessage = MessageDto & Partial<MessageMetaInfoState>;
 
-export const useAIConversation = () => {
+export const useMutateNewConversation = () => {
   const api = useApi();
-  const conversationStore = useConversationsStore();
+  const context = useTransientContext();
+  const navigate = useTransientNavigate();
+  const { selectedConfigurationId } = useUserBucket();
+  const { data: loadedConfigurations } = useQuery({
+    queryKey: ['enabled-configurations'],
+    queryFn: () => api.extensions.getConfigurations(true),
+    refetchOnWindowFocus: false,
+  });
+
+  return useMutation({
+    mutationFn: () =>
+      api.conversations.postConversation({
+        configurationId: loadedConfigurations?.items.find((x) => x.id === selectedConfigurationId)?.id,
+        context,
+      }),
+    onSuccess: (conversation) => {
+      navigate(`/chat/${conversation.id}`);
+    },
+  });
+};
+
+export const useStateMutateConversation = (conversationId: number) => {
+  const api = useApi();
+  const setConversation = useChatStore((s) => s.setConversation);
+
+  return useMutation({
+    mutationFn: (conversionUpdate: UpdateConversationDto) => {
+      return api.conversations.patchConversation(conversationId, conversionUpdate);
+    },
+    onSuccess: (conversation) => {
+      setConversation(conversation);
+    },
+  });
+};
+
+export const useStateMutateMessageRating = (messageId: number) => {
+  const api = useApi();
+  const selectedConversationId = useListOfChatsStore((s) => s.selectedConversationId);
+  const updateMessage = useChatStore((s) => s.updateMessage);
+
+  return useMutation({
+    mutationFn: async (rating: MessageDtoRatingEnum) => {
+      if (selectedConversationId) {
+        await api.conversations.rateMessage(selectedConversationId, messageId, { rating });
+      }
+    },
+    onSuccess: (_, rating) => {
+      updateMessage(messageId, { rating });
+    },
+  });
+};
+
+export const useStateMutateDuplicateConversation = () => {
+  const api = useApi();
+  const refetchListOfChats = useListOfChatsStore((s) => s.refetch);
+
+  return useMutation({
+    mutationFn: (id: number) => api.conversations.duplicateConversation(id),
+    onSuccess: () => {
+      refetchListOfChats();
+      toast.success(texts.chat.duplicateConversationSuccess);
+    },
+    onError: async () => {
+      toast.error(await buildError(texts.chat.duplicateConversationFailed));
+    },
+  });
+};
+
+export const useStateMutateRemoveAllConversations = () => {
+  const api = useApi();
+  const setSelectedConversationId = useListOfChatsStore((s) => s.setSelectedConversationId);
+  const setConversations = useListOfChatsStore((s) => s.setConversations);
+  const createNewConversation = useMutateNewConversation();
+
+  return useMutation({
+    mutationFn: () => api.conversations.deleteConversations(),
+    onSuccess: () => {
+      setSelectedConversationId(null); // this may not even be needed due to next line
+      setConversations([]);
+      createNewConversation.mutate();
+    },
+    onError: async (error) => {
+      toast.error(await buildError(texts.chat.clearConversationsFailed, error));
+    },
+  });
+};
+
+export const useStateMutateRemoveConversation = () => {
+  const api = useApi();
+  const setSelectedConversationId = useListOfChatsStore((s) => s.setSelectedConversationId);
+  const selectedConversationId = useListOfChatsStore((s) => s.selectedConversationId);
+  const removeConversation = useListOfChatsStore((s) => s.removeConversation);
+  const createNewConversation = useMutateNewConversation();
+
+  return useMutation({
+    mutationFn: (id: number) => api.conversations.deleteConversation(id),
+    onSuccess: (_, deletedId) => {
+      removeConversation(deletedId);
+      if (deletedId === selectedConversationId) {
+        setSelectedConversationId(null); // this may not even be needed due to next line
+        createNewConversation.mutate();
+      }
+    },
+    onError: async () => {
+      toast.error(await buildError(texts.chat.removeConversationFailed, texts.common.reloadAndTryAgain));
+    },
+  });
+};
+
+export const useStateMutateRenameConversation = () => {
+  const api = useApi();
+  const setConversation = useListOfChatsStore((s) => s.setConversation);
+
+  return useMutation({
+    mutationFn: ({ conversation, name }: { conversation: ConversationDto; name: string }) =>
+      api.conversations.patchConversation(conversation.id, { name, isNameSetManually: true }),
+    onSuccess: (conversation) => {
+      setConversation(conversation);
+    },
+    onError: async () => {
+      toast.error(await buildError(texts.chat.renameConversationFailed, texts.common.reloadAndTryAgain));
+    },
+  });
+};
+
+/**
+ * @description returns a function that is true if the conversion id provided
+ * points to an empty conversion.
+ **/
+export const useStateOfConversationEmptiness = () => {
+  const api = useApi();
+  const conversations = useListOfChatsStore((s) => s.conversations);
+  return async (id: number) => {
+    const valueToCheckIfEmpty = conversations.some((c) => c.id === id).valueOf();
+    console.log({ valueToCheckIfEmpty }); // check if api call needed
+    const { items } = await api.conversations.getMessages(id);
+    return items.length === 0;
+  };
+};
+
+/**
+ * @description Initially loads the list of all known conversations to make it
+ * available in global state.
+ **/
+export const useListOfChatsInit = () => {
+  const api = useApi();
+  const setConversations = useListOfChatsStore((s) => s.setConversations);
+  const setRefetchFn = useListOfChatsStore((s) => s.setRefetchFn);
+
   const initialQueryGetConversations = useQuery({
     queryKey: ['conversations'],
     queryFn: () => api.conversations.getConversations(),
   });
 
   useEffect(() => {
-    if (initialQueryGetConversations.data) conversationStore.setConversations(initialQueryGetConversations.data.items);
+    if (initialQueryGetConversations.data) setConversations(initialQueryGetConversations.data.items);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialQueryGetConversations.data]);
 
@@ -48,86 +205,9 @@ export const useAIConversation = () => {
     const refetchFn = () => {
       void initialQueryGetConversations.refetch();
     };
-    conversationStore.setRefetchFn(refetchFn);
+    setRefetchFn(refetchFn);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialQueryGetConversations.refetch]);
-
-  const { getStream, addMessage, setIsAiWritting, appendLastMessage, updateLastMessage, updateMessage, setMessages, messages } =
-    useChatStore_();
-  return {
-    setConversations: conversationStore.setConversations,
-    setConversation: conversationStore.setConversation,
-    removeConversation: conversationStore.removeConversation,
-    conversations: conversationStore.conversations,
-    refetch: conversationStore.refetch,
-    sendMessage: (conversationId: number, input: string, files?: FileDto[], editMessageId?: number) => {
-      if (editMessageId) {
-        setMessages(messages.filter((message) => message.id > 0 && message.id < editMessageId));
-      }
-
-      addMessage({
-        type: 'human',
-        content: [{ type: 'text', text: input }],
-        id: editMessageId ?? getMessagePlaceholderId('human'),
-      });
-      addMessage({ type: 'ai', content: [{ type: 'text', text: '' }], id: getMessagePlaceholderId('ai') });
-      setIsAiWritting(true);
-
-      getStream(conversationId, input, files, api, editMessageId).subscribe({
-        next: (msg) => {
-          if (msg.type === 'error' || msg.type === 'completed') setIsAiWritting(false);
-
-          switch (msg.type) {
-            case 'chunk': {
-              const chunk = msg.content[0];
-              if (chunk.type === 'text') appendLastMessage(chunk.text);
-              if (chunk.type === 'image_url') appendLastMessage(`![image](${chunk.image.url})`);
-              // We should try to handle all image_url to markdown conversions
-              // within the c4 backend in the future.
-              // E.g. the c4 dall-e tool sends images as markdown right away already.
-              return;
-            }
-            case 'tool_start':
-              return updateLastMessage((oldMessage) => ({
-                toolsInUse: { ...oldMessage.toolsInUse, [msg.tool.name]: 'Started' },
-              }));
-            case 'tool_end':
-              return updateLastMessage((oldMessage) => ({
-                toolsInUse: { ...oldMessage.toolsInUse, [msg.tool.name]: 'Completed' },
-              }));
-            // We should think about renaming the 'debug' case below, because it mostly shows the sources of files
-            // (also maybe files should not be sent as markdown ...) // added sources case - should replace the debug in the future
-            // debug will be replaced by sources. debug stays as a fallback for now but can be removed as soon as RAG servers are not in use anymore
-            case 'debug':
-              return updateLastMessage((oldMessage) => ({ debug: [...(oldMessage.debug || []), msg.content] }));
-            case 'sources':
-              return updateLastMessage((oldMessage) => ({ sources: [...(oldMessage.sources || []), ...msg.content] }));
-            case 'logging':
-              return updateLastMessage((oldMessage) => ({ logging: [...(oldMessage.logging || []), msg.content] }));
-            case 'error':
-              return updateLastMessage({ error: msg.message });
-            case 'completed':
-              return updateLastMessage({ tokenCount: msg.metadata.tokenCount });
-            case 'saved':
-              return updateMessage(getMessagePlaceholderId(msg.messageType), { id: msg.messageId });
-            case 'ui':
-              return updateLastMessage({ ui: msg.request });
-            case 'summary':
-              conversationStore.refetch();
-          }
-        },
-        error: (error: string | Error) => {
-          const message = error instanceof Error ? error.message : error;
-          updateLastMessage({ error: message });
-          setIsAiWritting(false);
-        },
-        complete: () => {
-          conversationStore.refetch();
-          setIsAiWritting(false);
-        },
-      });
-    },
-  };
 };
 
 type ChatState = {
@@ -153,9 +233,10 @@ type ChatState = {
   ) => Observable<StreamEventDto>;
 };
 
-// If useChatStore uses Zustand, there is no need to pass it down to components.
-// Every call of a Zustand hook will give access to the same state!
-const useChatStore_ = create<ChatState>()((set) => {
+/**
+ * Contains everything that is part of the currently open conversion.
+ **/
+const useChatStore = create<ChatState>()((set) => {
   return {
     conversation: { id: 0, configurationId: -1, createdAt: new Date() },
     messages: [],
@@ -202,19 +283,9 @@ const useChatStore_ = create<ChatState>()((set) => {
   };
 });
 
-/**
- * @deprecated Using Zustand hooks directly in ui-components is deprecated. Use
- * other hooks to wrap the Zustand hook instead. We want hooks to have
- * interfaces that fit our domains terminology. E.g. useAIConversation exports
- * a function called sendMessage, which will talk to the LLM and update the
- * messages internally. No separate call to a Zustand hook has to be made in
- * order to update messages after using sendMessage. An ideal version of the
- * useAIConversation hook exports only actions like sendMessage and states like
- * messages, but no setters.
- **/
-export const useChatStore = useChatStore_;
-
-type ConversationsState = {
+type ListOfChatsState = {
+  selectedConversationId: null | number;
+  setSelectedConversationId: (id: null | number) => void;
   conversations: ConversationDto[];
   setConversations: (conversations: ConversationDto[]) => void;
   setConversation: (conversation: ConversationDto) => void;
@@ -223,7 +294,13 @@ type ConversationsState = {
   setRefetchFn: (refetchFn: VoidFunction) => void;
 };
 
-const useConversationsStore = create<ConversationsState>()((set) => ({
+/**
+ * This is the list of all conversions a user has access to, since he created
+ * them at some point in the past.
+ **/
+const useListOfChatsStore = create<ListOfChatsState>()((set) => ({
+  selectedConversationId: null,
+  setSelectedConversationId: (id: null | number) => set({ selectedConversationId: id }),
   conversations: [],
   setConversations: (conversations) => set({ conversations }),
   setConversation: (conversation) =>
@@ -240,3 +317,121 @@ const useConversationsStore = create<ConversationsState>()((set) => ({
   refetch: () => {},
   setRefetchFn: (refetch) => set({ refetch }),
 }));
+
+export const useChatStream = (conversationId: number) => {
+  const api = useApi();
+  const navigate = useNavigate();
+  const chatStore = useChatStore();
+  const listOfChatsStore = useListOfChatsStore();
+
+  const {
+    isLoading: isConversationLoading,
+    data: loadedConversationAndMessages,
+    error,
+  } = useQuery({
+    queryKey: ['conversation', conversationId],
+    queryFn: async () => {
+      return {
+        conversation: await api.conversations.getConversation(conversationId),
+        messages: await api.conversations.getMessages(conversationId),
+      };
+    },
+    refetchOnWindowFocus: false,
+    retry: (failureCount, error: ResponseError) =>
+      // if we receive 404 or 403 from the server, then don't retry. Otherwise retry 3 times (default behavior).
+      error?.response?.status !== 404 && error?.response?.status !== 403 && failureCount < 3,
+  });
+  useEffect(() => {
+    if (error) {
+      if (error.response.status === 403) {
+        toast.error(texts.chat.noAccessToConversation);
+        void navigate('/chat');
+      } else if (error.response.status === 404) {
+        toast.error(texts.chat.conversationNotFound);
+        void navigate('/chat');
+      } else {
+        toast.error(`${texts.chat.errorLoadingMessagesOrConversation} ${texts.common.reloadAndTryAgain}`);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [error]);
+
+  useEffect(() => {
+    if (loadedConversationAndMessages) {
+      chatStore.setMessages(loadedConversationAndMessages.messages.items);
+      chatStore.setConversation(loadedConversationAndMessages.conversation);
+      listOfChatsStore.setSelectedConversationId(loadedConversationAndMessages.conversation.id);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loadedConversationAndMessages, chatStore.setConversation]);
+
+  const sendMessage = (conversationId: number, input: string, files?: FileDto[], editMessageId?: number) => {
+    if (editMessageId) {
+      chatStore.setMessages(chatStore.messages.filter((message) => message.id > 0 && message.id < editMessageId));
+    }
+
+    chatStore.addMessage({
+      type: 'human',
+      content: [{ type: 'text', text: input }],
+      id: editMessageId ?? getMessagePlaceholderId('human'),
+    });
+    chatStore.addMessage({ type: 'ai', content: [{ type: 'text', text: '' }], id: getMessagePlaceholderId('ai') });
+    chatStore.setIsAiWritting(true);
+
+    chatStore.getStream(conversationId, input, files, api, editMessageId).subscribe({
+      next: (msg) => {
+        if (msg.type === 'error' || msg.type === 'completed') chatStore.setIsAiWritting(false);
+
+        switch (msg.type) {
+          case 'chunk': {
+            const chunk = msg.content[0];
+            if (chunk.type === 'text') chatStore.appendLastMessage(chunk.text);
+            if (chunk.type === 'image_url') chatStore.appendLastMessage(`![image](${chunk.image.url})`);
+            return;
+          }
+          case 'tool_start':
+            return chatStore.updateLastMessage((oldMessage) => ({
+              toolsInUse: { ...oldMessage.toolsInUse, [msg.tool.name]: 'Started' },
+            }));
+          case 'tool_end':
+            return chatStore.updateLastMessage((oldMessage) => ({
+              toolsInUse: { ...oldMessage.toolsInUse, [msg.tool.name]: 'Completed' },
+            }));
+          case 'debug':
+            return chatStore.updateLastMessage((oldMessage) => ({ debug: [...(oldMessage.debug || []), msg.content] }));
+          case 'sources':
+            return chatStore.updateLastMessage((oldMessage) => ({ sources: [...(oldMessage.sources || []), ...msg.content] }));
+          case 'logging':
+            return chatStore.updateLastMessage((oldMessage) => ({ logging: [...(oldMessage.logging || []), msg.content] }));
+          case 'error':
+            return chatStore.updateLastMessage({ error: msg.message });
+          case 'completed':
+            return chatStore.updateLastMessage({ tokenCount: msg.metadata.tokenCount });
+          case 'saved':
+            return chatStore.updateMessage(getMessagePlaceholderId(msg.messageType), { id: msg.messageId });
+          case 'ui':
+            return chatStore.updateLastMessage({ ui: msg.request });
+          case 'summary':
+            listOfChatsStore.refetch();
+        }
+      },
+      error: (error: string | Error) => {
+        const message = error instanceof Error ? error.message : error;
+        chatStore.updateLastMessage({ error: message });
+        chatStore.setIsAiWritting(false);
+      },
+      complete: () => {
+        listOfChatsStore.refetch();
+        chatStore.setIsAiWritting(false);
+      },
+    });
+  };
+
+  return { sendMessage, isConversationLoading };
+};
+
+export const useStateOfConversation = () => useChatStore((s) => s.conversation);
+export const useStateOfMessages = () => useChatStore((s) => s.messages);
+export const useStateOfIsAiWritting = () => useChatStore((s) => s.isAiWritting);
+export const useStateOfSelectedConversationId = () => useListOfChatsStore((s) => s.selectedConversationId);
+export const useStateOfConversations = () => useListOfChatsStore((s) => s.conversations);
