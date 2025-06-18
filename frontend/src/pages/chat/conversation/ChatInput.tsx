@@ -24,13 +24,14 @@ import {
 } from './chat-input-utils';
 
 interface ChatInputProps {
+  textareaRef?: React.RefObject<HTMLTextAreaElement>;
   configuration?: ConfigurationDto;
   conversationId: number;
   isDisabled?: boolean;
   isEmpty?: boolean;
   onSubmit: (input: string, files?: FileDto[]) => void;
 }
-export function ChatInput({ conversationId, configuration, isDisabled, isEmpty, onSubmit }: ChatInputProps) {
+export function ChatInput({ textareaRef, conversationId, configuration, isDisabled, isEmpty, onSubmit }: ChatInputProps) {
   const api = useApi();
   const extensionsWithFilter = configuration?.extensions?.filter(isExtensionWithUserArgs) ?? [];
   const { updateContext, context } = useExtensionContext(conversationId);
@@ -72,14 +73,13 @@ export function ChatInput({ conversationId, configuration, isDisabled, isEmpty, 
     setDefaultValues(defaultValues ?? {});
   }, [configuration?.extensions]);
 
-  const textarea = useRef<HTMLTextAreaElement>(null);
   const { theme } = useTheme();
   const [input, setInput] = useState('');
   const [showFilter, setShowFilter] = useState(false);
 
   useEffect(() => {
-    textarea.current?.focus();
-  }, [conversationId]);
+    textareaRef?.current?.focus();
+  }, [conversationId, textareaRef]);
 
   const contextWithDefaults = context ?? defaultValues;
   const extensionFilterChips = extensionsWithFilter.map((extension) => ({
@@ -235,7 +235,7 @@ export function ChatInput({ conversationId, configuration, isDisabled, isEmpty, 
               onChange={doSetInput}
               onKeyDown={doKeyDown}
               placeholder={texts.chat.placeholder(configuration?.name ?? '')}
-              ref={textarea}
+              ref={textareaRef}
             />
             <div className="flex w-full justify-between gap-2">
               <div className="flex items-center gap-2">

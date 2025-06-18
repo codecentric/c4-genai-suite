@@ -14,16 +14,7 @@ import { AiAvatar } from './AiAvatar';
 import { ChatItemProps } from './ChatItemProps';
 import { ChatItemUI } from './ChatItemUI';
 
-export const AIChatItem = ({
-  agentName,
-  conversationId,
-  message,
-  isWriting,
-  isLast,
-  user,
-  llmLogo,
-  selectDocument,
-}: ChatItemProps) => {
+export const AIChatItem = ({ agentName, message, isWriting, isLast, user, llmLogo, selectDocument, }: ChatItemProps) => {
   const clipboard = useClipboard();
   const api = useApi();
   const { theme } = useTheme();
@@ -60,7 +51,6 @@ export const AIChatItem = ({
       {!isWriting && <ChatItemLogging logging={message.logging || []} />}
       {!(isWriting && isLast) && (
         <AIChatItemActions
-          conversationId={conversationId}
           messageId={message.id}
           copyTextToClipboard={copyTextToClipboard}
           rating={message.rating}
