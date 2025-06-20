@@ -1,18 +1,40 @@
-import { Button } from '@mantine/core';
+import { Button, Checkbox } from '@mantine/core';
 import { IconEdit, IconTrash } from '@tabler/icons-react';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
+import {
+  ColumnDef,
+  ColumnFiltersState,
+  getCoreRowModel,
+  getFacetedMinMaxValues,
+  getFacetedRowModel,
+  getFacetedUniqueValues,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  RowData,
+  useReactTable,
+} from '@tanstack/react-table';
+import { formatDate } from 'date-fns';
+import { useEffect, useMemo, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { BucketDto, BucketDtoTypeEnum, FileDto, useApi } from 'src/api';
-import { ConfirmDialog, Pagingation } from 'src/components';
+import { ConfirmDialog, FilterableTable, Pagingation } from 'src/components';
 import { useEventCallback, useTransientNavigate } from 'src/hooks';
-import { buildError } from 'src/lib';
+import { buildError, formatFileSize } from 'src/lib';
+import { extractType } from 'src/pages/utils';
 import { texts } from 'src/texts';
-import { FileCard } from './FileCard';
 import { UpsertBucketDialog } from './UpsertBucketDialog';
 import { useBucketstore, useFilesStore } from './state';
+
+declare module '@tanstack/react-table' {
+  //allows us to define custom properties for our columns
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  interface ColumnMeta<TData extends RowData, TValue> {
+    filterVariant?: 'text' | 'range' | 'select';
+  }
+}
 
 export function FilesPage() {
   const api = useApi();
@@ -20,7 +42,7 @@ export function FilesPage() {
 
   const bucketParam = useParams<'id'>();
   const bucketId = +bucketParam.id!;
-  const [uploading, setUploading] = useState<File[]>([]);
+  const [_uploading, setUploading] = useState<File[]>([]);
   const [page, setPage] = useState(0);
   const [total, setTotal] = useState(0);
   const { files, removeFile, setFile, setFiles } = useFilesStore();
@@ -29,6 +51,10 @@ export function FilesPage() {
   const [toUpdate, setToUpdate] = useState<boolean>();
   const [thisBucket, setThisBucket] = useState<BucketDto | null>(null);
   const { buckets, removeBucket, setBucket } = useBucketstore();
+
+  //Tanstack Table
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [rowSelection, setRowSelection] = useState({});
 
   const { data: bucket } = useQuery({
     queryKey: ['bucket', bucketId],
@@ -98,14 +124,101 @@ export function FilesPage() {
     onSuccess: (_, bucket) => {
       removeFile(bucket.id);
       setTotal((t) => t - 1);
+      setRowSelection({});
     },
     onError: async (error) => {
       toast.error(await buildError(texts.files.removeFileFailed, error));
     },
   });
 
+  const handleMultiRowDelete = () => {
+    const originalFiles = table.getSelectedRowModel().rows.map((row) => row.original);
+    originalFiles.forEach((file) => deleting.mutate(file));
+  };
+
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop: (files) => files.forEach((file) => upload.mutate(file)),
+  });
+
+  const columns = useMemo<ColumnDef<FileDto, unknown>[]>(
+    () => [
+      {
+        id: 'select',
+        header: ({ table }) => (
+          <Checkbox
+            radius="sm"
+            color="blue"
+            {...{
+              checked: table.getIsAllRowsSelected(),
+              indeterminate: table.getIsSomeRowsSelected(),
+              onChange: table.getToggleAllRowsSelectedHandler(),
+            }}
+          />
+        ),
+        cell: ({ row }) => (
+          <div className="px-0">
+            <Checkbox
+              radius="sm"
+              color="blue"
+              {...{
+                checked: row.getIsSelected(),
+                disabled: !row.getCanSelect(),
+                indeterminate: row.getIsSomeSelected(),
+                onChange: row.getToggleSelectedHandler(),
+              }}
+            />
+          </div>
+        ),
+      },
+      {
+        accessorKey: 'fileName',
+        cell: (info) => info.getValue(),
+        header: () => <span>{`File Name`}</span>,
+        meta: {
+          filterVariant: 'text',
+        },
+      },
+      {
+        accessorKey: 'mimeType',
+        cell: (info) => <span className="badge self-center bg-gray-100">{extractType(info.row.original)}</span>,
+        header: () => <span>{`File Type`}</span>,
+        meta: {
+          filterVariant: 'select',
+        },
+      },
+      {
+        id: 'fileSize',
+        accessorFn: (row) => row.fileSize,
+        cell: (info) => formatFileSize(Number(info.getValue())),
+        header: () => <span>{`File Size`}</span>,
+      },
+      {
+        id: 'uploadedAt',
+        accessorFn: (row) => row.uploadedAt,
+        cell: (info) => formatDate(String(info.getValue()), 'Pp'),
+        header: () => <span>{`Uploaded At`}</span>,
+      },
+    ],
+    [],
+  );
+
+  const table = useReactTable({
+    data: files,
+    columns: columns,
+    state: {
+      columnFilters: columnFilters,
+      rowSelection: rowSelection,
+    },
+    onColumnFiltersChange: setColumnFilters,
+    getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(), //client-side filtering
+    getSortedRowModel: getSortedRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getFacetedRowModel: getFacetedRowModel(), // client-side faceting
+    getFacetedUniqueValues: getFacetedUniqueValues(), // generate unique values for select filter/autocomplete
+    getFacetedMinMaxValues: getFacetedMinMaxValues(), // generate min/max values for range filter,
+    enableRowSelection: true,
+    onRowSelectionChange: setRowSelection,
   });
 
   return (
@@ -164,22 +277,9 @@ export function FilesPage() {
             </div>
           )}
 
-          <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
-            {files.map((file) => (
-              <FileCard key={file.id} file={file} onDelete={deleting.mutate} />
-            ))}
-
-            {uploading.map((file, i) => (
-              <div
-                key={i}
-                className="rounded-box flex h-32 flex-col items-center justify-center gap-2 truncate bg-gray-200 p-8 text-sm text-gray-500"
-              >
-                {texts.files.uploading}
-
-                <div>{file.name}</div>
-              </div>
-            ))}
-          </div>
+          {thisBucket.type !== BucketDtoTypeEnum.Conversation && (
+            <FilterableTable table={table} handleMultiDelete={handleMultiRowDelete} />
+          )}
           <Pagingation page={page} pageSize={pageSize} total={total} onPage={setPage} />
         </div>
       )}
