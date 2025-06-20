@@ -1,15 +1,13 @@
 import { ActionIcon, Alert, Button, Flex } from '@mantine/core';
 import { IconAlertCircle, IconCircleCheck, IconClipboard, IconThumbDown } from '@tabler/icons-react';
-import { useMutation } from '@tanstack/react-query';
 import { useEffect, useRef, useState } from 'react';
-import { MessageDtoRatingEnum, ProfileDto, useApi } from 'src/api';
+import { MessageDtoRatingEnum, ProfileDto } from 'src/api';
 import { Icon } from 'src/components';
 import { cn } from 'src/lib';
 import { texts } from 'src/texts';
-import { useChatStore } from '../../state';
+import { useStateMutateMessageRating } from '../../state';
 
 interface AIChatItemActionsProps {
-  conversationId: number;
   tokenCount?: number;
   messageId: number;
   renderAlways?: boolean;
@@ -30,7 +28,6 @@ const useVisibilityToggle = () => {
 };
 
 export const AIChatItemActions = ({
-  conversationId,
   messageId,
   copyTextToClipboard,
   rating,
@@ -39,19 +36,7 @@ export const AIChatItemActions = ({
   user,
 }: AIChatItemActionsProps) => {
   const scrollTargetRef = useRef<HTMLDivElement>(null);
-  const api = useApi();
-  const { updateMessage } = useChatStore();
-
-  // This query should ideally be moved into the main chat hook (currently in state.ts)
-  const updateRating = useMutation({
-    mutationFn: async (ratingValue: MessageDtoRatingEnum) => {
-      await api.conversations.rateMessage(conversationId, messageId, { rating: ratingValue });
-      return ratingValue;
-    },
-    onSuccess: (response) => {
-      updateMessage(messageId, { rating: response });
-    },
-  });
+  const updateMessageRating = useStateMutateMessageRating(messageId);
 
   const { isVisible: isRatingSelectorVisible, toggleVisibility, setHiddenVisibility } = useVisibilityToggle();
 
@@ -95,8 +80,8 @@ export const AIChatItemActions = ({
 
             <div className="mb-2 text-sm">{texts.chat.ratingHint}</div>
 
-            <div className={cn('flex flex-wrap gap-2', { 'opacity-50': updateRating.status === 'pending' })}>
-              {updateRating.status === 'success' && (
+            <div className={cn('flex flex-wrap gap-2', { 'opacity-50': updateMessageRating.isPending })}>
+              {updateMessageRating.isSuccess && (
                 <Alert
                   variant="light"
                   color="green"
@@ -107,7 +92,7 @@ export const AIChatItemActions = ({
                 >
                   <p>{texts.chat.updateRating.thanksForYourValuableFeedback}</p>
                   <Flex>
-                    <Button variant="light" size="compact-xs" color="green" mt="xs" onClick={updateRating.reset}>
+                    <Button variant="light" size="compact-xs" color="green" mt="xs" onClick={updateMessageRating.reset}>
                       {texts.chat.updateRating.changeResponse}
                     </Button>
                     <Button variant="subtle" size="compact-xs" color="green" mt="xs" onClick={setHiddenVisibility}>
@@ -116,7 +101,7 @@ export const AIChatItemActions = ({
                   </Flex>
                 </Alert>
               )}
-              {updateRating.status === 'error' && updateRating.error instanceof Error && (
+              {updateMessageRating.isError && updateMessageRating.error instanceof Error && (
                 <Alert
                   variant="light"
                   color="red"
@@ -125,24 +110,24 @@ export const AIChatItemActions = ({
                   p="xs"
                   w="100%"
                 >
-                  <p>{updateRating.error.message}</p>
+                  <p>{updateMessageRating.error.message}</p>
                   <Button
                     variant="light"
                     size="compact-xs"
                     color="red"
                     mt="xs"
-                    onClick={() => updateRating.variables && updateRating.mutate(updateRating.variables)}
+                    onClick={() => updateMessageRating.variables && updateMessageRating.mutate(updateMessageRating.variables)}
                   >
                     {texts.chat.updateRating.retry}
                   </Button>
                 </Alert>
               )}
-              {['idle', 'pending'].includes(updateRating.status) &&
+              {['idle', 'pending'].includes(updateMessageRating.status) &&
                 RATINGS.map((ratingOption) => (
                   <button
                     key={ratingOption}
                     className={cn('btn btn-outline btn-sm border-gray-300', { 'bg-gray-200': rating === ratingOption })}
-                    onClick={() => updateRating.mutate(ratingOption)}
+                    onClick={() => updateMessageRating.mutate(ratingOption)}
                   >
                     {texts.chat.rating[ratingOption]}
                   </button>
