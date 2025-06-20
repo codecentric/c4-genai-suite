@@ -1,14 +1,12 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from 'src/domain/users';
-import { FileEntity, FileRepository } from '../../database';
+import { BucketEntity, BucketRepository } from '../../database';
 import { buildClient } from './utils';
 
 export class GetDocumentContent {
   constructor(
-    public readonly user: User,
-    public readonly docId: number,
+    public readonly bucketId: number,
     public readonly chunkIds: string[],
   ) {}
 }
@@ -20,36 +18,28 @@ export class GetDocumentContentResponse {
 @QueryHandler(GetDocumentContent)
 export class GetDocumentContentHandler implements IQueryHandler<GetDocumentContent, GetDocumentContentResponse> {
   constructor(
-    @InjectRepository(FileEntity)
-    private readonly fileRepository: FileRepository,
+    @InjectRepository(BucketEntity)
+    private readonly bucketRepository: BucketRepository,
   ) {}
 
   async execute(query: GetDocumentContent): Promise<GetDocumentContentResponse> {
-    const { user, docId, chunkIds } = query;
+    const { bucketId, chunkIds } = query;
 
-    if (!docId) {
-      throw new BadRequestException('File ID is required');
+    console.log(`getting chunks for bucket ${bucketId} and chunkIds ${chunkIds.join(',')}`);
+
+    if (!chunkIds || chunkIds.length === 0) {
+      throw new BadRequestException('Chunk IDs are required');
     }
 
-    if (!chunkIds || chunkIds.length === 0) throw new BadRequestException('Chunk IDs are required');
-
-    const file = await this.fileRepository.findOne({
-      where: { docId },
-      relations: {
-        bucket: true,
-      },
+    const bucket = await this.bucketRepository.findOneBy({
+      id: bucketId,
     });
-    if (!file) {
-      throw new NotFoundException(`Cannot find a file with docId ${docId} for this user`);
-    }
-    if (file.bucket?.type != 'general' && file.userId != user.id) {
-      throw new NotFoundException(`Cannot find a file with docId ${docId} for this user`);
+    if (!bucket) {
+      throw new NotFoundException(`Cannot find a bucket with id ${bucketId} for this user`);
     }
 
-    const api = file.bucket ? buildClient(file.bucket) : undefined;
-
-    const result = await api?.getDocumentsContent(chunkIds, file.bucket?.indexName);
-
+    const api = buildClient(bucket);
+    const result = await api?.getDocumentsContent(chunkIds, bucket?.indexName);
     return new GetDocumentContentResponse(result ?? []);
   }
 }

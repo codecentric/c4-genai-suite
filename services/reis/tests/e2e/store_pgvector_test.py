@@ -141,7 +141,7 @@ def test_get_documents_content(file_uploader, client):
     # In this case, we have only one chunk for the file
     file_content = content["files"][0]["content"]
 
-    chunk_id = content["sources"][0]["metadata"]["chunk_ids"]
+    chunk_id = content["sources"][0]["chunk"]["uri"]
 
     response_document_content = client.get(
         "/documents/content", params={"chunk_ids": chunk_id, "indexName": OTHER_INDEX_NAME}

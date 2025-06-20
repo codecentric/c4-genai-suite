@@ -10,7 +10,7 @@
     "build-library": "cd ../library && npm run build",
     "prebuild": "npm run build-library",
     "build": "nest build",
-    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "format": "prettier --write \"src/**/*.ts\"",
     "prestart": "npm run build-library",
     "start": "nest start",
     "dev": "nest start",

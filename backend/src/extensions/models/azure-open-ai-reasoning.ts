@@ -1,13 +1,13 @@
 import { CallbackHandlerMethods } from '@langchain/core/callbacks/base';
 import { AzureChatOpenAI } from '@langchain/openai';
 import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from 'src/domain/chat';
-import { Extension, ExtensionConfiguration, ExtensionSpec } from 'src/domain/extensions';
+import { Extension, ExtensionConfiguration, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions';
 import { User } from 'src/domain/users';
 import { I18nService } from '../../localization/i18n.service';
 import { getEstimatedUsageCallback } from './internal/utils';
 
 @Extension()
-export class AzureOpenAIReasoningModelExtension implements Extension {
+export class AzureOpenAIReasoningModelExtension implements Extension<AzureOpenAIReasoningModelExtensionConfiguration> {
   constructor(private readonly i18n: I18nService) {}
 
   get spec(): ExtensionSpec {
@@ -51,15 +51,18 @@ export class AzureOpenAIReasoningModelExtension implements Extension {
     await model.invoke('Just a test call');
   }
 
-  getMiddlewares(_: User, configuration: AzureOpenAIReasoningModelExtensionConfiguration): Promise<ChatMiddleware[]> {
+  getMiddlewares(
+    _user: User,
+    extension: ExtensionEntity<AzureOpenAIReasoningModelExtensionConfiguration>,
+  ): Promise<ChatMiddleware[]> {
     const middleware = {
       invoke: async (context: ChatContext, getContext: GetContext, next: ChatNextDelegate): Promise<any> => {
-        context.llms[this.spec.name] = await context.cache.get(this.spec.name, configuration, () => {
+        context.llms[this.spec.name] = await context.cache.get(this.spec.name, extension.values, () => {
           // The model does not provide the token usage, therefore estimate it.
-          const callbacks = [getEstimatedUsageCallback('azure-open-ai-reasoning', configuration.deploymentName, getContext)];
+          const callbacks = [getEstimatedUsageCallback('azure-open-ai-reasoning', extension.values.deploymentName, getContext)];
 
           // Stream the result token by token to the frontend.
-          return this.createModel(configuration, callbacks, true);
+          return this.createModel(extension.values, callbacks, true);
         });
 
         return next(context);

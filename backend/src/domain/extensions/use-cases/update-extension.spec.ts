@@ -120,6 +120,7 @@ describe(UpdateExtension.name, () => {
           type: 'llm',
         },
         test,
+        getMiddlewares: () => Promise.resolve([]),
       } as Extension;
     });
 

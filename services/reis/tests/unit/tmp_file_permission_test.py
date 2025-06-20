@@ -61,6 +61,7 @@ def test_add_files_read_only(mocker, app, use_unknown_tmp_dir):
             )
         assert response.status_code == 500
 
+
 def test_path_traversal_attack():
     # Test path traversal prevention
     with pytest.raises(ValueError, match="Invalid file path"):

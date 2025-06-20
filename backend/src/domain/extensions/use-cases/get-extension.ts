@@ -2,11 +2,11 @@ import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ExtensionEntity, ExtensionRepository } from 'src/domain/database';
 import { ConfiguredExtension } from '../interfaces';
-import { ExplorerService } from '../services/explorer-service';
+import { ExplorerService } from '../services';
 import { buildExtension } from './utils';
 
 export class GetExtension {
-  constructor(public readonly id: number) {}
+  constructor(public readonly filter: { id?: number } | { externalId?: string }) {}
 }
 
 export class GetExtensionResponse {
@@ -22,9 +22,7 @@ export class GetExtensionHandler implements IQueryHandler<GetExtension, GetExten
   ) {}
 
   async execute(request: GetExtension): Promise<GetExtensionResponse> {
-    const { id } = request;
-
-    const entity = await this.extensions.findOneBy({ id });
+    const entity = await this.extensions.findOneBy(request.filter);
 
     if (!entity) {
       return new GetExtensionResponse();

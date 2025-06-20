@@ -6,7 +6,7 @@ import { MoreThan } from 'typeorm';
 import { z } from 'zod';
 import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from 'src/domain/chat';
 import { CacheEntity, CacheRepository } from 'src/domain/database';
-import { Extension, ExtensionConfiguration, ExtensionSpec } from 'src/domain/extensions';
+import { Extension, ExtensionConfiguration, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions';
 import { User } from 'src/domain/users';
 import { InternalError } from 'src/lib';
 import { I18nService } from '../../localization/i18n.service';
@@ -17,7 +17,7 @@ function isEnum<T>(values?: T[]): values is [T, ...T[]] {
 }
 
 @Extension()
-export class OpenApiExtension implements Extension {
+export class OpenApiExtension implements Extension<OpenApiExtensionConfiguration> {
   private readonly logger = new Logger(OpenApiExtension.name);
 
   constructor(
@@ -60,18 +60,18 @@ export class OpenApiExtension implements Extension {
     }
   }
 
-  async getMiddlewares(user: User, configuration: OpenApiExtensionConfiguration, id: number): Promise<ChatMiddleware[]> {
+  async getMiddlewares(_user: User, extension: ExtensionEntity<OpenApiExtensionConfiguration>): Promise<ChatMiddleware[]> {
     const middleware = {
       invoke: async (context: ChatContext, getContext: GetContext, next: ChatNextDelegate): Promise<any> => {
         try {
-          const tools = await context.cache.get(this.spec.name, configuration, async () => {
-            const api = this.getApi(configuration);
+          const tools = await context.cache.get(this.spec.name, extension.values, async () => {
+            const api = this.getApi(extension.values);
 
             const result: InternalTool[] = [];
             const tools = await api.getTools();
 
             for (const tool of tools.items) {
-              result.push(new InternalTool(this.cache, context, tool, api, context.user, id));
+              result.push(new InternalTool(this.cache, context, tool, api, context.user, extension.externalId));
             }
 
             return result;
@@ -81,7 +81,7 @@ export class OpenApiExtension implements Extension {
             context.tools.push(tool);
           }
         } catch (err) {
-          this.logger.error({ message: 'Failed to invoke tool server at {endpoint}', endpoint: configuration.endpoint }, err);
+          this.logger.error({ message: 'Failed to invoke tool server at {endpoint}', endpoint: extension.values.endpoint }, err);
         }
 
         return next(context);
@@ -131,7 +131,7 @@ class InternalTool extends StructuredTool {
     private readonly tool: ToolDto,
     private readonly api: ToolsApi,
     private readonly user: User,
-    private readonly id: number,
+    private readonly extensionExternalId: string,
   ) {
     super();
 
@@ -160,7 +160,7 @@ class InternalTool extends StructuredTool {
       shape[name] = type;
     }
 
-    this.name = `${tool.name}_${id}`;
+    this.name = `${extensionExternalId}_${tool.name}`;
     this.schema = z.object(shape);
     this.description = tool.description;
     this.displayName = tool.name;
@@ -176,7 +176,7 @@ class InternalTool extends StructuredTool {
     } else if (ui?.type === 'input' && ui.label) {
       const now = new Date();
       // The cached value is specific for this extension and the user.
-      const key = `${this.tool.name}_${this.id}_${this.context.user.id}`;
+      const key = `${this.extensionExternalId}_${this.context.user.id}`;
 
       // Find a cached value which expiration date is in the future.
       const cached = await this.cache.findOneBy({ key, expires: MoreThan(now) });

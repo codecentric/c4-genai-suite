@@ -1,12 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
 import { useApi } from 'src/api';
 
-export const useDocumentContent = (docId: number | undefined, chunkIds: string[]) => {
+export const useDocumentContent = (conversationId: number, messageId: number, documentUri: string) => {
   const api = useApi();
   return useQuery({
-    queryFn: () => api.files.getDocumentContent(docId!, chunkIds),
-    queryKey: ['files', 'document-content', { docId }, { chunkIds }],
-    enabled: docId != null,
+    queryFn: () => api.conversations.getDocumentChunks(conversationId, messageId, documentUri),
+    queryKey: ['files', 'document-content', { messageId }, { documentUri }],
+    enabled: !!documentUri,
   });
 };
 

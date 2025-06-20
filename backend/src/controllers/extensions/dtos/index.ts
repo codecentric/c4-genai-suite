@@ -574,10 +574,12 @@ export class ExtensionUserInfoDto {
     result.description = spec.description;
     result.logo = spec.logo;
     result.name = spec.name;
-    result.title = spec.title;
-    result.type = spec.type;
 
-    for (const [name, arg] of Object.entries(spec.userArguments ?? {})) {
+    const userArguments = spec.userArguments;
+    result.title = userArguments?.title ?? spec.title;
+    result.description = userArguments?.description ?? spec.description;
+
+    for (const [name, arg] of Object.entries(userArguments?.properties ?? {})) {
       result.userArguments[name] = arg;
     }
 

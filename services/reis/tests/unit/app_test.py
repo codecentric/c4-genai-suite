@@ -2,7 +2,6 @@ import pytest
 from fastapi.testclient import TestClient
 from langchain_community.embeddings import FakeEmbeddings
 from langchain_core.documents import Document
-from collections import Counter
 
 from rei_s.services.stores.devnull_store import DevNullStoreAdapter
 
@@ -26,8 +25,13 @@ def test_get_documents_content_without_parameters(client):
 
 
 def test_get_documents_content(mocker, client):
-    mocked_document1 = Document(page_content="test string", metadata={"source": "testfile.pdf", "format": "pdf"})
-    mocked_document2 = Document(page_content="test string 2", metadata={"source": "testfile2.pdf", "format": "pdf"})
+    mocked_document1 = Document(
+        page_content="test string", metadata={"source": "testfile.pdf", "format": "pdf", "mime_type": "application/pdf"}
+    )
+    mocked_document2 = Document(
+        page_content="test string 2",
+        metadata={"source": "testfile2.pdf", "format": "pdf", "mime_type": "application/pdf"},
+    )
     mocked_store = DevNullStoreAdapter()
 
     mocker.patch.object(mocked_store, "get_documents", autospec=True, return_value=[mocked_document1, mocked_document2])
@@ -43,8 +47,13 @@ def test_get_documents_content(mocker, client):
 
 
 def test_get_files(mocker, client):
-    mocked_document1 = Document(page_content="test string", metadata={"source": "testfile.pdf", "format": "pdf"})
-    mocked_document2 = Document(page_content="test string 2", metadata={"source": "testfile2.pdf", "format": "pdf"})
+    mocked_document1 = Document(
+        page_content="test string", metadata={"source": "testfile.pdf", "format": "pdf", "mime_type": "application/pdf"}
+    )
+    mocked_document2 = Document(
+        page_content="test string 2",
+        metadata={"source": "testfile2.pdf", "format": "pdf", "mime_type": "application/pdf"},
+    )
     mocked_store = DevNullStoreAdapter()
     mocker.patch.object(
         mocked_store, "similarity_search", autospec=True, return_value=[mocked_document1, mocked_document2]
@@ -61,9 +70,18 @@ def test_get_files(mocker, client):
 
 
 def test_get_files_sources(mocker, client):
-    mocked_document_a1 = Document(page_content="test string 1", metadata={"source": "testfile.pdf", "format": "pdf"})
-    mocked_document_b1 = Document(page_content="test string 2", metadata={"source": "testfile2.xml", "format": "xml"})
-    mocked_document_c1 = Document(page_content="test string 3", metadata={"source": "testfile3.pdf", "format": "pdf"})
+    mocked_document_a1 = Document(
+        page_content="test string 1",
+        metadata={"source": "testfile.pdf", "format": "pdf", "mime_type": "application/pdf"},
+    )
+    mocked_document_b1 = Document(
+        page_content="test string 2",
+        metadata={"source": "testfile2.xml", "format": "xml", "mime_type": "application/xml"},
+    )
+    mocked_document_c1 = Document(
+        page_content="test string 3",
+        metadata={"source": "testfile3.pdf", "format": "pdf", "mime_type": "application/pdf"},
+    )
     mocked_store = DevNullStoreAdapter()
     mocker.patch.object(
         mocked_store,
@@ -78,26 +96,31 @@ def test_get_files_sources(mocker, client):
 
     content = response.json()
     assert len(content["sources"]) == 3
-    assert content["sources"][0]["metadata"]["format"] == "pdf"
-    assert content["sources"][1]["metadata"]["format"] == "xml"
-    assert content["sources"][2]["metadata"]["format"] == "pdf"
+    assert content["sources"][0]["document"]["mimeType"] == "application/pdf"
+    assert content["sources"][1]["document"]["mimeType"] == "application/xml"
+    assert content["sources"][2]["document"]["mimeType"] == "application/pdf"
 
 
 def test_get_files_sources_page_concat(mocker, client):
     mocked_document_a1 = Document(
-        page_content="test string 1", metadata={"source": "testfile_a.pdf", "format": "pdf", "page": 5}
+        page_content="test string 1",
+        metadata={"source": "testfile_a.pdf", "format": "pdf", "mime_type": "application/pdf", "page": 5},
     )
     mocked_document_a2 = Document(
-        page_content="test string 2", metadata={"source": "testfile_a.pdf", "format": "pdf", "page": "9"}
+        page_content="test string 2",
+        metadata={"source": "testfile_a.pdf", "format": "pdf", "mime_type": "application/pdf", "page": "9"},
     )
     mocked_document_a3 = Document(
-        page_content="test string 3", metadata={"source": "testfile_a.pdf", "format": "pdf", "page": "4"}
+        page_content="test string 3",
+        metadata={"source": "testfile_a.pdf", "format": "pdf", "mime_type": "application/pdf", "page": "4"},
     )
     mocked_document_b1 = Document(
-        page_content="test string 2", metadata={"source": "testfile_b.pdf", "format": "pdf", "page": 109}
+        page_content="test string 2",
+        metadata={"source": "testfile_b.pdf", "format": "pdf", "mime_type": "application/pdf", "page": 109},
     )
     mocked_document_b2 = Document(
-        page_content="test string 3", metadata={"source": "testfile_b.pdf", "format": "pdf", "page": "42"}
+        page_content="test string 3",
+        metadata={"source": "testfile_b.pdf", "format": "pdf", "mime_type": "application/pdf", "page": "42"},
     )
     mocked_store = DevNullStoreAdapter()
     mocker.patch.object(
@@ -118,18 +141,26 @@ def test_get_files_sources_page_concat(mocker, client):
     assert response.status_code == 200
 
     content = response.json()
-    assert len(content["sources"]) == 2
-    assert Counter(content["sources"][0]["metadata"]["pages"]) == Counter(["5", "9", "4"])
-    assert Counter(content["sources"][1]["metadata"]["pages"]) == Counter(["42", "109"])
+    assert len(content["sources"]) == 5
+    assert content["sources"][0]["chunk"]["pages"] == [5]
+    assert content["sources"][1]["chunk"]["pages"] == [9]
+    assert content["sources"][2]["chunk"]["pages"] == [4]
+    assert content["sources"][3]["chunk"]["pages"] == [109]
+    assert content["sources"][4]["chunk"]["pages"] == [42]
 
 
 def test_get_files_sources_no_page(mocker, client):
     mocked_document_a1 = Document(
-        page_content="test string 1", metadata={"source": "testfile_a.pdf", "format": "pdf", "page": "5"}
+        page_content="test string 1",
+        metadata={"source": "testfile_a.pdf", "format": "pdf", "mime_type": "application/pdf", "page": "5"},
     )
-    mocked_document_b1 = Document(page_content="test string 2", metadata={"source": "testfile_b.pdf", "format": "pdf"})
+    mocked_document_b1 = Document(
+        page_content="test string 2",
+        metadata={"source": "testfile_b.pdf", "format": "pdf", "mime_type": "application/pdf"},
+    )
     mocked_document_b2 = Document(
-        page_content="test string 3", metadata={"source": "testfile_b.pdf", "format": "pdf", "page": "another value"}
+        page_content="test string 3",
+        metadata={"source": "testfile_b.pdf", "format": "pdf", "mime_type": "application/pdf", "page": "another value"},
     )
     mocked_store = DevNullStoreAdapter()
     mocker.patch.object(
@@ -148,9 +179,10 @@ def test_get_files_sources_no_page(mocker, client):
     assert response.status_code == 200
 
     content = response.json()
-    assert len(content["sources"]) == 2
-    assert content["sources"][0]["metadata"]["pages"] == ["5"]
-    assert content["sources"][1]["metadata"]["pages"] == []
+    assert len(content["sources"]) == 3
+    assert content["sources"][0]["chunk"]["pages"] == [5]
+    assert content["sources"][1]["chunk"]["pages"] is None
+    assert content["sources"][2]["chunk"]["pages"] is None
 
 
 def test_get_files_no_files(mocker, client):

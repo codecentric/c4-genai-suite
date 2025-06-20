@@ -84,10 +84,6 @@ export class ExecutorMiddleware implements ChatMiddleware {
   private async processResponse(response: AnswerResponseDto, context: ChatContext) {
     const { history, result } = context;
 
-    if (response.debug) {
-      result.next({ type: 'debug', content: response.debug });
-    }
-
     if (response.summary) {
       await this.commandBus.execute(new UpdateConversation(context.conversationId, context.user, { name: response.summary }));
     }

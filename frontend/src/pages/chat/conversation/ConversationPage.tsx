@@ -24,11 +24,11 @@ interface ConversationPageProps {
   onConfigurationSelected: (configurationId: number) => void;
   onConversationSelected: (conversationId: number) => void;
   selectedConfigurationId: number;
-  selectSourceChunkIds: (docId: number, ids: string[]) => void;
+  selectDocument: (conversationId: number, messageId: number, documentUri: string) => void;
 }
 
 export function ConversationPage(props: ConversationPageProps) {
-  const { onConversationSelected, selectedConfigurationId, onConfigurationSelected, selectSourceChunkIds } = props;
+  const { onConversationSelected, selectedConfigurationId, onConfigurationSelected, selectDocument } = props;
   const api = useApi();
 
   const { theme } = useTheme();
@@ -164,7 +164,7 @@ export function ConversationPage(props: ConversationPageProps) {
                 messages={messages}
                 isWriting={isAiWritting}
                 llmLogo={llmLogo}
-                selectSourceChunkIds={selectSourceChunkIds}
+                selectDocument={selectDocument}
                 onSubmit={doSubmit}
               />
             </div>

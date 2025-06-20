@@ -99,6 +99,7 @@ function createBucketEntityByType(type: BucketType): BucketEntity {
 function createExtensionEntity(name: string): ExtensionEntity {
   return {
     id: 1,
+    externalId: '1',
     name,
     enabled: true,
     values: {

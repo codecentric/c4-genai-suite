@@ -1,12 +1,12 @@
 import { ChatOllama } from '@langchain/ollama';
 import { createToolCallingAgent } from 'langchain/agents';
 import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from 'src/domain/chat';
-import { Extension, ExtensionConfiguration, ExtensionSpec } from 'src/domain/extensions';
+import { Extension, ExtensionConfiguration, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions';
 import { User } from 'src/domain/users';
 import { I18nService } from '../../localization/i18n.service';
 
 @Extension()
-export class OllamaModelExtension implements Extension {
+export class OllamaModelExtension implements Extension<OllamaModelExtensionConfiguration> {
   constructor(private readonly i18n: I18nService) {}
 
   get spec(): ExtensionSpec {
@@ -36,11 +36,11 @@ export class OllamaModelExtension implements Extension {
     await model.invoke('Just a test call');
   }
 
-  getMiddlewares(_: User, configuration: OllamaModelExtensionConfiguration): Promise<ChatMiddleware[]> {
+  getMiddlewares(_: User, extension: ExtensionEntity<OllamaModelExtensionConfiguration>): Promise<ChatMiddleware[]> {
     const middleware = {
       invoke: async (context: ChatContext, _: GetContext, next: ChatNextDelegate): Promise<any> => {
-        context.llms[this.spec.name] = await context.cache.get(this.spec.name, configuration, () => {
-          return this.createModel(configuration);
+        context.llms[this.spec.name] = await context.cache.get(this.spec.name, extension.values, () => {
+          return this.createModel(extension.values);
         });
         context.agentFactory = createToolCallingAgent;
 

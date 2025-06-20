@@ -1,13 +1,13 @@
 import { CallbackHandlerMethods } from '@langchain/core/callbacks/base';
 import { ChatMistralAI } from '@langchain/mistralai';
 import { ChatContext, ChatError, ChatMiddleware, ChatNextDelegate, GetContext } from 'src/domain/chat';
-import { Extension, ExtensionConfiguration, ExtensionSpec } from 'src/domain/extensions';
+import { Extension, ExtensionConfiguration, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions';
 import { User } from 'src/domain/users';
 import { I18nService } from '../../localization/i18n.service';
 import { getEstimatedUsageCallback } from './internal/utils';
 
 @Extension()
-export class MistralModelExtension implements Extension {
+export class MistralModelExtension implements Extension<MistralModelExtensionConfiguration> {
   constructor(private readonly i18n: I18nService) {}
 
   get spec(): ExtensionSpec {
@@ -44,21 +44,21 @@ export class MistralModelExtension implements Extension {
     await model.invoke('Just a test call');
   }
 
-  getMiddlewares(_: User, configuration: MistralModelExtensionConfiguration & { modelName: string }): Promise<ChatMiddleware[]> {
+  getMiddlewares(_: User, extension: ExtensionEntity<MistralModelExtensionConfiguration>): Promise<ChatMiddleware[]> {
     const middleware = {
       invoke: async (context: ChatContext, getContext: GetContext, next: ChatNextDelegate): Promise<any> => {
-        const isLargeModel = configuration.modelName.startsWith('mistral-large');
+        const isLargeModel = extension.values.modelName.startsWith('mistral-large');
 
         if (context.tools.length > 0 && !isLargeModel) {
           throw new ChatError('Tools are only supported with mistral-large model.');
         }
 
-        context.llms[this.spec.name] = await context.cache.get(this.spec.name, configuration, () => {
+        context.llms[this.spec.name] = await context.cache.get(this.spec.name, extension.values, () => {
           // The model does not provide the token usage, therefore estimate it.
-          const callbacks = [getEstimatedUsageCallback('mistral', configuration.modelName, getContext)];
+          const callbacks = [getEstimatedUsageCallback('mistral', extension.values.modelName, getContext)];
 
           // Stream the result token by token to the frontend.
-          return this.createModel(configuration, callbacks, true);
+          return this.createModel(extension.values, callbacks, true);
         });
 
         return next(context);

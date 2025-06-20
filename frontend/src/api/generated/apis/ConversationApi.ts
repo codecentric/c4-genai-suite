@@ -61,6 +61,12 @@ export interface GetConversationRequest {
     id: number;
 }
 
+export interface GetDocumentChunksRequest {
+    id: number;
+    messageId: number;
+    documentUri: string;
+}
+
 export interface GetMessagesRequest {
     id: number;
 }
@@ -294,6 +300,55 @@ export class ConversationApi extends runtime.BaseAPI {
      */
     async getConversations(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ConversationsDto> {
         const response = await this.getConversationsRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Get an array of document contents.
+     * 
+     */
+    async getDocumentChunksRaw(requestParameters: GetDocumentChunksRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<string>>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling getDocumentChunks().'
+            );
+        }
+
+        if (requestParameters['messageId'] == null) {
+            throw new runtime.RequiredError(
+                'messageId',
+                'Required parameter "messageId" was null or undefined when calling getDocumentChunks().'
+            );
+        }
+
+        if (requestParameters['documentUri'] == null) {
+            throw new runtime.RequiredError(
+                'documentUri',
+                'Required parameter "documentUri" was null or undefined when calling getDocumentChunks().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/conversations/{id}/messages/{messageId}/documents/{documentUri}/chunks`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))).replace(`{${"messageId"}}`, encodeURIComponent(String(requestParameters['messageId']))).replace(`{${"documentUri"}}`, encodeURIComponent(String(requestParameters['documentUri']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse<any>(response);
+    }
+
+    /**
+     * Get an array of document contents.
+     * 
+     */
+    async getDocumentChunks(id: number, messageId: number, documentUri: string, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<string>> {
+        const response = await this.getDocumentChunksRaw({ id: id, messageId: messageId, documentUri: documentUri }, initOverrides);
         return await response.value();
     }
 

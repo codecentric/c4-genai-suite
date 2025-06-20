@@ -90,6 +90,7 @@ describe(CreateExtension.name, () => {
           type: 'llm',
         },
         test,
+        getMiddlewares: () => Promise.resolve([]),
       } as Extension;
     });
 

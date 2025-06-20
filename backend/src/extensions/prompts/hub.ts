@@ -1,12 +1,12 @@
 import { ChatPromptTemplate } from '@langchain/core/prompts';
 import { pull } from 'langchain/hub';
 import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from 'src/domain/chat';
-import { Extension, ExtensionConfiguration, ExtensionSpec } from 'src/domain/extensions';
+import { Extension, ExtensionConfiguration, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions';
 import { User } from 'src/domain/users';
 import { I18nService } from '../../localization/i18n.service';
 
 @Extension()
-export class HubPromptExtension implements Extension {
+export class HubPromptExtension implements Extension<HubPromptExtensionConfiguration> {
   constructor(private readonly i18n: I18nService) {}
   private readonly cache: Record<string, ChatPromptTemplate> = {};
 
@@ -33,11 +33,11 @@ export class HubPromptExtension implements Extension {
     await pull<ChatPromptTemplate>(name);
   }
 
-  getMiddlewares(_: User, configuration: HubPromptExtensionConfiguration): Promise<ChatMiddleware[]> {
+  getMiddlewares(_: User, extension: ExtensionEntity<HubPromptExtensionConfiguration>): Promise<ChatMiddleware[]> {
     const middleware = {
       invoke: async (context: ChatContext, getContext: GetContext, next: ChatNextDelegate): Promise<any> => {
-        context.prompt = await context.cache.get(this.spec.name, configuration, async () => {
-          const { name } = configuration;
+        context.prompt = await context.cache.get(this.spec.name, extension.values, async () => {
+          const { name } = extension.values;
 
           return await pull<ChatPromptTemplate>(name);
         });

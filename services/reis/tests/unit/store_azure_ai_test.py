@@ -117,7 +117,7 @@ def test_get_documents_content(client, responses, faker):
     # In this case, we have only one chunk for the file
     file_content = content["files"][0]["content"]
 
-    chunk_id = content["sources"][0]["metadata"]["chunk_ids"]
+    chunk_id = content["sources"][0]["chunk"]["uri"]
 
     response_content = client.get("/documents/content", params={"chunk_ids": chunk_id})
 

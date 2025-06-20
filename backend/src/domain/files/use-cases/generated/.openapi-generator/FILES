@@ -2,12 +2,13 @@
 apis/FilesApi.ts
 apis/index.ts
 index.ts
+models/ChunkDto.ts
+models/DocumentDto.ts
 models/FileProcessResult.ts
 models/FileResult.ts
 models/FileType.ts
 models/FileTypesResult.ts
 models/HTTPValidationError.ts
-models/Identity.ts
 models/ResultDocument.ts
 models/SourceDto.ts
 models/ValidationError.ts

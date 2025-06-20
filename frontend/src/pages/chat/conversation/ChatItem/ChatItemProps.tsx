@@ -11,6 +11,6 @@ export interface ChatItemProps {
   rating?: MessageDtoRatingEnum;
   user: ProfileDto;
   llmLogo?: string;
-  selectSourceChunkIds: (docId: number, ids: string[]) => void;
+  selectDocument: (documentUri: string) => void;
   onSubmit: (input: string, files?: FileDto[], editMessageId?: number) => void;
 }

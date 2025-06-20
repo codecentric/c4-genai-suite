@@ -58,11 +58,6 @@ export interface GetBucketRequest {
     id: number;
 }
 
-export interface GetDocumentContentRequest {
-    docId: number;
-    chunkIds: Array<string>;
-}
-
 export interface GetFileTypesRequest {
     endpoint: string;
     headers?: string;
@@ -280,52 +275,6 @@ export class FilesApi extends runtime.BaseAPI {
      */
     async getBuckets(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BucketsDto> {
         const response = await this.getBucketsRaw(initOverrides);
-        return await response.value();
-    }
-
-    /**
-     * Get an array of document content by chunk ids.
-     * 
-     */
-    async getDocumentContentRaw(requestParameters: GetDocumentContentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<string>>> {
-        if (requestParameters['docId'] == null) {
-            throw new runtime.RequiredError(
-                'docId',
-                'Required parameter "docId" was null or undefined when calling getDocumentContent().'
-            );
-        }
-
-        if (requestParameters['chunkIds'] == null) {
-            throw new runtime.RequiredError(
-                'chunkIds',
-                'Required parameter "chunkIds" was null or undefined when calling getDocumentContent().'
-            );
-        }
-
-        const queryParameters: any = {};
-
-        if (requestParameters['chunkIds'] != null) {
-            queryParameters['chunkIds'] = requestParameters['chunkIds'];
-        }
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/api/buckets/documents/{docId}/content`.replace(`{${"docId"}}`, encodeURIComponent(String(requestParameters['docId']))),
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse<any>(response);
-    }
-
-    /**
-     * Get an array of document content by chunk ids.
-     * 
-     */
-    async getDocumentContent(docId: number, chunkIds: Array<string>, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<string>> {
-        const response = await this.getDocumentContentRaw({ docId: docId, chunkIds: chunkIds }, initOverrides);
         return await response.value();
     }
 

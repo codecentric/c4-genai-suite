@@ -9,7 +9,7 @@ type ChatHistoryProps = {
   messages: ChatMessage[];
   conversationId: number;
   llmLogo?: string;
-  selectSourceChunkIds: (docId: number, ids: string[]) => void;
+  selectDocument: (conversationId: number, messageId: number, documentUri: string) => void;
   onSubmit: (input: string, files?: FileDto[], editMessageId?: number) => void;
 };
 
@@ -19,7 +19,7 @@ export function ChatHistory({
   isWriting,
   llmLogo,
   messages,
-  selectSourceChunkIds,
+  selectDocument,
   onSubmit,
 }: ChatHistoryProps) {
   const profile = useProfile();
@@ -41,7 +41,7 @@ export function ChatHistory({
             message={message}
             user={profile}
             llmLogo={llmLogo}
-            selectSourceChunkIds={selectSourceChunkIds}
+            selectDocument={(documentUri) => selectDocument(conversationId, message.id, documentUri)}
             onSubmit={onSubmit}
           />
         ))}
@@ -58,7 +58,7 @@ export function ChatHistory({
             message={message}
             user={profile}
             llmLogo={llmLogo}
-            selectSourceChunkIds={selectSourceChunkIds}
+            selectDocument={(documentUri) => selectDocument(conversationId, message.id, documentUri)}
             onSubmit={onSubmit}
           />
         ))}

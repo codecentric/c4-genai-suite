@@ -146,7 +146,8 @@ export class ExecuteMiddleware implements ChatMiddleware {
           lastResult = result;
         }
       } else if (eventType === 'on_tool_start') {
-        result.next({ type: 'tool_start', tool: { name: getToolName(event.name) } });
+        const toolName = getToolName(event.name);
+        result.next({ type: 'tool_start', tool: { name: toolName } });
       } else if (eventType === 'on_tool_end') {
         if (this.configService.get<string>('LOG_RAG_CHUNKS', 'false') === 'true') {
           try {

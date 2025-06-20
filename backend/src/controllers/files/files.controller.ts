@@ -38,7 +38,6 @@ import {
   GetBucketResponse,
   GetBuckets,
   GetBucketsResponse,
-  GetDocumentContentResponse,
   GetFiles,
   GetFilesResponse,
   TestBucket,
@@ -47,7 +46,6 @@ import {
   UploadFile,
   UploadFileResponse,
 } from 'src/domain/files';
-import { GetDocumentContent } from '../../domain/files/use-cases/get-document-content';
 import { GetFileTypes, GetFileTypesResponse } from '../../domain/files/use-cases/get-file-types';
 import { BucketDto, BucketsDto, FileDto, FilesDto, FileTypesDto, TestBucketDto, UpsertBucketDto } from './dtos';
 import { keepAlive } from './keep-alive';
@@ -261,25 +259,5 @@ export class FilesController {
     const command = new DeleteFile(+id, +fileId);
 
     await this.commandBus.execute(command);
-  }
-
-  @Get('documents/:docId/content')
-  @ApiOperation({ operationId: 'getDocumentContent', description: 'Get an array of document content by chunk ids.' })
-  @ApiParam({
-    name: 'docId',
-    description: 'The ID of the document known to REIS.',
-    required: true,
-    type: Number,
-  })
-  @ApiQuery({
-    name: 'chunkIds',
-    description: 'The IDs of the chunks.',
-    required: true,
-    type: [String],
-  })
-  @ApiOkResponse({ type: [String] })
-  async getChunks(@Req() req: Request, @Param('docId', ParseIntPipe) docId: number, @Query('chunkIds') chunkIds: string[]) {
-    const result: GetDocumentContentResponse = await this.queryBus.execute(new GetDocumentContent(req.user, docId, chunkIds));
-    return result.documentContent;
   }
 }

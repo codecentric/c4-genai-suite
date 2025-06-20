@@ -19,6 +19,9 @@ export class ExtensionEntity {
   name!: string;
 
   @Column()
+  externalId!: string;
+
+  @Column()
   enabled!: boolean;
 
   @Column({ type: 'simple-json', nullable: true })

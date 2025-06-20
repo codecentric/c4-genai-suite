@@ -40,6 +40,7 @@ import {
   UpdateConversation,
   UpdateConversationResponse,
 } from 'src/domain/chat';
+import { GetDocumentContent, GetDocumentContentResponse } from '../../domain/chat';
 import {
   ConfirmDto,
   ConversationDto,
@@ -143,6 +144,39 @@ export class ConversationsController {
     const result: GetHistoryResponse = await this.queryBus.execute(new GetHistory(+id, req.user));
 
     return MessagesDto.fromDomain(result.history);
+  }
+
+  @Get(':id/messages/:messageId/documents/:documentUri/chunks')
+  @ApiOperation({ operationId: 'getDocumentChunks', description: 'Get an array of document contents.' })
+  @ApiParam({
+    name: 'id',
+    description: 'The ID of the conversation.',
+    required: true,
+    type: Number,
+  })
+  @ApiParam({
+    name: 'messageId',
+    description: 'The ID of the ai message',
+    required: true,
+    type: Number,
+  })
+  @ApiParam({
+    name: 'documentUri',
+    description: 'The uri of the document',
+    required: true,
+    type: String,
+  })
+  @ApiOkResponse({ type: [String] })
+  async getDocumentChunks(
+    @Req() req: Request,
+    @Param('id', ParseIntPipe) conversationId: number,
+    @Param('messageId', ParseIntPipe) messageId: number,
+    @Param('documentUri') documentUri: string,
+  ) {
+    const result: GetDocumentContentResponse = await this.queryBus.execute(
+      new GetDocumentContent(req.user, conversationId, messageId, documentUri),
+    );
+    return result.documentContent;
   }
 
   private async streamResponse(

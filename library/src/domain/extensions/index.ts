@@ -27,7 +27,7 @@ export interface ConfigurationModel {
 
   userGroupsIds: string[];
 
-  extensions?: ConfiguredExtension[];
+  extensions?: ConfiguredExtension<ExtensionConfiguration>[];
 }
 
 export interface ConfigurationUserValuesModel {
@@ -146,7 +146,7 @@ export interface ExtensionSpec {
 
   arguments: { [name: string]: ExtensionArgument };
 
-  userArguments?: { [key: string]: ExtensionArgument };
+  userArguments?: ExtensionObjectArgument;
 
   triggers?: string[];
 }
@@ -165,23 +165,33 @@ export type ExtensionState = {
   changes?: Record<string, any>[];
 };
 
-type ExtensionEntity = {
+export type ExtensionEntity<T extends ExtensionConfiguration = ExtensionConfiguration> = {
   id: number;
+  externalId: string;
+  name: string;
   enabled?: boolean;
-  values: ExtensionConfiguration;
+  values: T;
   state?: ExtensionState;
   configurableArguments?: ExtensionObjectArgument;
 };
 
-export class ConfiguredExtension {
+export class ConfiguredExtension<T extends ExtensionConfiguration = ExtensionConfiguration> {
   private constructor(
-    private readonly entity: ExtensionEntity,
-    private readonly extension: Extension,
+    private readonly entity: ExtensionEntity<T>,
+    private readonly extension: Extension<T>,
     public readonly spec: ExtensionSpec,
   ) {}
 
   get enabled(): boolean {
     return this.entity.enabled ?? false;
+  }
+
+  get externalId(): string {
+    return this.entity.externalId;
+  }
+
+  get name(): string {
+    return this.entity.name;
   }
 
   get id(): number {
@@ -216,6 +226,10 @@ export class ConfiguredExtension {
     return this.extension.fixedValues ?? {};
   }
 
+  async getChunks(documentUri: string, chunkUris: string[]): Promise<string[] | undefined> {
+    return this.extension.getChunks?.(this.entity.values, documentUri, chunkUris);
+  }
+
   getMiddlewares(
     user: User,
     userArgumentValues?: ExtensionUserArgumentValues,
@@ -225,58 +239,52 @@ export class ConfiguredExtension {
       return Promise.resolve([]);
     }
 
-    const values = {
+    this.entity.values = {
       ...(this.entity.values ?? {}),
       ...(userConfiguredValues ?? {}),
     };
 
-    return this.extension.getMiddlewares(user, values, this.entity.id, userArgumentValues);
+    return this.extension.getMiddlewares(user, this.entity, userArgumentValues);
   }
 
-  public static async create(
+  public static async create<T extends ExtensionConfiguration>(
     this: void,
-    extension: Extension,
-    entity: ExtensionEntity,
+    extension: Extension<T>,
+    entity: ExtensionEntity<T>,
     throwOnError: boolean = false,
     forceRebuild: boolean = false,
   ) {
     entity.state = entity.state ?? {};
-    const spec = extension.buildSpec
-      ? await extension.buildSpec(entity.values, entity.state, throwOnError, forceRebuild)
-      : extension.spec;
+    const spec = extension.buildSpec ? await extension.buildSpec(entity, throwOnError, forceRebuild) : extension.spec;
     return new ConfiguredExtension(entity, extension, spec);
   }
 
-  public static createInitial(this: void, extension: Extension) {
+  public static createInitial<T extends ExtensionConfiguration>(this: void, extension: Extension<T>) {
     const spec = extension.spec;
-    return new ConfiguredExtension({ id: 0, values: {}, state: {} }, extension, spec);
+    return new ConfiguredExtension({ id: 0, externalId: '', name: '', values: {} as T, state: {} }, extension, spec);
   }
 }
 
-export interface Extension {
+export interface Extension<
+  TConfig extends ExtensionConfiguration = ExtensionConfiguration,
+  TUserValues extends ExtensionUserArgumentValues = ExtensionUserArgumentValues,
+> {
   // the default spec
   spec: ExtensionSpec;
 
   // for dynamic specs
-  buildSpec?(
-    values: ExtensionConfiguration,
-    state: ExtensionState,
-    throwOnError: boolean,
-    forceRebuild: boolean,
-  ): Promise<ExtensionSpec>;
+  buildSpec?(extension: ExtensionEntity<TConfig>, throwOnError: boolean, forceRebuild: boolean): Promise<ExtensionSpec>;
 
-  fixedValues?: Partial<ExtensionConfiguration>;
+  //TODO: instead of passing configuration to every method call, make the extensions stateful
+  getChunks?(configuration: TConfig, documentUri: string, chunkUris: string[]): Promise<string[]>;
 
-  test?(configuration: ExtensionConfiguration): Promise<any>;
+  fixedValues?: Partial<TConfig>;
 
-  getMiddlewares?(
-    user: User,
-    configuration: ExtensionConfiguration,
-    id: number,
-    userArgumentValues?: ExtensionUserArgumentValues,
-  ): Promise<ChatMiddleware[]>;
+  test?(configuration: TConfig): Promise<any>;
 
-  getEmbedding?(user: User, configuration: ExtensionConfiguration): Promise<ExtensionEmbeddings>;
+  getMiddlewares(user: User, extension: ExtensionEntity<TConfig>, userArgumentValues?: TUserValues): Promise<ChatMiddleware[]>;
+
+  getEmbedding?(user: User, configuration: TConfig): Promise<ExtensionEmbeddings>;
 }
 
 export const EXTENSION_METADATA = 'EXTENSION';

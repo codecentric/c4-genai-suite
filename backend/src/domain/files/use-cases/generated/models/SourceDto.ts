@@ -13,12 +13,18 @@
  */
 
 import { mapValues } from '../runtime';
-import type { Identity } from './Identity';
+import type { DocumentDto } from './DocumentDto';
 import {
-    IdentityFromJSON,
-    IdentityFromJSONTyped,
-    IdentityToJSON,
-} from './Identity';
+    DocumentDtoFromJSON,
+    DocumentDtoFromJSONTyped,
+    DocumentDtoToJSON,
+} from './DocumentDto';
+import type { ChunkDto } from './ChunkDto';
+import {
+    ChunkDtoFromJSON,
+    ChunkDtoFromJSONTyped,
+    ChunkDtoToJSON,
+} from './ChunkDto';
 
 /**
  * 
@@ -33,11 +39,17 @@ export interface SourceDto {
      */
     title: string;
     /**
-     * The identity of the source.
-     * @type {Identity}
+     * The chunk.
+     * @type {ChunkDto}
      * @memberof SourceDto
      */
-    identity: Identity;
+    chunk: ChunkDto;
+    /**
+     * 
+     * @type {DocumentDto}
+     * @memberof SourceDto
+     */
+    document: DocumentDto | null;
     /**
      * 
      * @type {{ [key: string]: any; }}
@@ -51,7 +63,8 @@ export interface SourceDto {
  */
 export function instanceOfSourceDto(value: object): value is SourceDto {
     if (!('title' in value) || value['title'] === undefined) return false;
-    if (!('identity' in value) || value['identity'] === undefined) return false;
+    if (!('chunk' in value) || value['chunk'] === undefined) return false;
+    if (!('document' in value) || value['document'] === undefined) return false;
     return true;
 }
 
@@ -66,7 +79,8 @@ export function SourceDtoFromJSONTyped(json: any, ignoreDiscriminator: boolean):
     return {
         
         'title': json['title'],
-        'identity': IdentityFromJSON(json['identity']),
+        'chunk': ChunkDtoFromJSON(json['chunk']),
+        'document': DocumentDtoFromJSON(json['document']),
         'metadata': json['metadata'] == null ? undefined : json['metadata'],
     };
 }
@@ -78,7 +92,8 @@ export function SourceDtoToJSON(value?: SourceDto | null): any {
     return {
         
         'title': value['title'],
-        'identity': IdentityToJSON(value['identity']),
+        'chunk': ChunkDtoToJSON(value['chunk']),
+        'document': DocumentDtoToJSON(value['document']),
         'metadata': value['metadata'],
     };
 }

@@ -1,13 +1,13 @@
 import { CallbackHandlerMethods } from '@langchain/core/callbacks/base';
 import { ChatVertexAI } from '@langchain/google-vertexai';
 import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from 'src/domain/chat';
-import { Extension, ExtensionConfiguration, ExtensionSpec } from 'src/domain/extensions';
+import { Extension, ExtensionConfiguration, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions';
 import { User } from 'src/domain/users';
 import { I18nService } from '../../localization/i18n.service';
 import { getEstimatedUsageCallback } from './internal/utils';
 
 @Extension()
-export class VertexAIModelExtension implements Extension {
+export class VertexAIModelExtension implements Extension<VertexAIModelExtensionConfiguration> {
   constructor(private readonly i18n: I18nService) {}
 
   get spec(): ExtensionSpec {
@@ -36,15 +36,15 @@ export class VertexAIModelExtension implements Extension {
     await model.invoke('Just a test call');
   }
 
-  getMiddlewares(_: User, configuration: VertexAIModelExtensionConfiguration): Promise<ChatMiddleware[]> {
+  getMiddlewares(_: User, extension: ExtensionEntity<VertexAIModelExtensionConfiguration>): Promise<ChatMiddleware[]> {
     const middleware = {
       invoke: async (context: ChatContext, getContext: GetContext, next: ChatNextDelegate): Promise<any> => {
-        context.llms[this.spec.name] = await context.cache.get('open-ai-model', configuration, () => {
+        context.llms[this.spec.name] = await context.cache.get('open-ai-model', extension.values, () => {
           // The model does not provide the token usage, therefore estimate it.
-          const callbacks = [getEstimatedUsageCallback('vertex-ai', configuration.modelName, getContext)];
+          const callbacks = [getEstimatedUsageCallback('vertex-ai', extension.values.modelName, getContext)];
 
           // The model does not support any streaming parameters.
-          return this.createModel(configuration, callbacks);
+          return this.createModel(extension.values, callbacks);
         });
 
         return next(context);
