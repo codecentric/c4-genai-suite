@@ -1,19 +1,19 @@
 import { ActionIcon, Select, SelectProps, Text } from '@mantine/core';
 import { IconSettings } from '@tabler/icons-react';
 import { useState } from 'react';
-import { ConfigurationDto, ConversationDto } from 'src/api';
+import { ConfigurationDto } from 'src/api';
 import { ConfigurationUserValuesModal } from 'src/pages/chat/conversation/ConfigurationUserValuesModal';
 import { isMobile } from 'src/pages/utils';
-import { useStateMutateConversation } from '../state';
+import { useStateMutateConversation, useStateOfConversation } from '../state';
 
 interface ConfigurationProps {
-  conversation: ConversationDto;
   configuration: ConfigurationDto;
   configurations: ConfigurationDto[];
   canEditConfiguration?: boolean;
 }
 
-export const Configuration = ({ canEditConfiguration, conversation, configuration, configurations }: ConfigurationProps) => {
+export const Configuration = ({ canEditConfiguration, configuration, configurations }: ConfigurationProps) => {
+  const conversation = useStateOfConversation();
   const updateConversation = useStateMutateConversation(conversation.id);
 
   const [showModal, setShowModal] = useState(false);

@@ -100,12 +100,7 @@ export function ConversationPage(props: ConversationPageProps) {
         </>
       )}
       <div className="bg-white p-3">
-        <Configuration
-          canEditConfiguration={isNewConversation}
-          conversation={conversation}
-          configuration={configuration}
-          configurations={configurations}
-        />
+        <Configuration canEditConfiguration={isNewConversation} configuration={configuration} configurations={configurations} />
       </div>
       {isConversationLoading ? (
         <div className="fade-in w-full bg-white" style={{ height: 'calc(100vh - 4rem)' }} />
@@ -118,15 +113,7 @@ export function ConversationPage(props: ConversationPageProps) {
               }
               ref={containerRef}
             >
-              <ChatHistory
-                agentName={agentName}
-                conversationId={conversation.id}
-                messages={messages}
-                isWriting={isAiWritting}
-                llmLogo={llmLogo}
-                selectDocument={selectDocument}
-                onSubmit={doSubmit}
-              />
+              <ChatHistory agentName={agentName} llmLogo={llmLogo} selectDocument={selectDocument} onSubmit={doSubmit} />
             </div>
           )}
           <div className={`${!messages.length && 'grow'} flex shrink-0 flex-col items-center justify-center px-4`}>

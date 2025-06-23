@@ -135,14 +135,12 @@ export const useStateMutateDuplicateConversation = () => {
 
 export const useStateMutateRemoveAllConversations = () => {
   const api = useApi();
-  const setSelectedConversationId = useListOfChatsStore((s) => s.setSelectedConversationId);
   const setConversations = useListOfChatsStore((s) => s.setConversations);
   const createNewConversation = useMutateNewConversation();
 
   return useMutation({
     mutationFn: () => api.conversations.deleteConversations(),
     onSuccess: () => {
-      setSelectedConversationId(null); // this may not even be needed due to next line
       setConversations([]);
       createNewConversation.mutate();
     },
@@ -154,7 +152,6 @@ export const useStateMutateRemoveAllConversations = () => {
 
 export const useStateMutateRemoveConversation = () => {
   const api = useApi();
-  const setSelectedConversationId = useListOfChatsStore((s) => s.setSelectedConversationId);
   const selectedConversationId = useListOfChatsStore((s) => s.selectedConversationId);
   const removeConversation = useListOfChatsStore((s) => s.removeConversation);
   const createNewConversation = useMutateNewConversation();
@@ -164,7 +161,6 @@ export const useStateMutateRemoveConversation = () => {
     onSuccess: (_, deletedId) => {
       removeConversation(deletedId);
       if (deletedId === selectedConversationId) {
-        setSelectedConversationId(null); // this may not even be needed due to next line
         createNewConversation.mutate();
       }
     },
@@ -196,10 +192,7 @@ export const useStateMutateRenameConversation = () => {
  **/
 export const useStateOfConversationEmptiness = () => {
   const api = useApi();
-  const conversations = useListOfChatsStore((s) => s.conversations);
   return async (id: number) => {
-    const valueToCheckIfEmpty = conversations.some((c) => c.id === id).valueOf();
-    console.log({ valueToCheckIfEmpty }); // check if api call needed
     const { items } = await api.conversations.getMessages(id);
     return items.length === 0;
   };
