@@ -27,7 +27,7 @@ interface ConversationPageProps {
 }
 
 export function ConversationPage(props: ConversationPageProps) {
-  const { textareaRef, selectedConfigurationId, onConfigurationSelected, selectDocument} = props;
+  const { textareaRef, selectedConfigurationId, onConfigurationSelected, selectDocument } = props;
 
   const api = useApi();
   const conversationParam = useParams<'id'>();

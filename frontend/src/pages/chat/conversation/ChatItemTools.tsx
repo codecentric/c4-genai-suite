@@ -19,11 +19,7 @@ export function ChatItemTools(props: ChatItemToolsProps) {
       {Object.entries(tools).map(([name, state]) => (
         <div className="flex items-center gap-1 rounded border-[1px] border-gray-200 px-2 py-1" key={name}>
           <Markdown>{name}</Markdown>
-          {state === 'Started' && (
-            <>
-              <span className="loading loading-spinner loading-xs"></span>
-            </>
-          )}
+          {state === 'Started' && <span className="loading loading-spinner loading-xs"></span>}
         </div>
       ))}
     </div>
