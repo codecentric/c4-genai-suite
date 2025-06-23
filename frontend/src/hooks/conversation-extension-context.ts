@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { ConversationDto, useApi } from 'src/api';
+import { useApi } from 'src/api';
 
 type JSONValue = string | number | boolean | JSONObject | JSONArray | object | undefined;
 
@@ -20,15 +20,9 @@ export const useExtensionContext = (conversationId: number) => {
 
   const queryKey = ['conversation', conversationId, 'extensionArguments'];
 
-  const selectContext = (dto: ConversationDto) => dto?.extensionUserArguments as ExtensionContext | undefined;
-
-  const {
-    data: conversation,
-    error,
-    isLoading,
-  } = useQuery({
+  const query = useQuery({
     queryKey,
-    queryFn: () => api.conversations.getConversation(conversationId).then(selectContext),
+    queryFn: () => api.conversations.getConversation(conversationId).then((data) => data?.extensionUserArguments),
     enabled: !!conversationId,
   });
 
@@ -36,20 +30,16 @@ export const useExtensionContext = (conversationId: number) => {
     mutationFn: (context: ExtensionContext) =>
       api.conversations.patchConversation(conversationId, { extensionUserArguments: context }),
     onSuccess: (data) => {
-      queryClient.setQueryData(queryKey, () => selectContext(data));
+      queryClient.setQueryData(queryKey, () => data?.extensionUserArguments);
     },
   });
 
-  const updateContext = (newContext: ExtensionContext) => {
-    mutation.mutate(newContext);
-  };
-
   return {
-    context: conversation,
-    updateContext,
-    error,
-    isLoading,
+    context: query.data as ExtensionContext | undefined,
+    error: query.error,
+    isLoading: query.isLoading,
     isUpdating: mutation.isPending,
+    updateContext: mutation.mutate,
     updateError: mutation.error,
   };
 };

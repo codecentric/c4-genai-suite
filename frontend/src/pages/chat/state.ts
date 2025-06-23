@@ -41,6 +41,19 @@ const getMessagePlaceholderId = (messageType: StreamMessageSavedDtoMessageTypeEn
 
 export type ChatMessage = MessageDto & Partial<MessageMetaInfoState>;
 
+export const useConfirmAiAction = (requestId: string) => {
+  const api = useApi();
+
+  return useMutation({
+    // Fix type in backend to reflect boolean|string instead of using any (see usages)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    mutationFn: (result: any) => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      return api.conversations.confirm(requestId, { result });
+    },
+  });
+};
+
 export const useMutateNewConversation = () => {
   const api = useApi();
   const context = useTransientContext();
