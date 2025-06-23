@@ -324,5 +324,11 @@ function load() {
       welcomeText: translate('theme.welcomeText'),
       welcomeTextHints: translate('theme.welcomeTextHints'),
     },
+    welcome: {
+      title: translate('welcome.title'),
+      subtitle: translate('welcome.subtitle'),
+      setupAnAssistent: translate('welcome.setupAnAssistent'),
+      noAssistenIsSetUpYet: translate('welcome.noAssistenIsSetUpYet'),
+    },
   };
 }

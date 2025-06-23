@@ -1,6 +1,7 @@
 import { Button, Text, Title } from '@mantine/core';
 import { IconArrowRight } from '@tabler/icons-react';
 import { useProfile } from 'src/hooks';
+import { texts } from 'src/texts';
 
 export const WelcomePage = () => {
   const profile = useProfile();
@@ -8,15 +9,15 @@ export const WelcomePage = () => {
   return (
     <div className="flex h-screen items-center justify-center p-4">
       <div className="max-w-[500px] [&>*]:pb-2">
-        <Title>Welcome to c4 GenAI Suite</Title>
-        <Text c="dimmed">An AI chatbot with Model Context Provider (MCP) integration. Powered by Langchain.</Text>
+        <Title>{texts.welcome.title}</Title>
+        <Text c="dimmed">{texts.welcome.subtitle}</Text>
         <br />
         {profile.isAdmin ? (
           <Button component="a" href="/admin/assistants?create=true" rightSection={<IconArrowRight className="w-4" />}>
-            Setup an Assistent
+            {texts.welcome.setupAnAssistent}
           </Button>
         ) : (
-          <Text c="dimmed">No Assistent is set up yet. Ask your Admin to set up an Assistent get started.</Text>
+          <Text c="dimmed">{texts.welcome.noAssistenIsSetUpYet}</Text>
         )}
       </div>
     </div>
