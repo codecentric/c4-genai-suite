@@ -1,30 +1,22 @@
 import { FileDto } from 'src/api';
 import { useProfile } from 'src/hooks';
-import { ChatMessage } from '../state';
+import { useStateOfConversation, useStateOfIsAiWritting, useStateOfMessages } from '../state';
 import { ChatItem } from './ChatItem/ChatItem';
 
 type ChatHistoryProps = {
   agentName: string;
-  isWriting?: boolean;
-  messages: ChatMessage[];
-  conversationId: number;
   llmLogo?: string;
   selectDocument: (conversationId: number, messageId: number, documentUri: string) => void;
   onSubmit: (input: string, files?: FileDto[], editMessageId?: number) => void;
 };
 
-export function ChatHistory({
-  agentName,
-  conversationId,
-  isWriting,
-  llmLogo,
-  messages,
-  selectDocument,
-  onSubmit,
-}: ChatHistoryProps) {
+export function ChatHistory({ agentName, llmLogo, selectDocument, onSubmit }: ChatHistoryProps) {
   const profile = useProfile();
+  const messages = useStateOfMessages();
   const allMessagesButLastTwo = messages.slice(0, -2);
   const lastTwoMessages = messages.slice(-2);
+  const { id: conversationId } = useStateOfConversation();
+  const isWriting = useStateOfIsAiWritting();
   const autoScrollContainerForLastMessageExchange = 'grid min-h-full min-w-full max-w-full grid-rows-[max-content_1fr]';
 
   return (
