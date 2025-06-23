@@ -1,6 +1,7 @@
 from itertools import combinations
 
 
+from rei_s.config import Config
 from rei_s.services.formats import get_format_providers
 from rei_s.services.formats.code_provider import CodeProvider
 from rei_s.services.formats.html_provider import HtmlProvider
@@ -18,7 +19,7 @@ from rei_s.types.source_file import SourceFile, temp_file
 from tests.conftest import get_test_config
 
 
-def test_markdown_provider():
+def test_markdown_provider() -> None:
     content = b"# Hello World!"
     with temp_file(buffer=content, file_name="text.md") as source_file:
         md = MarkdownProvider()
@@ -28,7 +29,7 @@ def test_markdown_provider():
         assert docs[0].page_content == "# Hello World!"
 
 
-def test_html_provider():
+def test_html_provider() -> None:
     content = b"<h1>Hello World!</h1>"
     with temp_file(buffer=content, mime_type="text/html", file_name="text.html") as source_file:
         html = HtmlProvider()
@@ -38,7 +39,7 @@ def test_html_provider():
         assert docs[0].page_content == "<h1>Hello World!</h1>"
 
 
-def test_xlsx_provider():
+def test_xlsx_provider() -> None:
     source_file = SourceFile(
         path="tests/data/birthdays.xlsx",
         mime_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -54,7 +55,7 @@ def test_xlsx_provider():
     assert docs[0].metadata["page_number"] == 1
 
 
-def test_docx_provider():
+def test_docx_provider() -> None:
     source_file = SourceFile(
         path="tests/data/birthdays.docx",
         mime_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
@@ -68,7 +69,7 @@ def test_docx_provider():
     assert docs[0].page_content == "Darkwing Duck was born on 9/17/1966."
 
 
-def test_pptx_provider():
+def test_pptx_provider() -> None:
     source_file = SourceFile(
         path="tests/data/birthdays.pptx",
         mime_type="application/vnd.openxmlformats-officedocument.presentationml.presentation",
@@ -87,7 +88,7 @@ Gladstone Gander: 5/14/2001"""
     )
 
 
-def test_pdf_provider():
+def test_pdf_provider() -> None:
     source_file = SourceFile(path="tests/data/birthdays.pdf", mime_type="application/pdf", file_name="text.pdf")
 
     pdf = PdfProvider()
@@ -125,7 +126,7 @@ Page 2"""
     assert docs[1].metadata["page"] == 2
 
 
-def test_code_provider():
+def test_code_provider() -> None:
     content = b'print("Hello World!)'
     with temp_file(buffer=content, mime_type="text/x-python", file_name="script.py") as source_file:
         code = CodeProvider()
@@ -135,7 +136,7 @@ def test_code_provider():
         assert docs[0].page_content == 'print("Hello World!)'
 
 
-def test_json_provider():
+def test_json_provider() -> None:
     source_file = SourceFile(path="tests/data/birthdays.json", mime_type="application/json", file_name="birthdays.json")
 
     txt = JsonProvider(chunk_size=100)
@@ -149,7 +150,7 @@ def test_json_provider():
     assert docs[1].page_content == '{"additional_info": {"creator": "Walt Disney"}}'
 
 
-def test_xml_provider():
+def test_xml_provider() -> None:
     source_file = SourceFile(path="tests/data/birthdays.xml", mime_type="application/xml", file_name="birthdays.xml")
 
     txt = XmlProvider(chunk_size=150, chunk_overlap=0)
@@ -175,7 +176,7 @@ def test_xml_provider():
     )
 
 
-def test_yaml_provider():
+def test_yaml_provider() -> None:
     source_file = SourceFile(path="tests/data/birthdays.yaml", mime_type="application/yaml", file_name="birthdays.yaml")
 
     txt = YamlProvider(chunk_size=200, chunk_overlap=0)
@@ -205,7 +206,7 @@ ducks:
     )
 
 
-def test_plain_provider():
+def test_plain_provider() -> None:
     content = b"Hello World!"
     with temp_file(buffer=content, mime_type="text/plain", file_name="text.txt") as source_file:
         txt = PlainProvider(10, 0)
@@ -216,7 +217,7 @@ def test_plain_provider():
         assert docs[1].page_content == "World!"
 
 
-def test_outlook_provider():
+def test_outlook_provider() -> None:
     # file downloaded from https://docs.fileformat.com/email/msg/
     source_file = SourceFile(path="tests/data/email.msg", mime_type="application/vnd.ms-outlook", file_name="email.msg")
 
@@ -233,7 +234,7 @@ def test_outlook_provider():
 
 # this function needs to be kept up-to-date with dummy-configurations
 # of all formats which need to be activated via configurations
-def get_config_all_formats_enabled():
+def get_config_all_formats_enabled() -> Config:
     return get_test_config(
         dict(
             stt_type="azure-openai-whisper",
@@ -245,7 +246,7 @@ def get_config_all_formats_enabled():
     )
 
 
-def test_format_providers_unique():
+def test_format_providers_unique() -> None:
     # ensure that there are no two providers which handle the same file
     config = get_config_all_formats_enabled()
     format_provider_instances = get_format_providers(config)

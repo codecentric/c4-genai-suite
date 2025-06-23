@@ -12,11 +12,11 @@ class StoreFilter(BaseModel):
 
 class StoreAdapter(ABC):
     @abstractmethod
-    def add_documents(self, documents: list[Document]):
+    def add_documents(self, documents: list[Document]) -> None:
         raise NotImplementedError
 
     @abstractmethod
-    def delete(self, doc_id: str):
+    def delete(self, doc_id: str) -> None:
         raise NotImplementedError
 
     @abstractmethod

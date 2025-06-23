@@ -1,5 +1,5 @@
 import multiprocessing as mp
-from typing import List
+from typing import Any, Generator, List
 from math import ceil
 
 from fastapi import HTTPException
@@ -10,7 +10,7 @@ from rei_s.services.formats.utils import ProcessingError
 from rei_s.services.multiprocess_utils import process_file_in_process
 from rei_s.services.embeddings_provider import get_embeddings
 from rei_s.config import Config
-from rei_s.services.store_adapter import StoreFilter
+from rei_s.services.store_adapter import StoreAdapter, StoreFilter
 from rei_s.services.store_provider import get_store
 from rei_s.types.dtos import SourceDto, ChunkDto, DocumentDto
 from rei_s.types.source_file import SourceFile
@@ -19,7 +19,7 @@ from rei_s.services.formats import get_format_provider_mappings, get_format_prov
 from rei_s.metrics.metrics import files_processed_counter
 
 
-def batched(iterable: List[Document], n: int):
+def batched(iterable: List[Document], n: int) -> Generator[List[Document], None, None]:
     for i in range(0, len(iterable), n):
         yield iterable[i : i + n]
 
@@ -27,7 +27,7 @@ def batched(iterable: List[Document], n: int):
 def get_vector_store(
     config: Config,
     index_name: str | None,
-):
+) -> StoreAdapter:
     embeddings = get_embeddings(config)
     vector_store = get_store(config=config, embeddings=embeddings, index_name=index_name)
 
@@ -46,7 +46,7 @@ def get_file_name_extensions(config: Config) -> list[str]:
     return file_name_extensions
 
 
-def process_file(config: Config, file: SourceFile, chunk_size: int | None = None):
+def process_file(config: Config, file: SourceFile, chunk_size: int | None = None) -> List[Document]:
     logger.info(f"Processing file: {file.id}")
     chunks_with_metadata = [
         chunk
@@ -58,7 +58,7 @@ def process_file(config: Config, file: SourceFile, chunk_size: int | None = None
     return chunks_with_metadata
 
 
-def process_and_add_file(config: Config, file: SourceFile, bucket: str, index_name: str | None):
+def process_and_add_file(config: Config, file: SourceFile, bucket: str, index_name: str | None) -> bool:
     logger.info(f"Processing and add file: {file.id}")
     add_file(config, file, bucket, file.id, index_name)
     files_processed_counter.inc()
@@ -68,7 +68,7 @@ def process_and_add_file(config: Config, file: SourceFile, bucket: str, index_na
 
 def process_file_synchronously(
     format_: AbstractFormatProvider, file: SourceFile, chunk_size: int | None, threshold: int = 10**5
-):
+) -> List[Document]:
     # this function tries to optimize for performance,
     # since the process step is the single CPU intensive part
     # * small files are processed in the same thread to avoid overhead of starting a new process,
@@ -101,7 +101,7 @@ def generate_batches(
     bucket: str | None = None,
     doc_id: str | None = None,
     chunk_size: int | None = None,
-):
+) -> Generator[tuple[List[Document], int, int], None, None]:
     for format_ in get_format_providers(config):
         if format_.supports(file):
             try:
@@ -141,7 +141,7 @@ def generate_batches(
     raise HTTPException(status_code=415, detail="File format not supported.")
 
 
-def add_file(config: Config, file: SourceFile, bucket: str, doc_id: str, index_name: str | None = None):
+def add_file(config: Config, file: SourceFile, bucket: str, doc_id: str, index_name: str | None = None) -> None:
     vector_store = get_vector_store(config=config, index_name=index_name)
     for batch, index, num_batches in generate_batches(config, file, bucket, doc_id):
         logger.info(f"add {len(batch)} chunks for doc_id {doc_id}: ({index + 1}/{num_batches})")
@@ -197,7 +197,7 @@ def get_documents_content(config: Config, ids: List[str], index_name: str | None
     return content
 
 
-def delete_file(config: Config, doc_id: str, index_name: str | None = None):
+def delete_file(config: Config, doc_id: str, index_name: str | None = None) -> None:
     vector_store = get_vector_store(config=config, index_name=index_name)
     logger.info(f"delete chunks with doc_id '{doc_id}'")
     vector_store.delete(doc_id)
@@ -231,7 +231,7 @@ def get_file_sources_markdown(results: List[Document]) -> str:
     return header + content
 
 
-def parse_int_array(s):
+def parse_int_array(s: Any) -> List[int] | None:
     try:
         return [int(s)]
     except (ValueError, TypeError):
@@ -263,7 +263,3 @@ def get_file_sources(results: List[Document]) -> List[SourceDto]:
         )
         for i, doc in enumerate(results)
     ]
-
-
-def is_valid_page_number(x):
-    return isinstance(x, str) and x.isdigit()

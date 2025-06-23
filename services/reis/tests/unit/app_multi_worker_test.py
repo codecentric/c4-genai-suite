@@ -1,12 +1,14 @@
+from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from langchain_community.embeddings import FakeEmbeddings
 
-from rei_s.config import get_config
+from pytest_mock import MockerFixture
+from rei_s.config import Config, get_config
 from rei_s.services.stores.devnull_store import DevNullStoreAdapter
 from tests.conftest import get_test_config
 
 
-def get_config_override():
+def get_config_override() -> Config:
     return get_test_config(
         dict(
             workers=2,
@@ -17,7 +19,7 @@ def get_config_override():
     )
 
 
-def test_add_files_multiple_workers(mocker, app):
+def test_add_files_multiple_workers(mocker: MockerFixture, app: FastAPI) -> None:
     app.dependency_overrides[get_config] = get_config_override
 
     # mock embeddings to avoid calls to azure
@@ -30,7 +32,7 @@ def test_add_files_multiple_workers(mocker, app):
         with open("tests/data/birthdays.pdf", "rb") as f:
             response = client.post(
                 "/files",
-                data=f,
+                data=f,  # type: ignore[arg-type]
                 headers={
                     "bucket": "15",
                     "id": "1",
@@ -42,7 +44,7 @@ def test_add_files_multiple_workers(mocker, app):
         assert response.status_code == 200
 
 
-def test_process_files_multiple_workers(mocker, app):
+def test_process_files_multiple_workers(mocker: MockerFixture, app: FastAPI) -> None:
     app.dependency_overrides[get_config] = get_config_override
     # mock embeddings to assure that they are not generated
     mocker.patch(
@@ -61,7 +63,7 @@ def test_process_files_multiple_workers(mocker, app):
         with open("tests/data/birthdays.pdf", "rb") as f:
             response = client.post(
                 "/files/process",
-                data=f,
+                data=f,  # type: ignore[arg-type]
                 headers={
                     "bucket": "15",
                     "id": "1",

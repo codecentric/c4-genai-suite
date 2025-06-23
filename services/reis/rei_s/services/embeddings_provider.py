@@ -1,11 +1,12 @@
 from langchain_openai import OpenAIEmbeddings, AzureOpenAIEmbeddings
 from langchain_community.embeddings import FakeEmbeddings
 from langchain_ollama import OllamaEmbeddings
+from langchain_core.embeddings import Embeddings
 
 from rei_s.config import Config
 
 
-def get_embeddings(config: Config):
+def get_embeddings(config: Config) -> Embeddings:
     # for low tier subscriptions, we will encounter rate limits when uploading larger files
     # since we may have multiple workers using the same embedding endpoint, we will encounter
     # multiple triggers of the rate limit error. However, we do not want to fail after

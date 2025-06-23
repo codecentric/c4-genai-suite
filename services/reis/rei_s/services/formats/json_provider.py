@@ -1,4 +1,5 @@
 import json
+from typing import Any
 from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveJsonSplitter
 
@@ -14,11 +15,11 @@ class JsonProvider(AbstractFormatProvider):
         ".json",
     ]
 
-    def __init__(self, chunk_size: int = 1000, **_kwargs):
+    def __init__(self, chunk_size: int = 1000, **_kwargs: Any) -> None:
         super().__init__()
         self.default_chunk_size = chunk_size
 
-    def splitter(self, chunk_size: int | None = None):
+    def splitter(self, chunk_size: int | None = None) -> RecursiveJsonSplitter:
         chunk_size = validate_chunk_size(chunk_size, self.default_chunk_size)
         return RecursiveJsonSplitter(max_chunk_size=chunk_size)
 

@@ -60,7 +60,7 @@ line-length = 120
 select = ["E", "W", "F", "N", "A", "B"]
 
 [tool.mypy]
-# strict = true  # maybe we should activate the strict mode in the future
+strict = true
 install_types = true
 non_interactive = true
 ignore_missing_imports = true

@@ -94,7 +94,7 @@ class AzureAISearchStoreAdapter(StoreAdapter):
 
         return instance
 
-    def add_documents(self, documents: list[Document]):
+    def add_documents(self, documents: list[Document]) -> None:
         # langchain's abstraction of Azure AI seems to forget the ids and replaces them with the kwarg "key"
         # and langchains interface needs us to provide either no keys or keys for every document
         keys = [doc.id for doc in documents if doc.id is not None]
@@ -102,7 +102,7 @@ class AzureAISearchStoreAdapter(StoreAdapter):
             raise ValueError("If you give an `id` for any document, you need to give an id for every document")
         self.vector_store.add_documents(documents, keys=keys)
 
-    def delete(self, doc_id: str):
+    def delete(self, doc_id: str) -> None:
         # The `delete` method can only delete by the "key", which is unique, i.e., the chunk id.
         # To delete by our doc_id, we first need to fetch all chunk_ids of the doc_id.
         response = self.vector_store.client.search(search_text="*", filter=f"doc_id eq '{doc_id}'", select=["id"])

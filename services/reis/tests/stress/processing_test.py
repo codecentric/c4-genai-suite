@@ -3,6 +3,7 @@ from contextlib import contextmanager
 from glob import glob
 import os
 from time import perf_counter
+from typing import Callable, Generator
 import pytest
 import requests
 
@@ -20,7 +21,7 @@ file_set = [
 ]
 
 
-def process(url, filename):
+def process(url: str, filename: str) -> requests.Response:
     return requests.post(
         f"{url}/files/process",
         data=open(filename, "rb"),
@@ -31,7 +32,7 @@ def process(url, filename):
     )
 
 
-def process_and_add(url, n, filename):
+def process_and_add(url: str, n: int, filename: str) -> requests.Response:
     return requests.post(
         f"{url}/files",
         data=open(filename, "rb"),
@@ -45,13 +46,13 @@ def process_and_add(url, n, filename):
 
 
 @contextmanager
-def catchtime():
+def catchtime() -> Generator[Callable[[], float], None, None]:
     t1 = t2 = perf_counter()
     yield lambda: t2 - t1
     t2 = perf_counter()
 
 
-def test_lfs_files_available():
+def test_lfs_files_available() -> None:
     lfs_file = "tests/data_stress/dracula.pdf"
     file_size = os.path.getsize(lfs_file)
     assert file_size > 1000, (
@@ -63,7 +64,7 @@ def test_lfs_files_available():
 @pytest.mark.stress
 @pytest.mark.withoutresponses
 @pytest.mark.parametrize("files", file_set)
-def test_process_files(files):
+def test_process_files(files: list[str]) -> None:
     assert len(files) > 0
     # for just processing, we process every file 3 times, because processing is faster than adding
     files = files * 3
@@ -91,7 +92,7 @@ def test_process_files(files):
 @pytest.mark.stress
 @pytest.mark.withoutresponses
 @pytest.mark.parametrize("files", file_set)
-def test_process_embed_and_add_files(files):
+def test_process_embed_and_add_files(files: list[str]) -> None:
     assert len(files) > 0
     futures = []
 

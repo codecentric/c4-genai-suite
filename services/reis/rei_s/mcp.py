@@ -1,6 +1,6 @@
 import httpx
 from mcp.server.fastmcp import FastMCP
-from typing import Dict
+from typing import Any, Dict
 from pydantic import Field
 
 mcp = FastMCP(host="0.0.0.0", port="3202")
@@ -18,7 +18,7 @@ async def get_data_all_files(
         Comma separated if multiple files.""",
         default="",
     ),
-):
+) -> Any:
     """
     This function retrieves data from multiple files in a specified storage bucket based on a given search_query.
     It allows for limiting the number of results and optionally filtering the files to be processed.

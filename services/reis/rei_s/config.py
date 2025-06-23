@@ -14,14 +14,14 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 # Also our direct use of temp files uses the `tempfile` module, such that they are handled as well.
 # If `TMP_FILES_ROOT` is not set, the default is used (`/tmp` in most cases).
 # see also: https://python.readthedocs.io/en/latest/library/tempfile.html#tempfile.tempdir
-def update_tempdir():
+def update_tempdir() -> None:
     tempfile.tempdir = os.getenv("TMP_FILES_ROOT")
 
 
 update_tempdir()
 
 
-def check_needed(needed: Mapping[str, str | SecretStr | None], switch_name: str, switch_value: str):
+def check_needed(needed: Mapping[str, str | SecretStr | None], switch_name: str, switch_value: str) -> None:
     missing = []
     for name, value in needed.items():
         if value is None:
@@ -133,5 +133,7 @@ class Config(BaseSettings, frozen=True):  # type: ignore
 
 
 @lru_cache
-def get_config():
-    return Config()
+def get_config() -> Config:
+    # We need to ignore the missing argument errors, because we want Config to raise in case
+    # a mandatory argument was not passed via an env variable.
+    return Config()  # type: ignore[call-arg]

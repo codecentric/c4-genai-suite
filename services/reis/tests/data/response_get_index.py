@@ -1,7 +1,7 @@
 from responses import Response
 
 
-def index_get(endpoint: str, index_name: str):
+def index_get(endpoint: str, index_name: str) -> Response:
     return Response(
         method="GET",
         url=f"{endpoint}/indexes('{index_name}')?api-version=2024-07-01",
