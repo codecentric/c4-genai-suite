@@ -7,6 +7,7 @@ import { create } from 'zustand';
 import {
   AppClient,
   ConversationDto,
+  ConversationDtoRatingEnum,
   FileDto,
   MessageDto,
   MessageDtoRatingEnum,
@@ -73,6 +74,15 @@ export const useStateMutateConversation = (conversationId: number) => {
     },
     onSuccess: (conversation) => {
       setConversation(conversation);
+    },
+  });
+};
+
+export const useStateMutateConversationRating = (conversationId: number) => {
+  const api = useApi();
+  return useMutation({
+    mutationFn: (rating: ConversationDtoRatingEnum) => {
+      return api.conversations.patchConversation(conversationId, { rating });
     },
   });
 };
