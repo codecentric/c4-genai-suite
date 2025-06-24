@@ -13,7 +13,7 @@ pydantic-settings = "^2.10.0"
 langchain-core = "0.3.66"
 langchain-community = "0.3.25"
 langchain-openai = "0.3.24"
-langchain-postgres = "0.0.13"
+langchain-postgres = "0.0.15"
 psycopg = {extras = ["binary"], version = "^3.2.9"}
 fastapi = {extras = ["standard"], version = "0.115.13"}
 azure-search-documents = "11.5.2"
