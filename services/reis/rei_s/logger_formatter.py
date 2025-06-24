@@ -1,12 +1,12 @@
-import logging
+from logging import LogRecord, Formatter
 from types import TracebackType
 import orjson
 from datetime import datetime, timezone
 import traceback
 
 
-class JsonFormatter(logging.Formatter):
-    def format(self, record: logging.LogRecord) -> str:
+class JsonFormatter(Formatter):
+    def format(self, record: LogRecord) -> str:
         timestamp = datetime.fromtimestamp(record.created, tz=timezone.utc).isoformat() + "Z"
 
         log_obj = {
