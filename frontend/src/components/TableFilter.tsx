@@ -79,7 +79,7 @@ export function TableFilter({ column }: { column: Column<TData, unknown> }) {
   );
 }
 
-function DebouncedInput({
+export function DebouncedInput({
   value: initialValue,
   onChange,
   debounce = 500,

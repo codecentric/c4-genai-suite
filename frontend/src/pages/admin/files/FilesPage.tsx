@@ -1,9 +1,10 @@
 import { Button, Checkbox } from '@mantine/core';
 import { IconEdit, IconTrash } from '@tabler/icons-react';
+import { RankingInfo, rankItem } from '@tanstack/match-sorter-utils';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import {
   ColumnDef,
-  ColumnFiltersState,
+  FilterFn,
   getCoreRowModel,
   getFacetedMinMaxValues,
   getFacetedRowModel,
@@ -11,7 +12,6 @@ import {
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  RowData,
   useReactTable,
 } from '@tanstack/react-table';
 import { formatDate } from 'date-fns';
@@ -28,13 +28,32 @@ import { texts } from 'src/texts';
 import { UpsertBucketDialog } from './UpsertBucketDialog';
 import { useBucketstore, useFilesStore } from './state';
 
+type TData = FileDto;
 declare module '@tanstack/react-table' {
   //allows us to define custom properties for our columns
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  interface ColumnMeta<TData extends RowData, TValue> {
+  interface ColumnMeta<TData, TValue> {
     filterVariant?: 'text' | 'range' | 'select';
   }
+
+  interface FilterFns {
+    fuzzy: FilterFn<unknown>;
+  }
+
+  interface FilterMeta {
+    itemRank: RankingInfo;
+  }
 }
+
+const fuzzyFilter: FilterFn<TData> = (row, columnId, value, addMeta) => {
+  const itemRank = rankItem(row.getValue(columnId), String(value));
+
+  addMeta({
+    itemRank,
+  });
+
+  return itemRank.passed;
+};
 
 export function FilesPage() {
   const api = useApi();
@@ -53,7 +72,7 @@ export function FilesPage() {
   const { buckets, removeBucket, setBucket } = useBucketstore();
 
   //Tanstack Table
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [globalFilter, setGlobalFilter] = useState('');
   const [rowSelection, setRowSelection] = useState({});
 
   const { data: bucket } = useQuery({
@@ -174,17 +193,11 @@ export function FilesPage() {
         accessorKey: 'fileName',
         cell: (info) => info.getValue(),
         header: () => <span>{`File Name`}</span>,
-        meta: {
-          filterVariant: 'text',
-        },
       },
       {
         accessorKey: 'mimeType',
         cell: (info) => <span className="badge self-center bg-gray-100">{extractType(info.row.original)}</span>,
         header: () => <span>{`File Type`}</span>,
-        meta: {
-          filterVariant: 'select',
-        },
       },
       {
         id: 'fileSize',
@@ -206,10 +219,14 @@ export function FilesPage() {
     data: files,
     columns: columns,
     state: {
-      columnFilters: columnFilters,
       rowSelection: rowSelection,
+      globalFilter: globalFilter,
     },
-    onColumnFiltersChange: setColumnFilters,
+    filterFns: {
+      fuzzy: fuzzyFilter,
+    },
+    globalFilterFn: 'fuzzy',
+    onGlobalFilterChange: setGlobalFilter,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(), //client-side filtering
     getSortedRowModel: getSortedRowModel(),
@@ -293,6 +310,8 @@ export function FilesPage() {
               deleteDialogTitle={texts.files.removeFilesConfirmTitle}
               deleteDialogText={texts.files.removeFilesConfirmText(table.getSelectedRowModel().rows.length)}
               deleteDisabled={table.getSelectedRowModel().rows.length == 0 ? true : false}
+              globalFilter={globalFilter}
+              setGlobalFilter={setGlobalFilter}
             />
           )}
           <Pagingation page={page} pageSize={pageSize} total={total} onPage={setPage} />

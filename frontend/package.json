@@ -29,6 +29,7 @@
     "@tabler/icons-react": "^3.24.0",
     "@tailwindcss/postcss": "4.1.8",
     "@tailwindcss/vite": "4.1.8",
+    "@tanstack/match-sorter-utils": "^8.19.4",
     "@tanstack/react-query": "^5.53.1",
     "@tanstack/react-table": "^8.21.3",
     "clsx": "^2.1.1",

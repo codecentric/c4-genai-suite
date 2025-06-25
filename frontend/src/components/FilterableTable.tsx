@@ -5,7 +5,7 @@ import { FileDto } from 'src/api';
 import { cn } from 'src/lib';
 import { texts } from 'src/texts';
 import { ConfirmDialog } from './ConfirmDialog';
-import { TableFilter } from './TableFilter';
+import { DebouncedInput } from './TableFilter';
 
 export type TData = FileDto;
 
@@ -15,6 +15,8 @@ export type FilterableTableProps = {
   deleteDialogTitle: string;
   deleteDialogText: string;
   deleteDisabled: boolean;
+  globalFilter: string;
+  setGlobalFilter: (filter: string) => void;
 };
 
 export function FilterableTable(props: FilterableTableProps) {
@@ -22,6 +24,14 @@ export function FilterableTable(props: FilterableTableProps) {
 
   return (
     <div className="relative flex w-full flex-col overflow-x-scroll rounded-xl bg-white bg-clip-border p-2 shadow-sm">
+      <div>
+        <DebouncedInput
+          value={props.globalFilter ?? ''}
+          onChange={(value) => props.setGlobalFilter(String(value))}
+          className="text-md mb-4 w-auto rounded border px-1 font-normal shadow-xs placeholder:text-xs"
+          placeholder={'Search... / Suche...'}
+        />
+      </div>
       <table className="w-full min-w-max table-auto border-collapse">
         <thead>
           {props.table.getHeaderGroups().map((headerGroup) => (
@@ -35,11 +45,6 @@ export function FilterableTable(props: FilterableTableProps) {
                           <div className="text-sm font-bold">
                             {flexRender(header.column.columnDef.header, header.getContext())}
                           </div>
-                          {header.column.getCanFilter() ? (
-                            <div className="text-sm font-normal">
-                              <TableFilter column={header.column} />
-                            </div>
-                          ) : null}
                         </div>
                         <div
                           {...{
