@@ -3,6 +3,9 @@ updates:
   - package-ecosystem: "docker"
     directories:
       - "/"
+      - "/backend"
+      - "/frontend"
+      - "/services/reis"
       - "/dev/caddy-gateway-proxy"
     schedule:
       interval: "weekly"
@@ -24,11 +27,8 @@ updates:
       - "/backend"
       - "/e2e"
       - "/frontend"
-      - "/library"
     schedule:
       interval: "daily"
-    ignore:
-      - dependency-name: "@c4/library"
 
   - package-ecosystem: "pip"
     directories:
