@@ -1,4 +1,4 @@
-import { ActionIcon, Button, Portal } from '@mantine/core';
+import { ActionIcon, Button, Menu, Portal } from '@mantine/core';
 import { IconFilter, IconMicrophone, IconPaperclip } from '@tabler/icons-react';
 import { useMutation } from '@tanstack/react-query';
 import React, { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
@@ -29,6 +29,12 @@ interface ChatInputProps {
   isEmpty?: boolean;
   onSubmit: (input: string, files?: FileDto[]) => void;
 }
+
+const SPEECH_RECOGNITION_LANGUAGES: { name: string; code: string }[] = [
+  { name: 'Deutsch', code: 'de-DE' },
+  { name: 'English', code: 'en-US' },
+];
+
 export function ChatInput({ conversationId, configuration, isDisabled, isEmpty, onSubmit }: ChatInputProps) {
   const api = useApi();
   const extensionsWithFilter = configuration?.extensions?.filter(isExtensionWithUserArgs) ?? [];
@@ -176,6 +182,8 @@ export function ChatInput({ conversationId, configuration, isDisabled, isEmpty, 
   const { transcript, listening, resetTranscript, browserSupportsSpeechRecognition, isMicrophoneAvailable } =
     useSpeechRecognition();
 
+  const [speechLanguage, setSpeechLanguage] = useState<string>(SPEECH_RECOGNITION_LANGUAGES[0].code);
+
   useEffect(() => {
     if (listening && transcript) {
       setInput(transcript);
@@ -203,7 +211,7 @@ export function ChatInput({ conversationId, configuration, isDisabled, isEmpty, 
 
         await SpeechRecognition.startListening({
           continuous: true,
-          language: 'de-DE',
+          language: speechLanguage,
         });
         setIsRecording(true);
 
@@ -314,17 +322,32 @@ export function ChatInput({ conversationId, configuration, isDisabled, isEmpty, 
                 )}
               </div>
               <div className="flex items-center gap-1">
-                <ActionIcon
-                  variant={isRecording ? 'filled' : 'outline'}
-                  size="lg"
-                  color={isRecording ? 'red' : 'black'}
-                  className={`border-gray-200 ${isRecording ? 'animate-pulse' : ''}`}
-                  //onClick={handleRecording}
-                  onClick={toggleSpeechRecognition}
-                  title={isRecording ? 'Stop recording' : 'Start recording'}
-                >
-                  <IconMicrophone className="w-4" />
-                </ActionIcon>
+                <Menu shadow="md">
+                  <Menu.Target>
+                    <ActionIcon
+                      variant={isRecording ? 'filled' : 'outline'}
+                      size="lg"
+                      color={isRecording ? 'red' : 'black'}
+                      className={`border-gray-200 ${isRecording ? 'animate-pulse' : ''}`}
+                      onClick={toggleSpeechRecognition}
+                      title={isRecording ? 'Stop recording' : 'Start recording'}
+                    >
+                      <IconMicrophone className="w-4" />
+                    </ActionIcon>
+                  </Menu.Target>
+                  <Menu.Dropdown>
+                    {SPEECH_RECOGNITION_LANGUAGES.map((language) => (
+                      <Menu.Item
+                        key={language.code}
+                        onClick={() => setSpeechLanguage(language.code)}
+                        color={speechLanguage === language.code ? 'black' : ''}
+                        fw={speechLanguage === language.code ? 'bold' : ''}
+                      >
+                        {language.name}
+                      </Menu.Item>
+                    ))}
+                  </Menu.Dropdown>
+                </Menu>
                 <ActionIcon
                   type="submit"
                   size="lg"
