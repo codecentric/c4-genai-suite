@@ -1,5 +1,5 @@
 import { ActionIcon, Button, Portal } from '@mantine/core';
-import { IconFilter, IconPaperclip } from '@tabler/icons-react';
+import { IconFilter, IconMicrophone, IconPaperclip } from '@tabler/icons-react';
 import { useMutation } from '@tanstack/react-query';
 import React, { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
@@ -169,6 +169,54 @@ export function ChatInput({ conversationId, configuration, isDisabled, isEmpty, 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const footer = `${configuration?.chatFooter || ''} ${theme.chatFooter || ''}`.trim();
+
+  const [isRecording, setIsRecording] = useState(false);
+  //const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+
+  const handleRecording = async () => {
+    console.log('handleRecording');
+
+    if (isRecording) {
+      mediaRecorderRef.current?.stop();
+      setIsRecording(false);
+    } else {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
+
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
+        }
+      };
+
+      mediaRecorder.onstop = () => {
+        stream.getTracks().forEach((track) => track.stop());
+
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
+
+        if (audioBlob.size > 0) {
+          console.log('audioBlob', audioBlob);
+        }
+
+        // Upload?
+        //const audioUrl = URL.createObjectURL(audioBlob);
+        //setAudioUrl(audioUrl);
+      };
+
+      mediaRecorder.onerror = (event) => {
+        console.error('MediaRecorder error:', event);
+      };
+
+      mediaRecorder.start();
+
+      setIsRecording(true);
+    }
+  };
+
   return (
     <>
       <div className="flex flex-col gap-2">
@@ -264,14 +312,26 @@ export function ChatInput({ conversationId, configuration, isDisabled, isEmpty, 
                   </Button>
                 )}
               </div>
-              <ActionIcon
-                type="submit"
-                size={'lg'}
-                disabled={!input || isDisabled || uploadMutations.some((m) => m.status === 'pending')}
-                data-testid="chat-submit-button"
-              >
-                <Icon icon="arrow-up" />
-              </ActionIcon>
+              <div className="flex items-center gap-1">
+                <ActionIcon
+                  variant={isRecording ? 'filled' : 'outline'}
+                  size="lg"
+                  color={isRecording ? 'red' : 'black'}
+                  className={`border-gray-200 ${isRecording ? 'animate-pulse' : ''}`}
+                  onClick={handleRecording}
+                  title={isRecording ? 'Stop recording' : 'Start recording'}
+                >
+                  <IconMicrophone className="w-4" />
+                </ActionIcon>
+                <ActionIcon
+                  type="submit"
+                  size="lg"
+                  disabled={!input || isDisabled || uploadMutations.some((m) => m.status === 'pending')}
+                  data-testid="chat-submit-button"
+                >
+                  <Icon icon="arrow-up" />
+                </ActionIcon>
+              </div>
             </div>
           </div>
         </form>
