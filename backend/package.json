@@ -43,7 +43,7 @@
     "@langchain/core": "^0.3.50",
     "@langchain/google-genai": "^0.2.5",
     "@langchain/google-vertexai": "^0.2.5",
-    "@langchain/mistralai": "^0.2.0",
+    "@langchain/mistralai": "^0.2.1",
     "@langchain/ollama": "^0.2.0",
     "@langchain/openai": "^0.5.8",
     "@modelcontextprotocol/sdk": "^1.10.2",
