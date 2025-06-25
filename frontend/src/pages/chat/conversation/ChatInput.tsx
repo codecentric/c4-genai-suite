@@ -193,7 +193,7 @@ export function ChatInput({ conversationId, configuration, isDisabled, isEmpty, 
         }
       };
 
-      mediaRecorder.onstop = () => {
+      /*mediaRecorder.onstop = () => {
         stream.getTracks().forEach((track) => track.stop());
 
         const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
@@ -205,6 +205,10 @@ export function ChatInput({ conversationId, configuration, isDisabled, isEmpty, 
         // Upload?
         //const audioUrl = URL.createObjectURL(audioBlob);
         //setAudioUrl(audioUrl);
+      };*/
+      mediaRecorder.onstop = () => {
+        stream.getTracks().forEach((track) => track.stop());
+        setInput('Audio recording stopped');
       };
 
       mediaRecorder.onerror = (event) => {
