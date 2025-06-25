@@ -2,17 +2,14 @@ FROM node:22.14.0 AS build
 ARG VERSION
 WORKDIR /src
 
-COPY package*.json .
+COPY package*.json ./
 RUN npm ci
 
 COPY . .
 RUN VITE_VERSION="$VERSION" npm run build
 
 
-#FROM caddy:2.9.1 # TODO switch back to official Caddy image after migration to GitHub has concluded. The official Caddy image cannot be used as a base image with codecentric's GitLab Runners.
-FROM alpine:3.21.3
-
-RUN apk add --no-cache caddy
+FROM caddy:2.10.0
 
 WORKDIR /srv
 

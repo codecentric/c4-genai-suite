@@ -9,7 +9,7 @@ RUN npm run build
 FROM base AS frontend_build
 ARG VERSION
 WORKDIR /src/frontend
-COPY frontend/package*.json .
+COPY frontend/package*.json ./
 RUN npm ci
 COPY frontend .
 RUN VITE_VERSION="$VERSION" npm run build
@@ -19,7 +19,7 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=80
 
-RUN apk add --no-cache caddy tini
+RUN apk add --no-cache caddy=2.8.4-r7 tini=0.19.0-r3
 COPY Caddyfile /etc/caddy/Caddyfile
 
 COPY --from=backend_build /src/backend/dist /app/backend/dist
