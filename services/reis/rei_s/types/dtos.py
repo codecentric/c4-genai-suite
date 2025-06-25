@@ -3,22 +3,27 @@ from pydantic import BaseModel, Field, ConfigDict
 from pydantic.alias_generators import to_camel
 
 
-class Identity(BaseModel):
-    file_name: str = Field(description="The name of the file.")
-    source_system: str = Field(description="The system that provided the source.")
-    unique_path_or_id: Optional[str] = Field(None, description="The unique path or ID of the source.")
-    link: Optional[str] = Field(None, description="A link to the source.")
-    version: Optional[str] = Field(None, description="The version of the source.")
-    mime_type: Optional[str] = Field(None, description="The MIME type of the source.")
+class ChunkDto(BaseModel):
+    uri: str = Field(description="Unique uri or id of the chunk.")
+    content: str = Field(description="The content of the chunk.")
+    pages: Optional[list[int]] = Field(description="The pages of the chunk inside the document.")
+    score: float = Field(description="The score of the result.")
+    model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
 
+
+class DocumentDto(BaseModel):
+    uri: str = Field(description="Unique uri or id of the document.")
+    name: str = Field(description="The name of the document, e.g. the file name")
+    mime_type: str = Field(description="The mime type of the document")
+    link: Optional[str] = Field(description="A link to the source of the document")
     model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
 
 
 class SourceDto(BaseModel):
     title: str = Field(description="The title of the source.")
-    identity: Identity = Field(description="The identity of the source.")
+    chunk: ChunkDto = Field(description="The chunk.")
+    document: Optional[DocumentDto] = Field(description="The document.")
     metadata: Optional[Dict[str, Any]] = Field(None, description="Additional metadata about the source.")
-
     model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
 
 

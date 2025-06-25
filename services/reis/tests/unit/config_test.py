@@ -1,12 +1,14 @@
 import os
+from typing import Generator
 from unittest import mock
+from pydantic import ValidationError
 import pytest
 
 from rei_s.config import Config
 
 
 @pytest.fixture
-def empty_env():
+def empty_env() -> Generator[None, None, None]:
     with mock.patch.dict(os.environ, clear=True):
         yield
 
@@ -41,8 +43,8 @@ def empty_env():
         ),
     ],
 )
-def test_env(empty_env, env_file, defined, undefined):
-    settings = Config(_env_file=env_file, _env_file_encoding="utf-8")
+def test_env(empty_env: None, env_file: str, defined: list[str], undefined: list[str]) -> None:
+    settings = Config(_env_file=env_file, _env_file_encoding="utf-8")  # type: ignore[call-arg]
 
     for name in undefined:
         assert getattr(settings, name) is None
@@ -60,9 +62,9 @@ def test_env(empty_env, env_file, defined, undefined):
         ("tests/data/env_embeddings_missing_openai_model.env", ["EMBEDDINGS_OPENAI_MODEL_NAME"]),
     ],
 )
-def test_env_missing(empty_env, env_file, expected_missing):
-    with pytest.raises(Exception) as exc_info:
-        Config(_env_file=env_file, _env_file_encoding="utf-8")
+def test_env_missing(empty_env: None, env_file: str, expected_missing: list[str]) -> None:
+    with pytest.raises(ValidationError) as exc_info:
+        Config(_env_file=env_file, _env_file_encoding="utf-8")  # type: ignore[call-arg]
 
     error_msgs = {i["msg"] for i in exc_info.value.errors()}
 
@@ -77,9 +79,9 @@ def test_env_missing(empty_env, env_file, expected_missing):
         ("tests/data/env_wrong_store_type.env"),
     ],
 )
-def test_env_wrong(empty_env, env_file):
-    with pytest.raises(Exception) as exc_info:
-        Config(_env_file=env_file, _env_file_encoding="utf-8")
+def test_env_wrong(empty_env: None, env_file: str) -> None:
+    with pytest.raises(ValidationError) as exc_info:
+        Config(_env_file=env_file, _env_file_encoding="utf-8")  # type: ignore[call-arg]
 
     assert len(exc_info.value.errors()) == 1
 

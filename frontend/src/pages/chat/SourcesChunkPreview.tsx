@@ -6,18 +6,23 @@ import { Alert } from 'src/components';
 import { useDocumentContent } from 'src/hooks/api/files';
 
 export type SourcesChunkPreviewProps = {
-  source: ChunksSource;
+  document: DocumentSource;
   onClose: () => void;
 };
 
-export type ChunksSource = {
-  docId: number;
-  chunkIds: string[];
+export type DocumentSource = {
+  conversationId: number;
+  messageId: number;
+  documentUri: string;
 };
 
-export const SourcesChunkPreview = ({ onClose, source }: SourcesChunkPreviewProps) => {
+export const SourcesChunkPreview = ({ onClose, document }: SourcesChunkPreviewProps) => {
   const { t } = useTranslation();
-  const { data, isPending, isError, refetch } = useDocumentContent(source.docId, source.chunkIds);
+  const { data, isPending, isError, refetch } = useDocumentContent(
+    document.conversationId,
+    document.messageId,
+    document.documentUri,
+  );
   const container = (children: ReactNode) => (
     <Card withBorder mt="sm" mr="xs" ml="6">
       <Card.Section withBorder inheritPadding py="xs">

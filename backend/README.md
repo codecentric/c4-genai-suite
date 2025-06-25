@@ -47,12 +47,10 @@ npm run migration:revert
 
 ## Create Extensions
 
-There is no static link to extensions from the extension module.
 Each extension class needs to meet the following criteria:
-- class name needs to have the suffix "Extension"
 - class need to include the decorator @Extension
 - class need to implement the interface Extension
-- class must be placed anywhere in the folder src/extensions/**
+- class must be added to the providers list in src/extensions/module.ts
 
 ## Test
 

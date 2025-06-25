@@ -195,6 +195,43 @@
         "tags": ["conversation"]
       }
     },
+    "/api/conversations/{id}/messages/{messageId}/documents/{documentUri}/chunks": {
+      "get": {
+        "description": "Get an array of document contents.",
+        "operationId": "getDocumentChunks",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "The ID of the conversation.",
+            "schema": { "type": "number" }
+          },
+          {
+            "name": "messageId",
+            "required": true,
+            "in": "path",
+            "description": "The ID of the ai message",
+            "schema": { "type": "number" }
+          },
+          {
+            "name": "documentUri",
+            "required": true,
+            "in": "path",
+            "description": "The uri of the document",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/json": { "schema": { "type": "array", "items": { "type": "string" } } } }
+          }
+        },
+        "summary": "",
+        "tags": ["conversation"]
+      }
+    },
     "/api/conversations/{id}/messages/{messageId}/sse": {
       "put": {
         "description": "Updates an existing message message of the converation and handles it.",
@@ -823,36 +860,6 @@
         "tags": ["files"]
       }
     },
-    "/api/buckets/documents/{docId}/content": {
-      "get": {
-        "description": "Get an array of document content by chunk ids.",
-        "operationId": "getDocumentContent",
-        "parameters": [
-          {
-            "name": "docId",
-            "required": true,
-            "in": "path",
-            "description": "The ID of the document known to REIS.",
-            "schema": { "type": "number" }
-          },
-          {
-            "name": "chunkIds",
-            "required": true,
-            "in": "query",
-            "description": "The IDs of the chunks.",
-            "schema": { "type": "array", "items": { "type": "string" } }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": { "application/json": { "schema": { "type": "array", "items": { "type": "string" } } } }
-          }
-        },
-        "summary": "",
-        "tags": ["files"]
-      }
-    },
     "/api/settings/{imageType}": {
       "get": {
         "description": "Gets the logo.",
@@ -1356,26 +1363,35 @@
         },
         "required": ["content", "type"]
       },
+      "ChunkDto": {
+        "type": "object",
+        "properties": {
+          "uri": { "type": "string", "description": "Uri or id of the chunk", "example": "s5q-chunk://{chunkId})" },
+          "content": { "type": "string", "description": "Text representation of the chunk" },
+          "pages": { "description": "Page reference, if applicable", "type": "array", "items": { "type": "number" } }
+        },
+        "required": ["content"]
+      },
+      "DocumentDto": {
+        "type": "object",
+        "properties": {
+          "uri": { "type": "string", "description": "Uri or id of the document", "example": "s5q-document://{documentId}" },
+          "name": { "type": "string", "description": "Name of the document" },
+          "mimeType": { "type": "string", "description": "MIME type of the document", "example": "application/pdf" },
+          "size": { "type": "number", "description": "Size of the document in bytes" },
+          "link": { "type": "string", "description": "Link to the document, if available" }
+        },
+        "required": ["uri", "mimeType"]
+      },
       "SourceDto": {
         "type": "object",
         "properties": {
           "title": { "type": "string", "description": "The title of the source." },
-          "identity": {
-            "type": "object",
-            "description": "The identity of the source.",
-            "properties": {
-              "fileName": { "type": "string", "nullable": false },
-              "sourceSystem": { "type": "string", "nullable": false },
-              "uniquePathOrId": { "type": "string", "nullable": true },
-              "link": { "type": "string", "nullable": true },
-              "version": { "type": "string", "nullable": true },
-              "mimeType": { "type": "string", "nullable": true },
-              "fileSize": { "type": "number", "nullable": true }
-            }
-          },
+          "chunk": { "description": "Chunk information", "allOf": [{ "$ref": "#/components/schemas/ChunkDto" }] },
+          "document": { "description": "Document information", "allOf": [{ "$ref": "#/components/schemas/DocumentDto" }] },
           "metadata": { "type": "object", "description": "Additional metadata about the source.", "additionalProperties": true }
         },
-        "required": ["title", "identity"]
+        "required": ["title", "chunk"]
       },
       "StreamSourcesEvent": {
         "type": "object",

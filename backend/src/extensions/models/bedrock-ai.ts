@@ -2,13 +2,13 @@ import { ChatBedrockConverse } from '@langchain/aws';
 import { CallbackHandlerMethods } from '@langchain/core/callbacks/base';
 import { createToolCallingAgent } from 'langchain/agents';
 import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from 'src/domain/chat';
-import { Extension, ExtensionConfiguration, ExtensionSpec } from 'src/domain/extensions';
+import { Extension, ExtensionConfiguration, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions';
 import { User } from 'src/domain/users';
 import { I18nService } from '../../localization/i18n.service';
 import { getEstimatedUsageCallback } from './internal/utils';
 
 @Extension()
-export class BedrockModelExtension implements Extension {
+export class BedrockModelExtension implements Extension<BedrockConverseExtensionConfiguration> {
   constructor(private readonly i18n: I18nService) {}
   get spec(): ExtensionSpec {
     return {
@@ -74,13 +74,13 @@ export class BedrockModelExtension implements Extension {
     await model.invoke('Just a test call');
   }
 
-  getMiddlewares(_: User, configuration: BedrockConverseExtensionConfiguration): Promise<ChatMiddleware[]> {
+  getMiddlewares(_: User, extension: ExtensionEntity<BedrockConverseExtensionConfiguration>): Promise<ChatMiddleware[]> {
     const middleware = {
       invoke: async (context: ChatContext, getContext: GetContext, next: ChatNextDelegate): Promise<any> => {
-        context.llms[this.spec.name] = await context.cache.get(this.spec.name, configuration, () => {
-          const callbacks = [getEstimatedUsageCallback('bedrock-ai', configuration.model, getContext)];
+        context.llms[this.spec.name] = await context.cache.get(this.spec.name, extension.values, () => {
+          const callbacks = [getEstimatedUsageCallback('bedrock-ai', extension.values.model, getContext)];
 
-          return this.createModel(configuration, callbacks);
+          return this.createModel(extension.values, callbacks);
         });
         context.agentFactory = createToolCallingAgent;
 

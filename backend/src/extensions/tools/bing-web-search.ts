@@ -2,12 +2,12 @@ import { StructuredTool } from '@langchain/core/tools';
 import { Logger } from '@nestjs/common';
 import { z } from 'zod';
 import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from 'src/domain/chat';
-import { Extension, ExtensionConfiguration, ExtensionSpec } from 'src/domain/extensions';
+import { Extension, ExtensionConfiguration, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions';
 import { User } from 'src/domain/users';
 import { I18nService } from '../../localization/i18n.service';
 
 @Extension()
-export class BingWebSearchExtension implements Extension {
+export class BingWebSearchExtension implements Extension<BingWebSearchExtensionConfiguration> {
   constructor(private readonly i18n: I18nService) {}
 
   get spec(): ExtensionSpec {
@@ -29,10 +29,10 @@ export class BingWebSearchExtension implements Extension {
     };
   }
 
-  getMiddlewares(user: User, configuration: BingWebSearchExtensionConfiguration, id: number): Promise<ChatMiddleware[]> {
+  getMiddlewares(_user: User, extension: ExtensionEntity<BingWebSearchExtensionConfiguration>): Promise<ChatMiddleware[]> {
     const middleware = {
       invoke: async (context: ChatContext, getContext: GetContext, next: ChatNextDelegate): Promise<any> => {
-        context.tools.push(new InternalTool(configuration, id));
+        context.tools.push(new InternalTool(extension.values, extension.externalId));
         return next(context);
       },
     };
@@ -57,10 +57,10 @@ class InternalTool extends StructuredTool {
     query: z.string().describe('The search query.'),
   });
 
-  constructor(configuration: BingWebSearchExtensionConfiguration, id: number) {
+  constructor(configuration: BingWebSearchExtensionConfiguration, extensionExternalId: string) {
     super();
 
-    this.name = `azure-ai-search-${id}`;
+    this.name = extensionExternalId;
 
     this.apiKey = configuration.apiKey;
 

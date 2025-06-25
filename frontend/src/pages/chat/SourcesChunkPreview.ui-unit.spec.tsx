@@ -7,7 +7,7 @@ import { render } from '../admin/test-utils';
 describe('SourcesChunkPreview', () => {
   const defaultProps: SourcesChunkPreviewProps = {
     onClose: vi.fn(),
-    source: { docId: 0, chunkIds: [] },
+    document: { conversationId: 0, messageId: 0, documentUri: 'test' },
   };
 
   it('should call onClose when cancel button is clicked', async () => {

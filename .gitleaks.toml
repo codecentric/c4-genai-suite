@@ -1,0 +1,11 @@
+title = "c4 Gitleaks configuration"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "global allow list"
+regexTarget = "match"
+regexes = [
+  '''secret''',
+]

@@ -3,14 +3,21 @@ import { DynamicStructuredTool } from '@langchain/core/tools';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { SSEClientTransport } from '@modelcontextprotocol/sdk/client/sse.js';
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
-import { CallToolRequest, CallToolResultSchema, ListToolsResultSchema } from '@modelcontextprotocol/sdk/types.js';
+import { CallToolRequest, CallToolResultSchema, ListToolsResultSchema, McpError } from '@modelcontextprotocol/sdk/types.js';
 import { JsonSchemaObject, jsonSchemaToZod } from '@n8n/json-schema-to-zod';
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { diff } from 'json-diff-ts';
 import { renderString } from 'nunjucks';
 import { z } from 'zod';
 import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from 'src/domain/chat';
-import { Extension, ExtensionArgument, ExtensionObjectArgument, ExtensionSpec } from 'src/domain/extensions';
+import {
+  Extension,
+  ExtensionArgument,
+  ExtensionEntity,
+  ExtensionObjectArgument,
+  ExtensionSpec,
+  ExtensionStringArgument,
+} from 'src/domain/extensions';
 import { User } from 'src/domain/users';
 import { I18nService } from '../../localization/i18n.service';
 import { transformMCPToolResponse } from './mcp-types/transformer';
@@ -22,6 +29,17 @@ enum Transport {
   STREAMABLE_HTTP = 'streamableHttp',
 }
 
+type ConfigurationAttributeSource = 'llm' | 'user' | 'admin';
+
+type ConfigurationAttributes = Record<
+  // one record per value
+  string,
+  {
+    source: ConfigurationAttributeSource;
+    value: any;
+  }
+>;
+
 interface Configuration {
   serverName: string;
   endpoint: string;
@@ -32,14 +50,7 @@ interface Configuration {
     {
       enabled: boolean;
       description?: string;
-      attributes?: Record<
-        // one record per value
-        string,
-        {
-          source: 'llm' | 'user' | 'admin';
-          value: any;
-        }
-      >;
+      attributes?: ConfigurationAttributes;
     }
   >;
 }
@@ -58,7 +69,13 @@ export class NamedDynamicStructuredTool extends DynamicStructuredTool {
   }
 }
 
-function toExtensionArgument(schema: JsonSchemaObject & { title?: string; description?: string }): ExtensionArgument | undefined {
+// zod has no password type since it is handled as string so we introduce a whitelist to map password fields
+const passwordKeys = ['apiKey', 'api-key', 'password', 'credentials'];
+
+function toExtensionArgument(
+  schema: JsonSchemaObject & { title?: string; description?: string },
+  attributeKey?: string,
+): ExtensionArgument | undefined {
   if (schema.type === 'number' || schema.type === 'integer') {
     return {
       type: 'number',
@@ -69,11 +86,13 @@ function toExtensionArgument(schema: JsonSchemaObject & { title?: string; descri
       required: false,
     };
   } else if (schema.type === 'string') {
+    const format = attributeKey && passwordKeys.includes(attributeKey) ? 'password' : (schema.format as 'input');
+
     return {
       type: 'string',
       title: '',
       enum: schema.enum as string[],
-      format: schema.format as 'input',
+      format,
       required: false,
     };
   } else if (schema.type === 'boolean') {
@@ -89,7 +108,7 @@ function toExtensionArgument(schema: JsonSchemaObject & { title?: string; descri
       required: false,
       properties: Object.entries(schema.properties ?? {}).reduce(
         (prev, [key, type]) => {
-          const propertyType = toExtensionArgument(type as JsonSchemaObject);
+          const propertyType = toExtensionArgument(type as JsonSchemaObject, key);
           if (propertyType) {
             prev[key] = propertyType;
           }
@@ -109,6 +128,7 @@ function toExtensionArgument(schema: JsonSchemaObject & { title?: string; descri
       title: '',
       required: false,
       items: arrayItemType,
+      default: schema.default as any[],
     };
   }
 }
@@ -120,7 +140,7 @@ function toArguments(i18n: I18nService, tools: MCPListToolsResultSchema['tools']
       toolObject.properties[tool.name] = Object.entries(methodSchema.properties ?? {}).reduce(
         (methodObject, [name, type]) => {
           const methodType = type as JsonSchemaObject;
-          const innerMethodType = toExtensionArgument(methodType);
+          const innerMethodType = toExtensionArgument(methodType, name);
           if (!innerMethodType) {
             return methodObject;
           }
@@ -179,14 +199,16 @@ function toUserArguments(values: Configuration, schemaArgument: ExtensionObjectA
   return Object.entries(values.schema ?? {}).reduce(
     (userArguments, [methodName, methodConfig]) => {
       if (methodConfig.enabled) {
+        const schemaObjectArgument = schemaArgument.properties?.[methodName] as ExtensionObjectArgument;
+        const descriptionArgument = schemaObjectArgument?.properties?.['description'] as ExtensionStringArgument;
+        const attributesArgument = schemaObjectArgument?.properties?.['attributes'] as ExtensionObjectArgument;
         const methodArguments = {
           type: 'object',
           title: methodName,
+          description: methodConfig?.description || descriptionArgument.default || '',
           properties: Object.entries(methodConfig.attributes ?? {}).reduce(
             (prev, [key, value]) => {
               if (value.source === 'user') {
-                const schemaObjectArgument = schemaArgument.properties?.[methodName] as ExtensionObjectArgument;
-                const attributesArgument = schemaObjectArgument?.properties?.['attributes'] as ExtensionObjectArgument;
                 const parameterArgument = attributesArgument?.properties?.[key] as ExtensionObjectArgument;
                 const valuesArguments = parameterArgument?.properties?.['value'];
                 if (valuesArguments) {
@@ -212,7 +234,7 @@ function toUserArguments(values: Configuration, schemaArgument: ExtensionObjectA
 
 @Extension()
 @Injectable()
-export class MCPToolsExtension implements Extension {
+export class MCPToolsExtension implements Extension<Configuration> {
   private logger = new Logger(this.constructor.name);
 
   constructor(protected readonly i18n: I18nService) {}
@@ -263,14 +285,16 @@ export class MCPToolsExtension implements Extension {
   }
 
   async buildSpec(
-    values: Configuration,
-    state: ExtensionState,
+    extension: ExtensionEntity<Configuration>,
     throwOnError: boolean,
     forceRebuild: boolean,
   ): Promise<ExtensionSpec> {
     const spec = this.spec;
+    const state = (extension.state ?? {}) as ExtensionState;
+    const values = extension.values;
+
     try {
-      const changed = values.endpoint !== state.endpoint;
+      const changed = values.endpoint !== state?.endpoint;
 
       if (changed || !state.tools || forceRebuild) {
         const { tools } = await this.getTools(values);
@@ -288,7 +312,12 @@ export class MCPToolsExtension implements Extension {
       }
 
       spec.arguments['schema'] = toArguments(this.i18n, state.tools);
-      spec.userArguments = toUserArguments(values, spec.arguments['schema']);
+      spec.userArguments = {
+        type: 'object',
+        title: values.serverName,
+        description: '',
+        properties: toUserArguments(values, spec.arguments['schema']),
+      };
     } catch (err) {
       const errorMessage = `Cannot connect to mcp tool`;
 
@@ -325,16 +354,42 @@ export class MCPToolsExtension implements Extension {
     });
   }
 
+  private applyTemplates(context: ChatContext, templateArgs: Record<string, any>, args?: Record<string, any>) {
+    const templateKeys = Object.keys(templateArgs);
+
+    return Object.fromEntries(
+      Object.entries(args ?? templateArgs).map(([key, value]) => [
+        key,
+        typeof value === 'string' && typeof templateArgs[key] === 'string' && templateArgs[key]
+          ? renderString(templateArgs[key], {
+              ...context,
+              language: this.i18n.language,
+              value,
+            })
+          : templateKeys.includes(key)
+            ? value
+            : undefined,
+      ]),
+    );
+  }
+
+  private getTemplateArgs(attributes: ConfigurationAttributes, source: ConfigurationAttributeSource) {
+    return Object.fromEntries(
+      Object.entries(attributes)
+        .filter(([_, attribute]) => attribute.source === source)
+        .map(([key, attribute]) => [key, attribute.value ?? null]),
+    );
+  }
+
   async getMiddlewares(
     _user: User,
-    configuration: Configuration,
-    extensionId: number,
+    extension: ExtensionEntity<Configuration>,
     userArgs?: Record<string, Record<string, any>>,
   ): Promise<ChatMiddleware[]> {
     const middleware = {
       invoke: async (context: ChatContext, _: GetContext, next: ChatNextDelegate): Promise<any> => {
-        const { tools, client } = (await this.getTools(configuration)) ?? [];
-        const schemaData = configuration.schema ?? {};
+        const { tools, client } = (await this.getTools(extension.values)) ?? [];
+        const schemaData = extension.values.schema ?? {};
 
         const filteredTools = tools.filter((x) => schemaData[x.name]?.enabled);
 
@@ -342,42 +397,50 @@ export class MCPToolsExtension implements Extension {
           ...filteredTools.map(({ name, description, inputSchema }) => {
             const params = schemaData[name];
             const schema = inputSchema as JsonSchemaObject;
+            // only expose attributes that are configured to be defined by the llm
             schema.properties = Object.fromEntries(
               Object.entries(schema.properties ?? {}).filter(([key]) => params.attributes?.[key]?.source === 'llm'),
             );
-            const templateAdminArgs = Object.fromEntries(
-              Object.entries(params.attributes ?? {})
-                .filter((entry) => entry[1].source === 'admin')
-                .map(([key, value]) => [key, value.value]),
-            );
-            const userDefined = userArgs?.[name] ?? {};
+
+            const userDefinedArgs = userArgs?.[name] ?? {};
+            const displayName = `${extension.values.serverName}: ${name}`;
 
             return new NamedDynamicStructuredTool({
-              displayName: `${configuration.serverName}: ${name}`,
-              name: `${name}_${extensionId}`,
+              displayName,
+              name: `${extension.externalId}_${name}`,
               description: params.description || description || name,
               schema: jsonSchemaToZod(schema),
               func: async (args: Record<string, any>) => {
-                // allows templating the admin defined value based on context and original llmValue
-                const adminArgs = Object.fromEntries(
-                  Object.entries(templateAdminArgs).map(([key, value]) => [
-                    key,
-                    typeof value === 'string'
-                      ? renderString(value, { ...context, userArgs, llmValue: args[key] as string })
-                      : value,
-                  ]),
-                );
+                const attributes = params.attributes ?? {};
+                const adminArgs = this.applyTemplates(context, this.getTemplateArgs(attributes, 'admin'));
+                const llmArgs = this.applyTemplates(context, this.getTemplateArgs(attributes, 'llm'), args);
+                const userArgs = this.applyTemplates(context, this.getTemplateArgs(attributes, 'user'), userDefinedArgs);
+                this.logger.log(`Calling function ${name}`);
 
-                const argument = { ...args, ...adminArgs, ...userDefined };
-                this.logger.log(`Calling function ${name}`, { argument: argument });
-                const req: CallToolRequest = { method: 'tools/call', params: { name, arguments: argument } };
-                const res = await client.request(req, CallToolResultSchema);
-                const { sources, content } = transformMCPToolResponse(res);
-                if (sources.length) {
-                  context.result.next({ type: 'sources', content: sources });
+                try {
+                  const req: CallToolRequest = {
+                    method: 'tools/call',
+                    params: { name, arguments: { ...llmArgs, ...adminArgs, ...userArgs } },
+                  };
+                  const res = await client.request(req, CallToolResultSchema);
+                  const { sources, content } = transformMCPToolResponse(res);
+                  if (sources.length) {
+                    context.history?.addSources(extension.externalId, sources);
+                  }
+
+                  return content;
+                } catch (err) {
+                  context.result.next({
+                    type: 'debug',
+                    content: this.i18n.t('texts.extensions.mcpTools.errorToolCall', { tool: name }),
+                  });
+                  if (err instanceof McpError) {
+                    this.logger.error('mcpError during tool call', err);
+                  } else {
+                    this.logger.error('error during tool call', err);
+                  }
+                  throw err;
                 }
-
-                return content;
               },
             });
           }),

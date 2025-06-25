@@ -6,7 +6,7 @@ from fastapi.openapi.utils import get_openapi
 from rei_s.app_factory import create
 
 
-def generate():
+def generate() -> None:
     filename = "reis-spec.json" if "--no-dev" in argv else "reis-dev-spec.json"
     app = create()
 

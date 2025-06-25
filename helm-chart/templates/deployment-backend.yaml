@@ -139,6 +139,12 @@ spec:
             - secretRef:
                 name: {{ include "c4genaisuite.fullname" . }}-backend
           volumeMounts:
+          {{- if and .Values.backend.ssl.rootCertificateConfigMapName .Values.backend.ssl.rootCertificateConfigMapKey }}
+            - mountPath: /etc/ssl/certs/{{ .Values.backend.ssl.rootCertificateConfigMapKey }}
+              name: root-certificate
+              subPath: {{ .Values.backend.ssl.rootCertificateConfigMapKey }}
+              readOnly: true
+          {{- end }}
           {{- if or .Values.backend.postgresql.ssl.rootCertificateConfigMapName .Values.backend.postgresql.ssl.clientCertificateSecretName }}
             {{- if .Values.backend.postgresql.ssl.rootCertificateConfigMapKey }}
             - mountPath: /etc/ssl/certs/{{ .Values.backend.postgresql.ssl.rootCertificateConfigMapKey }}
@@ -161,6 +167,11 @@ spec:
           {{- toYaml . | nindent 12 }}
           {{- end }}
       volumes:
+        {{- if .Values.backend.ssl.rootCertificateConfigMapName }}
+        - name: root-certificate
+          configMap:
+            name: {{ .Values.backend.ssl.rootCertificateConfigMapName }}
+        {{- end }}
       {{- if or .Values.backend.postgresql.ssl.rootCertificateConfigMapName .Values.backend.postgresql.ssl.clientCertificateSecretName }}
         {{- if .Values.backend.postgresql.ssl.rootCertificateConfigMapName }}
         - name: postgresql-root-certificate

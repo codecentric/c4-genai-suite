@@ -8,29 +8,29 @@ license = "Apache-2.0"
 
 [tool.poetry.dependencies]
 python = "<4.0,>=3.12.0"
-pydantic = "2.11.6"
-pydantic-settings = "^2.7.1"
-langchain-core = "0.3.65"
-langchain-community = "0.3.25"
-langchain-openai = "0.3.23"
-langchain-postgres = "0.0.13"
+pydantic = "2.11.7"
+pydantic-settings = "^2.10.1"
+langchain-core = "0.3.66"
+langchain-community = "0.3.26"
+langchain-openai = "0.3.25"
+langchain-postgres = "0.0.15"
 psycopg = {extras = ["binary"], version = "^3.2.9"}
-fastapi = {extras = ["standard"], version = "0.115.12"}
+fastapi = {extras = ["standard"], version = "0.115.13"}
 azure-search-documents = "11.5.2"
 azure-identity = "1.23.0"
-unstructured = {extras = ["docx", "md", "pptx", "xlsx"], version = "0.17.2"}
+unstructured = {extras = ["docx", "md", "pptx", "xlsx"], version = "0.18.1"}
 pdfminer-six = "^20250506"
 ffmpeg-python = "^0.2.0"
 aiofiles = "^24.1.0"
 prometheus-fastapi-instrumentator = "^7.0.0"
-fastmcp = "^2.8.0"
+fastmcp = "^2.9.0"
 langchain-ollama = "^0.3.3"
 
 [tool.poetry.group.dev.dependencies]
-ruff = "0.11.13"
+ruff = "0.12.0"
 mypy = "1.16.1"
 pre-commit = "4.2.0"
-pytest = "8.4.0"
+pytest = "8.4.1"
 pytest-cov = "6.2.1"
 pytest-mock = "3.14.1"
 pytest-responses = "0.5.1"
@@ -60,7 +60,7 @@ line-length = 120
 select = ["E", "W", "F", "N", "A", "B"]
 
 [tool.mypy]
-# strict = true  # maybe we should activate the strict mode in the future
+strict = true
 install_types = true
 non_interactive = true
 ignore_missing_imports = true

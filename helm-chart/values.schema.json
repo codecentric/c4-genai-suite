@@ -75,6 +75,21 @@
                     "description": "Base URL should match `https://{{ingress.host}}`. Required for OpenID Connect or assistants using Dall-E image generation.",
                     "default": "\"\""
                 },
+                "ssl": {
+                    "type": "object",
+                    "properties": {
+                        "rootCertificateConfigMapName": {
+                            "type": "string",
+                            "description": "Name of the ConfigMap containing the root certificate for the external services.",
+                            "default": ""
+                        },
+                        "rootCertificateConfigMapKey": {
+                            "type": "string",
+                            "description": "Key in the ConfigMap that holds the root certificate for the external services.",
+                            "default": "ca.crt"
+                        }
+                    }
+                },
                 "auth": {
                     "type": "object",
                     "properties": {

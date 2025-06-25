@@ -13,7 +13,7 @@ export class ChooseLllMiddleware implements ChatMiddleware {
   constructor(private readonly commandBus: CommandBus) {}
 
   async invoke(context: ChatContext, getContext: GetContext, next: ChatNextDelegate): Promise<any> {
-    if (context.llm) {
+    if (context.llm && context.llms[context.llm]) {
       await next(context);
       return;
     }

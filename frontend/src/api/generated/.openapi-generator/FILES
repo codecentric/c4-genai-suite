@@ -15,6 +15,7 @@ models/BucketDto.ts
 models/BucketDtoFileSizeLimits.ts
 models/BucketsDto.ts
 models/ChatSuggestionDto.ts
+models/ChunkDto.ts
 models/ConfigurationDto.ts
 models/ConfigurationUserValuesDto.ts
 models/ConfigurationsDto.ts
@@ -23,6 +24,7 @@ models/ConversationDto.ts
 models/ConversationsDto.ts
 models/CreateConversationDto.ts
 models/CreateExtensionDto.ts
+models/DocumentDto.ts
 models/ExtensionArgumentArraySpecDto.ts
 models/ExtensionArgumentArraySpecDtoItems.ts
 models/ExtensionArgumentBooleanSpecDto.ts
@@ -57,7 +59,6 @@ models/SendMessageDto.ts
 models/SettingsDto.ts
 models/SiteLinkDto.ts
 models/SourceDto.ts
-models/SourceDtoIdentity.ts
 models/StreamCompletedEventDto.ts
 models/StreamDebugEvent.ts
 models/StreamErrorEventDto.ts

@@ -1,10 +1,10 @@
 import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from 'src/domain/chat';
-import { Extension, ExtensionConfiguration, ExtensionSpec } from 'src/domain/extensions';
+import { Extension, ExtensionConfiguration, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions';
 import { User } from 'src/domain/users';
 import { I18nService } from '../../localization/i18n.service';
 
 @Extension()
-export class CustomPromptExtension implements Extension {
+export class CustomPromptExtension implements Extension<CustomPromptExtensionConfiguration> {
   constructor(private readonly i18n: I18nService) {}
 
   get spec(): ExtensionSpec {
@@ -25,10 +25,10 @@ export class CustomPromptExtension implements Extension {
     };
   }
 
-  getMiddlewares(_: User, configuration: CustomPromptExtensionConfiguration): Promise<ChatMiddleware[]> {
+  getMiddlewares(_: User, extension: ExtensionEntity<CustomPromptExtensionConfiguration>): Promise<ChatMiddleware[]> {
     const middleware = {
       invoke: async (context: ChatContext, getContext: GetContext, next: ChatNextDelegate): Promise<any> => {
-        const { text } = configuration;
+        const { text } = extension.values;
         if (text) {
           context.systemMessages.push(text);
         }

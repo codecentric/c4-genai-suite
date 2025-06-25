@@ -1,7 +1,7 @@
 import { StructuredTool } from '@langchain/core/tools';
 import { z } from 'zod';
 import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from 'src/domain/chat';
-import { Extension, ExtensionConfiguration, ExtensionSpec } from 'src/domain/extensions';
+import { Extension, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions';
 import { User } from 'src/domain/users';
 import { I18nService } from '../../localization/i18n.service';
 
@@ -20,10 +20,10 @@ export class ConfirmExtension implements Extension {
     };
   }
 
-  getMiddlewares(user: User, configuration: ExtensionConfiguration, id: number): Promise<ChatMiddleware[]> {
+  getMiddlewares(_user: User, extension: ExtensionEntity): Promise<ChatMiddleware[]> {
     const middleware = {
       invoke: async (context: ChatContext, getContext: GetContext, next: ChatNextDelegate): Promise<any> => {
-        context.tools.push(new InternalTool(context, id));
+        context.tools.push(new InternalTool(context, extension.externalId));
         return next(context);
       },
     };
@@ -52,11 +52,11 @@ class InternalTool extends StructuredTool {
 
   constructor(
     private readonly context: ChatContext,
-    id: number,
+    extensionExternalId: string,
   ) {
     super();
 
-    this.name = `confirm_${id}`;
+    this.name = extensionExternalId;
   }
 
   protected async _call(arg: z.infer<typeof this.schema>): Promise<string> {

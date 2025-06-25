@@ -3,11 +3,14 @@ import ffmpeg
 from pydantic import ValidationError
 import pytest
 from langchain_core.documents import Document
+from pytest_mock import MockerFixture
+from faker import Faker
 
 from rei_s.services.formats.utils import ProcessingError
 from rei_s.services.formats.video_transcription_provider import VideoTranscriptionProvider
 from rei_s.services.formats.voice_transcription_provider import VoiceTranscriptionProvider
 from rei_s.types.source_file import SourceFile
+from rei_s.config import Config
 from tests.conftest import get_test_config
 
 # Here we test the STT integration end to end by calling to a test deployment
@@ -17,7 +20,7 @@ from tests.conftest import get_test_config
 # If needed environment variables are missing, the test is skipped
 
 
-def test_lfs_files_available():
+def test_lfs_files_available() -> None:
     lfs_file = "tests/data/birthdays.mp3"
     file_size = os.path.getsize(lfs_file)
     assert file_size > 1000, (
@@ -27,14 +30,14 @@ def test_lfs_files_available():
 
 
 @pytest.fixture(scope="module", autouse=True)
-def check_ffmpeg_available():
+def check_ffmpeg_available() -> None:
     try:
         ffmpeg.probe("tests/data/birthdays.mp3", loglevel="warning")
     except FileNotFoundError:
         pytest.skip("ffmpeg not available, skip all STT tests")
 
 
-def get_mock_config():
+def get_mock_config() -> Config:
     return get_test_config(
         dict(
             stt_type="azure-openai-whisper",
@@ -46,7 +49,7 @@ def get_mock_config():
     )
 
 
-def get_config_override():
+def get_config_override() -> Config:
     try:
         return get_test_config(
             dict(
@@ -58,7 +61,7 @@ def get_config_override():
 
 
 @pytest.fixture
-def mocked_whisper_answer(mocker, faker):
+def mocked_whisper_answer(mocker: MockerFixture, faker: Faker) -> str:
     content = faker.text()
     docs = [Document(content)]
     mocker.patch("langchain_community.document_loaders.parsers.audio.AzureOpenAIWhisperParser.parse", return_value=docs)
@@ -75,7 +78,7 @@ def mocked_whisper_answer(mocker, faker):
         "birthdays.wav",
     ],
 )
-def test_audio_transcription_provider_mocked(mocked_whisper_answer, filename):
+def test_audio_transcription_provider_mocked(mocked_whisper_answer: str, filename: str) -> None:
     source_file = SourceFile(path=f"tests/data/{filename}", mime_type="", file_name=filename)
 
     # the audio file is 16 s long. With a segment duration of 7 s we split it in 3 parts
@@ -91,7 +94,7 @@ def test_audio_transcription_provider_mocked(mocked_whisper_answer, filename):
     assert mocked_whisper_answer in docs[1].page_content
 
 
-def test_audio_transcription_provider_broken_file(mocked_whisper_answer):
+def test_audio_transcription_provider_broken_file(mocked_whisper_answer: str) -> None:
     # we will give something which is not a media file to ffmpeg and wait the error
     source_file = SourceFile(path="tests/data/birthdays.pdf", mime_type="audio/mp3", file_name="birthdays.mp3")
 
@@ -102,7 +105,7 @@ def test_audio_transcription_provider_broken_file(mocked_whisper_answer):
     with pytest.raises(ProcessingError) as e:
         provider.process_file(source_file)
         assert e.value.message.startswith("Error handling audio file for voice transcription with ffmpeg")
-        assert e.value.status.startswith(400)
+        assert 400 <= e.value.status < 500
 
 
 # Since Whisper has a rather low rate limit in requests per minute, this test might take a few minutes to finish
@@ -112,7 +115,7 @@ def test_audio_transcription_provider_broken_file(mocked_whisper_answer):
         "birthdays.flac",
     ],
 )
-def test_audio_transcription_provider(filename: str):
+def test_audio_transcription_provider(filename: str) -> None:
     config = get_config_override()
 
     source_file = SourceFile(path=f"tests/data/{filename}", mime_type="", file_name=filename)
@@ -136,7 +139,7 @@ def test_audio_transcription_provider(filename: str):
         "birthdays.wav",
     ],
 )
-def test_video_transcription_provider_mocked(mocked_whisper_answer, filename):
+def test_video_transcription_provider_mocked(mocked_whisper_answer: str, filename: str) -> None:
     source_file = SourceFile(path=f"tests/data/{filename}", mime_type="video/mp4", file_name="birthdays.mp4")
 
     provider = VideoTranscriptionProvider(config=get_mock_config(), chunk_size=200, chunk_overlap=0)
@@ -148,7 +151,7 @@ def test_video_transcription_provider_mocked(mocked_whisper_answer, filename):
     assert mocked_whisper_answer in docs[0].page_content
 
 
-def test_video_transcription_provider_broken_file(mocked_whisper_answer):
+def test_video_transcription_provider_broken_file(mocked_whisper_answer: str) -> None:
     # we will give something which is not a media file to ffmpeg and wait the error
 
     source_file = SourceFile(path="tests/data/birthdays.pdf", mime_type="video/mp4", file_name="birthdays.mp4")
@@ -162,4 +165,4 @@ def test_video_transcription_provider_broken_file(mocked_whisper_answer):
         assert e.value.message.startswith(
             "Error extracting audio track from video file for voice transcription with ffmpeg"
         )
-        assert e.value.status.startswith(400)
+        assert 400 <= e.value.status < 500

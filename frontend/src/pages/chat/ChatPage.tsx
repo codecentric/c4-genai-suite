@@ -14,7 +14,7 @@ import { texts } from 'src/texts';
 import { isMobile } from '../utils';
 import { Conversations } from './Conversations';
 import { NewPage } from './NewPage';
-import { ChunksSource, SourcesChunkPreview } from './SourcesChunkPreview';
+import { DocumentSource, SourcesChunkPreview } from './SourcesChunkPreview';
 import { ConversationPage } from './conversation/ConversationPage';
 import { Files } from './files/Files';
 import { useAIConversation } from './state';
@@ -53,7 +53,7 @@ export function ChatPage() {
   const api = useApi();
   const { theme } = useTheme();
   const isMobileView = isMobile();
-  const [selectedChunkSource, setSelectedChunkSource] = useState<ChunksSource | undefined>();
+  const [selectedDocument, setSelectedDocument] = useState<DocumentSource | undefined>();
 
   const navigate = useTransientNavigate();
 
@@ -63,7 +63,7 @@ export function ChatPage() {
 
   const [sidebarLeft, setSidebarLeft] = useSidebarState('sidebar-left');
   const [sidebarRight, setSidebarRight] = useSidebarState('sidebar-right');
-  const panelSizes = getPanelSizes(sidebarRight || !!selectedChunkSource);
+  const panelSizes = getPanelSizes(sidebarRight || !!selectedDocument);
 
   // Consider to stop handing this down into the ProfileButton and use a hook inside the ProfileButton for this instead
   const deleting = useMutation({
@@ -86,8 +86,8 @@ export function ChatPage() {
     }
   };
   // close the sources tab everytime the user selects another conversation
-  useEffect(() => setSelectedChunkSource(undefined), [selectedConversationId]);
-  const rightPanelVisible = sidebarRight && selectedConversationId && (userBucket || selectedChunkSource);
+  useEffect(() => setSelectedDocument(undefined), [selectedConversationId]);
+  const rightPanelVisible = sidebarRight && selectedConversationId && (userBucket || selectedDocument);
   return (
     <div className="flex h-screen flex-col">
       <NavigationBar theme={theme} />
@@ -147,8 +147,8 @@ export function ChatPage() {
                       onConversationSelected={setSelectedConversationId}
                       selectedConfigurationId={selectedConfigurationId}
                       onConfigurationSelected={setSelectedConfigurationId}
-                      selectSourceChunkIds={(docId, chunkIds) => {
-                        setSelectedChunkSource({ docId, chunkIds });
+                      selectDocument={(conversationId, messageId, documentUri) => {
+                        setSelectedDocument({ conversationId, messageId, documentUri });
                         setSidebarRight(true);
                       }}
                     />
@@ -175,8 +175,8 @@ export function ChatPage() {
                 onClick={() => setSidebarRight(!sidebarRight)}
                 tooltip={
                   sidebarRight
-                    ? texts.common.hide(selectedChunkSource ? texts.chat.sources.content : texts.common.files)
-                    : texts.common.show(selectedChunkSource ? texts.chat.sources.content : texts.common.files)
+                    ? texts.common.hide(selectedDocument ? texts.chat.sources.content : texts.common.files)
+                    : texts.common.show(selectedDocument ? texts.chat.sources.content : texts.common.files)
                 }
               />
             )}
@@ -186,8 +186,8 @@ export function ChatPage() {
           <>
             {!isMobileView && <CustomResizeHandle />}
             <Panel style={{ overflow: 'auto' }} id="right" order={2} {...panelSizes.right} className="bg-gray-100">
-              {selectedChunkSource ? (
-                <SourcesChunkPreview onClose={() => setSelectedChunkSource(undefined)} source={selectedChunkSource} />
+              {selectedDocument ? (
+                <SourcesChunkPreview onClose={() => setSelectedDocument(undefined)} document={selectedDocument} />
               ) : (
                 userBucket && (
                   <Files

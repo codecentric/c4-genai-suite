@@ -36,7 +36,7 @@ RUN npm ci --omit=dev
 #
 FROM base AS production
 
-RUN apk add git python3 uv
+RUN apk add git python3=3.12.11-r0 uv=0.5.31-r0
 
 WORKDIR /mcp-server
 

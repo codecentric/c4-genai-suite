@@ -1,11 +1,11 @@
 import { ChatOpenAI } from '@langchain/openai';
 import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from 'src/domain/chat';
-import { Extension, ExtensionConfiguration, ExtensionSpec } from 'src/domain/extensions';
+import { Extension, ExtensionConfiguration, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions';
 import { User } from 'src/domain/users';
 import { I18nService } from '../../localization/i18n.service';
 
 @Extension()
-export class OpenAICompatibleModelExtension implements Extension {
+export class OpenAICompatibleModelExtension implements Extension<OpenAICompatibleModelExtensionConfiguration> {
   constructor(private readonly i18n: I18nService) {}
 
   get spec(): ExtensionSpec {
@@ -74,11 +74,11 @@ export class OpenAICompatibleModelExtension implements Extension {
     await model.invoke('Just a test call');
   }
 
-  getMiddlewares(_: User, configuration: OpenAICompatibleModelExtensionConfiguration): Promise<ChatMiddleware[]> {
+  getMiddlewares(_: User, extension: ExtensionEntity<OpenAICompatibleModelExtensionConfiguration>): Promise<ChatMiddleware[]> {
     const middleware = {
       invoke: async (context: ChatContext, getContext: GetContext, next: ChatNextDelegate): Promise<any> => {
-        context.llms[this.spec.name] = await context.cache.get(this.spec.name, configuration, () => {
-          return this.createModel(configuration, true);
+        context.llms[this.spec.name] = await context.cache.get(this.spec.name, extension.values, () => {
+          return this.createModel(extension.values, true);
         });
 
         return next(context);

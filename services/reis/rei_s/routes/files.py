@@ -27,7 +27,7 @@ from rei_s.metrics.metrics import files_added_to_queue
 router = APIRouter()
 
 
-def check_index_name(index_name: str):
+def check_index_name(index_name: str) -> str | None:
     # We enforce the most strict subset of rules to satisfy all vector stores
     # (at the moment that are just the Azure AI Search rules)
     if index_name == "":
@@ -135,7 +135,7 @@ async def post_files(
     index_name: Annotated[
         str | None, Header(description="The name of the index", alias="indexName"), AfterValidator(check_index_name)
     ] = None,
-):
+) -> None:
     """
     Processes the file into chunks and stores them in the vector store.
     """
@@ -226,7 +226,7 @@ def delete_files(
     index_name: Annotated[
         str | None, Query(description="The name of the index", alias="indexName"), AfterValidator(check_index_name)
     ] = None,
-):
+) -> None:
     """
     Deletes all chunks belonging to the specified file in the vector store.
     """

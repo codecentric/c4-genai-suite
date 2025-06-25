@@ -216,9 +216,10 @@
       "toolDescription": "Beschreibung",
       "toolDescriptionHint": "Beschreibung des Tools.",
       "source": "Quelle",
-      "sourceHint": "Wo soll der Wert definiert werden.",
-      "value": "Wert",
-      "valueHint": "Fester Wert, der verwendet wird, wenn die ausgewählte Quelle 'Admin' ist."
+      "sourceHint": "An welcher Stelle wird der Wert bestimmt.",
+      "value": "Wert (Template)",
+      "valueHint": "Wert, der beim Toolaufruf verwendet wird.",
+      "errorToolCall": "Es ist ein Fehler aufgetreten beim Aufruf des Tools '{tool}'"
     }
   },
   "chat": {

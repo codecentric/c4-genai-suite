@@ -1,73 +1,59 @@
-import { SourceDto } from '../../../controllers/shared';
-import { MCPText } from './transformer';
+import { Source } from 'src/domain/chat';
 
 export type C4JsonType = {
   kind: string;
   version: string;
   data: {
     text: string;
-    original: string;
+    original?: string;
     id: string;
     score: number;
     region: {
-      bounding_boxes: {
+      bounding_boxes?: {
         left: number;
         top: number;
         width: number;
         height: number;
         page: number;
       }[];
+      pages?: number[];
     };
     metadata: {
       uri: string;
       mime_type: string;
-      attributes: Record<string, any>;
+      link?: string;
+      size?: number;
+      title?: string;
+      attributes?: {
+        [key: string]: any;
+      };
     };
   };
 };
 
-const getDistinctPages = (regions: C4JsonType['data']['region']): string => {
-  const pages = Array.from(new Set(regions.bounding_boxes.map((x) => x.page)));
-  return pages.join(',');
+const getDistinctPages = (regions: C4JsonType['data']['region']): number[] => {
+  return Array.from(new Set(regions.bounding_boxes?.map((x) => x.page) ?? regions.pages ?? []));
 };
 
 export const convertC4JsonToText = (type: C4JsonType): { type: 'text'; text: string } => {
-  return { type: 'text', text: type.data.text };
+  return { type: 'text', text: type.data.original ?? type.data.text };
 };
 
-export const convertC4JsonToSource = (type: C4JsonType): SourceDto => {
+export const convertC4JsonToSource = (type: C4JsonType): Source => {
   const metadata = type.data.metadata;
   return {
-    title: type.data.id,
-    identity: {
-      fileName: type.data.id,
-      sourceSystem: 'Sherloq',
-      uniquePathOrId: type.data.id,
-      // Link to tool proxy which shows the uri
-      //link: type.data.metadata.uri,
-      mimeType: metadata.mime_type,
+    title: type.data.metadata.title ?? type.data.id,
+    chunk: {
+      content: type.data.original ?? type.data.text,
+      pages: getDistinctPages(type.data.region),
+      score: type.data.score,
     },
-    metadata: {
-      ...(metadata.attributes ?? {}),
-      page: getDistinctPages(type.data.region),
+    document: {
+      uri: type.data.metadata.uri,
+      mimeType: type.data.metadata.mime_type,
+      link: type.data.metadata.link,
+      size: type.data.metadata.size,
     },
+    metadata: metadata.attributes ?? {},
   };
-};
-
-export const getDataFromC4Json = ({
-  mimeType,
-  text,
-}: {
-  mimeType?: string;
-  text: unknown;
-}): { text: MCPText; source: SourceDto } | undefined => {
-  if (mimeType === 'application/x-c4-json-v1') {
-    const sourceData = JSON.parse(text as string) as C4JsonType;
-    return {
-      text: convertC4JsonToText(sourceData),
-      source: convertC4JsonToSource(sourceData),
-    };
-  }
-
-  return undefined;
 };

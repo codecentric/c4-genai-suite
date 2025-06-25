@@ -13,8 +13,8 @@ services:
 
   c4-backend:
     build:
-      context: .
-      dockerfile: Containerfile.backend
+      context: backend
+      dockerfile: Containerfile
     hostname: c4-backend
     environment:
       AUTH_ENABLE_PASSWORD: true
@@ -116,7 +116,8 @@ services:
             "mcp-fetch": {
               "command": "uvx",
               "args": [
-                "mcp-server-fetch"
+                "mcp-server-fetch",
+                "--ignore-robots-txt"
               ],
               "port": 8000
             }

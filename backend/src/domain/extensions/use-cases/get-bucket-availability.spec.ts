@@ -1,4 +1,4 @@
-import { Extension } from '@c4/library/domain/extensions';
+import { Extension } from 'src/domain/extensions';
 import {
   BucketEntity,
   BucketRepository,
@@ -99,6 +99,7 @@ function createBucketEntityByType(type: BucketType): BucketEntity {
 function createExtensionEntity(name: string): ExtensionEntity {
   return {
     id: 1,
+    externalId: '1',
     name,
     enabled: true,
     values: {

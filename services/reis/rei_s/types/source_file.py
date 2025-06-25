@@ -1,6 +1,7 @@
 from contextlib import contextmanager
 import os
 from tempfile import NamedTemporaryFile
+from typing import Generator
 import uuid
 
 from pydantic import BaseModel, Field
@@ -40,12 +41,14 @@ class SourceFile(BaseModel):
 
         return SourceFile(id=id_, path=path, mime_type="", file_name=file_name)
 
-    def delete(self):
+    def delete(self) -> None:
         os.remove(self.path)
 
 
 @contextmanager
-def temp_file(buffer: bytes, extension: str | None = None, mime_type: str = "", file_name: str | None = None):
+def temp_file(
+    buffer: bytes, extension: str | None = None, mime_type: str = "", file_name: str | None = None
+) -> Generator[SourceFile, None, None]:
     """Creates a temporary file with the given content, which is deleted on leaving the context"""
     # note that the tempfiles will be created in the directory defined in the env variable `TMP_FILES_ROOT`
     # or `/tmp` if unspecified

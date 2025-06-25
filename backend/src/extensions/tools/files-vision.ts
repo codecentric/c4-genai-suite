@@ -1,4 +1,3 @@
-import { User } from '@c4/library/domain/users';
 import { DynamicStructuredToolInput } from '@langchain/core/dist/tools';
 import { StringOutputParser } from '@langchain/core/output_parsers';
 import { ChatPromptTemplate } from '@langchain/core/prompts';
@@ -7,7 +6,8 @@ import { forwardRef, Inject, Logger } from '@nestjs/common';
 import { QueryBus } from '@nestjs/cqrs';
 import { z } from 'zod';
 import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from 'src/domain/chat';
-import { Extension, ExtensionSpec } from 'src/domain/extensions';
+import { Extension, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions';
+import { User } from 'src/domain/users';
 import { GetFiles, GetFilesResponse, matchExtension } from '../../domain/files';
 import { I18nService } from '../../localization/i18n.service';
 
@@ -20,8 +20,10 @@ export class NamedDynamicStructuredTool extends DynamicStructuredTool {
   }
 }
 
+type FilesVisionExtensionConfiguration = { fileNameExtensions: string[]; maxFiles: [] };
+
 @Extension()
-export class FilesExtension implements Extension {
+export class FilesVisionExtension implements Extension<FilesVisionExtensionConfiguration> {
   private logger = new Logger(this.constructor.name);
 
   constructor(
@@ -63,22 +65,18 @@ export class FilesExtension implements Extension {
     };
   }
 
-  getMiddlewares(
-    user: User,
-    configuration: { fileNameExtensions: string[]; maxFiles: [] },
-    extensionId: number,
-  ): Promise<ChatMiddleware[]> {
+  getMiddlewares(user: User, extension: ExtensionEntity<FilesVisionExtensionConfiguration>): Promise<ChatMiddleware[]> {
     const middleware = {
       invoke: async (context: ChatContext, getContext: GetContext, next: ChatNextDelegate): Promise<any> => {
         const imageFiles = context.files
           ?.filter(({ fileName }) =>
-            configuration.fileNameExtensions.some((fileNameExtension) => matchExtension(fileName, fileNameExtension)),
+            extension.values.fileNameExtensions.some((fileNameExtension) => matchExtension(fileName, fileNameExtension)),
           )
           ?.map(({ id }) => id);
 
         const commonArguments = {
           displayName: this.spec.title,
-          name: `${this.spec.name}_${extensionId}`,
+          name: extension.externalId,
           schema: z.object({}),
           returnDirect: false,
         };
@@ -127,7 +125,7 @@ export class FilesExtension implements Extension {
                   page: 0,
                   pageSize: context.files?.length ?? 1,
                   conversationId: context.conversationId,
-                  extensionId,
+                  extensionId: extension.id,
                   files: imageFiles,
                   withContent: true,
                 }),

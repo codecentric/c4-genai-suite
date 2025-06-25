@@ -1,11 +1,12 @@
-import logging
+from logging import LogRecord, Formatter
+from types import TracebackType
 import orjson
 from datetime import datetime, timezone
 import traceback
 
 
-class JsonFormatter(logging.Formatter):
-    def format(self, record):
+class JsonFormatter(Formatter):
+    def format(self, record: LogRecord) -> str:
         timestamp = datetime.fromtimestamp(record.created, tz=timezone.utc).isoformat() + "Z"
 
         log_obj = {
@@ -20,5 +21,7 @@ class JsonFormatter(logging.Formatter):
 
         return orjson.dumps(log_obj).decode()
 
-    def format_exception(self, exc_info):
+    def format_exception(
+        self, exc_info: tuple[type[BaseException], BaseException, TracebackType | None] | tuple[None, None, None]
+    ) -> str:
         return "".join(traceback.format_exception(*exc_info))

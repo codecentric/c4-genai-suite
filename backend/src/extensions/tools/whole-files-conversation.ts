@@ -3,14 +3,14 @@ import { forwardRef, Inject, Logger } from '@nestjs/common';
 import { QueryBus } from '@nestjs/cqrs';
 import { z } from 'zod';
 import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from 'src/domain/chat';
-import { Extension, ExtensionConfiguration, ExtensionSpec } from 'src/domain/extensions';
+import { Extension, ExtensionConfiguration, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions';
 import { User } from 'src/domain/users';
 import { GetFiles, GetFilesResponse } from '../../domain/files';
 import { FileProcessResult } from '../../domain/files/use-cases/generated';
 import { I18nService } from '../../localization/i18n.service';
 
 @Extension()
-export class WholeFilesExtension implements Extension {
+export class WholeFilesExtension implements Extension<WholeFilesExtensionConfiguration> {
   constructor(
     @Inject(forwardRef(() => QueryBus))
     protected readonly queryBus: QueryBus,
@@ -80,7 +80,7 @@ export class WholeFilesExtension implements Extension {
     return content;
   }
 
-  getMiddlewares(user: User, configuration: WholeFilesExtensionConfiguration, extensionId: number): Promise<ChatMiddleware[]> {
+  getMiddlewares(user: User, extension: ExtensionEntity<WholeFilesExtensionConfiguration>): Promise<ChatMiddleware[]> {
     const middleware = {
       invoke: async (context: ChatContext, getContext: GetContext, next: ChatNextDelegate): Promise<any> => {
         const matchingFiles: GetFilesResponse = await this.queryBus.execute(
@@ -88,9 +88,9 @@ export class WholeFilesExtension implements Extension {
             user,
             bucketIdOrType: 'conversation',
             page: 0,
-            pageSize: context.files?.length ?? configuration.maxFiles,
+            pageSize: context.files?.length ?? extension.values.maxFiles,
             conversationId: context.conversationId,
-            extensionId,
+            extensionId: extension.id,
             files: context.files ? context.files.map((x) => x.id) : undefined,
             withContent: true,
           }),
@@ -129,7 +129,7 @@ export class WholeFilesExtension implements Extension {
           }
         }
 
-        context.tools.push(new InternalTool(description + enrichment, this.queryBus, context, extensionId, fileContent));
+        context.tools.push(new InternalTool(description + enrichment, this.queryBus, context, extension.externalId, fileContent));
         return next(context);
       },
     };
@@ -153,12 +153,12 @@ class InternalTool extends StructuredTool {
     public readonly description: string,
     private readonly queryBus: QueryBus,
     private readonly context: ChatContext,
-    extensionId: number,
+    extensionExternalId: string,
     private readonly fileContent: string,
   ) {
     super();
 
-    this.name = `files_whole_${extensionId}`;
+    this.name = extensionExternalId;
   }
 
   protected _call(): Promise<string> {

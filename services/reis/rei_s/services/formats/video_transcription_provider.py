@@ -1,3 +1,4 @@
+from typing import Any
 from langchain_core.documents import Document
 import ffmpeg
 
@@ -26,7 +27,9 @@ class VideoTranscriptionProvider(VoiceTranscriptionProvider):
         ".wmv",
     ]
 
-    def __init__(self, config: Config | None = None, chunk_size: int = 1000, chunk_overlap: int = 200, **kwargs):
+    def __init__(
+        self, config: Config | None = None, chunk_size: int = 1000, chunk_overlap: int = 200, **kwargs: Any
+    ) -> None:
         super().__init__(config=config, chunk_size=chunk_size, chunk_overlap=chunk_overlap, **kwargs)
 
     @staticmethod

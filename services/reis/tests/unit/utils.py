@@ -1,13 +1,18 @@
 from contextlib import contextmanager
 import os
+from typing import Callable, Generator
 
 
-def noop():
+def noop() -> None:
     pass
 
 
 @contextmanager
-def env_value(key: str, value: str, apply=noop):
+def env_value(
+    key: str,
+    value: str,
+    apply: Callable[[], None] = noop,
+) -> Generator[None, None, None]:
     previous_value = os.getenv(key)
     os.environ[key] = value
     apply()

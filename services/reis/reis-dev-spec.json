@@ -427,6 +427,87 @@
   },
   "components": {
     "schemas": {
+      "ChunkDto": {
+        "properties": {
+          "uri": {
+            "type": "string",
+            "title": "Uri",
+            "description": "Unique uri or id of the chunk."
+          },
+          "content": {
+            "type": "string",
+            "title": "Content",
+            "description": "The content of the chunk."
+          },
+          "pages": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "integer"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pages",
+            "description": "The pages of the chunk inside the document."
+          },
+          "score": {
+            "type": "number",
+            "title": "Score",
+            "description": "The score of the result."
+          }
+        },
+        "type": "object",
+        "required": [
+          "uri",
+          "content",
+          "pages",
+          "score"
+        ],
+        "title": "ChunkDto"
+      },
+      "DocumentDto": {
+        "properties": {
+          "uri": {
+            "type": "string",
+            "title": "Uri",
+            "description": "Unique uri or id of the document."
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "description": "The name of the document, e.g. the file name"
+          },
+          "mimeType": {
+            "type": "string",
+            "title": "Mimetype",
+            "description": "The mime type of the document"
+          },
+          "link": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Link",
+            "description": "A link to the source of the document"
+          }
+        },
+        "type": "object",
+        "required": [
+          "uri",
+          "name",
+          "mimeType",
+          "link"
+        ],
+        "title": "DocumentDto"
+      },
       "FileProcessResult": {
         "properties": {
           "chunks": {
@@ -520,74 +601,6 @@
         "type": "object",
         "title": "HTTPValidationError"
       },
-      "Identity": {
-        "properties": {
-          "fileName": {
-            "type": "string",
-            "title": "Filename",
-            "description": "The name of the file."
-          },
-          "sourceSystem": {
-            "type": "string",
-            "title": "Sourcesystem",
-            "description": "The system that provided the source."
-          },
-          "uniquePathOrId": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Uniquepathorid",
-            "description": "The unique path or ID of the source."
-          },
-          "link": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Link",
-            "description": "A link to the source."
-          },
-          "version": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Version",
-            "description": "The version of the source."
-          },
-          "mimeType": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Mimetype",
-            "description": "The MIME type of the source."
-          }
-        },
-        "type": "object",
-        "required": [
-          "fileName",
-          "sourceSystem"
-        ],
-        "title": "Identity"
-      },
       "ResultDocument": {
         "properties": {
           "content": {
@@ -631,9 +644,20 @@
             "title": "Title",
             "description": "The title of the source."
           },
-          "identity": {
-            "$ref": "#/components/schemas/Identity",
-            "description": "The identity of the source."
+          "chunk": {
+            "$ref": "#/components/schemas/ChunkDto",
+            "description": "The chunk."
+          },
+          "document": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DocumentDto"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The document."
           },
           "metadata": {
             "anyOf": [
@@ -652,7 +676,8 @@
         "type": "object",
         "required": [
           "title",
-          "identity"
+          "chunk",
+          "document"
         ],
         "title": "SourceDto"
       },

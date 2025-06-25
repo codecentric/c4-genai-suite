@@ -1,7 +1,7 @@
 apiVersion: v2
 name: c4-genai-suite
 description: A Helm chart for the c4 GenAI Suite.
-version: 7.0.1
-appVersion: 7.0.1
+version: 8.2.0
+appVersion: 8.2.0
 sources:
   - https://github.com/codecentric/c4-genai-suite/

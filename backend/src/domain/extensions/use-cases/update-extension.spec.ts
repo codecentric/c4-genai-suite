@@ -1,6 +1,6 @@
-import { Extension, ExtensionStringArgument } from '@c4/library/domain/extensions';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { DeepPartial } from 'typeorm';
+import { Extension, ExtensionStringArgument } from 'src/domain/extensions';
 import { ExtensionEntity, ExtensionRepository } from '../../database';
 import { ExplorerService } from '../services';
 import { UpdateExtension, UpdateExtensionHandler } from './update-extension';
@@ -120,6 +120,7 @@ describe(UpdateExtension.name, () => {
           type: 'llm',
         },
         test,
+        getMiddlewares: () => Promise.resolve([]),
       } as Extension;
     });
 

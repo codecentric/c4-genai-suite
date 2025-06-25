@@ -25,7 +25,7 @@ FROM python:3.13-slim-bookworm AS production
 
 # we need this library for psycopg and extracting audio streams from videos
 RUN apt-get update \
-&& apt-get -y install libpq5 ffmpeg
+&& apt-get -y install libpq5=15.13-0+deb12u1 ffmpeg=7:5.1.6-0+deb12u1
 
 ENV VIRTUAL_ENV=/reis/.venv \
 PATH="/reis/.venv/bin:$PATH"

@@ -1,7 +1,7 @@
 import { StructuredTool } from '@langchain/core/tools';
 import { z } from 'zod';
 import { ChatContext, ChatMiddleware, ChatNextDelegate, ExtensionUserArgumentValues, GetContext } from 'src/domain/chat';
-import { Extension, ExtensionArgument, ExtensionConfiguration, ExtensionSpec } from 'src/domain/extensions';
+import { Extension, ExtensionArgument, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions';
 import { User } from 'src/domain/users';
 import { I18nService } from '../../localization/i18n.service';
 
@@ -18,46 +18,51 @@ export class UserArgsExtension implements Extension {
       type: 'tool',
       arguments: {},
       userArguments: {
-        dateUserArgument: {
-          type: 'string',
-          title: this.i18n.t('texts.extensions.common.date'),
-          format: 'date',
-        },
-        stringUserArgument: {
-          type: 'string',
-          title: this.i18n.t('texts.extensions.common.string'),
-        },
-        multiSelectUserArgument: {
-          type: 'array',
-          title: this.i18n.t('texts.extensions.common.multiSelect'),
-          items: {
-            title: '',
+        type: 'object',
+        title: this.i18n.t('texts.extensions.userArgs.title'),
+        description: this.i18n.t('texts.extensions.userArgs.description'),
+        properties: {
+          dateUserArgument: {
             type: 'string',
-            enum: ['value1', 'value2', 'value3', 'value4', 'value5'],
+            title: this.i18n.t('texts.extensions.common.date'),
+            format: 'date',
           },
-          uniqueItems: true,
-          default: ['value2', 'value3'],
-        },
-        singleSelectUserArgument: {
-          type: 'string',
-          title: this.i18n.t('texts.extensions.common.singleSelect'),
-          format: 'select',
-          enum: ['value1', 'value2', 'value3', 'value4', 'value5'],
-          default: 'value4',
-        },
-        dateRangeUserArgument: {
-          type: 'object',
-          title: this.i18n.t('texts.extensions.common.dateRange'),
-          properties: {
-            from: {
+          stringUserArgument: {
+            type: 'string',
+            title: this.i18n.t('texts.extensions.common.string'),
+          },
+          multiSelectUserArgument: {
+            type: 'array',
+            title: this.i18n.t('texts.extensions.common.multiSelect'),
+            items: {
+              title: '',
               type: 'string',
-              title: this.i18n.t('texts.extensions.common.dateFrom'),
-              format: 'date',
+              enum: ['value1', 'value2', 'value3', 'value4', 'value5'],
             },
-            until: {
-              type: 'string',
-              title: this.i18n.t('texts.extensions.common.dateUntil'),
-              format: 'date',
+            uniqueItems: true,
+            default: ['value2', 'value3'],
+          },
+          singleSelectUserArgument: {
+            type: 'string',
+            title: this.i18n.t('texts.extensions.common.singleSelect'),
+            format: 'select',
+            enum: ['value1', 'value2', 'value3', 'value4', 'value5'],
+            default: 'value4',
+          },
+          dateRangeUserArgument: {
+            type: 'object',
+            title: this.i18n.t('texts.extensions.common.dateRange'),
+            properties: {
+              from: {
+                type: 'string',
+                title: this.i18n.t('texts.extensions.common.dateFrom'),
+                format: 'date',
+              },
+              until: {
+                type: 'string',
+                title: this.i18n.t('texts.extensions.common.dateUntil'),
+                format: 'date',
+              },
             },
           },
         },
@@ -66,7 +71,7 @@ export class UserArgsExtension implements Extension {
   }
 
   private getDefaultArgs() {
-    const userArguments = this.spec.userArguments ?? {};
+    const userArguments = this.spec.userArguments?.properties ?? {};
     const getDefault = (argument: ExtensionArgument) => {
       switch (argument.type) {
         case 'string':
@@ -79,15 +84,10 @@ export class UserArgsExtension implements Extension {
     return Object.fromEntries(Object.keys(userArguments).map((key) => [key, getDefault(userArguments[key])]));
   }
 
-  getMiddlewares(
-    user: User,
-    configuration: ExtensionConfiguration,
-    id: number,
-    userArgs?: ExtensionUserArgumentValues,
-  ): Promise<ChatMiddleware[]> {
+  getMiddlewares(_user: User, extension: ExtensionEntity, userArgs?: ExtensionUserArgumentValues): Promise<ChatMiddleware[]> {
     const middleware = {
       invoke: async (context: ChatContext, getContext: GetContext, next: ChatNextDelegate): Promise<any> => {
-        context.tools.push(new InternalTool(userArgs ?? this.getDefaultArgs(), context, id));
+        context.tools.push(new InternalTool(userArgs ?? this.getDefaultArgs(), context, extension.externalId));
         return next(context);
       },
     };
@@ -110,11 +110,11 @@ class InternalTool extends StructuredTool {
   constructor(
     private readonly userArgs: any,
     private readonly context: ChatContext,
-    id: number,
+    extensionExternalId: string,
   ) {
     super();
 
-    this.name = `user_args_${id}`;
+    this.name = extensionExternalId;
   }
 
   protected _call(): Promise<string> {

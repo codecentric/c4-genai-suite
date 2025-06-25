@@ -1,7 +1,10 @@
+from typing import Generator
+from fastapi import FastAPI
 import pytest
 
 from fastapi.testclient import TestClient
 from langchain_community.embeddings import FakeEmbeddings
+from pytest_mock import MockerFixture
 from rei_s.config import update_tempdir
 from rei_s.services.stores.devnull_store import DevNullStoreAdapter
 from rei_s.utils import get_uploaded_file_path
@@ -9,18 +12,18 @@ from tests.unit.utils import env_value
 
 
 @pytest.fixture
-def use_unknown_tmp_dir():
+def use_unknown_tmp_dir() -> Generator[None, None, None]:
     with env_value("TMP_FILES_ROOT", "/unknown", update_tempdir):
         yield
 
 
 @pytest.fixture
-def use_tmp_dir():
+def use_tmp_dir() -> Generator[None, None, None]:
     with env_value("TMP_FILES_ROOT", "/tmp", update_tempdir):
         yield
 
 
-def test_add_files_write(mocker, app, use_tmp_dir):
+def test_add_files_write(mocker: MockerFixture, app: FastAPI, use_tmp_dir: None) -> None:
     # mock embeddings to avoid calls to azure
     mocker.patch("rei_s.services.embeddings_provider.get_embeddings", return_value=FakeEmbeddings(size=1352))
     # mock store to avoid calls to the db
@@ -30,7 +33,7 @@ def test_add_files_write(mocker, app, use_tmp_dir):
         with open("tests/data/birthdays.pptx", "rb") as f:
             response = client.post(
                 "/files",
-                data=f,
+                data=f,  # type: ignore[arg-type]
                 headers={
                     "bucket": "15",
                     "id": "1",
@@ -41,7 +44,7 @@ def test_add_files_write(mocker, app, use_tmp_dir):
         assert response.status_code == 200
 
 
-def test_add_files_read_only(mocker, app, use_unknown_tmp_dir):
+def test_add_files_read_only(mocker: MockerFixture, app: FastAPI, use_unknown_tmp_dir: None) -> None:
     # mock embeddings to avoid calls to azure
     mocker.patch("rei_s.services.embeddings_provider.get_embeddings", return_value=FakeEmbeddings(size=1352))
     # mock store to avoid calls to the db
@@ -51,7 +54,7 @@ def test_add_files_read_only(mocker, app, use_unknown_tmp_dir):
         with open("tests/data/birthdays.pptx", "rb") as f:
             response = client.post(
                 "/files",
-                data=f,
+                data=f,  # type: ignore[arg-type]
                 headers={
                     "bucket": "15",
                     "id": "1",
@@ -61,7 +64,8 @@ def test_add_files_read_only(mocker, app, use_unknown_tmp_dir):
             )
         assert response.status_code == 500
 
-def test_path_traversal_attack():
+
+def test_path_traversal_attack() -> None:
     # Test path traversal prevention
     with pytest.raises(ValueError, match="Invalid file path"):
         get_uploaded_file_path("../../../etc/passwd")

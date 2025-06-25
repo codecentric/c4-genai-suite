@@ -1,0 +1,23 @@
+name: Gitleaks Secret Detection
+permissions:
+  contents: read
+
+on:
+  push:
+  workflow_call:
+  workflow_dispatch:
+
+jobs:
+  secret-detection:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/gitleaks/gitleaks:v8.27.0
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Clone the entire repo history
+      - run: >-
+          set -o pipefail;
+          git config --global --add safe.directory "$(pwd)";
+          gitleaks git -v --redact=80 --platform github --log-opts="HEAD" --no-color 2>&1 | tee $GITHUB_STEP_SUMMARY

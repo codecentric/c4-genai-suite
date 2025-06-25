@@ -5,14 +5,14 @@ import { CommandBus } from '@nestjs/cqrs';
 import * as uuid from 'uuid';
 import { AuthService } from 'src/domain/auth';
 import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from 'src/domain/chat';
-import { Extension, ExtensionConfiguration, ExtensionSpec } from 'src/domain/extensions';
+import { Extension, ExtensionConfiguration, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions';
 import { UploadBlob } from 'src/domain/settings';
 import { User } from 'src/domain/users';
 import { BlobCategory } from '../../domain/database';
 import { I18nService } from '../../localization/i18n.service';
 
 @Extension()
-export class DallEExtension implements Extension {
+export class DallEExtension implements Extension<DallEExtensionConfiguration> {
   constructor(
     private readonly authService: AuthService,
     @Inject(forwardRef(() => CommandBus))
@@ -75,11 +75,11 @@ export class DallEExtension implements Extension {
     await wrapper.invoke('Dog');
   }
 
-  async getMiddlewares(user: User, configuration: DallEExtensionConfiguration): Promise<ChatMiddleware[]> {
+  async getMiddlewares(_user: User, extension: ExtensionEntity<DallEExtensionConfiguration>): Promise<ChatMiddleware[]> {
     const middleware = {
       invoke: async (context: ChatContext, getContext: GetContext, next: ChatNextDelegate): Promise<any> => {
-        const tool = await context.cache.get(this.spec.name, configuration, () => {
-          const wrapper = this.createWrapper(configuration);
+        const tool = await context.cache.get(this.spec.name, extension.values, () => {
+          const wrapper = this.createWrapper(extension.values);
 
           return Promise.resolve(new InternalTool(this.authService, wrapper, this.commandBus, this.spec));
         });

@@ -1,6 +1,6 @@
-import { User } from '@c4/library/domain/users';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { User } from 'src/domain/users';
 import { ConversationEntity, ConversationRepository } from '../../database';
 import { DeleteConversationsHandler } from './delete-conversations';
 

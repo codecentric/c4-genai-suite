@@ -216,9 +216,10 @@
       "toolDescription": "Description",
       "toolDescriptionHint": "Description of this tool.",
       "source": "Source",
-      "sourceHint": "Where should the value be defined.",
-      "value": "Value",
-      "valueHint": "Fixed value that is used when selected source is admin."
+      "sourceHint": "Defines where the value should be defined.",
+      "value": "Value (Template)",
+      "valueHint": "Value that is used during tool call",
+      "errorToolCall": "An error occurred during the tool call '{tool}'"
     }
   },
   "chat": {

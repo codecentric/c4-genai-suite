@@ -22,7 +22,7 @@ export const AIChatItem = ({
   isLast,
   user,
   llmLogo,
-  selectSourceChunkIds,
+  selectDocument,
 }: ChatItemProps) => {
   const clipboard = useClipboard();
   const api = useApi();
@@ -52,7 +52,7 @@ export const AIChatItem = ({
         {textContent}
       </Markdown>
       {message.sources && message.sources?.length > 0 ? (
-        <ChatItemSources sources={message.sources || []} selectSourceChunkIds={selectSourceChunkIds} />
+        <ChatItemSources sources={message.sources || []} selectDocument={selectDocument} />
       ) : (
         <ChatItemDebug debug={message.debug || []} />
       )}

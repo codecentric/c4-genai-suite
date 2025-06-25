@@ -1,9 +1,13 @@
 from io import BytesIO
+from faker import Faker
+from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from langchain_community.embeddings import FakeEmbeddings
 import pytest
 
-from rei_s.config import get_config
+from pytest_mock import MockerFixture
+from responses import RequestsMock
+from rei_s.config import Config, get_config
 from rei_s.services.store_adapter import StoreFilter
 from rei_s.services.stores.azure_ai_search import AzureAISearchStoreAdapter
 from tests.conftest import get_test_config
@@ -16,7 +20,7 @@ endpoint = "https://example.search.windows.net"
 api_version = "2024-07-01"
 
 
-def get_config_override():
+def get_config_override() -> Config:
     return get_test_config(
         dict(
             store_type="azure-ai-search",
@@ -29,7 +33,7 @@ def get_config_override():
 
 
 @pytest.fixture
-def client(mocker, app):
+def client(mocker: MockerFixture, app: FastAPI) -> TestClient:
     app.dependency_overrides[get_config] = get_config_override
 
     # mock embeddings to avoid calls to azure
@@ -40,7 +44,7 @@ def client(mocker, app):
     return client
 
 
-def test_upload_file(faker, client, responses):
+def test_upload_file(faker: Faker, client: TestClient, responses: RequestsMock) -> None:
     filename = faker.file_name(extension="txt")
     content = faker.text()
 
@@ -54,7 +58,7 @@ def test_upload_file(faker, client, responses):
     f = BytesIO(content.encode())
     response = client.post(
         "/files",
-        data=f,
+        data=f,  # type: ignore[arg-type]
         headers={
             "bucket": "1",
             "id": "1",
@@ -66,7 +70,7 @@ def test_upload_file(faker, client, responses):
     assert response.status_code == 200
 
 
-def mock_search_response(responses, filename, input_content):
+def mock_search_response(responses: RequestsMock, filename: str, input_content: str) -> None:
     responses.add(index_get(endpoint, index_name))
     responses.add(
         responses.POST,
@@ -85,7 +89,7 @@ def mock_search_response(responses, filename, input_content):
     )
 
 
-def test_get_files(client, responses, faker):
+def test_get_files(client: TestClient, responses: RequestsMock, faker: Faker) -> None:
     filename = faker.file_name(extension="md")
     input_content = faker.text()
     mock_search_response(responses, filename, input_content)
@@ -102,7 +106,7 @@ def test_get_files(client, responses, faker):
     assert "bucket" not in content["files"][0]["metadata"]
 
 
-def test_get_documents_content(client, responses, faker):
+def test_get_documents_content(client: TestClient, responses: RequestsMock, faker: Faker) -> None:
     filename = faker.file_name(extension="md")
     input_content = faker.text()
 
@@ -117,7 +121,7 @@ def test_get_documents_content(client, responses, faker):
     # In this case, we have only one chunk for the file
     file_content = content["files"][0]["content"]
 
-    chunk_id = content["sources"][0]["metadata"]["chunk_ids"]
+    chunk_id = content["sources"][0]["chunk"]["uri"]
 
     response_content = client.get("/documents/content", params={"chunk_ids": chunk_id})
 
@@ -125,7 +129,7 @@ def test_get_documents_content(client, responses, faker):
     assert response_content.json() == [file_content]
 
 
-def test_get_files_deleted(client, responses):
+def test_get_files_deleted(client: TestClient, responses: RequestsMock) -> None:
     responses.add(index_get(endpoint, index_name))
     responses.add(
         responses.POST,
@@ -161,11 +165,11 @@ def test_get_files_deleted(client, responses):
         (StoreFilter(doc_ids=["3", "2"]), "search.in(doc_id, '3, 2')"),
     ],
 )
-def test_filter_conversion(test_input, expected):
+def test_filter_conversion(test_input: StoreFilter, expected: str) -> None:
     assert AzureAISearchStoreAdapter.convert_filter(test_input) == expected
 
 
-def test_filter_conversion_raises():
+def test_filter_conversion_raises() -> None:
     with pytest.raises(Exception) as exc_info:
         AzureAISearchStoreAdapter.convert_filter(StoreFilter(bucket="42", doc_ids=[]))
     assert exc_info.value.args[0] == "The result would not match any entry"

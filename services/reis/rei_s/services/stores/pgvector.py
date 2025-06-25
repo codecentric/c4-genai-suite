@@ -46,10 +46,10 @@ class PGVectorStoreAdapter(StoreAdapter):
 
         return instance
 
-    def add_documents(self, documents: list[Document]):
+    def add_documents(self, documents: list[Document]) -> None:
         self.vector_store.add_documents(documents)
 
-    def delete(self, doc_id: str):
+    def delete(self, doc_id: str) -> None:
         # The vector store does not offer a method to delete chunks by metadata (only chunk id), thus
         # we do it ourselves by calling SQLAlchemy directly using the protected `_make_sync_session` method.
         from sqlalchemy import delete

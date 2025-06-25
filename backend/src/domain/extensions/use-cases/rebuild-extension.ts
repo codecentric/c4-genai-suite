@@ -55,6 +55,7 @@ export class RebuildExtensionHandler implements ICommandHandler<RebuildExtension
         }),
       extension,
       true,
+      true,
     );
 
     return new RebuildExtensionResponse(extensionInstance);

@@ -97,8 +97,8 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
       await sendMessage(page, configuration, {
         message: 'Write a one-column table with the lower case letters from a to z in the rows.',
       });
-      await page.waitForTimeout(500);
-      const element = page.getByText(/^What is the capital of Germany\?Friendly AI/);
+      await page.waitForTimeout(1000);
+      const element = page.getByText(/^What is the capital of Germany.+Friendly AI/);
       await expectElementInYRange(element, -200, 116);
     });
 

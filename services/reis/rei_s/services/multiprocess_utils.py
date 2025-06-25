@@ -6,7 +6,7 @@ from rei_s.services.formats.abstract_format_provider import AbstractFormatProvid
 from rei_s.types.source_file import SourceFile
 
 
-def init_subprocess_logger():
+def init_subprocess_logger() -> None:
     """For initilizing the logging format in newly spawned processes"""
     logger = logging.getLogger("root")
 
@@ -16,7 +16,12 @@ def init_subprocess_logger():
     logger.addHandler(handler)
 
 
-def process_file_in_process(format_: AbstractFormatProvider, file: SourceFile, chunk_size: int | None, queue: mp.Queue):
+def process_file_in_process(
+    format_: AbstractFormatProvider,
+    file: SourceFile,
+    chunk_size: int | None,
+    queue: mp.Queue,  # type: ignore[type-arg]
+) -> None:
     try:
         init_subprocess_logger()
         chunks = format_.process_file(file, chunk_size)

@@ -16,9 +16,12 @@ jobs:
     strategy:
       matrix:
         service:
-          - name: backend
-            containerfile: Containerfile.backend
+          - name: bundled
+            containerfile: Containerfile
             context: .
+          - name: backend
+            containerfile: backend/Containerfile
+            context: backend/
           - name: frontend
             containerfile: frontend/Containerfile
             context: frontend/
@@ -41,3 +44,5 @@ jobs:
           tags: ghcr.io/${{ github.repository }}/${{ matrix.service.name }}:commit-${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          build-args: |
+            VERSION=${{ github.ref_type == 'tag' && github.ref_name || github.sha }}

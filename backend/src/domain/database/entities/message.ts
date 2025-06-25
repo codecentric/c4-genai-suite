@@ -1,6 +1,8 @@
-import { Source } from '@c4/library/domain/chat';
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Source } from 'src/domain/chat';
 import { ConversationEntity } from './conversation';
+
+export type ExtensionSource = Source & { extensionExternalId: string };
 
 @Entity({ name: 'messages' })
 export class MessageEntity {
@@ -26,7 +28,10 @@ export class MessageEntity {
   debug?: any;
 
   @Column('json', { nullable: true })
-  sources!: Source[];
+  sources?: ExtensionSource[];
+
+  @Column('json', { nullable: true })
+  sourcesOriginal?: Record<string, any>[];
 
   @ManyToOne(() => ConversationEntity, (conversation) => conversation.messages, { onDelete: 'CASCADE' })
   conversation!: ConversationEntity;

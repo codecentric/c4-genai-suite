@@ -1,7 +1,8 @@
 import { BadRequestException, Injectable, PipeTransform } from '@nestjs/common';
 import { ApiProperty, getSchemaPath } from '@nestjs/swagger';
 import { SchemaObject } from '@nestjs/swagger/dist/interfaces/open-api-spec.interface';
-import { IsDefined, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsArray, IsDefined, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
 
 export class ImageUrlDto {
   @ApiProperty({
@@ -105,33 +106,72 @@ export const MessageContentDto: SchemaObject = {
   },
 };
 
-export class SourceDto {
-  @ApiProperty({ description: 'The title of the source.', required: true })
-  title!: string;
-
+export class ChunkDto {
   @ApiProperty({
-    description: 'The identity of the source.',
-    selfRequired: true,
-    type: 'object',
-    properties: {
-      fileName: { type: 'string', nullable: false },
-      sourceSystem: { type: 'string', nullable: false },
-      uniquePathOrId: { type: 'string', nullable: true },
-      link: { type: 'string', nullable: true },
-      version: { type: 'string', nullable: true },
-      mimeType: { type: 'string', nullable: true },
-      fileSize: { type: 'number', nullable: true },
-    },
+    description: 'Uri or id of the chunk',
+    example: 's5q-chunk://{chunkId})',
+    required: false,
+    type: 'string',
   })
-  identity!: {
-    fileName: string;
-    sourceSystem: string;
-    uniquePathOrId?: string | null;
-    link?: string | null;
-    version?: string | null;
-    mimeType?: string | null;
-    fileSize?: number | null;
-  };
+  @IsString()
+  @IsOptional()
+  uri?: string | null;
+
+  @ApiProperty({ description: 'Text representation of the chunk', required: true, type: 'string' })
+  @IsString()
+  content!: string;
+
+  @ApiProperty({ description: 'Page reference, if applicable', required: false, type: [Number] })
+  @IsNumber({}, { each: true })
+  @IsArray()
+  @IsOptional()
+  pages?: number[] | null;
+}
+
+export class DocumentDto {
+  @ApiProperty({
+    description: 'Uri or id of the document',
+    example: 's5q-document://{documentId}',
+    required: true,
+  })
+  @IsString()
+  uri!: string;
+
+  @ApiProperty({ description: 'Name of the document', required: false, type: 'string' })
+  @IsString()
+  @IsOptional()
+  name?: string | null;
+
+  @ApiProperty({ description: 'MIME type of the document', example: 'application/pdf', required: true, type: 'string' })
+  @IsString()
+  mimeType!: string;
+
+  @ApiProperty({ description: 'Size of the document in bytes', required: false, type: 'number' })
+  @IsNumber()
+  @IsOptional()
+  size?: number | null;
+
+  @ApiProperty({ description: 'Link to the document, if available', required: false, type: 'string' })
+  @IsString()
+  @IsOptional()
+  link?: string | null;
+}
+
+export class SourceDto {
+  @ApiProperty({ description: 'The title of the source.', required: true, type: 'string' })
+  @IsString()
+  title!: string; // title of the source document
+
+  @ApiProperty({ description: 'Chunk information', required: true, type: ChunkDto })
+  @Type(() => ChunkDto)
+  @ValidateNested()
+  chunk!: ChunkDto;
+
+  @ApiProperty({ description: 'Document information', required: false, type: DocumentDto })
+  @Type(() => DocumentDto)
+  @ValidateNested()
+  @IsOptional()
+  document?: DocumentDto | null;
 
   @ApiProperty({
     description: 'Additional metadata about the source.',
@@ -139,7 +179,7 @@ export class SourceDto {
     additionalProperties: true,
     selfRequired: false,
   })
-  metadata?: object | null;
+  metadata?: Record<string, any> | null;
 }
 
 interface ParseDatePipeOptions {

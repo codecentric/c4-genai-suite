@@ -121,7 +121,7 @@ export class UserFilesController {
     @Query('extensionId', new ParseIntPipe()) extensionId: number,
     @Query('conversationId', new ParseIntPipe({ optional: true })) conversationId?: number,
   ) {
-    const result: GetExtensionResponse = await this.queryBus.execute(new GetExtension(extensionId));
+    const result: GetExtensionResponse = await this.queryBus.execute(new GetExtension({ id: extensionId }));
     if (!result.extension?.enabled) {
       throw new NotFoundException('Extension not found');
     }

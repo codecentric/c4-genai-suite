@@ -71,7 +71,6 @@ jobs:
           cache: 'npm'
           cache-dependency-path: backend/package-lock.json
       - run: npm install
-      - run: npm run prebuild
       - run: npm run lint
 
   test:

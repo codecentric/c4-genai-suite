@@ -1,33 +1,39 @@
+from fastapi import FastAPI
 import pytest
 from fastapi.testclient import TestClient
 from langchain_community.embeddings import FakeEmbeddings
 from langchain_core.documents import Document
-from collections import Counter
 
+from pytest_mock import MockerFixture
 from rei_s.services.stores.devnull_store import DevNullStoreAdapter
 
 
 @pytest.fixture
-def client(app):
+def client(app: FastAPI) -> TestClient:
     client = TestClient(app)
     return client
 
 
-def test_get_files_fail(client):
+def test_get_files_fail(client: TestClient) -> None:
     response = client.get("/files")
     # missing required args
     assert response.status_code == 422
 
 
-def test_get_documents_content_without_parameters(client):
+def test_get_documents_content_without_parameters(client: TestClient) -> None:
     response = client.get("/documents/content")
     assert response.status_code == 422
     assert response.json()["detail"][0]["msg"] == "Field required"
 
 
-def test_get_documents_content(mocker, client):
-    mocked_document1 = Document(page_content="test string", metadata={"source": "testfile.pdf", "format": "pdf"})
-    mocked_document2 = Document(page_content="test string 2", metadata={"source": "testfile2.pdf", "format": "pdf"})
+def test_get_documents_content(mocker: MockerFixture, client: TestClient) -> None:
+    mocked_document1 = Document(
+        page_content="test string", metadata={"source": "testfile.pdf", "format": "pdf", "mime_type": "application/pdf"}
+    )
+    mocked_document2 = Document(
+        page_content="test string 2",
+        metadata={"source": "testfile2.pdf", "format": "pdf", "mime_type": "application/pdf"},
+    )
     mocked_store = DevNullStoreAdapter()
 
     mocker.patch.object(mocked_store, "get_documents", autospec=True, return_value=[mocked_document1, mocked_document2])
@@ -42,9 +48,14 @@ def test_get_documents_content(mocker, client):
     assert content[1] == "test string 2"
 
 
-def test_get_files(mocker, client):
-    mocked_document1 = Document(page_content="test string", metadata={"source": "testfile.pdf", "format": "pdf"})
-    mocked_document2 = Document(page_content="test string 2", metadata={"source": "testfile2.pdf", "format": "pdf"})
+def test_get_files(mocker: MockerFixture, client: TestClient) -> None:
+    mocked_document1 = Document(
+        page_content="test string", metadata={"source": "testfile.pdf", "format": "pdf", "mime_type": "application/pdf"}
+    )
+    mocked_document2 = Document(
+        page_content="test string 2",
+        metadata={"source": "testfile2.pdf", "format": "pdf", "mime_type": "application/pdf"},
+    )
     mocked_store = DevNullStoreAdapter()
     mocker.patch.object(
         mocked_store, "similarity_search", autospec=True, return_value=[mocked_document1, mocked_document2]
@@ -60,10 +71,19 @@ def test_get_files(mocker, client):
     assert content["debug"] == "## Sources\n\n* testfile.pdf\n* testfile2.pdf"
 
 
-def test_get_files_sources(mocker, client):
-    mocked_document_a1 = Document(page_content="test string 1", metadata={"source": "testfile.pdf", "format": "pdf"})
-    mocked_document_b1 = Document(page_content="test string 2", metadata={"source": "testfile2.xml", "format": "xml"})
-    mocked_document_c1 = Document(page_content="test string 3", metadata={"source": "testfile3.pdf", "format": "pdf"})
+def test_get_files_sources(mocker: MockerFixture, client: TestClient) -> None:
+    mocked_document_a1 = Document(
+        page_content="test string 1",
+        metadata={"source": "testfile.pdf", "format": "pdf", "mime_type": "application/pdf"},
+    )
+    mocked_document_b1 = Document(
+        page_content="test string 2",
+        metadata={"source": "testfile2.xml", "format": "xml", "mime_type": "application/xml"},
+    )
+    mocked_document_c1 = Document(
+        page_content="test string 3",
+        metadata={"source": "testfile3.pdf", "format": "pdf", "mime_type": "application/pdf"},
+    )
     mocked_store = DevNullStoreAdapter()
     mocker.patch.object(
         mocked_store,
@@ -78,26 +98,31 @@ def test_get_files_sources(mocker, client):
 
     content = response.json()
     assert len(content["sources"]) == 3
-    assert content["sources"][0]["metadata"]["format"] == "pdf"
-    assert content["sources"][1]["metadata"]["format"] == "xml"
-    assert content["sources"][2]["metadata"]["format"] == "pdf"
+    assert content["sources"][0]["document"]["mimeType"] == "application/pdf"
+    assert content["sources"][1]["document"]["mimeType"] == "application/xml"
+    assert content["sources"][2]["document"]["mimeType"] == "application/pdf"
 
 
-def test_get_files_sources_page_concat(mocker, client):
+def test_get_files_sources_page_concat(mocker: MockerFixture, client: TestClient) -> None:
     mocked_document_a1 = Document(
-        page_content="test string 1", metadata={"source": "testfile_a.pdf", "format": "pdf", "page": 5}
+        page_content="test string 1",
+        metadata={"source": "testfile_a.pdf", "format": "pdf", "mime_type": "application/pdf", "page": 5},
     )
     mocked_document_a2 = Document(
-        page_content="test string 2", metadata={"source": "testfile_a.pdf", "format": "pdf", "page": "9"}
+        page_content="test string 2",
+        metadata={"source": "testfile_a.pdf", "format": "pdf", "mime_type": "application/pdf", "page": "9"},
     )
     mocked_document_a3 = Document(
-        page_content="test string 3", metadata={"source": "testfile_a.pdf", "format": "pdf", "page": "4"}
+        page_content="test string 3",
+        metadata={"source": "testfile_a.pdf", "format": "pdf", "mime_type": "application/pdf", "page": "4"},
     )
     mocked_document_b1 = Document(
-        page_content="test string 2", metadata={"source": "testfile_b.pdf", "format": "pdf", "page": 109}
+        page_content="test string 2",
+        metadata={"source": "testfile_b.pdf", "format": "pdf", "mime_type": "application/pdf", "page": 109},
     )
     mocked_document_b2 = Document(
-        page_content="test string 3", metadata={"source": "testfile_b.pdf", "format": "pdf", "page": "42"}
+        page_content="test string 3",
+        metadata={"source": "testfile_b.pdf", "format": "pdf", "mime_type": "application/pdf", "page": "42"},
     )
     mocked_store = DevNullStoreAdapter()
     mocker.patch.object(
@@ -118,18 +143,26 @@ def test_get_files_sources_page_concat(mocker, client):
     assert response.status_code == 200
 
     content = response.json()
-    assert len(content["sources"]) == 2
-    assert Counter(content["sources"][0]["metadata"]["pages"]) == Counter(["5", "9", "4"])
-    assert Counter(content["sources"][1]["metadata"]["pages"]) == Counter(["42", "109"])
+    assert len(content["sources"]) == 5
+    assert content["sources"][0]["chunk"]["pages"] == [5]
+    assert content["sources"][1]["chunk"]["pages"] == [9]
+    assert content["sources"][2]["chunk"]["pages"] == [4]
+    assert content["sources"][3]["chunk"]["pages"] == [109]
+    assert content["sources"][4]["chunk"]["pages"] == [42]
 
 
-def test_get_files_sources_no_page(mocker, client):
+def test_get_files_sources_no_page(mocker: MockerFixture, client: TestClient) -> None:
     mocked_document_a1 = Document(
-        page_content="test string 1", metadata={"source": "testfile_a.pdf", "format": "pdf", "page": "5"}
+        page_content="test string 1",
+        metadata={"source": "testfile_a.pdf", "format": "pdf", "mime_type": "application/pdf", "page": "5"},
     )
-    mocked_document_b1 = Document(page_content="test string 2", metadata={"source": "testfile_b.pdf", "format": "pdf"})
+    mocked_document_b1 = Document(
+        page_content="test string 2",
+        metadata={"source": "testfile_b.pdf", "format": "pdf", "mime_type": "application/pdf"},
+    )
     mocked_document_b2 = Document(
-        page_content="test string 3", metadata={"source": "testfile_b.pdf", "format": "pdf", "page": "another value"}
+        page_content="test string 3",
+        metadata={"source": "testfile_b.pdf", "format": "pdf", "mime_type": "application/pdf", "page": "another value"},
     )
     mocked_store = DevNullStoreAdapter()
     mocker.patch.object(
@@ -148,12 +181,13 @@ def test_get_files_sources_no_page(mocker, client):
     assert response.status_code == 200
 
     content = response.json()
-    assert len(content["sources"]) == 2
-    assert content["sources"][0]["metadata"]["pages"] == ["5"]
-    assert content["sources"][1]["metadata"]["pages"] == []
+    assert len(content["sources"]) == 3
+    assert content["sources"][0]["chunk"]["pages"] == [5]
+    assert content["sources"][1]["chunk"]["pages"] is None
+    assert content["sources"][2]["chunk"]["pages"] is None
 
 
-def test_get_files_no_files(mocker, client):
+def test_get_files_no_files(mocker: MockerFixture, client: TestClient) -> None:
     mocked_store = DevNullStoreAdapter()
     mocker.patch.object(mocked_store, "similarity_search", autospec=True, return_value=[])
     mocker.patch("rei_s.services.store_service.get_vector_store", return_value=mocked_store)
@@ -166,13 +200,13 @@ def test_get_files_no_files(mocker, client):
     assert content["debug"] == ""
 
 
-def test_add_files_fail(client):
+def test_add_files_fail(client: TestClient) -> None:
     response = client.post("/files")
     # missing required args
     assert response.status_code == 422
 
 
-def test_add_files(mocker, client):
+def test_add_files(mocker: MockerFixture, client: TestClient) -> None:
     # mock embeddings to avoid calls to azure
     mocker.patch("rei_s.services.embeddings_provider.get_embeddings", return_value=FakeEmbeddings(size=1352))
     # mock store to avoid calls to the db
@@ -181,7 +215,7 @@ def test_add_files(mocker, client):
     with open("tests/data/birthdays.pdf", "rb") as f:
         response = client.post(
             "/files",
-            data=f,
+            data=f,  # type: ignore[arg-type]
             headers={
                 "bucket": "15",
                 "id": "1",
@@ -192,7 +226,7 @@ def test_add_files(mocker, client):
     assert response.status_code == 200
 
 
-def test_process_files(mocker, client):
+def test_process_files(mocker: MockerFixture, client: TestClient) -> None:
     # mock embeddings to assure that they are not generated
     mocker.patch(
         "rei_s.services.embeddings_provider.get_embeddings",
@@ -209,7 +243,7 @@ def test_process_files(mocker, client):
     with open("tests/data/birthdays.pdf", "rb") as f:
         response = client.post(
             "/files/process",
-            data=f,
+            data=f,  # type: ignore[arg-type]
             headers={
                 "id": "1",
                 "fileName": "test.pdf",
@@ -222,14 +256,14 @@ def test_process_files(mocker, client):
     assert any("Daniel Düsentrieb" in chunk["content"] for chunk in json["chunks"])
 
 
-def test_add_damaged_file(mocker, client):
+def test_add_damaged_file(mocker: MockerFixture, client: TestClient) -> None:
     mocker.patch("rei_s.services.embeddings_provider.get_embeddings", return_value=FakeEmbeddings(size=1352))
     mocker.patch("rei_s.services.store_service.get_vector_store", return_value=DevNullStoreAdapter())
 
     with open("tests/data/birthdays.pptx", "rb") as f:
         response = client.post(
             "/files",
-            data=f,
+            data=f,  # type: ignore[arg-type]
             headers={
                 "bucket": "15",
                 "id": "1",
@@ -241,14 +275,14 @@ def test_add_damaged_file(mocker, client):
     assert "Processing failed" in response.text
 
 
-def test_add_damaged_large_file(mocker, client):
+def test_add_damaged_large_file(mocker: MockerFixture, client: TestClient) -> None:
     mocker.patch("rei_s.services.embeddings_provider.get_embeddings", return_value=FakeEmbeddings(size=1352))
     mocker.patch("rei_s.services.store_service.get_vector_store", return_value=DevNullStoreAdapter())
 
     with open("tests/data_stress/gg.pdf", "rb") as f:
         response = client.post(
             "/files",
-            data=f,
+            data=f,  # type: ignore[arg-type]
             headers={
                 "id": "1",
                 "bucket": "15",
@@ -260,14 +294,14 @@ def test_add_damaged_large_file(mocker, client):
     assert "Processing failed" in response.text
 
 
-def test_add_unsupported_file(mocker, client):
+def test_add_unsupported_file(mocker: MockerFixture, client: TestClient) -> None:
     mocker.patch("rei_s.services.embeddings_provider.get_embeddings", return_value=FakeEmbeddings(size=1352))
     mocker.patch("rei_s.services.store_service.get_vector_store", return_value=DevNullStoreAdapter())
 
     with open("tests/data/birthdays.pdf", "rb") as f:
         response = client.post(
             "/files",
-            data=f,
+            data=f,  # type: ignore[arg-type]
             headers={
                 "id": "1",
                 "bucket": "15",
@@ -279,7 +313,7 @@ def test_add_unsupported_file(mocker, client):
     assert "File format not supported" in response.text
 
 
-def test_file_types(client):
+def test_file_types(client: TestClient) -> None:
     response = client.get("/files/types")
     assert response.status_code == 200
 
@@ -296,7 +330,7 @@ def test_file_types(client):
     assert ".yml" in extensions
 
 
-def test_bad_index_name(client):
+def test_bad_index_name(client: TestClient) -> None:
     response = client.get("/files", params={"query": "test", "bucket": "1", "take": "3", "indexName": "indexName"})
     assert response.status_code == 422
     response = client.get("/files", params={"query": "test", "bucket": "1", "take": "3", "indexName": "index-name%"})
@@ -305,6 +339,6 @@ def test_bad_index_name(client):
     assert response.status_code == 422
 
 
-def test_health(client):
+def test_health(client: TestClient) -> None:
     response = client.get("/health")
     assert response.status_code == 200

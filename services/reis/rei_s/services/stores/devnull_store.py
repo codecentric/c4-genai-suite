@@ -13,10 +13,10 @@ class DevNullStoreAdapter(StoreAdapter):
     def create(cls, config: Config, embeddings: Embeddings, index_name: str | None = None) -> "DevNullStoreAdapter":
         return cls()
 
-    def add_documents(self, documents: list[Document]):
+    def add_documents(self, documents: list[Document]) -> None:
         pass
 
-    def delete(self, doc_id: str):
+    def delete(self, doc_id: str) -> None:
         pass
 
     def similarity_search(self, query: str, k: int = 4, search_filter: StoreFilter | None = None) -> List[Document]:

@@ -13,4 +13,7 @@ data:
   AUTH_OAUTH_TOKEN_URL: "{{ .Values.backend.auth.tokenUrl }}"
   AUTH_OAUTH_USER_INFO_URL: "{{ .Values.backend.auth.userInfoUrl }}"
   METRICS_PORT: "{{ .Values.backend.metrics.port }}"
+  {{- if and .Values.backend.ssl.rootCertificateConfigMapName .Values.backend.ssl.rootCertificateConfigMapKey }}
+  NODE_EXTRA_CA_CERTS: "/etc/ssl/certs/{{ .Values.backend.ssl.rootCertificateConfigMapKey }}"
   {{- end }}
+{{- end }}

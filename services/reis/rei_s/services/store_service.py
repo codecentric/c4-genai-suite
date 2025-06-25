@@ -1,5 +1,5 @@
 import multiprocessing as mp
-from typing import List, Dict
+from typing import Any, Generator, List
 from math import ceil
 
 from fastapi import HTTPException
@@ -10,16 +10,16 @@ from rei_s.services.formats.utils import ProcessingError
 from rei_s.services.multiprocess_utils import process_file_in_process
 from rei_s.services.embeddings_provider import get_embeddings
 from rei_s.config import Config
-from rei_s.services.store_adapter import StoreFilter
+from rei_s.services.store_adapter import StoreAdapter, StoreFilter
 from rei_s.services.store_provider import get_store
-from rei_s.types.dtos import SourceDto, Identity, SourceKey
+from rei_s.types.dtos import SourceDto, ChunkDto, DocumentDto
 from rei_s.types.source_file import SourceFile
 from rei_s.services.formats.abstract_format_provider import AbstractFormatProvider
 from rei_s.services.formats import get_format_provider_mappings, get_format_providers
 from rei_s.metrics.metrics import files_processed_counter
 
 
-def batched(iterable: List[Document], n: int):
+def batched(iterable: List[Document], n: int) -> Generator[List[Document], None, None]:
     for i in range(0, len(iterable), n):
         yield iterable[i : i + n]
 
@@ -27,7 +27,7 @@ def batched(iterable: List[Document], n: int):
 def get_vector_store(
     config: Config,
     index_name: str | None,
-):
+) -> StoreAdapter:
     embeddings = get_embeddings(config)
     vector_store = get_store(config=config, embeddings=embeddings, index_name=index_name)
 
@@ -46,7 +46,7 @@ def get_file_name_extensions(config: Config) -> list[str]:
     return file_name_extensions
 
 
-def process_file(config: Config, file: SourceFile, chunk_size: int | None = None):
+def process_file(config: Config, file: SourceFile, chunk_size: int | None = None) -> List[Document]:
     logger.info(f"Processing file: {file.id}")
     chunks_with_metadata = [
         chunk
@@ -58,7 +58,7 @@ def process_file(config: Config, file: SourceFile, chunk_size: int | None = None
     return chunks_with_metadata
 
 
-def process_and_add_file(config: Config, file: SourceFile, bucket: str, index_name: str | None):
+def process_and_add_file(config: Config, file: SourceFile, bucket: str, index_name: str | None) -> bool:
     logger.info(f"Processing and add file: {file.id}")
     add_file(config, file, bucket, file.id, index_name)
     files_processed_counter.inc()
@@ -68,7 +68,7 @@ def process_and_add_file(config: Config, file: SourceFile, bucket: str, index_na
 
 def process_file_synchronously(
     format_: AbstractFormatProvider, file: SourceFile, chunk_size: int | None, threshold: int = 10**5
-):
+) -> List[Document]:
     # this function tries to optimize for performance,
     # since the process step is the single CPU intensive part
     # * small files are processed in the same thread to avoid overhead of starting a new process,
@@ -101,7 +101,7 @@ def generate_batches(
     bucket: str | None = None,
     doc_id: str | None = None,
     chunk_size: int | None = None,
-):
+) -> Generator[tuple[List[Document], int, int], None, None]:
     for format_ in get_format_providers(config):
         if format_.supports(file):
             try:
@@ -125,6 +125,7 @@ def generate_batches(
                             metadata={
                                 **x.metadata,
                                 "format": format_.name,
+                                "mime_type": file.mime_type,
                                 "doc_id": doc_id,
                                 "bucket": bucket,
                                 "source": file.file_name,
@@ -140,7 +141,7 @@ def generate_batches(
     raise HTTPException(status_code=415, detail="File format not supported.")
 
 
-def add_file(config: Config, file: SourceFile, bucket: str, doc_id: str, index_name: str | None = None):
+def add_file(config: Config, file: SourceFile, bucket: str, doc_id: str, index_name: str | None = None) -> None:
     vector_store = get_vector_store(config=config, index_name=index_name)
     for batch, index, num_batches in generate_batches(config, file, bucket, doc_id):
         logger.info(f"add {len(batch)} chunks for doc_id {doc_id}: ({index + 1}/{num_batches})")
@@ -196,7 +197,7 @@ def get_documents_content(config: Config, ids: List[str], index_name: str | None
     return content
 
 
-def delete_file(config: Config, doc_id: str, index_name: str | None = None):
+def delete_file(config: Config, doc_id: str, index_name: str | None = None) -> None:
     vector_store = get_vector_store(config=config, index_name=index_name)
     logger.info(f"delete chunks with doc_id '{doc_id}'")
     vector_store.delete(doc_id)
@@ -230,65 +231,35 @@ def get_file_sources_markdown(results: List[Document]) -> str:
     return header + content
 
 
+def parse_int_array(s: Any) -> List[int] | None:
+    try:
+        return [int(s)]
+    except (ValueError, TypeError):
+        return None
+
+
 def get_file_sources(results: List[Document]) -> List[SourceDto]:
     if not results:
         return []
 
-    sources_dict: Dict[SourceKey, SourceDto] = {}
+    length = len(results)
 
-    for doc in results:
-        doc_metadata = doc.metadata
-        file_name = doc_metadata.get("source") or "Unknown Filename"
-        source_system = "file-upload"
-        unique_path_or_id = doc_metadata.get("doc_id")
-        page = str(doc_metadata["page"]) if "page" in doc_metadata else ""
-        link = doc_metadata.get("link")
-        version = doc_metadata.get("version")
-        mime_type = doc_metadata.get("format")
-        chunk_id = doc_metadata.get("id")
-
-        title = doc_metadata.get("source", "Unknown")
-
-        source_key = (file_name, source_system, version, mime_type, unique_path_or_id)
-
-        if not sources_dict or source_key not in sources_dict:
-            sources_dict[source_key] = SourceDto(
-                title=title,
-                identity=Identity(
-                    file_name=file_name,
-                    source_system=source_system,
-                    unique_path_or_id=unique_path_or_id,
-                    link=link,
-                    version=version,
-                    mime_type=mime_type,
-                ),
-                metadata={key: value for key, value in doc_metadata.items() if key not in {"page", "id", "doc_id"}},
-            )
-
-        metadata = sources_dict[source_key].metadata or {}
-
-        if "chunk_ids" not in metadata.keys():
-            metadata["chunk_ids"] = []
-
-        # only 1 of these cases will be true chunk_id (azure ai) or doc.id (pgvector)
-        if chunk_id:
-            metadata["chunk_ids"].append(chunk_id)
-
-        if doc.id:
-            metadata["chunk_ids"].append(doc.id)
-
-        if "pages" not in metadata.keys():
-            metadata["pages"] = []
-
-        if page:
-            metadata["pages"].append(page)
-
-    for source in sources_dict.values():
-        if source.metadata is not None:
-            source.metadata["pages"] = set(filter(is_valid_page_number, source.metadata.get("pages", [])))
-
-    return list(sources_dict.values())
-
-
-def is_valid_page_number(x):
-    return isinstance(x, str) and x.isdigit()
+    return [
+        SourceDto(
+            title=doc.metadata.get("source", "Unknown"),
+            chunk=ChunkDto(
+                uri=doc.metadata.get("id") or doc.id or "",
+                content=doc.page_content,
+                pages=parse_int_array(doc.metadata.get("page")),
+                score=length - i,
+            ),
+            document=DocumentDto(
+                uri=doc.metadata.get("doc_id", ""),
+                name=doc.metadata.get("source", "Unknown Filename"),
+                mime_type=doc.metadata.get("mime_type", ""),
+                link=doc.metadata.get("link"),
+            ),
+            metadata={key: value for key, value in doc.metadata.items() if key not in {"page", "id", "doc_id"}},
+        )
+        for i, doc in enumerate(results)
+    ]

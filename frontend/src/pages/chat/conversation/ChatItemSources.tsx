@@ -1,14 +1,13 @@
 /* eslint-disable react-refresh/only-export-components */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import isEqual from 'fast-deep-equal';
 import React, { useMemo } from 'react';
 import { SourceDto } from 'src/api';
 import Source from 'src/pages/chat/conversation/Source';
 import { texts } from 'src/texts';
 
-const ChatItemSources: React.FC<{ sources: SourceDto[]; selectSourceChunkIds: (docId: number, ids: string[]) => void }> = ({
+const ChatItemSources: React.FC<{ sources: SourceDto[]; selectDocument: (documentUri: string) => void }> = ({
   sources,
-  selectSourceChunkIds,
+  selectDocument,
 }) => {
   const uniqueSources = useMemo(() => mergeIdenticalSources(sources), [sources]);
 
@@ -19,7 +18,7 @@ const ChatItemSources: React.FC<{ sources: SourceDto[]; selectSourceChunkIds: (d
       <h2 className="mb-4 text-xl font-bold">{texts.chat.sources.sources}</h2>
       <ul>
         {uniqueSources.map((source, index) => (
-          <Source key={index} source={source} selectSourceChunkIds={selectSourceChunkIds} />
+          <Source key={index} source={source} selectDocument={selectDocument} />
         ))}
       </ul>
     </div>
@@ -32,7 +31,9 @@ export const mergeIdenticalSources = (sources: SourceDto[]): SourceDto[] => {
   const uniqueSources: SourceDto[] = [];
 
   sources.forEach((source) => {
-    const alreadyAddedSource = uniqueSources.find((s) => isEqual(s.identity, source.identity));
+    const alreadyAddedSource = uniqueSources.find((s) => s.document?.uri && s.document.uri === source.document?.uri);
+    source.metadata ??= {};
+    source.metadata['pages'] = source.chunk.pages ?? [];
 
     if (!alreadyAddedSource) {
       uniqueSources.push(source);
@@ -45,9 +46,6 @@ export const mergeIdenticalSources = (sources: SourceDto[]): SourceDto[] => {
     if (metadata) {
       if (metadata['pages']) {
         metadata['pages'] = formatPages(toStringNumberArray(metadata['pages']) || []);
-      }
-      if (metadata['chunk_ids']) {
-        metadata['chunk_ids'] = Array.from(new Set(toStringNumberArray(metadata['chunk_ids']) || [])).join(', ');
       }
     }
   });

@@ -1,7 +1,7 @@
-import { ChatContext } from '@c4/library/domain/chat';
-import { Extension, ExtensionConfiguration } from '@c4/library/domain/extensions';
-import { User } from '@c4/library/domain/users';
 import { StructuredToolInterface } from '@langchain/core/tools';
+import { ChatContext } from 'src/domain/chat';
+import { Extension, ExtensionConfiguration, ExtensionEntity } from 'src/domain/extensions';
+import { User } from 'src/domain/users';
 import { I18nService } from '../../localization/i18n.service';
 
 type ExtensionConstructor = new (i18n: I18nService) => Extension;
@@ -40,7 +40,7 @@ export function modelExtensionTestSuite(modelExtension: ExtensionConstructor, in
     const next = (context: ChatContext) => Promise.resolve(context);
 
     const config: ExtensionConfiguration = { modelName: '' };
-    const middlewares = await extension.getMiddlewares?.(user, config, 2);
+    const middlewares = await extension.getMiddlewares?.(user, { id: 2, externalId: '', values: config } as ExtensionEntity);
 
     expect(extension.getMiddlewares?.bind(extension)).toBeDefined();
     expect(middlewares?.length).toBe(1);

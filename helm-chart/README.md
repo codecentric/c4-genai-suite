@@ -82,6 +82,8 @@ reis:
 | ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
 | `backend.enabled`                                     | Specifies whether c4 should be deployed                                                                                                                                                                                 | `true`                                       |
 | `backend.baseUrl`                                     | Base URL should match `https://{{ingress.host}}`. Required for OpenID Connect or assistants using Dall-E image generation.                                                                                              | `""`                                         |
+| `backend.ssl.rootCertificateConfigMapName`            | Name of the ConfigMap containing the root certificate for the external services.                                                                                                                                        | `""`                                         |
+| `backend.ssl.rootCertificateConfigMapKey`             | Key in the ConfigMap that holds the root certificate for the external services.                                                                                                                                         | `ca.crt`                                     |
 | `backend.auth.enablePassword`                         | Specifies if the build in Username & Password auth is used                                                                                                                                                              | `false`                                      |
 | `backend.auth.initialAdminUsername`                   | The initial admin user Username saved in DB                                                                                                                                                                             | `""`                                         |
 | `backend.auth.initialAdminPassword`                   | The initial admin user Password hashed and saved in DB                                                                                                                                                                  | `""`                                         |
@@ -394,7 +396,7 @@ The new `frontend.*` settings are optional and only needed when customizing:
 - Extra volumes and volume mounts
 - Pod resources
 
-## 7.0.0 to 7.0.1
+## 7.0.0 to 8.0.0
 
 The Helm Chart has been renamed to `c4-genai-suite`. As a result, you cannot upgrade an existing installation using
 `helm upgrade`. However, because the chart’s components are stateless, you can install the new chart alongside the old

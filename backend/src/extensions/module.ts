@@ -8,60 +8,51 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from 'src/domain/auth/module';
 import { BucketEntity, CacheEntity, FileEntity } from 'src/domain/database';
 import { Extension } from 'src/domain/extensions';
+import { AzureOpenAIModelExtension } from './models/azure-open-ai';
+import { AzureOpenAIReasoningModelExtension } from './models/azure-open-ai-reasoning';
+import { BedrockModelExtension } from './models/bedrock-ai';
+import { GoogleGenAIModelExtension } from './models/google-genai';
+import { MistralModelExtension } from './models/mistral';
+import { OllamaModelExtension } from './models/ollama';
+import { OpenAIModelExtension } from './models/open-ai';
+import { OpenAICompatibleModelExtension } from './models/open-ai-compatible';
+import { VertexAIModelExtension } from './models/vertex-al';
+import { CustomPromptExtension } from './prompts/custom';
+import { HubPromptExtension } from './prompts/hub';
+import { SummaryPromptExtension } from './prompts/summary';
+import { Always42Extension } from './tools/always-42';
+import { AzureAISearchExtension } from './tools/azure-ai-search';
+import { AzureDallEExtension } from './tools/azure-dall-e';
+import { BingWebSearchExtension } from './tools/bing-web-search';
+import { CalculatorExtension } from './tools/calculator';
+import { ConfirmExtension } from './tools/confirm';
+import { DallEExtension } from './tools/dall-e';
+import { FilesExtension } from './tools/files';
+import { FilesConversationExtension } from './tools/files-conversation';
+import { FilesVisionExtension } from './tools/files-vision';
+import { MCPToolsExtension } from './tools/mcp-tools';
+import { OpenApiExtension } from './tools/open-api';
+import { ContextExtension } from './tools/show-context';
+import { SimpleInputExtension } from './tools/simple-input';
+import { UserArgsExtension } from './tools/user-args';
+import { WholeFilesExtension } from './tools/whole-files-conversation';
 
-const extensionBaseDir = __dirname;
 const extensionClassSuffix = 'Extension';
-const extensionFileSuffix = '.js';
-const foldersToIgnore = new Set(['internal', 'generated']);
 
-function getLibraryVersion(path: string) {
-  const versionPath = `${path}/library.version`;
-  if (fs.existsSync(versionPath)) {
-    return fs.readFileSync(versionPath).toString('utf-8');
+function getDynamicExtensionModules() {
+  const extensionModulesFolder = path.join(__dirname, '..', '..', 'node_modules', '@c4', 'extensions');
+  if (fs.existsSync(extensionModulesFolder)) {
+    const entries = fs.readdirSync(extensionModulesFolder, { withFileTypes: true });
+
+    return entries
+      .filter((x) => x.isDirectory())
+      .map((entry) => {
+        copyDirFiles(path.join(extensionModulesFolder, entry.name, 'i18n'), path.join(__dirname, '..', 'localization', 'i18n'));
+        return `@c4/extensions/${entry.name}`;
+      });
   }
 
-  return null;
-}
-
-function getExtensionModulePaths(directory = extensionBaseDir): string[] {
-  const entries = fs.readdirSync(directory, { withFileTypes: true });
-  const extensionFiles = [] as string[];
-  entries.forEach((entry) => {
-    const entryFullPath = path.join(directory, entry.name);
-    if (entry.isFile() && entry.name.endsWith(extensionFileSuffix)) {
-      const relativeModulePath = path.relative(extensionBaseDir, entryFullPath);
-      extensionFiles.push(path.join('..', 'extensions', relativeModulePath));
-    } else if (entry.isDirectory() && !foldersToIgnore.has(entry.name)) {
-      extensionFiles.push(...getExtensionModulePaths(entryFullPath));
-    }
-  });
-
-  return extensionFiles;
-}
-
-function getExternalExtensionModules(logger: Logger) {
-  const backendLibaryVersion = getLibraryVersion('.');
-  const extensionModulePrefix = '@c4/extensions';
-  const extensionFolder = `node_modules/${extensionModulePrefix}`;
-  const externalExtensions = [] as string[];
-  if (fs.existsSync(extensionFolder)) {
-    const entries = fs.readdirSync(extensionFolder, { withFileTypes: true });
-    entries.forEach((entry) => {
-      if (entry.isDirectory()) {
-        const extensionLibraryVersion = getLibraryVersion(`${extensionFolder}/${entry.name}`);
-        if (backendLibaryVersion === extensionLibraryVersion) {
-          externalExtensions.push(`${extensionModulePrefix}/${entry.name}`);
-          copyDirFiles(path.join(extensionFolder, entry.name, 'i18n'), path.join(__dirname, '..', 'localization', 'i18n'));
-        } else {
-          logger.warn(
-            `Error loading extension: version mismatch between backend (@c4/library): ${backendLibaryVersion} and ${entry.name}: ${extensionLibraryVersion}`,
-          );
-        }
-      }
-    });
-  }
-
-  return externalExtensions;
+  return [];
 }
 
 function copyDirFiles(source: string, target: string) {
@@ -79,11 +70,10 @@ function copyDirFiles(source: string, target: string) {
   });
 }
 
-async function getExtensionProviders(logger: Logger): Promise<Type<Extension>[]> {
+async function getDynamicExtensionProviders(logger: Logger): Promise<Type<Extension>[]> {
   const providers: Type<Extension>[] = [];
 
-  const extensionModules = getExtensionModulePaths();
-  extensionModules.push(...getExternalExtensionModules(logger));
+  const extensionModules = getDynamicExtensionModules();
 
   for (const extensionModule of extensionModules) {
     try {
@@ -105,11 +95,41 @@ async function getExtensionProviders(logger: Logger): Promise<Type<Extension>[]>
 @Module({})
 export class ExtensionLibraryModule {
   static async register(): Promise<DynamicModule> {
-    const providers = await getExtensionProviders(new Logger(ExtensionLibraryModule.name));
+    const dynamicProviders = await getDynamicExtensionProviders(new Logger(ExtensionLibraryModule.name));
     return {
       module: ExtensionLibraryModule,
       imports: [ConfigModule, AuthModule, CqrsModule, TypeOrmModule.forFeature([CacheEntity, BucketEntity, FileEntity])],
-      providers,
+      providers: [
+        ...dynamicProviders,
+        AzureOpenAIModelExtension,
+        AzureOpenAIReasoningModelExtension,
+        BedrockModelExtension,
+        GoogleGenAIModelExtension,
+        MistralModelExtension,
+        OllamaModelExtension,
+        OpenAIModelExtension,
+        OpenAICompatibleModelExtension,
+        VertexAIModelExtension,
+        CustomPromptExtension,
+        HubPromptExtension,
+        SummaryPromptExtension,
+        Always42Extension,
+        AzureAISearchExtension,
+        AzureDallEExtension,
+        BingWebSearchExtension,
+        CalculatorExtension,
+        ConfirmExtension,
+        DallEExtension,
+        FilesExtension,
+        FilesConversationExtension,
+        FilesVisionExtension,
+        MCPToolsExtension,
+        OpenApiExtension,
+        ContextExtension,
+        SimpleInputExtension,
+        UserArgsExtension,
+        WholeFilesExtension,
+      ],
     };
   }
 }

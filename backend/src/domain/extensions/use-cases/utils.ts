@@ -139,9 +139,10 @@ export function buildExtension(
   source: ExtensionEntity,
   extension: Extension,
   throwOnError = false,
+  forceRebuild = false,
 ): Promise<ConfiguredExtension> {
   source.values = source.values ?? {};
-  return ConfiguredExtension.create(extension, source, throwOnError);
+  return ConfiguredExtension.create(extension, source, throwOnError, forceRebuild);
 }
 
 export async function buildConfiguration(
