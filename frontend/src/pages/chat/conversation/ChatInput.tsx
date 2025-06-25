@@ -2,6 +2,7 @@ import { ActionIcon, Button, Portal } from '@mantine/core';
 import { IconFilter, IconMicrophone, IconPaperclip } from '@tabler/icons-react';
 import { useMutation } from '@tanstack/react-query';
 import React, { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
+import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 import TextareaAutosize from 'react-textarea-autosize';
 import { toast } from 'react-toastify';
 import { ConfigurationDto, FileDto, useApi } from 'src/api';
@@ -171,53 +172,51 @@ export function ChatInput({ conversationId, configuration, isDisabled, isEmpty, 
   const footer = `${configuration?.chatFooter || ''} ${theme.chatFooter || ''}`.trim();
 
   const [isRecording, setIsRecording] = useState(false);
-  //const [audioUrl, setAudioUrl] = useState<string | null>(null);
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const audioChunksRef = useRef<Blob[]>([]);
 
-  const handleRecording = async () => {
-    console.log('handleRecording');
+  const { transcript, listening, resetTranscript, browserSupportsSpeechRecognition, isMicrophoneAvailable } =
+    useSpeechRecognition();
 
-    if (isRecording) {
-      mediaRecorderRef.current?.stop();
+  const toggleSpeechRecognition = async () => {
+    if (!browserSupportsSpeechRecognition) {
       setIsRecording(false);
-    } else {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream);
-      mediaRecorderRef.current = mediaRecorder;
-      audioChunksRef.current = [];
+      toast.error('Your browser does not support speech recognition');
+      return;
+    }
+    if (!isMicrophoneAvailable) {
+      setIsRecording(false);
+      toast.error('Your Microphone is not available');
+      return;
+    }
+    try {
+      if (listening) {
+        await SpeechRecognition.stopListening();
 
-      mediaRecorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          audioChunksRef.current.push(event.data);
-        }
-      };
-
-      /*mediaRecorder.onstop = () => {
-        stream.getTracks().forEach((track) => track.stop());
-
-        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
-
-        if (audioBlob.size > 0) {
-          console.log('audioBlob', audioBlob);
+        if (transcript) {
+          setInput(() => {
+            const newValue = transcript;
+            return newValue.trim();
+          });
         }
 
-        // Upload?
-        //const audioUrl = URL.createObjectURL(audioBlob);
-        //setAudioUrl(audioUrl);
-      };*/
-      mediaRecorder.onstop = () => {
-        stream.getTracks().forEach((track) => track.stop());
-        setInput('Audio recording stopped');
-      };
+        resetTranscript();
+        setIsRecording(false);
+      } else {
+        const permissionResult = await navigator.mediaDevices.getUserMedia({ audio: true });
 
-      mediaRecorder.onerror = (event) => {
-        console.error('MediaRecorder error:', event);
-      };
+        await SpeechRecognition.startListening({
+          continuous: true,
+          language: 'de-DE',
+        });
+        setIsRecording(true);
 
-      mediaRecorder.start();
-
-      setIsRecording(true);
+        if (permissionResult && permissionResult.getTracks) {
+          permissionResult.getTracks().forEach((track) => track.stop());
+        }
+      }
+    } catch (err) {
+      console.error('Speech recognition error:', err);
+      toast.error(`Speech recognition error. Browser don't support speech recognition or Microphone is not available`);
+      setIsRecording(false);
     }
   };
 
@@ -322,7 +321,8 @@ export function ChatInput({ conversationId, configuration, isDisabled, isEmpty, 
                   size="lg"
                   color={isRecording ? 'red' : 'black'}
                   className={`border-gray-200 ${isRecording ? 'animate-pulse' : ''}`}
-                  onClick={handleRecording}
+                  //onClick={handleRecording}
+                  onClick={toggleSpeechRecognition}
                   title={isRecording ? 'Stop recording' : 'Start recording'}
                 >
                   <IconMicrophone className="w-4" />
