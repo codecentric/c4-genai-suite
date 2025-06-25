@@ -334,14 +334,14 @@ typing-extensions = ">=4.0.0"
 
 [[package]]
 name = "azure-search-documents"
-version = "11.5.2"
+version = "11.5.3"
 description = "Microsoft Azure Cognitive Search Client Library for Python"
 optional = false
 python-versions = ">=3.8"
 groups = ["main"]
 files = [
-    {file = "azure_search_documents-11.5.2-py3-none-any.whl", hash = "sha256:c949d011008a4b0bcee3db91132741b4e4d50ddb3f7e2f48944d949d4b413b11"},
-    {file = "azure_search_documents-11.5.2.tar.gz", hash = "sha256:98977dd1fa4978d3b7d8891a0856b3becb6f02cc07ff2e1ea40b9c7254ada315"},
+    {file = "azure_search_documents-11.5.3-py3-none-any.whl", hash = "sha256:110617751c6c8bd50b1f0af2b00a478bd4fbaf4e2f0387e3454c26ec3eb433d6"},
+    {file = "azure_search_documents-11.5.3.tar.gz", hash = "sha256:6931149ec0db90485d78648407f18ea4271420473c7cb646bf87790374439989"},
 ]
 
 [package.dependencies]
@@ -5298,4 +5298,4 @@ cffi = ["cffi (>=1.11)"]
 [metadata]
 lock-version = "2.1"
 python-versions = "<4.0,>=3.12.0"
-content-hash = "184cdab5553ac0b16f39f485d814e3a4cbc23da95018f5bd6d2601d251baf383"
+content-hash = "8cdd23efbd95333ca518340f9677e95bbdda3d85718c037ca7377027b7f5e9fa"
