@@ -17,16 +17,16 @@ jobs:
       matrix:
         service:
           - name: bundled
-            containerfile: Containerfile
+            containerfile: Dockerfile
             context: .
           - name: backend
-            containerfile: backend/Containerfile
+            containerfile: backend/Dockerfile
             context: backend/
           - name: frontend
-            containerfile: frontend/Containerfile
+            containerfile: frontend/Dockerfile
             context: frontend/
           - name: reis
-            containerfile: services/reis/Containerfile
+            containerfile: services/reis/Dockerfile
             context: services/reis/
     steps:
       - uses: actions/checkout@v4

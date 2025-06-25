@@ -16,13 +16,13 @@ jobs:
       matrix:
         image:
           - name: caddy-gateway-proxy
-            containerfile: dev/caddy-gateway-proxy/Containerfile
+            containerfile: dev/caddy-gateway-proxy/Dockerfile
             context: dev/caddy-gateway-proxy/
           - name: mcp-tool-as-server
-            containerfile: dev/mcp-tool-as-server/Containerfile
+            containerfile: dev/mcp-tool-as-server/Dockerfile
             context: dev/mcp-tool-as-server/
           - name: oauth-mock
-            containerfile: dev/oauth-mock/Containerfile
+            containerfile: dev/oauth-mock/Dockerfile
             context: dev/oauth-mock/
     steps:
       - uses: actions/checkout@v4

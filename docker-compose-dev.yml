@@ -2,7 +2,7 @@ services:
   c4-frontend:
     build:
       context: frontend
-      dockerfile: Containerfile
+      dockerfile: Dockerfile
     volumes:
       - ./dev/Caddyfile:/etc/caddy/Caddyfile
     ports:
@@ -14,7 +14,7 @@ services:
   c4-backend:
     build:
       context: backend
-      dockerfile: Containerfile
+      dockerfile: Dockerfile
     hostname: c4-backend
     environment:
       AUTH_ENABLE_PASSWORD: true
