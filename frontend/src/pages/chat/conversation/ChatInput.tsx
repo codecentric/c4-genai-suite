@@ -176,6 +176,12 @@ export function ChatInput({ conversationId, configuration, isDisabled, isEmpty, 
   const { transcript, listening, resetTranscript, browserSupportsSpeechRecognition, isMicrophoneAvailable } =
     useSpeechRecognition();
 
+  useEffect(() => {
+    if (listening && transcript) {
+      setInput(transcript);
+    }
+  }, [listening, transcript]);
+
   const toggleSpeechRecognition = async () => {
     if (!browserSupportsSpeechRecognition) {
       setIsRecording(false);
@@ -190,14 +196,6 @@ export function ChatInput({ conversationId, configuration, isDisabled, isEmpty, 
     try {
       if (listening) {
         await SpeechRecognition.stopListening();
-
-        if (transcript) {
-          setInput(() => {
-            const newValue = transcript;
-            return newValue.trim();
-          });
-        }
-
         resetTranscript();
         setIsRecording(false);
       } else {
