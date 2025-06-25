@@ -1,8 +1,8 @@
 import { useEffect, useRef } from 'react';
-import { useMutateNewConversation } from './state';
+import { useMutateNewChat } from './state/listOfChats';
 
 export function NewChatRedirect() {
-  const createNewConversation = useMutateNewConversation();
+  const createNewConversation = useMutateNewChat();
   const hasRun = useRef(false);
 
   useEffect(() => {

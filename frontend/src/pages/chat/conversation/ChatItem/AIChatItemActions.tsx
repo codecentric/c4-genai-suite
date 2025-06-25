@@ -5,7 +5,7 @@ import { MessageDtoRatingEnum, ProfileDto } from 'src/api';
 import { Icon } from 'src/components';
 import { cn } from 'src/lib';
 import { texts } from 'src/texts';
-import { useStateMutateMessageRating } from '../../state';
+import { useStateMutateMessageRating } from '../../state/chat';
 
 interface AIChatItemActionsProps {
   tokenCount?: number;

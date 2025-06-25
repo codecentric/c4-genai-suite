@@ -4,8 +4,8 @@ import { addDays, startOfDay } from 'date-fns';
 import { describe, expect, it, vi } from 'vitest';
 import { ConversationDto } from 'src/api';
 import { render } from 'src/pages/admin/test-utils';
-import { useStateOfConversations } from 'src/pages/chat/state';
 import { ConversationItems } from './ConversationItems';
+import { useStateOfChats } from './state/listOfChats';
 
 vi.mock('src/api', () => ({
   useApi: () => ({}),
@@ -32,22 +32,25 @@ function mockMutation<TData = unknown, TVariables = void>(): UseMutationResult<T
   };
 }
 
-vi.mock('src/pages/chat/state', () => ({
-  useStateOfSelectedConversationId: vi.fn(),
-  useStateOfConversations: vi.fn(),
+vi.mock('src/pages/chat/state/chat', () => ({
+  useStateOfSelectedChatId: vi.fn(),
+}));
+
+vi.mock('src/pages/chat/state/listOfChats', () => ({
+  useStateOfChats: vi.fn(),
   useListOfChats: vi.fn(),
-  useStateMutateRenameConversation: mockMutation,
-  useStateMutateRemoveConversation: mockMutation,
-  useMutateNewConversation: vi.fn(),
-  useStateMutateRemoveAllConversations: mockMutation,
-  useStateMutateDuplicateConversation: mockMutation,
-  useStateOfConversationEmptiness: vi.fn(),
+  useStateMutateRenameChat: mockMutation,
+  useMutateNewChat: vi.fn(),
+  useStateMutateRemoveAllChats: mockMutation,
+  useStateMutateDuplicateChat: mockMutation,
+  useStateOfChatEmptiness: vi.fn(),
+  useStateMutateRemoveChat: mockMutation,
 }));
 
 describe('Conversations', () => {
   const now = new Date();
 
-  const mockedConversations: ConversationDto[] = [
+  const mockedChats: ConversationDto[] = [
     { id: 1, createdAt: now, configurationId: 1 },
     { id: 4, createdAt: new Date('2023-10-01'), configurationId: 1 },
     { id: 3, createdAt: startOfDay(addDays(now, -20)), configurationId: 1 },
@@ -56,7 +59,7 @@ describe('Conversations', () => {
   ];
 
   it('should render conversations components sorted by date', () => {
-    vi.mocked(useStateOfConversations).mockImplementation(() => mockedConversations);
+    vi.mocked(useStateOfChats).mockImplementation(() => mockedChats);
 
     render(<ConversationItems />);
 

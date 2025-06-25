@@ -2,12 +2,12 @@ import { addDays, addMonths, format, isSameDay, startOfDay, startOfMonth } from 
 import { ConversationDto } from 'src/api';
 import { texts } from 'src/texts';
 import { ConversationItem } from './ConversationItem';
-import { useStateOfConversations } from './state';
+import { useStateOfChats } from './state/listOfChats';
 
 type ConversationGroup = { date: string; entries: ConversationDto[] };
 
-function groupConversations(conversations: ConversationDto[]): ConversationGroup[] {
-  if (conversations.length === 0) {
+function groupConversations(chats: ConversationDto[]): ConversationGroup[] {
+  if (chats.length === 0) {
     return [];
   }
 
@@ -17,7 +17,7 @@ function groupConversations(conversations: ConversationDto[]): ConversationGroup
   const withinMonths = startOfMonth(addMonths(now, -3));
 
   const conversationGroups = Array.from(
-    conversations
+    chats
       .reduce((prev, curr) => {
         const date = curr.createdAt;
 
@@ -47,8 +47,8 @@ function groupConversations(conversations: ConversationDto[]): ConversationGroup
 }
 
 export function ConversationItems() {
-  const conversations = useStateOfConversations();
-  const grouped = groupConversations(conversations);
+  const chats = useStateOfChats();
+  const grouped = groupConversations(chats);
 
   return (
     <div className="flex flex-col gap-4">
@@ -56,8 +56,8 @@ export function ConversationItems() {
         <div key={group.date} className="grid">
           <h4 className="pb-1 pl-2 text-xs font-light">{group.date}</h4>
           <div className="grid">
-            {group.entries.map((conversation) => (
-              <ConversationItem key={conversation.id} conversation={conversation} />
+            {group.entries.map((chat) => (
+              <ConversationItem key={chat.id} chat={chat} />
             ))}
           </div>
         </div>

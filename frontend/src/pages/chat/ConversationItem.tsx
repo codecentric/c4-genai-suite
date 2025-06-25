@@ -1,97 +1,67 @@
 import { Button, Menu, rem } from '@mantine/core';
 import { IconCopy, IconDots, IconEdit, IconTrash } from '@tabler/icons-react';
-import { ChangeEvent, FormEvent, KeyboardEvent, memo, useEffect, useState } from 'react';
+import { FormEvent, memo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ConversationDto } from 'src/api';
 import { texts } from 'src/texts';
-import {
-  useStateMutateDuplicateConversation,
-  useStateMutateRemoveConversation,
-  useStateMutateRenameConversation,
-  useStateOfSelectedConversationId,
-} from './state';
+import { useStateOfSelectedChatId } from './state/chat';
+import { useStateMutateDuplicateChat, useStateMutateRemoveChat, useStateMutateRenameChat } from './state/listOfChats';
 import { isMobile } from '../utils';
 
-interface ConversationProps {
-  conversation: ConversationDto;
+const getInputValue = (e: FormEvent<HTMLFormElement>) => (new FormData(e.currentTarget).get('name') as string)?.trim();
+
+interface ChatProps {
+  chat: ConversationDto;
 }
 
-export const ConversationItem = memo(({ conversation }: ConversationProps) => {
-  const selectedConversationId = useStateOfSelectedConversationId();
-  const removeConversation = useStateMutateRemoveConversation();
-  const duplicateConversation = useStateMutateDuplicateConversation();
-  const renameConversation = useStateMutateRenameConversation();
-  const [name, setName] = useState(conversation.name);
+export const ConversationItem = memo(({ chat }: ChatProps) => {
+  const isSelected = chat.id === useStateOfSelectedChatId();
+  const removeChat = useStateMutateRemoveChat();
+  const duplicateChat = useStateMutateDuplicateChat();
+  const renameChat = useStateMutateRenameChat();
+  const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [showRenameInput, setShowRenameInput] = useState(false);
 
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    setName(conversation.name);
-  }, [conversation.name]);
-
-  const doCancel = (event: KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Escape') {
-      doStopRename();
-    }
-  };
-
-  const doCommit = (event: FormEvent) => {
-    if (name) {
-      renameConversation.mutate({ conversation, name });
-      setShowRenameInput(false);
-    } else {
-      doStopRename();
-    }
-
+  const submitRename = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-  };
-
-  const doStopRename = () => {
+    const name = getInputValue(event);
+    if (name && name !== chat.name) {
+      renameChat.mutate({ chat, name });
+    }
     setShowRenameInput(false);
-    setName(conversation.name);
-  };
-
-  const doStartRename = () => {
-    setShowRenameInput(true);
-    setName(conversation.name);
-  };
-
-  const doSetText = (event: ChangeEvent<HTMLInputElement>) => {
-    setName(event.target.value);
   };
 
   if (showRenameInput) {
     return (
-      <form className="p-0" onSubmit={doCommit}>
+      <form className="p-0" onSubmit={submitRename}>
         <div>
           <input
             autoFocus
+            name="name"
             className="input input-sm input-bordered h-9 w-full"
-            onBlur={doStopRename}
-            onChange={doSetText}
-            onKeyUp={doCancel}
-            value={name || ''}
+            onBlur={() => setShowRenameInput(false)}
+            onKeyUp={(e) => e.key === 'Escape' && setShowRenameInput(false)}
+            defaultValue={chat.name}
           />
         </div>
       </form>
     );
   }
 
-  const selected = selectedConversationId === conversation.id;
   return (
     <Button
       size="sm"
       p="xs"
-      onClick={() => navigate(`/chat/${conversation.id}`)}
+      onClick={async () => await navigate(`/chat/${chat.id}`)}
       fullWidth
       justify="space-between"
-      variant={selected ? 'filled' : 'subtle'}
+      variant={isSelected ? 'filled' : 'subtle'}
       classNames={{ root: 'relative group transition-all' }}
       role="navigation"
+      onDoubleClick={() => isSelected && setShowRenameInput(true)}
     >
-      {conversation.name}
+      {chat.name}
       <div
         onClick={(e) => e.stopPropagation()}
         className={`absolute top-0 right-0 flex h-full items-center px-2 ${isMobile() ? '' : 'opacity-0 group-hover:opacity-100'}`}
@@ -103,23 +73,23 @@ export const ConversationItem = memo(({ conversation }: ConversationProps) => {
           <Menu.Dropdown>
             <Menu.Item
               leftSection={<IconEdit className="h-4 w-4" />}
-              disabled={renameConversation.isPending}
-              onClick={doStartRename}
+              disabled={renameChat.isPending}
+              onClick={() => setShowRenameInput(true)}
             >
               {texts.common.rename}
             </Menu.Item>
             <Menu.Item
               leftSection={<IconCopy className="h-4 w-4" />}
-              disabled={duplicateConversation.isPending}
-              onClick={() => duplicateConversation.mutate(conversation.id)}
+              disabled={duplicateChat.isPending}
+              onClick={() => duplicateChat.mutate(chat.id)}
             >
               {texts.common.duplicate}
             </Menu.Item>
             <Menu.Item
               color="red"
               leftSection={<IconTrash className="h-4 w-4" />}
-              disabled={removeConversation.isPending}
-              onClick={() => removeConversation.mutate(conversation.id)}
+              disabled={removeChat.isPending}
+              onClick={() => removeChat.mutate(chat.id)}
             >
               {texts.common.remove}
             </Menu.Item>

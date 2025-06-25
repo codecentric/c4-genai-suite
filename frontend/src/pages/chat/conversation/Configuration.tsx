@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { ConfigurationDto } from 'src/api';
 import { ConfigurationUserValuesModal } from 'src/pages/chat/conversation/ConfigurationUserValuesModal';
 import { isMobile } from 'src/pages/utils';
-import { useStateMutateConversation, useStateOfConversation } from '../state';
+import { useStateMutateChat, useStateOfChat } from '../state/chat';
 
 interface ConfigurationProps {
   configuration: ConfigurationDto;
@@ -13,8 +13,8 @@ interface ConfigurationProps {
 }
 
 export const Configuration = ({ canEditConfiguration, configuration, configurations }: ConfigurationProps) => {
-  const conversation = useStateOfConversation();
-  const updateConversation = useStateMutateConversation(conversation.id);
+  const chat = useStateOfChat();
+  const updateChat = useStateMutateChat(chat.id);
 
   const [showModal, setShowModal] = useState(false);
 
@@ -36,7 +36,7 @@ export const Configuration = ({ canEditConfiguration, configuration, configurati
         radius={'md'}
         comboboxProps={{ radius: 'md' }}
         renderOption={renderSelectOption}
-        onChange={(value) => value && updateConversation.mutate({ configurationId: +value })}
+        onChange={(value) => value && updateChat.mutate({ configurationId: +value })}
         value={configuration?.id + ''}
         data={configurations.map((c) => ({ value: c.id + '', label: c.name }))}
         disabled={!canEditConfiguration}

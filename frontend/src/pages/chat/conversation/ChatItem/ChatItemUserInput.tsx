@@ -2,7 +2,7 @@ import { memo, useRef } from 'react';
 import { StreamUIRequestDto } from 'src/api';
 import { Markdown } from 'src/components';
 import { texts } from 'src/texts';
-import { useConfirmAiAction } from '../../state';
+import { useConfirmAiAction } from '../../state/chat';
 
 export const ChatItemUserInput = memo(({ request }: { request: StreamUIRequestDto }) => {
   const textInputRef = useRef<HTMLInputElement>(null);
