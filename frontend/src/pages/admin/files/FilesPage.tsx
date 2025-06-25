@@ -42,7 +42,7 @@ export function FilesPage() {
 
   const bucketParam = useParams<'id'>();
   const bucketId = +bucketParam.id!;
-  const [_uploading, setUploading] = useState<File[]>([]);
+  const [uploading, setUploading] = useState<File[]>([]);
   const [page, setPage] = useState(0);
   const [total, setTotal] = useState(0);
   const { files, removeFile, setFile, setFiles } = useFilesStore();
@@ -219,6 +219,8 @@ export function FilesPage() {
     getFacetedMinMaxValues: getFacetedMinMaxValues(), // generate min/max values for range filter,
     enableRowSelection: true,
     onRowSelectionChange: setRowSelection,
+    columnResizeDirection: 'ltr',
+    columnResizeMode: 'onChange',
   });
 
   return (
@@ -268,17 +270,30 @@ export function FilesPage() {
 
           {/* only show the file upload dropzone if this is not a user/conversation bucket */}
           {thisBucket?.type !== BucketDtoTypeEnum.Conversation && thisBucket?.type !== BucketDtoTypeEnum.User && (
-            <div
-              className="rounded-box flex h-32 items-center justify-center border-2 border-dashed border-gray-300 p-4 text-gray-600 transition-all hover:border-gray-400"
-              {...getRootProps()}
-            >
-              <input {...getInputProps()} />
-              {isDragActive ? <p>{texts.common.dropZoneDrop}</p> : <p>{texts.common.dropZone}</p>}
+            <div>
+              <div
+                className="rounded-box flex h-32 items-center justify-center border-2 border-dashed border-gray-300 p-4 text-gray-600 transition-all hover:border-gray-400"
+                {...getRootProps()}
+              >
+                <input {...getInputProps()} />
+                {isDragActive ? <p>{texts.common.dropZoneDrop}</p> : <p>{texts.common.dropZone}</p>}
+              </div>
+              {uploading.length > 0 && (
+                <div className="py-1 text-xs text-gray-500">
+                  {uploading.length == 1 ? texts.files.uploading : texts.files.uploadMultiple(uploading.length)}
+                </div>
+              )}
             </div>
           )}
 
           {thisBucket.type !== BucketDtoTypeEnum.Conversation && (
-            <FilterableTable table={table} handleMultiDelete={handleMultiRowDelete} />
+            <FilterableTable
+              table={table}
+              handleMultiDelete={handleMultiRowDelete}
+              deleteDialogTitle={texts.files.removeFilesConfirmTitle}
+              deleteDialogText={texts.files.removeFilesConfirmText(table.getSelectedRowModel().rows.length)}
+              deleteDisabled={table.getSelectedRowModel().rows.length == 0 ? true : false}
+            />
           )}
           <Pagingation page={page} pageSize={pageSize} total={total} onPage={setPage} />
         </div>

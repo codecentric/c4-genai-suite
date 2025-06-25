@@ -9,14 +9,22 @@ import { TableFilter } from './TableFilter';
 
 export type TData = FileDto;
 
-export function FilterableTable({ table, handleMultiDelete }: { table: TanTable<TData>; handleMultiDelete: () => void }) {
+export type FilterableTableProps = {
+  table: TanTable<TData>;
+  handleMultiDelete: () => void;
+  deleteDialogTitle: string;
+  deleteDialogText: string;
+  deleteDisabled: boolean;
+};
+
+export function FilterableTable(props: FilterableTableProps) {
   const containerClass = 'flex flex-row items-center justify-between';
 
   return (
     <div className="relative flex w-full flex-col overflow-x-scroll rounded-xl bg-white bg-clip-border p-2 shadow-sm">
       <table className="w-full min-w-max table-auto border-collapse">
         <thead>
-          {table.getHeaderGroups().map((headerGroup) => (
+          {props.table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
               {headerGroup.headers.map((header) => {
                 return (
@@ -57,12 +65,15 @@ export function FilterableTable({ table, handleMultiDelete }: { table: TanTable<
           ))}
         </thead>
         <tbody>
-          {table.getRowModel().rows.map((row) => {
+          {props.table.getRowModel().rows.map((row) => {
             return (
               <tr key={row.id} className="border-t border-gray-200">
                 {row.getVisibleCells().map((cell) => {
                   return (
-                    <td key={cell.id} className="max-w-44 overflow-hidden p-2 text-sm font-normal text-nowrap overflow-ellipsis">
+                    <td
+                      key={cell.id}
+                      className="w-fit max-w-72 overflow-hidden p-2 text-sm font-normal text-nowrap overflow-ellipsis"
+                    >
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </td>
                   );
@@ -73,14 +84,10 @@ export function FilterableTable({ table, handleMultiDelete }: { table: TanTable<
         </tbody>
       </table>
       <div className="flex flex-row items-center justify-between gap-x-2 border-t border-gray-300 p-2 text-sm">
-        <div className="text-gray-500">{`${table.getSelectedRowModel().rows.length} Rows Selected`}</div>
-        <ConfirmDialog
-          title={texts.files.removeFileConfirmTitle}
-          text={texts.files.removeFileConfirmText}
-          onPerform={() => handleMultiDelete()}
-        >
+        <div className="text-gray-500">{`${props.table.getSelectedRowModel().rows.length} Rows Selected`}</div>
+        <ConfirmDialog title={props.deleteDialogTitle} text={props.deleteDialogText} onPerform={() => props.handleMultiDelete()}>
           {({ onClick }) => (
-            <Button variant="light" color="red" onClick={onClick} size="xs">
+            <Button variant="light" color="red" onClick={onClick} size="xs" disabled={props.deleteDisabled}>
               {texts.common.remove}
             </Button>
           )}

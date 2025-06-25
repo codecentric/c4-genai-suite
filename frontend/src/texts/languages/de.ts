@@ -216,7 +216,9 @@ export const de: typeof en = {
     removeBucketConfirmTitle: 'Datei löschen',
     removeBucketFailed: 'Löschen des Buckets fehlgeschlagen',
     removeFileConfirmText: 'Möchtest du die Datei wirklich löschen?',
+    removeFilesConfirmText: 'Möchtest du wirklich {{fileCount}} Datei(en) löschen?',
     removeFileConfirmTitle: 'Datei löschen',
+    removeFilesConfirmTitle: 'Datei(en) löschen',
     removeFileFailed: 'Löschen der Datei fehlgeschlagen.',
     selectAll: 'Alles auswählen',
     testFailed: 'Bucket ist nicht gültig',
@@ -229,8 +231,8 @@ export const de: typeof en = {
       'Datei {{fileName}} konnte nicht hochgeladen werden. Das Hochladen von Bildern in den Benutzerdateien-Bucket wird derzeit nicht unterstützt.',
     uploadImageFailedUseThePaperclip:
       'Datei {{fileName}} konnte nicht hochgeladen werden. Bilder können über das 📎-Symbol im Nachrichtenfenster hochgeladen werden.',
-    uploading: 'Datei wird hochgeladen',
-    upload: 'Hochladen...',
+    uploading: 'Datei wird hochgeladen...',
+    uploadMultiple: '{{fileCount}} Dateien werden hochgeladen...',
     wholeFileTooLarge: 'Die Datei ist größer als die definierte maximale Dateigröße',
   },
   login: {

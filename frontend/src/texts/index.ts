@@ -244,7 +244,9 @@ function load() {
       removeBucketConfirmTitle: translate('files.removeBucketConfirmTitle'),
       removeBucketFailed: translate('files.removeBucketFailed'),
       removeFileConfirmText: translate('files.removeFileConfirmText'),
+      removeFilesConfirmText: (fileCount: number) => translate('files.removeFilesConfirmText', { fileCount }),
       removeFileConfirmTitle: translate('files.removeFileConfirmTitle'),
+      removeFilesConfirmTitle: translate('files.removeFilesConfirmTitle'),
       removeFileFailed: translate('files.removeFileFailed'),
       selectAll: translate('files.selectAll'),
       testFailed: translate('files.testFailed'),
@@ -256,7 +258,7 @@ function load() {
       uploadImageFailedNotYetSupported: (fileName: string) => translate('files.uploadImageFailedNotYetSupported', { fileName }),
       uploadImageFailedUseThePaperclip: (fileName: string) => translate('files.uploadImageFailedUseThePaperclip', { fileName }),
       uploading: translate('files.uploading'),
-      upload: translate('files.upload'),
+      uploadMultiple: (fileCount: number) => translate('files.uploadMultiple', { fileCount }),
       wholeFileTooLarge: translate('files.wholeFileTooLarge'),
     },
     login: {

@@ -46,7 +46,7 @@ export function TableFilter({ column }: { column: Column<TData, unknown> }) {
     <select
       onChange={(e) => column.setFilterValue(e.target.value)}
       value={columnFilterValue?.toString()}
-      className="w-auto rounded-sm border text-xs font-normal shadow-xs"
+      className="w-16 rounded-sm border font-normal shadow-xs"
     >
       <option value="">All</option>
       {sortedUniqueValues.map((value) => (
