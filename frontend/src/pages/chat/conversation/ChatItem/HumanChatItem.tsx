@@ -8,13 +8,15 @@ import { useEventCallback } from 'src/hooks';
 import { useConversationFiles } from 'src/hooks/api/files';
 import { cn } from 'src/lib';
 import { texts } from 'src/texts';
+import { useStateOfSelectedChatId } from '../../state/chat';
 import { ChatItemProps } from './ChatItemProps';
 
-export const HumanChatItem = ({ message, onSubmit, chatId }: ChatItemProps) => {
+export const HumanChatItem = ({ message, editMessage }: ChatItemProps) => {
   // MessageDTO ist generated from the backend models.
   // It may be refactored to become a simple string
   // instead of an array with one entry (in the futute ;) ).
   const textContent = message.content[0]?.type === 'text' ? message.content[0].text : '';
+  const chatId = useStateOfSelectedChatId();
   const { data: chatFiles } = useConversationFiles(chatId);
   const [editedText, setEditedText] = useState(textContent);
   const [isEditing, setIsEditing] = useState(false);
@@ -27,7 +29,7 @@ export const HumanChatItem = ({ message, onSubmit, chatId }: ChatItemProps) => {
 
   const handleSave = () => {
     setIsEditing(false);
-    onSubmit(editedText, chatFiles, message.id);
+    editMessage(editedText, chatFiles, message.id);
   };
 
   const doKeyDown = useEventCallback((event: React.KeyboardEvent<HTMLTextAreaElement>) => {

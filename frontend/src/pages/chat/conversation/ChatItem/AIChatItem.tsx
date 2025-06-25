@@ -2,7 +2,9 @@ import { Box } from '@mantine/core';
 import { useClipboard, useDebouncedValue } from '@mantine/hooks';
 import { toast } from 'react-toastify';
 import { Alert, Markdown } from 'src/components';
+import { useProfile } from 'src/hooks';
 import { texts } from 'src/texts';
+import { useStateOfIsAiWriting } from '../../state/chat';
 import { ChatItemDebug } from '../ChatItemDebug';
 import { ChatItemLogging } from '../ChatItemLogging';
 import ChatItemSources from '../ChatItemSources';
@@ -12,11 +14,13 @@ import { AiAvatar } from './AiAvatar';
 import { ChatItemProps } from './ChatItemProps';
 import { ChatItemUserInput } from './ChatItemUserInput';
 
-export const AIChatItem = ({ agentName, message, isWriting, isLast, user, llmLogo, selectDocument }: ChatItemProps) => {
+export const AIChatItem = ({ agentName, message, isLast, llmLogo, selectDocument }: ChatItemProps) => {
   // MessageDTO ist generated from the backend models.
   // It may be refactored to become a simple string
   // instead of an array with one entry (in the futute ;) ).
   const textContent = message.content[0]?.type === 'text' ? message.content[0].text : '';
+  const user = useProfile();
+  const isWriting = useStateOfIsAiWriting();
   const clipboard = useClipboard();
 
   const copyTextToClipboard = () => {

@@ -1,4 +1,4 @@
-import { FileDto, MessageDtoRatingEnum, ProfileDto } from 'src/api';
+import { FileDto, MessageDtoRatingEnum } from 'src/api';
 import { ChatMessage } from '../../state/types';
 
 export interface ChatItemProps {
@@ -6,11 +6,8 @@ export interface ChatItemProps {
   message: ChatMessage;
   isLast: boolean;
   isBeforeLast: boolean;
-  isWriting?: boolean;
-  chatId: number;
   rating?: MessageDtoRatingEnum;
-  user: ProfileDto;
   llmLogo?: string;
   selectDocument: (documentUri: string) => void;
-  onSubmit: (input: string, files?: FileDto[], editMessageId?: number) => void;
+  editMessage: (input: string, files?: FileDto[], editMessageId?: number) => void;
 }
