@@ -13,13 +13,8 @@ import { NewChatRedirect } from './NewChatRedirect';
 import { DocumentSource, SourcesChunkPreview } from './SourcesChunkPreview';
 import { ConversationPage } from './conversation/ConversationPage';
 import { Files } from './files/Files';
-import {
-  useListOfChatsInit,
-  useMutateNewConversation,
-  useStateMutateRemoveAllConversations,
-  useStateOfConversationEmptiness,
-  useStateOfSelectedConversationId,
-} from './state';
+import { useStateOfSelectedChatId } from './state/chat';
+import { useListOfChatsInit, useMutateNewChat, useStateMutateRemoveAllChats, useStateOfChatEmptiness } from './state/listOfChats';
 import { useUserBucket } from './useUserBucket';
 
 const CustomResizeHandle = () => (
@@ -58,10 +53,10 @@ export function ChatPage() {
 
   const [selectedDocument, setSelectedDocument] = useState<DocumentSource | undefined>();
   const { userBucket, selectedConfigurationId, setSelectedConfigurationId } = useUserBucket();
-  const checkIfEmptyConversation = useStateOfConversationEmptiness();
-  const selectedConversationId = useStateOfSelectedConversationId();
-  const removeAllConversations = useStateMutateRemoveAllConversations();
-  const createNewConversation = useMutateNewConversation();
+  const checkIfEmptyChat = useStateOfChatEmptiness();
+  const selectedChatId = useStateOfSelectedChatId();
+  const removeAllChats = useStateMutateRemoveAllChats();
+  const createNewChat = useMutateNewChat();
 
   const [sidebarLeft, setSidebarLeft] = useSidebarState('sidebar-left');
   const [sidebarRight, setSidebarRight] = useSidebarState('sidebar-right');
@@ -70,16 +65,16 @@ export function ChatPage() {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const openNewChatIfNeeded = async () => {
-    if (selectedConversationId) {
-      if (await checkIfEmptyConversation(selectedConversationId)) textareaRef.current?.focus();
-      else createNewConversation.mutate();
+    if (selectedChatId) {
+      if (await checkIfEmptyChat(selectedChatId)) textareaRef.current?.focus();
+      else createNewChat.mutate();
     }
   };
 
   // close the sources tab everytime the user selects another conversation
-  useEffect(() => setSelectedDocument(undefined), [selectedConversationId]);
+  useEffect(() => setSelectedDocument(undefined), [selectedChatId]);
 
-  const rightPanelVisible = sidebarRight && selectedConversationId && (userBucket || selectedDocument);
+  const rightPanelVisible = sidebarRight && selectedChatId && (userBucket || selectedDocument);
   return (
     <div className="flex h-screen flex-col">
       <NavigationBar theme={theme} />
@@ -114,7 +109,7 @@ export function ChatPage() {
                 <ConversationItems />
               </div>
               <div className="p-2" onClick={(e) => e.stopPropagation()}>
-                <ProfileButton section="chat" onClearConversations={removeAllConversations.mutate} />
+                <ProfileButton section="chat" onClearConversations={removeAllChats.mutate} />
               </div>
             </Panel>
             {!isMobileView && <CustomResizeHandle />}
@@ -181,11 +176,7 @@ export function ChatPage() {
                 <SourcesChunkPreview onClose={() => setSelectedDocument(undefined)} document={selectedDocument} />
               ) : (
                 userBucket && (
-                  <Files
-                    configurationId={selectedConfigurationId}
-                    userBucket={userBucket}
-                    conversationId={selectedConversationId}
-                  />
+                  <Files configurationId={selectedConfigurationId} userBucket={userBucket} conversationId={selectedChatId} />
                 )
               )}
             </Panel>

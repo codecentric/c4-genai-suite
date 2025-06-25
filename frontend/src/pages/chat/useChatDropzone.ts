@@ -8,35 +8,35 @@ import { buildError } from 'src/lib';
 import { texts } from 'src/texts';
 import { filterFilesByFileNameExtensions, matchExtension } from './conversation/chat-input-utils';
 
-export const useChatDropzone = (configurationId: number | undefined, conversationId: number) => {
+export const useChatDropzone = (configurationId: number | undefined, chatId: number) => {
   const api = useApi();
   const { data: userBucket } = useConversationBucketAvailabilities(configurationId);
   const upload = useMutation({
-    mutationKey: ['upload-files-in-conversation'],
+    mutationKey: ['upload-files-in-chat'],
     mutationFn: async (data: { file: File; extensionId: number }) => {
       const file = data.file;
-      return api.files.postUserFile(data.extensionId, conversationId, file);
+      return api.files.postUserFile(data.extensionId, chatId, file);
     },
     onError: async (error, uploadedFile) => {
       toast.error(await buildError(`${texts.files.uploadFailed} '${uploadedFile.file.name}'`, error));
     },
     onSettled: () => refetch(),
   });
-  const uploadMutations = useTypedMutationStates(upload, ['upload-files-in-conversation']);
-  const { data: conversationFiles = [], refetch } = useConversationFiles(conversationId);
+  const uploadMutations = useTypedMutationStates(upload, ['upload-files-in-chat']);
+  const { data: chatFiles = [], refetch } = useConversationFiles(chatId);
   const uploadingFiles = uploadMutations
     .filter((m) => m.status === 'pending')
     .map((m) => m.variables?.file)
     .filter(Boolean)
     .map((f) => f!)
-    .filter((f) => !conversationFiles?.some((conversationFile) => conversationFile?.fileName === f?.name));
+    .filter((f) => !chatFiles?.some((chatFile) => chatFile?.fileName === f?.name));
 
   const getFileSlots = () => {
     return userBucket?.extensions.map((x) => {
       const maxFiles = x.maxFiles ?? Number.MAX_SAFE_INTEGER;
 
       const extUploadingFiles = filterFilesByFileNameExtensions(uploadingFiles, x.fileNameExtensions);
-      const extConversationFiles = filterFilesByFileNameExtensions(conversationFiles, x.fileNameExtensions);
+      const extConversationFiles = filterFilesByFileNameExtensions(chatFiles, x.fileNameExtensions);
       const remainingSlots = maxFiles - (extUploadingFiles.length + extConversationFiles.length);
       return {
         extensionTitle: x.title,
@@ -81,7 +81,7 @@ export const useChatDropzone = (configurationId: number | undefined, conversatio
       );
       const maxFiles = extension.maxFiles ?? Number.MAX_SAFE_INTEGER;
       const extUploadingFiles = filterFilesByFileNameExtensions(uploadingFiles, extension.fileNameExtensions);
-      const extConversationFiles = filterFilesByFileNameExtensions(conversationFiles, extension.fileNameExtensions);
+      const extConversationFiles = filterFilesByFileNameExtensions(chatFiles, extension.fileNameExtensions);
       const remainingSlots = maxFiles - (extUploadingFiles.length + extConversationFiles.length);
 
       const filesForExtensionToUpload = filesForExtension.slice(0, remainingSlots);
@@ -110,7 +110,7 @@ export const useChatDropzone = (configurationId: number | undefined, conversatio
     refetchConversationFiles: refetch,
     upload,
     uploadMutations,
-    conversationFiles,
+    chatFiles,
     userBucket,
     uploadingFiles,
     fullFileSlots,

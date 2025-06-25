@@ -1,10 +1,9 @@
-import { ConversationDto } from 'src/api';
 import { Dialog } from 'src/pages/Dialog';
 import { texts } from 'src/texts';
-import { useStateMutateConversationRating } from '../state';
+import { useStateMutateChatRating } from '../state/chat';
 
-export function ConversationRating({ conversation }: { conversation: ConversationDto }) {
-  const updateConversationRating = useStateMutateConversationRating(conversation.id);
+export function ChatRating({ chatId }: { chatId: number }) {
+  const updateConversationRating = useStateMutateChatRating(chatId);
 
   return (
     <Dialog

@@ -1,5 +1,5 @@
 import { FileDto, MessageDtoRatingEnum, ProfileDto } from 'src/api';
-import { ChatMessage } from '../../state';
+import { ChatMessage } from '../../state/types';
 
 export interface ChatItemProps {
   agentName: string;
@@ -7,7 +7,7 @@ export interface ChatItemProps {
   isLast: boolean;
   isBeforeLast: boolean;
   isWriting?: boolean;
-  conversationId: number;
+  chatId: number;
   rating?: MessageDtoRatingEnum;
   user: ProfileDto;
   llmLogo?: string;

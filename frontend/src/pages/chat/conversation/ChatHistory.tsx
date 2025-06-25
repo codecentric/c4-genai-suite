@@ -1,12 +1,12 @@
 import { FileDto } from 'src/api';
 import { useProfile } from 'src/hooks';
-import { useStateOfConversation, useStateOfIsAiWritting, useStateOfMessages } from '../state';
+import { useStateOfIsAiWriting, useStateOfMessages, useStateOfSelectedChatId } from '../state/chat';
 import { ChatItem } from './ChatItem/ChatItem';
 
 type ChatHistoryProps = {
   agentName: string;
   llmLogo?: string;
-  selectDocument: (conversationId: number, messageId: number, documentUri: string) => void;
+  selectDocument: (chatId: number, messageId: number, documentUri: string) => void;
   onSubmit: (input: string, files?: FileDto[], editMessageId?: number) => void;
 };
 
@@ -15,8 +15,8 @@ export function ChatHistory({ agentName, llmLogo, selectDocument, onSubmit }: Ch
   const messages = useStateOfMessages();
   const allMessagesButLastTwo = messages.slice(0, -2);
   const lastTwoMessages = messages.slice(-2);
-  const { id: conversationId } = useStateOfConversation();
-  const isWriting = useStateOfIsAiWritting();
+  const chatId = useStateOfSelectedChatId();
+  const isWriting = useStateOfIsAiWriting();
   const autoScrollContainerForLastMessageExchange = 'grid min-h-full min-w-full max-w-full grid-rows-[max-content_1fr]';
 
   return (
@@ -24,16 +24,16 @@ export function ChatHistory({ agentName, llmLogo, selectDocument, onSubmit }: Ch
       <div className={'grid'}>
         {allMessagesButLastTwo.map((message, i) => (
           <ChatItem
-            key={`${i}_${conversationId}`}
+            key={`${i}_${chatId}`}
             agentName={agentName}
-            conversationId={conversationId}
+            chatId={chatId}
             isWriting={isWriting}
             isLast={i === messages.length - 1}
             isBeforeLast={i === messages.length - 2}
             message={message}
             user={profile}
             llmLogo={llmLogo}
-            selectDocument={(documentUri) => selectDocument(conversationId, message.id, documentUri)}
+            selectDocument={(documentUri) => selectDocument(chatId, message.id, documentUri)}
             onSubmit={onSubmit}
           />
         ))}
@@ -41,16 +41,16 @@ export function ChatHistory({ agentName, llmLogo, selectDocument, onSubmit }: Ch
       <div className={autoScrollContainerForLastMessageExchange}>
         {lastTwoMessages.map((message, i) => (
           <ChatItem
-            key={`${i + messages.length - 2}_${conversationId}`}
+            key={`${i + messages.length - 2}_${chatId}`}
             agentName={agentName}
-            conversationId={conversationId}
+            chatId={chatId}
             isWriting={isWriting}
             isLast={i === 1}
             isBeforeLast={i === 0}
             message={message}
             user={profile}
             llmLogo={llmLogo}
-            selectDocument={(documentUri) => selectDocument(conversationId, message.id, documentUri)}
+            selectDocument={(documentUri) => selectDocument(chatId, message.id, documentUri)}
             onSubmit={onSubmit}
           />
         ))}
