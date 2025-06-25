@@ -72,7 +72,7 @@ export function ConversationPage(props: ConversationPageProps) {
     return configuration?.agentName || theme.agentName || texts.chat.sourceAI;
   }, [configuration?.agentName, theme.agentName]);
 
-  const doSubmit = useEventCallback((input: string, uploadedFiles?: FileDto[], editMessageId?: number) => {
+  const submitMessage = useEventCallback((input: string, uploadedFiles?: FileDto[], editMessageId?: number) => {
     sendMessage(chatId, input, uploadedFiles, editMessageId);
     setTimeout(() => scrollToBottom(), 500);
     return false;
@@ -113,7 +113,7 @@ export function ConversationPage(props: ConversationPageProps) {
               }
               ref={containerRef}
             >
-              <ChatHistory agentName={agentName} llmLogo={llmLogo} selectDocument={selectDocument} onSubmit={doSubmit} />
+              <ChatHistory agentName={agentName} llmLogo={llmLogo} selectDocument={selectDocument} editMessage={submitMessage} />
             </div>
           )}
           <div className={`${!messages.length && 'grow'} flex shrink-0 flex-col items-center justify-center px-4`}>
@@ -130,7 +130,7 @@ export function ConversationPage(props: ConversationPageProps) {
                 configuration={configuration}
                 isDisabled={isAiWriting}
                 isEmpty={isNewConversation}
-                onSubmit={doSubmit}
+                submitMessage={submitMessage}
               />
               <div
                 data-testid={'scrollToBottomButton'}

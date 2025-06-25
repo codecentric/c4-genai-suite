@@ -29,9 +29,9 @@ interface ChatInputProps {
   chatId: number;
   isDisabled?: boolean;
   isEmpty?: boolean;
-  onSubmit: (input: string, files?: FileDto[]) => void;
+  submitMessage: (input: string, files?: FileDto[]) => void;
 }
-export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEmpty, onSubmit }: ChatInputProps) {
+export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEmpty, submitMessage }: ChatInputProps) {
   const api = useApi();
   const extensionsWithFilter = configuration?.extensions?.filter(isExtensionWithUserArgs) ?? [];
   const { updateContext, context } = useExtensionContext(chatId);
@@ -97,7 +97,7 @@ export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEm
 
   const doSetText = useEventCallback((text: string, chatFiles?: FileDto[]) => {
     try {
-      onSubmit(text, chatFiles);
+      submitMessage(text, chatFiles);
     } finally {
       setInput('');
     }
