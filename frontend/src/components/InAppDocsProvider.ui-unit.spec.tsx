@@ -1,6 +1,8 @@
 import { MantineProvider } from '@mantine/core';
 import { fireEvent, render, screen } from '@testing-library/react';
+import { PropsWithChildren } from 'react';
 import { describe, expect, it, vi } from 'vitest';
+import { ProfileContext } from 'src/hooks';
 import { InAppDocsProvider, useDocsContext } from './InAppDocsProvider';
 
 vi.mock('react-router-dom', () => ({
@@ -17,6 +19,11 @@ vi.mock('@tanstack/react-query', () => ({
   })),
 }));
 
+const ProfileProvider = ({ children }: PropsWithChildren) => (
+  <ProfileContext.Provider value={{ id: '', name: 'Admin', email: 'admin@admin.com', isAdmin: true }}>
+    {children}
+  </ProfileContext.Provider>
+);
 const TestComponent = () => {
   const { isDocsButtonVisible, toggleDocs } = useDocsContext();
   return (
@@ -34,9 +41,11 @@ describe('InAppDocsProvider', () => {
   it('initially shows docs button and hide docs panel', () => {
     render(
       <MantineProvider>
-        <InAppDocsProvider>
-          <TestComponent />
-        </InAppDocsProvider>
+        <ProfileProvider>
+          <InAppDocsProvider>
+            <TestComponent />
+          </InAppDocsProvider>
+        </ProfileProvider>
       </MantineProvider>,
     );
 
@@ -47,9 +56,11 @@ describe('InAppDocsProvider', () => {
   it('after toggle: hides docs button and shows docs panel', () => {
     render(
       <MantineProvider>
-        <InAppDocsProvider>
-          <TestComponent />
-        </InAppDocsProvider>
+        <ProfileProvider>
+          <InAppDocsProvider>
+            <TestComponent />
+          </InAppDocsProvider>
+        </ProfileProvider>
       </MantineProvider>,
     );
 
@@ -61,9 +72,11 @@ describe('InAppDocsProvider', () => {
   it('close button: shows docs button and hides docs panel', () => {
     render(
       <MantineProvider>
-        <InAppDocsProvider>
-          <TestComponent />
-        </InAppDocsProvider>
+        <ProfileProvider>
+          <InAppDocsProvider>
+            <TestComponent />
+          </InAppDocsProvider>
+        </ProfileProvider>
       </MantineProvider>,
     );
 
