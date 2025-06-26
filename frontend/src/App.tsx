@@ -51,46 +51,48 @@ export function App() {
         <BrowserRouter>
           <TransientProvider>
             <ThemeProviders>
-              <InAppDocsProvider>
-                <Routes>
-                  <Route
-                    path="/*"
-                    element={
-                      <Routes>
-                        <Route
-                          path="/chat/*"
-                          element={
-                            <RouteWhenPrivate>
+              <Routes>
+                <Route
+                  path="/*"
+                  element={
+                    <Routes>
+                      <Route
+                        path="/chat/*"
+                        element={
+                          <RouteWhenPrivate>
+                            <InAppDocsProvider>
                               <ChatOrWelcomePage />
-                            </RouteWhenPrivate>
-                          }
-                        />
-                        <Route
-                          path="/admin/*"
-                          element={
-                            <RouteWhenPrivate>
+                            </InAppDocsProvider>
+                          </RouteWhenPrivate>
+                        }
+                      />
+                      <Route
+                        path="/admin/*"
+                        element={
+                          <RouteWhenPrivate>
+                            <InAppDocsProvider>
                               <RouteWhenAdmin>
                                 <AdminPage />
                               </RouteWhenAdmin>
-                            </RouteWhenPrivate>
-                          }
-                        />
-                        <Route path="*" element={<TransientNavigate to="/chat" />} />
-                      </Routes>
-                    }
-                  />
+                            </InAppDocsProvider>
+                          </RouteWhenPrivate>
+                        }
+                      />
+                      <Route path="*" element={<TransientNavigate to="/chat" />} />
+                    </Routes>
+                  }
+                />
 
-                  <Route
-                    path="/login"
-                    element={
-                      <RouteWhenLoggedOut>
-                        <LoginPage />
-                      </RouteWhenLoggedOut>
-                    }
-                  />
-                  <Route path="*" element={<TransientNavigate to="/" />} />
-                </Routes>
-              </InAppDocsProvider>
+                <Route
+                  path="/login"
+                  element={
+                    <RouteWhenLoggedOut>
+                      <LoginPage />
+                    </RouteWhenLoggedOut>
+                  }
+                />
+                <Route path="*" element={<TransientNavigate to="/" />} />
+              </Routes>
             </ThemeProviders>
           </TransientProvider>
         </BrowserRouter>
