@@ -977,21 +977,21 @@ standard = ["uvicorn[standard] (>=0.15.0)"]
 
 [[package]]
 name = "fastmcp"
-version = "2.9.0"
+version = "2.9.2"
 description = "The fast, Pythonic way to build MCP servers."
 optional = false
 python-versions = ">=3.10"
 groups = ["main"]
 files = [
-    {file = "fastmcp-2.9.0-py3-none-any.whl", hash = "sha256:e5b00e5fcea2d216d96f7cfb8b67836bd58fc3cd57147e0d89043d905a84334f"},
-    {file = "fastmcp-2.9.0.tar.gz", hash = "sha256:3f1dc97c409193729b4aa8ad240ad396fe767a982c55c3a3e788f422b1278dd6"},
+    {file = "fastmcp-2.9.2-py3-none-any.whl", hash = "sha256:3626a3d9b1fa6325756273b6d1fe1ec610baafec957ac22f7aa1dc17c1db8b93"},
+    {file = "fastmcp-2.9.2.tar.gz", hash = "sha256:c000eb0a2d50afcc7d26be4c867abf5c995ca0e0119f17417d50f61e2e17347c"},
 ]
 
 [package.dependencies]
 authlib = ">=1.5.2"
 exceptiongroup = ">=1.2.2"
 httpx = ">=0.28.1"
-mcp = ">=1.9.4,<2.0.0"
+mcp = ">=1.9.4,<1.10.0"
 openapi-pydantic = ">=0.5.1"
 python-dotenv = ">=1.1.0"
 rich = ">=13.9.4"
@@ -5298,4 +5298,4 @@ cffi = ["cffi (>=1.11)"]
 [metadata]
 lock-version = "2.1"
 python-versions = "<4.0,>=3.12.0"
-content-hash = "8cdd23efbd95333ca518340f9677e95bbdda3d85718c037ca7377027b7f5e9fa"
+content-hash = "a3b5491e9c1b4700948b6a2c8cc47455af74324f71f6eaae11f60b14f3875c7b"
