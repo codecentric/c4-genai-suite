@@ -1,7 +1,7 @@
 #
 # Base image for all modules
 #
-FROM node:24.2.0-alpine3.21 AS base
+FROM node:24.3.0-alpine3.21 AS base
 
 #
 # MCP SERVER
