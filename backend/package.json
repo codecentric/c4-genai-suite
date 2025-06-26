@@ -38,7 +38,7 @@
     "migration:revert": "npm run typeorm -- -d src/config/typeorm-migration.config.ts migration:revert"
   },
   "dependencies": {
-    "@langchain/aws": "0.1.10",
+    "@langchain/aws": "0.1.11",
     "@langchain/community": "^0.3.42",
     "@langchain/core": "^0.3.50",
     "@langchain/google-genai": "^0.2.5",
