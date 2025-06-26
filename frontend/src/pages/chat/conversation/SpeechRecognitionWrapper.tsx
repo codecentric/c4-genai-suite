@@ -1,12 +1,18 @@
 import { ActionIcon, Group, Menu } from '@mantine/core';
 import { IconChevronDown, IconMicrophone } from '@tabler/icons-react';
-import { SPEECH_RECOGNITION_LANGUAGES } from 'src/pages/utils';
+import { texts } from 'src/texts';
+
+export interface Language {
+  name: string;
+  code: string;
+}
 
 interface SpeechRecognitionWrapperProps {
   isRecording: boolean;
   toggleSpeechRecognition: () => void;
   speechLanguage: string;
   setSpeechLanguage: (speechLanguage: string) => void;
+  languages: Language[];
 }
 
 export function SpeechRecognitionWrapper({
@@ -14,6 +20,7 @@ export function SpeechRecognitionWrapper({
   toggleSpeechRecognition,
   speechLanguage,
   setSpeechLanguage,
+  languages,
 }: SpeechRecognitionWrapperProps) {
   return (
     <>
@@ -25,7 +32,7 @@ export function SpeechRecognitionWrapper({
             color={isRecording ? 'red' : 'black'}
             className={`border-gray-200 ${isRecording ? 'animate-pulse' : ''} rounded-r-none border-r-0`}
             onClick={toggleSpeechRecognition}
-            title={isRecording ? 'Stop recording' : 'Start recording'}
+            title={isRecording ? texts.chat.speechRecognition.stopMicrophone : texts.chat.speechRecognition.useMicrophone}
             style={{ borderTopRightRadius: 0, borderBottomRightRadius: 0, width: '36px' }}
           >
             <IconMicrophone className="w-4" />
@@ -50,7 +57,7 @@ export function SpeechRecognitionWrapper({
               </ActionIcon>
             </Menu.Target>
             <Menu.Dropdown>
-              {SPEECH_RECOGNITION_LANGUAGES.map((language) => (
+              {languages.map((language) => (
                 <Menu.Item
                   key={language.code}
                   onClick={() => setSpeechLanguage(language.code)}

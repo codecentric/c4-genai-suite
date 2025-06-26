@@ -1,7 +1,7 @@
 import { ActionIcon, Button, Portal } from '@mantine/core';
 import { IconFilter, IconPaperclip } from '@tabler/icons-react';
 import { useMutation } from '@tanstack/react-query';
-import React, { ChangeEvent, useCallback,useEffect, useRef, useState } from 'react';
+import React, { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
 import { toast } from 'react-toastify';
 import { ConfigurationDto, FileDto, useApi } from 'src/api';
@@ -11,8 +11,7 @@ import { useSpeechRecognitionToggle } from 'src/hooks/useSpeechRecognitionToggle
 import { buildError } from 'src/lib';
 import { FileItem } from 'src/pages/chat/conversation/FileItem';
 import { FilterModal } from 'src/pages/chat/conversation/FilterModal';
-import { SpeechRecognitionWrapper } from 'src/pages/chat/conversation/SpeechRecognitionWrapper';
-import { SPEECH_RECOGNITION_LANGUAGES } from 'src/pages/utils';
+import { Language, SpeechRecognitionWrapper } from 'src/pages/chat/conversation/SpeechRecognitionWrapper';
 import { texts } from 'src/texts';
 import { useChatDropzone } from '../useChatDropzone';
 import { Suggestions } from './Suggestions';
@@ -36,7 +35,6 @@ export function ChatInput({ conversationId, configuration, isDisabled, isEmpty, 
   const extensionsWithFilter = configuration?.extensions?.filter(isExtensionWithUserArgs) ?? [];
   const { updateContext, context } = useExtensionContext(conversationId);
   const [defaultValues, setDefaultValues] = useState<UserArgumentDefaultValueByExtensionIDAndName>({});
-  const [speechLanguage, setSpeechLanguage] = useState<string>(SPEECH_RECOGNITION_LANGUAGES[0].code);
   const {
     uploadingFiles,
     fullFileSlots,
@@ -50,6 +48,13 @@ export function ChatInput({ conversationId, configuration, isDisabled, isEmpty, 
     upload,
     userBucket,
   } = useChatDropzone(configuration?.id, conversationId);
+
+  const speechRecognitionLanguages: Language[] = [
+    { name: texts.chat.speechRecognition.languages.de, code: 'de-DE' },
+    { name: texts.chat.speechRecognition.languages.en, code: 'en-US' },
+  ];
+
+  const [speechLanguage, setSpeechLanguage] = useState<string>(speechRecognitionLanguages[0].code);
 
   const ALLOW_SPEECH_RECOGNITION: boolean = true;
 
@@ -283,6 +288,7 @@ export function ChatInput({ conversationId, configuration, isDisabled, isEmpty, 
                     toggleSpeechRecognition={toggleSpeechRecognition}
                     speechLanguage={speechLanguage}
                     setSpeechLanguage={setSpeechLanguage}
+                    languages={speechRecognitionLanguages}
                   />
                 )}
 

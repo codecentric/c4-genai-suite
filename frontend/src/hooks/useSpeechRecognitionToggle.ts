@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 import { toast } from 'react-toastify';
+import { texts } from 'src/texts';
 
 interface UseSpeechRecognitionToggleProps {
   speechLanguage: string;
@@ -21,13 +22,13 @@ export function useSpeechRecognitionToggle({ speechLanguage, onTranscriptUpdate 
   const toggleSpeechRecognition = async () => {
     if (!browserSupportsSpeechRecognition) {
       setIsRecording(false);
-      toast.error('Your browser does not support speech recognition');
+      toast.error(texts.chat.speechRecognition.browserNotSupported);
       return;
     }
 
     if (!isMicrophoneAvailable) {
       setIsRecording(false);
-      toast.error('Your Microphone is not available');
+      toast.error(texts.chat.speechRecognition.microphoneNotAvailable);
       return;
     }
 
@@ -51,7 +52,7 @@ export function useSpeechRecognitionToggle({ speechLanguage, onTranscriptUpdate 
       }
     } catch (err) {
       console.error('Speech recognition error:', err);
-      toast.error(`Speech recognition error. Browser don't support speech recognition or Microphone is not available`);
+      toast.error(texts.chat.speechRecognition.speechRecognitionFailed);
       setIsRecording(false);
     }
   };
