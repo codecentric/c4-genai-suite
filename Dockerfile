@@ -1,4 +1,4 @@
-FROM node:22.14.0-alpine3.21 AS base
+FROM node:24.2.0-alpine3.21 AS base
 
 FROM base AS backend_build
 WORKDIR /src/backend
