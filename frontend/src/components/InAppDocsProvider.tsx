@@ -4,6 +4,7 @@ import { IconX } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
 import React, { createContext, useContext, useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import { useProfile } from 'src/hooks';
 import { texts } from 'src/texts';
 import { Markdown } from '../components/Markdown';
 
@@ -73,7 +74,9 @@ export const InAppDocsProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [isDocsOpen, setIsDocsOpen] = useState(false);
 
   const toggleDocs = () => setIsDocsOpen((prev) => !prev);
-  const isDocsAvailable = query.isSuccess;
+  const profile = useProfile();
+  console.log(profile);
+  const isDocsAvailable = query.isSuccess && profile?.isAdmin;
   const isDocsButtonVisible = isDocsAvailable && !isDocsOpen;
 
   return (
