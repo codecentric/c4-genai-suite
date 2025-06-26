@@ -1698,14 +1698,14 @@ ollama = ">=0.4.8,<1.0.0"
 
 [[package]]
 name = "langchain-openai"
-version = "0.3.25"
+version = "0.3.26"
 description = "An integration package connecting OpenAI and LangChain"
 optional = false
 python-versions = ">=3.9"
 groups = ["main"]
 files = [
-    {file = "langchain_openai-0.3.25-py3-none-any.whl", hash = "sha256:a7d5c9d4f4ff2b6156f313e92e652833fdfd42084ecfd0980e719dc8472ea51c"},
-    {file = "langchain_openai-0.3.25.tar.gz", hash = "sha256:6dd33e4a2513cf915af6c2508e782d2c90956a88650739fd8d31e14bdb7f7e44"},
+    {file = "langchain_openai-0.3.26-py3-none-any.whl", hash = "sha256:2f216b92195e43fc30a28af8842cf704e72abe3b0ae2cbf85004ca75c5274575"},
+    {file = "langchain_openai-0.3.26.tar.gz", hash = "sha256:6f8420f164095834477d13715bc08a7553cdc229df30110d390c3d8880b728f3"},
 ]
 
 [package.dependencies]
@@ -5298,4 +5298,4 @@ cffi = ["cffi (>=1.11)"]
 [metadata]
 lock-version = "2.1"
 python-versions = "<4.0,>=3.12.0"
-content-hash = "248e752ce24a5d634e48fce65de49045f3845a7453ca32764b9af20933a1ee6f"
+content-hash = "ba75663f896c2acdde76b855d5c762dc07453efc5f6e55cd64f020b7bf975504"
