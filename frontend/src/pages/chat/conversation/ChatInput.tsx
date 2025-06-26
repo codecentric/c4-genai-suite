@@ -1,13 +1,13 @@
 import { ActionIcon, Button, Portal } from '@mantine/core';
 import { IconFilter, IconPaperclip } from '@tabler/icons-react';
 import { useMutation } from '@tanstack/react-query';
-import React, { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
-import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
+import React, { ChangeEvent, useCallback,useEffect, useRef, useState } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
 import { toast } from 'react-toastify';
 import { ConfigurationDto, FileDto, useApi } from 'src/api';
 import { Icon, Markdown } from 'src/components';
 import { ExtensionContext, JSONObject, useEventCallback, useExtensionContext, useTheme } from 'src/hooks';
+import { useSpeechRecognitionToggle } from 'src/hooks/useSpeechRecognitionToggle';
 import { buildError } from 'src/lib';
 import { FileItem } from 'src/pages/chat/conversation/FileItem';
 import { FilterModal } from 'src/pages/chat/conversation/FilterModal';
@@ -31,12 +31,12 @@ interface ChatInputProps {
   isEmpty?: boolean;
   onSubmit: (input: string, files?: FileDto[]) => void;
 }
-
 export function ChatInput({ conversationId, configuration, isDisabled, isEmpty, onSubmit }: ChatInputProps) {
   const api = useApi();
   const extensionsWithFilter = configuration?.extensions?.filter(isExtensionWithUserArgs) ?? [];
   const { updateContext, context } = useExtensionContext(conversationId);
   const [defaultValues, setDefaultValues] = useState<UserArgumentDefaultValueByExtensionIDAndName>({});
+  const [speechLanguage, setSpeechLanguage] = useState<string>(SPEECH_RECOGNITION_LANGUAGES[0].code);
   const {
     uploadingFiles,
     fullFileSlots,
@@ -50,6 +50,8 @@ export function ChatInput({ conversationId, configuration, isDisabled, isEmpty, 
     upload,
     userBucket,
   } = useChatDropzone(configuration?.id, conversationId);
+
+  const ALLOW_SPEECH_RECOGNITION: boolean = true;
 
   useEffect(() => {
     const defaultValues = configuration?.extensions?.filter(isExtensionWithUserArgs).reduce(
@@ -71,8 +73,6 @@ export function ChatInput({ conversationId, configuration, isDisabled, isEmpty, 
   const { theme } = useTheme();
   const [input, setInput] = useState('');
   const [showFilter, setShowFilter] = useState(false);
-
-  const ALLOW_SPEECH_RECOGNITION: boolean = true;
 
   useEffect(() => {
     textarea.current?.focus();
@@ -176,54 +176,10 @@ export function ChatInput({ conversationId, configuration, isDisabled, isEmpty, 
 
   const footer = `${configuration?.chatFooter || ''} ${theme.chatFooter || ''}`.trim();
 
-  const [isRecording, setIsRecording] = useState(false);
-
-  const { transcript, listening, resetTranscript, browserSupportsSpeechRecognition, isMicrophoneAvailable } =
-    useSpeechRecognition();
-
-  const [speechLanguage, setSpeechLanguage] = useState<string>(SPEECH_RECOGNITION_LANGUAGES[0].code);
-
-  useEffect(() => {
-    if (listening && transcript) {
-      setInput(transcript);
-    }
-  }, [listening, transcript]);
-
-  const toggleSpeechRecognition = async () => {
-    if (!browserSupportsSpeechRecognition) {
-      setIsRecording(false);
-      toast.error('Your browser does not support speech recognition');
-      return;
-    }
-    if (!isMicrophoneAvailable) {
-      setIsRecording(false);
-      toast.error('Your Microphone is not available');
-      return;
-    }
-    try {
-      if (listening) {
-        await SpeechRecognition.stopListening();
-        resetTranscript();
-        setIsRecording(false);
-      } else {
-        const permissionResult = await navigator.mediaDevices.getUserMedia({ audio: true });
-
-        await SpeechRecognition.startListening({
-          continuous: true,
-          language: speechLanguage,
-        });
-        setIsRecording(true);
-
-        if (permissionResult && permissionResult.getTracks) {
-          permissionResult.getTracks().forEach((track) => track.stop());
-        }
-      }
-    } catch (err) {
-      console.error('Speech recognition error:', err);
-      toast.error(`Speech recognition error. Browser don't support speech recognition or Microphone is not available`);
-      setIsRecording(false);
-    }
-  };
+  const { isRecording, toggleSpeechRecognition } = useSpeechRecognitionToggle({
+    speechLanguage,
+    onTranscriptUpdate: setInput,
+  });
 
   return (
     <>
@@ -333,7 +289,7 @@ export function ChatInput({ conversationId, configuration, isDisabled, isEmpty, 
                 <ActionIcon
                   type="submit"
                   size="lg"
-                  disabled={!input || isDisabled || uploadMutations.some((m) => m.status === 'pending')}
+                  disabled={!input || isDisabled || uploadMutations.some((m) => m.status === 'pending') || isRecording}
                   data-testid="chat-submit-button"
                 >
                   <Icon icon="arrow-up" />
