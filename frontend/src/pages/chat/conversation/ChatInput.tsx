@@ -1,5 +1,5 @@
-import { ActionIcon, Button, Menu, Portal } from '@mantine/core';
-import { IconFilter, IconMicrophone, IconPaperclip } from '@tabler/icons-react';
+import { ActionIcon, Button, Group, Menu, Portal } from '@mantine/core';
+import { IconChevronDown, IconFilter, IconMicrophone, IconPaperclip } from '@tabler/icons-react';
 import { useMutation } from '@tanstack/react-query';
 import React, { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
@@ -74,6 +74,8 @@ export function ChatInput({ conversationId, configuration, isDisabled, isEmpty, 
   const { theme } = useTheme();
   const [input, setInput] = useState('');
   const [showFilter, setShowFilter] = useState(false);
+
+  const ALLOW_SPEECH_RECOGNITION: boolean = true;
 
   useEffect(() => {
     textarea.current?.focus();
@@ -322,32 +324,56 @@ export function ChatInput({ conversationId, configuration, isDisabled, isEmpty, 
                 )}
               </div>
               <div className="flex items-center gap-1">
-                <Menu shadow="md">
-                  <Menu.Target>
-                    <ActionIcon
-                      variant={isRecording ? 'filled' : 'outline'}
-                      size="lg"
-                      color={isRecording ? 'red' : 'black'}
-                      className={`border-gray-200 ${isRecording ? 'animate-pulse' : ''}`}
-                      onClick={toggleSpeechRecognition}
-                      title={isRecording ? 'Stop recording' : 'Start recording'}
-                    >
-                      <IconMicrophone className="w-4" />
-                    </ActionIcon>
-                  </Menu.Target>
-                  <Menu.Dropdown>
-                    {SPEECH_RECOGNITION_LANGUAGES.map((language) => (
-                      <Menu.Item
-                        key={language.code}
-                        onClick={() => setSpeechLanguage(language.code)}
-                        color={speechLanguage === language.code ? 'black' : ''}
-                        fw={speechLanguage === language.code ? 'bold' : ''}
+                {ALLOW_SPEECH_RECOGNITION && (
+                  <div className="flex" style={{ width: 'fit-content' }}>
+                    <Group wrap="nowrap" gap={0} align="stretch">
+                      <ActionIcon
+                        variant={isRecording ? 'filled' : 'outline'}
+                        size="lg"
+                        color={isRecording ? 'red' : 'black'}
+                        className={`border-gray-200 ${isRecording ? 'animate-pulse' : ''} rounded-r-none border-r-0`}
+                        onClick={toggleSpeechRecognition}
+                        title={isRecording ? 'Stop recording' : 'Start recording'}
+                        style={{ borderTopRightRadius: 0, borderBottomRightRadius: 0, width: '36px' }}
                       >
-                        {language.name}
-                      </Menu.Item>
-                    ))}
-                  </Menu.Dropdown>
-                </Menu>
+                        <IconMicrophone className="w-4" />
+                      </ActionIcon>
+                      <Menu shadow="md">
+                        <Menu.Target>
+                          <ActionIcon
+                            variant="outline"
+                            size="xs"
+                            className="rounded-l-none"
+                            disabled={isRecording}
+                            style={{
+                              borderTopLeftRadius: 0,
+                              borderBottomLeftRadius: 0,
+                              paddingLeft: 0,
+                              paddingRight: 0,
+                              width: '12px',
+                              height: 'auto',
+                            }}
+                          >
+                            <IconChevronDown className="w-3" />
+                          </ActionIcon>
+                        </Menu.Target>
+                        <Menu.Dropdown>
+                          {SPEECH_RECOGNITION_LANGUAGES.map((language) => (
+                            <Menu.Item
+                              key={language.code}
+                              onClick={() => setSpeechLanguage(language.code)}
+                              color={speechLanguage === language.code ? 'black' : ''}
+                              fw={speechLanguage === language.code ? 'bold' : ''}
+                            >
+                              {language.name}
+                            </Menu.Item>
+                          ))}
+                        </Menu.Dropdown>
+                      </Menu>
+                    </Group>
+                  </div>
+                )}
+
                 <ActionIcon
                   type="submit"
                   size="lg"
