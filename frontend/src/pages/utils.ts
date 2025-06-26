@@ -13,3 +13,8 @@ export function extractType(file: FileDto): string {
  * To implement the responsive version see: https://mantine.dev/hooks/use-media-query/
  */
 export const isMobile = () => window.matchMedia('(max-width: 600px)').matches;
+
+export const SPEECH_RECOGNITION_LANGUAGES: { name: string; code: string }[] = [
+  { name: 'Deutsch', code: 'de-DE' },
+  { name: 'English', code: 'en-US' },
+];
