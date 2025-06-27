@@ -56,8 +56,6 @@ export function ChatInput({ conversationId, configuration, isDisabled, isEmpty, 
 
   const [speechLanguage, setSpeechLanguage] = useState<string>(speechRecognitionLanguages[0].code);
 
-  const ALLOW_SPEECH_RECOGNITION: boolean = true;
-
   useEffect(() => {
     const defaultValues = configuration?.extensions?.filter(isExtensionWithUserArgs).reduce(
       (prev, extension) => {
@@ -282,16 +280,13 @@ export function ChatInput({ conversationId, configuration, isDisabled, isEmpty, 
                 )}
               </div>
               <div className="flex items-center gap-1">
-                {ALLOW_SPEECH_RECOGNITION && (
-                  <SpeechRecognitionWrapper
-                    isRecording={isRecording}
-                    toggleSpeechRecognition={toggleSpeechRecognition}
-                    speechLanguage={speechLanguage}
-                    setSpeechLanguage={setSpeechLanguage}
-                    languages={speechRecognitionLanguages}
-                  />
-                )}
-
+                <SpeechRecognitionWrapper
+                  isRecording={isRecording}
+                  toggleSpeechRecognition={toggleSpeechRecognition}
+                  speechLanguage={speechLanguage}
+                  setSpeechLanguage={setSpeechLanguage}
+                  languages={speechRecognitionLanguages}
+                />
                 <ActionIcon
                   type="submit"
                   size="lg"
