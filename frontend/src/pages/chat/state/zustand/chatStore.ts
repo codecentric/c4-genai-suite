@@ -34,10 +34,6 @@ export const useChatStore = create<ChatState>()((set) => {
     chat: { id: 0, configurationId: -1, createdAt: new Date() },
     messages: [],
     getStream: (chatId, query, files, api, editMessageId) => api.stream.streamPrompt(chatId, { query, files }, editMessageId),
-    // We may want to improve readability here using "immer".
-    // However, we should also store the message text (including the images as markdown)
-    // into a simple string variable.
-    // It seems some chunk structure was abused to fit the UI code in the past.
     appendLastMessage: (text) =>
       set((state) => {
         const lastMsg = state.messages.pop();
