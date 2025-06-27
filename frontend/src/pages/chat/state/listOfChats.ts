@@ -126,7 +126,7 @@ export const useMutateNewChat = () => {
 export const useStateOfChats = () => useListOfChatsStore((s) => s.chats);
 
 /**
- * @description returns a function that is true if the conversion id provided
+ * @description returns a function that is true if the provided conversation id
  * points to an empty conversion.
  **/
 export const useStateOfChatEmptiness = () => {
