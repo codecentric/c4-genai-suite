@@ -93,7 +93,7 @@
     "@nestjs/schematics": "11.0.5",
     "@nestjs/testing": "11.1.2",
     "@openapitools/openapi-generator-cli": "2.21.0",
-    "@testcontainers/postgresql": "10.28.0",
+    "@testcontainers/postgresql": "^11.0.3",
     "@types/bcrypt": "5.0.2",
     "@types/cookie-parser": "1.4.9",
     "@types/express": "5.0.2",
