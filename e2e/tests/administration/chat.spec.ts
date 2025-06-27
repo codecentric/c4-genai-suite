@@ -48,7 +48,7 @@ test('Chat', async ({ page }) => {
     const userMessage = `Hello`;
 
     await page.locator('form').getByRole('textbox').fill(userMessage);
-    await page.locator('form').getByRole('button').click();
+    await page.locator('form').getByTestId('chat-submit-button').click();
     const testoutput = await page.waitForSelector(`:has-text("No llm")`);
     expect(testoutput).toBeDefined();
   });

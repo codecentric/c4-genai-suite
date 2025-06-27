@@ -7,9 +7,11 @@ import { toast } from 'react-toastify';
 import { ConfigurationDto, FileDto, useApi } from 'src/api';
 import { Icon, Markdown } from 'src/components';
 import { ExtensionContext, JSONObject, useEventCallback, useExtensionContext, useTheme } from 'src/hooks';
+import { useSpeechRecognitionToggle } from 'src/hooks/useSpeechRecognitionToggle';
 import { buildError } from 'src/lib';
 import { FileItem } from 'src/pages/chat/conversation/FileItem';
 import { FilterModal } from 'src/pages/chat/conversation/FilterModal';
+import { Language, SpeechRecognitionButton } from 'src/pages/chat/conversation/SpeechRecognitionButton';
 import { texts } from 'src/texts';
 import { useChatDropzone } from '../useChatDropzone';
 import { Suggestions } from './Suggestions';
@@ -46,6 +48,13 @@ export function ChatInput({ conversationId, configuration, isDisabled, isEmpty, 
     upload,
     userBucket,
   } = useChatDropzone(configuration?.id, conversationId);
+
+  const speechRecognitionLanguages: Language[] = [
+    { name: texts.chat.speechRecognition.languages.de, code: 'de-DE' },
+    { name: texts.chat.speechRecognition.languages.en, code: 'en-US' },
+  ];
+
+  const [speechLanguage, setSpeechLanguage] = useState<string>(speechRecognitionLanguages[0].code);
 
   useEffect(() => {
     const defaultValues = configuration?.extensions?.filter(isExtensionWithUserArgs).reduce(
@@ -169,6 +178,12 @@ export function ChatInput({ conversationId, configuration, isDisabled, isEmpty, 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const footer = `${configuration?.chatFooter || ''} ${theme.chatFooter || ''}`.trim();
+
+  const { toggleSpeechRecognition, listening } = useSpeechRecognitionToggle({
+    speechLanguage,
+    onTranscriptUpdate: setInput,
+  });
+
   return (
     <>
       <div className="flex flex-col gap-2">
@@ -264,14 +279,23 @@ export function ChatInput({ conversationId, configuration, isDisabled, isEmpty, 
                   </Button>
                 )}
               </div>
-              <ActionIcon
-                type="submit"
-                size={'lg'}
-                disabled={!input || isDisabled || uploadMutations.some((m) => m.status === 'pending')}
-                data-testid="chat-submit-button"
-              >
-                <Icon icon="arrow-up" />
-              </ActionIcon>
+              <div className="flex items-center gap-1">
+                <SpeechRecognitionButton
+                  listening={listening}
+                  toggleSpeechRecognition={toggleSpeechRecognition}
+                  speechLanguage={speechLanguage}
+                  setSpeechLanguage={setSpeechLanguage}
+                  languages={speechRecognitionLanguages}
+                />
+                <ActionIcon
+                  type="submit"
+                  size="lg"
+                  disabled={!input || isDisabled || uploadMutations.some((m) => m.status === 'pending') || listening}
+                  data-testid="chat-submit-button"
+                >
+                  <Icon icon="arrow-up" />
+                </ActionIcon>
+              </div>
             </div>
           </div>
         </form>
