@@ -17,7 +17,7 @@ const init = async () => {
 };
 
 async function setupDatabase(): Promise<{ dbClient: Client; dbContainer: StartedPostgreSqlContainer }> {
-  const postgresContainer: StartedPostgreSqlContainer = await new PostgreSqlContainer()
+  const postgresContainer: StartedPostgreSqlContainer = await new PostgreSqlContainer('postgres:17.5-alpine')
     .withWaitStrategy(Wait.forListeningPorts())
     .start();
   const postgresClient: Client = new Client({ connectionString: postgresContainer.getConnectionUri() });
