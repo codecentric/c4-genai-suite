@@ -2,7 +2,7 @@ name: Build Container images
 
 # this workflow will be triggered manually from workflows needing the images
 on:
-  push:
+  pull_request:
     paths:
       - .github/workflows/build-container-images.yaml
   workflow_call:

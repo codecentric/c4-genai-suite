@@ -3,14 +3,10 @@ permissions:
   contents: read
 
 on:
-  push:
+  pull_request:
     paths:
       - .github/workflows/frontend.yaml
       - frontend/**
-    branches:
-      - '**'
-    tags-ignore:
-      - "**"
   workflow_call:
 
 defaults:

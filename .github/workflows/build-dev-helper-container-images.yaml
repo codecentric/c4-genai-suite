@@ -1,6 +1,6 @@
 name: Build Dev Helper Container Images
 on:
-  push:
+  pull_request:
     paths:
       - .github/workflows/build-dev-helper-container-images.yaml
       - /dev

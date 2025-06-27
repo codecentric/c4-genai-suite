@@ -6,7 +6,7 @@ permissions:
 on:
   workflow_call:
   workflow_dispatch:
-  push:
+  pull_request:
     paths:
       - .github/workflows/e2e-complete.yaml
   schedule:

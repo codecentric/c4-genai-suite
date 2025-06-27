@@ -3,14 +3,10 @@ permissions:
   contents: read
 
 on:
-  push:
+  pull_request:
     paths:
       - .github/workflows/helm-chart.yaml
       - helm-chart/**
-    branches:
-      - '**'
-    tags-ignore:
-      - "**"
   workflow_call:
 
 jobs:

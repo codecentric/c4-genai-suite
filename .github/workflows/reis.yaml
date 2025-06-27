@@ -3,14 +3,10 @@ permissions:
   contents: read
 
 on:
-  push:
+  pull_request:
     paths:
       - .github/workflows/reis.yaml
       - services/reis/**
-    branches:
-      - '**'
-    tags-ignore:
-      - "**"
   workflow_call:
 
 defaults:
