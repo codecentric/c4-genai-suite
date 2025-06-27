@@ -135,7 +135,7 @@ export const en = {
       },
       microphoneNotAvailable: 'Microphone is not available',
       speechRecognitionFailed:
-        "Speech recognition error. Browser don't support speech recognition or Microphone is not available",
+        "Speech recognition error. Browser doesn't support speech recognition or Microphone is not available",
       stopMicrophone: 'Stop using microphone',
       useMicrophone: 'Start using microphone',
     },

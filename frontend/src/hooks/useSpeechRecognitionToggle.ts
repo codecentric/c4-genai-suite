@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 import { toast } from 'react-toastify';
 import { texts } from 'src/texts';
@@ -9,7 +9,6 @@ interface UseSpeechRecognitionToggleProps {
 }
 
 export function useSpeechRecognitionToggle({ speechLanguage, onTranscriptUpdate }: UseSpeechRecognitionToggleProps) {
-  const [isRecording, setIsRecording] = useState(false);
   const { transcript, listening, resetTranscript, browserSupportsSpeechRecognition, isMicrophoneAvailable } =
     useSpeechRecognition();
 
@@ -21,13 +20,11 @@ export function useSpeechRecognitionToggle({ speechLanguage, onTranscriptUpdate 
 
   const toggleSpeechRecognition = async () => {
     if (!browserSupportsSpeechRecognition) {
-      setIsRecording(false);
       toast.error(texts.chat.speechRecognition.browserNotSupported);
       return;
     }
 
     if (!isMicrophoneAvailable) {
-      setIsRecording(false);
       toast.error(texts.chat.speechRecognition.microphoneNotAvailable);
       return;
     }
@@ -36,7 +33,6 @@ export function useSpeechRecognitionToggle({ speechLanguage, onTranscriptUpdate 
       if (listening) {
         await SpeechRecognition.stopListening();
         resetTranscript();
-        setIsRecording(false);
       } else {
         const permissionResult = await navigator.mediaDevices.getUserMedia({ audio: true });
 
@@ -44,7 +40,6 @@ export function useSpeechRecognitionToggle({ speechLanguage, onTranscriptUpdate 
           continuous: true,
           language: speechLanguage,
         });
-        setIsRecording(true);
 
         if (permissionResult && permissionResult.getTracks) {
           permissionResult.getTracks().forEach((track) => track.stop());
@@ -53,8 +48,7 @@ export function useSpeechRecognitionToggle({ speechLanguage, onTranscriptUpdate 
     } catch (err) {
       console.error('Speech recognition error:', err);
       toast.error(texts.chat.speechRecognition.speechRecognitionFailed);
-      setIsRecording(false);
     }
   };
-  return { isRecording, toggleSpeechRecognition };
+  return { toggleSpeechRecognition, listening };
 }

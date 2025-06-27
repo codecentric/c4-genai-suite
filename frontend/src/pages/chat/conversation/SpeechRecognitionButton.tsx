@@ -8,15 +8,15 @@ export interface Language {
 }
 
 interface SpeechRecognitionWrapperProps {
-  isRecording: boolean;
+  listening: boolean;
   toggleSpeechRecognition: () => void;
   speechLanguage: string;
   setSpeechLanguage: (speechLanguage: string) => void;
   languages: Language[];
 }
 
-export function SpeechRecognitionWrapper({
-  isRecording,
+export function SpeechRecognitionButton({
+  listening,
   toggleSpeechRecognition,
   speechLanguage,
   setSpeechLanguage,
@@ -27,13 +27,14 @@ export function SpeechRecognitionWrapper({
       <div className="flex" style={{ width: 'fit-content' }}>
         <Group wrap="nowrap" gap={0} align="stretch">
           <ActionIcon
-            variant={isRecording ? 'filled' : 'outline'}
+            variant={listening ? 'filled' : 'outline'}
             size="lg"
-            color={isRecording ? 'red' : 'black'}
-            className={`border-gray-200 ${isRecording ? 'animate-pulse' : ''} rounded-r-none border-r-0`}
+            color={listening ? 'red' : 'black'}
+            className={`border-gray-200 ${listening ? 'animate-pulse' : ''} rounded-r-none border-r-0`}
             onClick={toggleSpeechRecognition}
-            title={isRecording ? texts.chat.speechRecognition.stopMicrophone : texts.chat.speechRecognition.useMicrophone}
+            title={listening ? texts.chat.speechRecognition.stopMicrophone : texts.chat.speechRecognition.useMicrophone}
             style={{ borderTopRightRadius: 0, borderBottomRightRadius: 0, width: '36px' }}
+            aria-label={listening ? texts.chat.speechRecognition.stopMicrophone : texts.chat.speechRecognition.useMicrophone}
           >
             <IconMicrophone className="w-4" />
           </ActionIcon>
@@ -43,7 +44,7 @@ export function SpeechRecognitionWrapper({
                 variant="outline"
                 size="xs"
                 className="rounded-l-none"
-                disabled={isRecording}
+                disabled={listening}
                 style={{
                   borderTopLeftRadius: 0,
                   borderBottomLeftRadius: 0,

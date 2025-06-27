@@ -11,7 +11,7 @@ import { useSpeechRecognitionToggle } from 'src/hooks/useSpeechRecognitionToggle
 import { buildError } from 'src/lib';
 import { FileItem } from 'src/pages/chat/conversation/FileItem';
 import { FilterModal } from 'src/pages/chat/conversation/FilterModal';
-import { Language, SpeechRecognitionWrapper } from 'src/pages/chat/conversation/SpeechRecognitionWrapper';
+import { Language, SpeechRecognitionButton } from 'src/pages/chat/conversation/SpeechRecognitionButton';
 import { texts } from 'src/texts';
 import { useChatDropzone } from '../useChatDropzone';
 import { Suggestions } from './Suggestions';
@@ -179,7 +179,7 @@ export function ChatInput({ conversationId, configuration, isDisabled, isEmpty, 
 
   const footer = `${configuration?.chatFooter || ''} ${theme.chatFooter || ''}`.trim();
 
-  const { isRecording, toggleSpeechRecognition } = useSpeechRecognitionToggle({
+  const { toggleSpeechRecognition, listening } = useSpeechRecognitionToggle({
     speechLanguage,
     onTranscriptUpdate: setInput,
   });
@@ -280,8 +280,8 @@ export function ChatInput({ conversationId, configuration, isDisabled, isEmpty, 
                 )}
               </div>
               <div className="flex items-center gap-1">
-                <SpeechRecognitionWrapper
-                  isRecording={isRecording}
+                <SpeechRecognitionButton
+                  listening={listening}
                   toggleSpeechRecognition={toggleSpeechRecognition}
                   speechLanguage={speechLanguage}
                   setSpeechLanguage={setSpeechLanguage}
@@ -290,7 +290,7 @@ export function ChatInput({ conversationId, configuration, isDisabled, isEmpty, 
                 <ActionIcon
                   type="submit"
                   size="lg"
-                  disabled={!input || isDisabled || uploadMutations.some((m) => m.status === 'pending') || isRecording}
+                  disabled={!input || isDisabled || uploadMutations.some((m) => m.status === 'pending') || listening}
                   data-testid="chat-submit-button"
                 >
                   <Icon icon="arrow-up" />
