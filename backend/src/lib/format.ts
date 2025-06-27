@@ -11,7 +11,7 @@ export function prettyFormat(): Format {
         return info;
       }
 
-      info.message = message.replace(/{(.*?)}/g, (match, placeholder: string) => {
+      info.message = message.replace(/{([^{}]*)}/g, (match, placeholder: string) => {
         return (info[placeholder] as string) || placeholder;
       });
 
