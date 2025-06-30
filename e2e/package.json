@@ -21,7 +21,7 @@
     "@typescript-eslint/parser": "8.35.0",
     "eslint": "9.28.0",
     "eslint-config-prettier": "10.1.5",
-    "eslint-plugin-import": "2.31.0",
+    "eslint-plugin-import": "2.32.0",
     "eslint-plugin-prettier": "5.4.1",
     "globals": "16.2.0",
     "wait-on": "8.0.3"
