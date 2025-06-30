@@ -192,24 +192,24 @@ export function FilesPage() {
       {
         accessorKey: 'fileName',
         cell: (info) => info.getValue(),
-        header: () => <span>{`File Name`}</span>,
+        header: () => <span>{texts.files.properties.fileName}</span>,
       },
       {
         accessorKey: 'mimeType',
         cell: (info) => <span className="badge self-center bg-gray-100">{extractType(info.row.original)}</span>,
-        header: () => <span>{`File Type`}</span>,
+        header: () => <span>{texts.files.properties.fileType}</span>,
       },
       {
         id: 'fileSize',
         accessorFn: (row) => row.fileSize,
         cell: (info) => formatFileSize(Number(info.getValue())),
-        header: () => <span>{`File Size`}</span>,
+        header: () => <span>{texts.files.properties.fileSize}</span>,
       },
       {
         id: 'uploadedAt',
         accessorFn: (row) => row.uploadedAt,
         cell: (info) => formatDate(String(info.getValue()), 'Pp'),
-        header: () => <span>{`Uploaded At`}</span>,
+        header: () => <span>{texts.files.properties.uploadedAt}</span>,
       },
     ],
     [],

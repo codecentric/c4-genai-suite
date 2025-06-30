@@ -212,6 +212,12 @@ export const de: typeof en = {
     perUserQuota: 'Die maximale Anzahl an Dateien, die jeder Benutzer in diesen Bucket hochladen darf.',
     allowedFileTypes: 'Erlaubte Dateitypen',
     invalidEndpointError: 'Verbindung zum Endpunkt fehlgeschlagen',
+    properties: {
+      fileName: 'Dateiname',
+      fileType: 'Dateityp',
+      fileSize: 'Dateigröße',
+      uploadedAt: 'Hochgeladen am',
+    },
     removeBucketConfirmText: 'Möchtest du den Bucket wirklich löschen?',
     removeBucketConfirmTitle: 'Datei löschen',
     removeBucketFailed: 'Löschen des Buckets fehlgeschlagen',

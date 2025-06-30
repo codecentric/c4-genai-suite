@@ -210,6 +210,12 @@ export const en = {
     perUserQuota: 'The maximum number of files each user may upload to this bucket.',
     allowedFileTypes: 'The allowed file types',
     invalidEndpointError: 'Cannot connect to endpoint',
+    properties: {
+      fileName: 'File Name',
+      fileType: 'File Type',
+      fileSize: 'File Size',
+      uploadedAt: 'Uploaded at',
+    },
     removeBucketConfirmText: 'Do you really want to remove the bucket?',
     removeBucketConfirmTitle: 'Remove bucket',
     removeBucketFailed: 'Failed to remove bucket',

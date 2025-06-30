@@ -240,6 +240,12 @@ function load() {
       perUserQuota: translate('files.perUserQuota'),
       allowedFileTypes: translate('files.allowedFileTypes'),
       invalidEndpointError: translate('files.invalidEndpointError'),
+      properties: {
+        fileName: translate('files.properties.fileName'),
+        fileType: translate('files.properties.fileType'),
+        fileSize: translate('files.properties.fileSize'),
+        uploadedAt: translate('files.properties.uploadedAt'),
+      },
       removeBucketConfirmText: translate('files.removeBucketConfirmText'),
       removeBucketConfirmTitle: translate('files.removeBucketConfirmTitle'),
       removeBucketFailed: translate('files.removeBucketFailed'),
