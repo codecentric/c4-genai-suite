@@ -22,22 +22,23 @@ import {
 } from './chat-input-utils';
 
 interface ChatInputProps {
+  textareaRef?: React.RefObject<HTMLTextAreaElement>;
   configuration?: ConfigurationDto;
-  conversationId: number;
+  chatId: number;
   isDisabled?: boolean;
   isEmpty?: boolean;
-  onSubmit: (input: string, files?: FileDto[]) => void;
+  submitMessage: (input: string, files?: FileDto[]) => void;
 }
-export function ChatInput({ conversationId, configuration, isDisabled, isEmpty, onSubmit }: ChatInputProps) {
+export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEmpty, submitMessage }: ChatInputProps) {
   const api = useApi();
   const extensionsWithFilter = configuration?.extensions?.filter(isExtensionWithUserArgs) ?? [];
-  const { updateContext, context } = useExtensionContext(conversationId);
+  const { updateContext, context } = useExtensionContext(chatId);
   const [defaultValues, setDefaultValues] = useState<UserArgumentDefaultValueByExtensionIDAndName>({});
   const {
     uploadingFiles,
     fullFileSlots,
     allowedFileNameExtensions,
-    conversationFiles,
+    chatFiles,
     handleUploadFile,
     multiple,
     uploadLimitReached,
@@ -45,7 +46,7 @@ export function ChatInput({ conversationId, configuration, isDisabled, isEmpty, 
     uploadMutations,
     upload,
     userBucket,
-  } = useChatDropzone(configuration?.id, conversationId);
+  } = useChatDropzone(configuration?.id, chatId);
 
   useEffect(() => {
     const defaultValues = configuration?.extensions?.filter(isExtensionWithUserArgs).reduce(
@@ -63,14 +64,13 @@ export function ChatInput({ conversationId, configuration, isDisabled, isEmpty, 
     setDefaultValues(defaultValues ?? {});
   }, [configuration?.extensions]);
 
-  const textarea = useRef<HTMLTextAreaElement>(null);
   const { theme } = useTheme();
   const [input, setInput] = useState('');
   const [showFilter, setShowFilter] = useState(false);
 
   useEffect(() => {
-    textarea.current?.focus();
-  }, [conversationId]);
+    textareaRef?.current?.focus();
+  }, [chatId, textareaRef]);
 
   const contextWithDefaults = context ?? defaultValues;
   const extensionFilterChips = extensionsWithFilter.map((extension) => ({
@@ -86,9 +86,9 @@ export function ChatInput({ conversationId, configuration, isDisabled, isEmpty, 
     setInput(event.target.value);
   });
 
-  const doSetText = useEventCallback((text: string, conversationFiles?: FileDto[]) => {
+  const doSetText = useEventCallback((text: string, chatFiles?: FileDto[]) => {
     try {
-      onSubmit(text, conversationFiles);
+      submitMessage(text, chatFiles);
     } finally {
       setInput('');
     }
@@ -98,7 +98,7 @@ export function ChatInput({ conversationId, configuration, isDisabled, isEmpty, 
     if (isDisabled || !input || input.length === 0 || upload.status === 'pending') {
       return;
     }
-    doSetText(input, conversationFiles);
+    doSetText(input, chatFiles);
     event.preventDefault();
     void refetchConversationFiles();
   });
@@ -181,7 +181,7 @@ export function ChatInput({ conversationId, configuration, isDisabled, isEmpty, 
         {isEmpty && <Suggestions configuration={configuration} theme={theme} onSelect={doSetText} />}
 
         <div className="flex flex-wrap gap-2">
-          {conversationFiles.map((file) => (
+          {chatFiles.map((file) => (
             <FileItem key={file.id} file={file} onRemove={() => deleteFile.mutate(file)} />
           ))}
           {uploadingFiles.map((file) => (
@@ -218,7 +218,7 @@ export function ChatInput({ conversationId, configuration, isDisabled, isEmpty, 
               onChange={doSetInput}
               onKeyDown={doKeyDown}
               placeholder={texts.chat.placeholder(configuration?.name ?? '')}
-              ref={textarea}
+              ref={textareaRef}
             />
             <div className="flex w-full justify-between gap-2">
               <div className="flex items-center gap-2">

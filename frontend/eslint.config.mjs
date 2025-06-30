@@ -11,6 +11,8 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import js from "@eslint/js";
 import { FlatCompat } from "@eslint/eslintrc";
+import noRestrictedApiConversations from "./eslint-rules/no-restricted-api-conversations.js";
+import noZustandOutsideState from "./eslint-rules/no-zustand-outside-state.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -48,6 +50,12 @@ export default defineConfig([globalIgnores([
         "react-refresh": reactRefresh,
         "@typescript-eslint": fixupPluginRules(typescriptEslintEslintPlugin),
         "testing-library": fixupPluginRules(testingLibrary),
+        "custom": {
+            rules: {
+                "no-restricted-api-conversations": noRestrictedApiConversations,
+                "no-zustand-outside-state": noZustandOutsideState
+            }
+        }
     },
 
     languageOptions: {
@@ -103,6 +111,25 @@ export default defineConfig([globalIgnores([
                 order: "asc",
             },
         }],
+
+        "custom/no-zustand-outside-state": ["error"],
+
+        // To enforce api-calles are managed via hooks, and not within random tsx files.
+        "custom/no-restricted-api-conversations": ["error", {
+            allowedPaths: [
+                "src/pages/chat/state",
+		"src/hooks/api/files.ts",
+		"src/hooks/conversation-extension-context.ts",
+            ]
+        }],
+
+        // Restrict imports from zustand state to only within the state directory
+        "no-restricted-imports": ["error", {
+	    patterns: [{
+	      group: ["*/state/zustand/*"],
+	      message: "Access Zustand state only via hooks from '*/state/*' that expose specific sub-states or handle sync between API and local state.",
+	    }],
+	}],
 
         "prettier/prettier": ["error"],
 

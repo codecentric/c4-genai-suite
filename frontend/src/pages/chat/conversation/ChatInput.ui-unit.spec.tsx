@@ -52,7 +52,7 @@ describe('ChatInput', () => {
   it('should allow file upload in empty conversation', () => {
     mockConversationFiles([]);
 
-    render(<ChatInput conversationId={0} onSubmit={() => {}} />);
+    render(<ChatInput chatId={0} submitMessage={() => {}} />);
 
     expect(getFileInputButton()).not.toBeDisabled();
     assertFilesInChatExtensionErrorMessageVisible(false);
@@ -86,7 +86,7 @@ describe('ChatInput', () => {
       },
     ]);
 
-    render(<ChatInput conversationId={0} onSubmit={() => {}} />);
+    render(<ChatInput chatId={0} submitMessage={() => {}} />);
 
     expect(getFileInputButton()).not.toBeDisabled();
     assertFilesInChatExtensionErrorMessageVisible(false);
@@ -119,7 +119,7 @@ describe('ChatInput', () => {
         docId: 0,
       })),
     ]);
-    render(<ChatInput conversationId={0} onSubmit={() => {}} />);
+    render(<ChatInput chatId={0} submitMessage={() => {}} />);
 
     expect(getFileInputButton()).toBeDisabled();
     assertFilesInChatExtensionErrorMessageVisible(true);

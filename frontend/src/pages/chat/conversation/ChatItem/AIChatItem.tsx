@@ -1,10 +1,10 @@
 import { Box } from '@mantine/core';
 import { useClipboard, useDebouncedValue } from '@mantine/hooks';
 import { toast } from 'react-toastify';
-import { useApi } from 'src/api';
 import { Alert, Markdown } from 'src/components';
-import { useTheme } from 'src/hooks';
+import { useProfile } from 'src/hooks';
 import { texts } from 'src/texts';
+import { useStateOfIsAiWriting } from '../../state/chat';
 import { ChatItemDebug } from '../ChatItemDebug';
 import { ChatItemLogging } from '../ChatItemLogging';
 import ChatItemSources from '../ChatItemSources';
@@ -12,42 +12,33 @@ import { ChatItemTools } from '../ChatItemTools';
 import { AIChatItemActions } from './AIChatItemActions';
 import { AiAvatar } from './AiAvatar';
 import { ChatItemProps } from './ChatItemProps';
-import { ChatItemUI } from './ChatItemUI';
+import { ChatItemUserInput } from './ChatItemUserInput';
 
-export const AIChatItem = ({
-  agentName,
-  conversationId,
-  message,
-  isWriting,
-  isLast,
-  user,
-  llmLogo,
-  selectDocument,
-}: ChatItemProps) => {
-  const clipboard = useClipboard();
-  const api = useApi();
-  const { theme } = useTheme();
-
+export const AIChatItem = ({ agentName, message, isLast, llmLogo, selectDocument }: ChatItemProps) => {
   // MessageDTO ist generated from the backend models.
   // It may be refactored to become a simple string
   // instead of an array with one entry (in the futute ;) ).
   const textContent = message.content[0]?.type === 'text' ? message.content[0].text : '';
+  const user = useProfile();
+  const isWriting = useStateOfIsAiWriting();
+  const clipboard = useClipboard();
 
   const copyTextToClipboard = () => {
     clipboard.copy(textContent);
     toast(texts.common.copied, { type: 'info' });
   };
+
   const [debouncedIsWriting] = useDebouncedValue(isWriting, 500);
   const newReply = isWriting || debouncedIsWriting;
   return (
     <div className={'scroll-y-m-4 group box-border max-w-full'} data-testid="chat-item">
       <div className="flex items-center gap-2">
-        <AiAvatar avatarLogoUrl={theme.avatarLogoUrl} baseUrl={api.url} llmLogo={llmLogo} />
+        <AiAvatar llmLogo={llmLogo} />
         <strong>{agentName}</strong>
       </div>
       {message.error && <Alert text={message.error} className="mt-1" />}
       <ChatItemTools tools={message.toolsInUse || {}} />
-      {message.ui && <ChatItemUI request={message.ui} />}
+      {message.ui && <ChatItemUserInput request={message.ui} />}
       <Markdown animateText={isLast && newReply} className="box-border max-w-full">
         {textContent}
       </Markdown>
@@ -60,7 +51,6 @@ export const AIChatItem = ({
       {!isWriting && <ChatItemLogging logging={message.logging || []} />}
       {!(isWriting && isLast) && (
         <AIChatItemActions
-          conversationId={conversationId}
           messageId={message.id}
           copyTextToClipboard={copyTextToClipboard}
           rating={message.rating}
