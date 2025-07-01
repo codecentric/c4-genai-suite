@@ -48,7 +48,7 @@ In this step, you might be asked for some API-Keys, e.g., for the REI-S.
 
 ## Run tests
 
-Run tests using `npm run test` (stop anything that could block the ports for frontent or backend before running the tests)
+Run tests using `npm run test` (stop anything that could block the ports for frontend or backend before running the tests)
 
 You can also view the outputs in the `/outputs` directory for services started by the dev/test script.
 
@@ -58,7 +58,7 @@ Then pull the large files in the c4 repository via `git lfs pull`.
 
 ## Run the application for development
 
-Run `npm run dev` to start frontent, backend and the required postgres docker.
+Run `npm run dev` to start frontend, backend and the required postgres docker.
 
 Access the frontend at <http://localhost:5173>, running in development mode with live updates. Use the login details in `backend/.env`.
 
