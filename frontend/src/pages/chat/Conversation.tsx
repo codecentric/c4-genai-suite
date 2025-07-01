@@ -4,6 +4,7 @@ import { ChangeEvent, FormEvent, KeyboardEvent, memo, useEffect, useState } from
 import { useNavigate } from 'react-router-dom';
 import { ConversationDto } from 'src/api';
 import { texts } from 'src/texts';
+import { isMobile } from '../utils';
 
 interface ConversationProps {
   selectedConversationId: number | null;
@@ -87,7 +88,7 @@ export const Conversation = memo(
         {conversation.name}
         <div
           onClick={(e) => e.stopPropagation()}
-          className={'absolute top-0 right-0 flex h-full items-center px-2 opacity-0 group-hover:opacity-100'}
+          className={`absolute top-0 right-0 flex h-full items-center px-2 ${isMobile() ? '' : 'opacity-0 group-hover:opacity-100'}`}
         >
           <Menu width={200} opened={menuOpen} onChange={setMenuOpen}>
             <Menu.Target>
