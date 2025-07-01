@@ -1,6 +1,6 @@
 import { screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
-import { FileDto } from 'src/api';
+import { ConfigurationDto, FileDto } from 'src/api';
 import { useConversationBucketAvailabilities } from 'src/hooks/api/extensions';
 import { useConversationFiles } from 'src/hooks/api/files';
 import { render } from 'src/pages/admin/test-utils';
@@ -124,6 +124,33 @@ describe('ChatInput', () => {
     expect(getFileInputButton()).toBeDisabled();
     assertFilesInChatExtensionErrorMessageVisible(true);
     assertFilesVisionExtensionErrorMessageVisible(true);
+  });
+
+  it('should prefill text input with suggestion, when clicking on a suggestion', async () => {
+    mockConversationFiles([]);
+    const mockOnSubmit = vi.fn();
+    const chatInputConfiguration: ConfigurationDto = {
+      description: '',
+      enabled: false,
+      id: 0,
+      name: '',
+      chatSuggestions: [
+        {
+          title: 'Suggestion Title',
+          subtitle: 'Suggestion Subtitle',
+          text: 'This is a suggestion',
+        },
+      ],
+    };
+
+    render(<ChatInput conversationId={0} onSubmit={mockOnSubmit} configuration={chatInputConfiguration} isEmpty={true} />);
+
+    const suggestionButton = screen.getByText('Suggestion Title');
+
+    suggestionButton.click();
+
+    const textInput = await screen.findByRole('textbox');
+    expect(textInput).toHaveValue('This is a suggestion');
   });
 });
 
