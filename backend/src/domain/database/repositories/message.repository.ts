@@ -40,10 +40,12 @@ export class MessageRepository extends Repository<MessageEntity> {
            ORDER BY s."date"
     `;
 
-    const rawResults = (await this.query(sql, params)) as Array<{
-      date: Date;
-      total: string;
-    }>;
+    const rawResults = await this.query<
+      Array<{
+        date: Date;
+        total: string;
+      }>
+    >(sql, params);
 
     return rawResults.map((x) => ({
       ...x,

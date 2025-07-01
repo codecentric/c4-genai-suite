@@ -56,11 +56,13 @@ export class UsageRepository extends Repository<UsageEntity> {
            ORDER BY s."date"
     `;
 
-    const rawResults = (await this.query(sql, params)) as Array<{
-      date: Date;
-      total: string;
-      byCategory: Record<string, number>;
-    }>;
+    const rawResults = await this.query<
+      Array<{
+        date: Date;
+        total: string;
+        byCategory: Record<string, number>;
+      }>
+    >(sql, params);
 
     return rawResults.map((x) => ({
       ...x,
@@ -108,11 +110,13 @@ export class UsageRepository extends Repository<UsageEntity> {
            ORDER BY s."date"
     `;
 
-    const rawResults = (await this.query(sql, params)) as Array<{
-      date: Date;
-      total: string;
-      byModel: Record<string, number>;
-    }>;
+    const rawResults = await this.query<
+      Array<{
+        date: Date;
+        total: string;
+        byModel: Record<string, number>;
+      }>
+    >(sql, params);
 
     return rawResults.map((x) => ({
       ...x,
