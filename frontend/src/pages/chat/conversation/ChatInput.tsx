@@ -145,7 +145,6 @@ export function ChatInput({ conversationId, configuration, isDisabled, isEmpty, 
 
   const handleFilePaste = useCallback(
     (event: ClipboardEvent) => {
-      event.preventDefault();
       const items = event.clipboardData?.items;
       if (!items) {
         return;
@@ -162,7 +161,10 @@ export function ChatInput({ conversationId, configuration, isDisabled, isEmpty, 
         filesToUpload.push(blob);
       }
 
-      handleUploadFile(filesToUpload);
+      if (filesToUpload.length) {
+        event.preventDefault();
+        handleUploadFile(filesToUpload);
+      }
     },
     [handleUploadFile],
   );
