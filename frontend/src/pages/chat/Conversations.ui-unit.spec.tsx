@@ -40,7 +40,7 @@ vi.mock('src/pages/chat/state/listOfChats', () => ({
   useStateOfChats: vi.fn(),
   useListOfChats: vi.fn(),
   useStateMutateRenameChat: mockMutation,
-  useMutateNewChat: vi.fn(),
+  useMutateNewChat: mockMutation,
   useStateMutateRemoveAllChats: mockMutation,
   useStateMutateDuplicateChat: mockMutation,
   useStateOfChatEmptiness: vi.fn(),
