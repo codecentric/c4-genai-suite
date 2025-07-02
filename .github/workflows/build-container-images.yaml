@@ -26,6 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      packages: write
     strategy:
       matrix:
         service:
@@ -53,11 +54,8 @@ jobs:
         with:
           context: ${{ matrix.service.context }}
           file: ${{ matrix.service.containerfile }}
-          # FIXME
-          push: false
-          # push: ${{ inputs.push-to-registry }}
           tags: ${{ inputs.tag-prefix }}${{ matrix.service.name }}:commit-${{ github.sha }}
-          outputs: type=docker,dest=/tmp/${{ matrix.service.name }}.tar
+          outputs: ${{ inputs.push-to-registry && 'type=registry' || format('type=docker,dest=/tmp/{0}.tar', matrix.service.name) }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |

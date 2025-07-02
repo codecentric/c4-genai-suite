@@ -10,10 +10,12 @@ on:
         required: true
         type: string
     secrets:
+      # we make the secrets optional to allow forks to run the pipeline
+      # tests that need the secrets will be skipped
       AZURE_OPENAI_API_KEY:
-        required: true
+        required: false
       STORE_AZURE_AI_SEARCH_SERVICE_API_KEY:
-        required: true
+        required: false
 
 defaults:
   run:
@@ -97,7 +99,7 @@ jobs:
             --network test-network \
             --name mcp-fetch \
             -e CONFIG='{"mcpServers":{"mcp-fetch":{"command":"uvx","args":["mcp-server-fetch"],"port":8000}}}' \
-            ghcr.io/${{ github.repository }}/dev-helper/mcp-tool-as-server:latest
+            ghcr.io/codecentric/c4-genai-suite/dev-helper/mcp-tool-as-server:latest
       - uses: actions/download-artifact@v4
         with:
           name: frontend
@@ -116,7 +118,7 @@ jobs:
             -d \
             -p 80:80 \
             --network test-network \
-            ghcr.io/${{ github.repository }}/dev-helper/caddy-gateway-proxy:latest
+            ghcr.io/codecentric/c4-genai-suite/dev-helper/caddy-gateway-proxy:latest
       - run: docker ps
       - uses: actions/setup-node@v4
         with:
