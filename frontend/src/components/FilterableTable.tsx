@@ -1,20 +1,13 @@
-import { Button } from '@mantine/core';
 import { IconSortAscending, IconSortDescending } from '@tabler/icons-react';
 import { flexRender, Table as TanTable } from '@tanstack/react-table';
 import { FileDto } from 'src/api';
 import { cn } from 'src/lib';
-import { texts } from 'src/texts';
-import { ConfirmDialog } from './ConfirmDialog';
 import { DebouncedInput } from './TableFilter';
 
 export type TData = FileDto;
 
 export type FilterableTableProps = {
   table: TanTable<TData>;
-  handleMultiDelete: () => void;
-  deleteDialogTitle: string;
-  deleteDialogText: string;
-  deleteDisabled: boolean;
   globalFilter: string;
   setGlobalFilter: (filter: string) => void;
 };
@@ -23,7 +16,7 @@ export function FilterableTable(props: FilterableTableProps) {
   const containerClass = 'flex flex-row items-center justify-between';
 
   return (
-    <div className="relative flex w-full flex-col overflow-x-scroll rounded-xl bg-white bg-clip-border p-2 shadow-sm">
+    <div className="flex w-full flex-col">
       <div>
         <DebouncedInput
           value={props.globalFilter ?? ''}
@@ -72,7 +65,7 @@ export function FilterableTable(props: FilterableTableProps) {
         <tbody>
           {props.table.getRowModel().rows.map((row) => {
             return (
-              <tr key={row.id} className="border-t border-gray-200">
+              <tr key={row.id} className="border-t border-gray-200 hover:bg-gray-50">
                 {row.getVisibleCells().map((cell) => {
                   return (
                     <td
@@ -88,16 +81,6 @@ export function FilterableTable(props: FilterableTableProps) {
           })}
         </tbody>
       </table>
-      <div className="flex flex-row items-center justify-between gap-x-2 border-t border-gray-300 p-2 text-sm">
-        <div className="text-gray-500">{`${props.table.getSelectedRowModel().rows.length} Rows Selected`}</div>
-        <ConfirmDialog title={props.deleteDialogTitle} text={props.deleteDialogText} onPerform={() => props.handleMultiDelete()}>
-          {({ onClick }) => (
-            <Button variant="light" color="red" onClick={onClick} size="xs" disabled={props.deleteDisabled}>
-              {texts.common.remove}
-            </Button>
-          )}
-        </ConfirmDialog>
-      </div>
     </div>
   );
 }

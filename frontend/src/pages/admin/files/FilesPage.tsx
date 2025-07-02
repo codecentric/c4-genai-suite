@@ -1,10 +1,8 @@
 import { Button, Checkbox } from '@mantine/core';
-import { IconEdit, IconTrash } from '@tabler/icons-react';
-import { RankingInfo, rankItem } from '@tanstack/match-sorter-utils';
+import { IconEdit, IconLoader, IconTrash, IconUpload } from '@tabler/icons-react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import {
   ColumnDef,
-  FilterFn,
   getCoreRowModel,
   getFacetedMinMaxValues,
   getFacetedRowModel,
@@ -27,33 +25,13 @@ import { extractType } from 'src/pages/utils';
 import { texts } from 'src/texts';
 import { UpsertBucketDialog } from './UpsertBucketDialog';
 import { useBucketstore, useFilesStore } from './state';
-
-type TData = FileDto;
 declare module '@tanstack/react-table' {
   //allows us to define custom properties for our columns
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   interface ColumnMeta<TData, TValue> {
     filterVariant?: 'text' | 'range' | 'select';
   }
-
-  interface FilterFns {
-    fuzzy: FilterFn<unknown>;
-  }
-
-  interface FilterMeta {
-    itemRank: RankingInfo;
-  }
 }
-
-const fuzzyFilter: FilterFn<TData> = (row, columnId, value, addMeta) => {
-  const itemRank = rankItem(row.getValue(columnId), String(value));
-
-  addMeta({
-    itemRank,
-  });
-
-  return itemRank.passed;
-};
 
 export function FilesPage() {
   const api = useApi();
@@ -155,8 +133,9 @@ export function FilesPage() {
     originalFiles.forEach((file) => deleting.mutate(file));
   };
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+  const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
     onDrop: (files) => files.forEach((file) => upload.mutate(file)),
+    noClick: true,
   });
 
   const columns = useMemo<ColumnDef<FileDto, unknown>[]>(
@@ -222,10 +201,7 @@ export function FilesPage() {
       rowSelection: rowSelection,
       globalFilter: globalFilter,
     },
-    filterFns: {
-      fuzzy: fuzzyFilter,
-    },
-    globalFilterFn: 'fuzzy',
+    globalFilterFn: 'includesString',
     onGlobalFilterChange: setGlobalFilter,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(), //client-side filtering
@@ -248,7 +224,7 @@ export function FilesPage() {
             <div className="flex items-end justify-between">
               <h2 className="text-3xl">{thisBucket.name}</h2>
               <div className="flex gap-2">
-                <Button variant="light" leftSection={<IconEdit size={20} />} onClick={() => setToUpdate(true)}>
+                <Button leftSection={<IconEdit size={20} />} onClick={() => setToUpdate(true)}>
                   {texts.common.edit}
                 </Button>
                 <ConfirmDialog
@@ -257,7 +233,7 @@ export function FilesPage() {
                   onPerform={() => deletingBucket.mutate(thisBucket)}
                 >
                   {({ onClick }) => (
-                    <Button onClick={onClick} variant="light" color="red" leftSection={<IconTrash size={20} />}>
+                    <Button variant="light" onClick={onClick} color="red" leftSection={<IconTrash size={20} />}>
                       {texts.common.remove}
                     </Button>
                   )}
@@ -281,38 +257,46 @@ export function FilesPage() {
             {thisBucket.type !== BucketDtoTypeEnum.Conversation && (
               <div className="my-4 flex">
                 <h2 className="grow text-2xl">{texts.files.headlineSearchable}</h2>
+                {thisBucket.type !== BucketDtoTypeEnum.User && (
+                  <Button onClick={open} disabled={isDragActive || uploading.length > 0} color="black">
+                    {uploading.length > 0 ? <IconLoader size={20} className="animate-spin" /> : <IconUpload size={20} />}
+                  </Button>
+                )}
               </div>
             )}
           </div>
 
-          {/* only show the file upload dropzone if this is not a user/conversation bucket */}
-          {thisBucket?.type !== BucketDtoTypeEnum.Conversation && thisBucket?.type !== BucketDtoTypeEnum.User && (
-            <div>
-              <div
-                className="rounded-box flex h-32 items-center justify-center border-2 border-dashed border-gray-300 p-4 text-gray-600 transition-all hover:border-gray-400"
-                {...getRootProps()}
-              >
-                <input {...getInputProps()} />
-                {isDragActive ? <p>{texts.common.dropZoneDrop}</p> : <p>{texts.common.dropZone}</p>}
-              </div>
-              {uploading.length > 0 && (
-                <div className="py-1 text-xs text-gray-500">
-                  {uploading.length == 1 ? texts.files.uploading : texts.files.uploadMultiple(uploading.length)}
-                </div>
-              )}
-            </div>
-          )}
-
           {thisBucket.type !== BucketDtoTypeEnum.Conversation && (
-            <FilterableTable
-              table={table}
-              handleMultiDelete={handleMultiRowDelete}
-              deleteDialogTitle={texts.files.removeFilesConfirmTitle}
-              deleteDialogText={texts.files.removeFilesConfirmText(table.getSelectedRowModel().rows.length)}
-              deleteDisabled={table.getSelectedRowModel().rows.length == 0 ? true : false}
-              globalFilter={globalFilter}
-              setGlobalFilter={setGlobalFilter}
-            />
+            <div className="relative flex w-full flex-col overflow-x-scroll rounded-xl bg-white bg-clip-border p-2 shadow-sm">
+              {thisBucket?.type !== BucketDtoTypeEnum.User ? (
+                <div className={isDragActive ? 'rounded-sm bg-gray-50' : ''} {...getRootProps()}>
+                  <input {...getInputProps()} />
+                  <FilterableTable table={table} globalFilter={globalFilter} setGlobalFilter={setGlobalFilter} />
+                </div>
+              ) : (
+                <FilterableTable table={table} globalFilter={globalFilter} setGlobalFilter={setGlobalFilter} />
+              )}
+              <div className="flex flex-row items-center justify-between gap-x-2 border-t border-gray-300 p-2 text-sm">
+                <div className="text-gray-500">{`${table.getSelectedRowModel().rows.length} Rows Selected`}</div>
+                <ConfirmDialog
+                  title={texts.files.removeFilesConfirmTitle}
+                  text={texts.files.removeFilesConfirmText(table.getSelectedRowModel().rows.length)}
+                  onPerform={() => handleMultiRowDelete()}
+                >
+                  {({ onClick }) => (
+                    <Button
+                      variant="light"
+                      color="red"
+                      onClick={onClick}
+                      size="xs"
+                      disabled={table.getSelectedRowModel().rows.length == 0 ? true : false}
+                    >
+                      {texts.common.remove}
+                    </Button>
+                  )}
+                </ConfirmDialog>
+              </div>
+            </div>
           )}
           <Pagingation page={page} pageSize={pageSize} total={total} onPage={setPage} />
         </div>
