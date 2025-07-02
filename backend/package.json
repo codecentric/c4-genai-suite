@@ -63,7 +63,7 @@
     "class-validator": "^0.14.1",
     "cookie-parser": "^1.4.7",
     "date-fns": "^4.1.0",
-    "dotenv": "^16.5.0",
+    "dotenv": "^16.6.1",
     "express-session": "^1.18.1",
     "json-diff-ts": "^4.6.3",
     "langchain": "^0.3.29",
