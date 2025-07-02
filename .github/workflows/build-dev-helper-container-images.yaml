@@ -3,7 +3,7 @@ on:
   pull_request:
     paths:
       - .github/workflows/build-dev-helper-container-images.yaml
-      - /dev
+      - dev/
 
 jobs:
   build-and-push-container:

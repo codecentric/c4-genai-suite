@@ -25,72 +25,6 @@ jobs:
     permissions:
       contents: read
       packages: read
-    services:
-      pgvector:
-        image: pgvector/pgvector:pg16
-        env:
-          POSTGRES_USER: admin
-          POSTGRES_PASSWORD: secret
-          POSTGRES_DB: cccc
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-      backend:
-        image: ghcr.io/${{ github.repository }}/backend:commit-${{ github.sha }}
-        env:
-          BASE_URL: http://localhost
-          DB_URL: postgres://admin:secret@pgvector:5432/cccc
-          C4_DB_RETRY_DELAY: 6000
-          NODE_ENV: development
-          AUTH_ENABLE_PASSWORD: true
-          AUTH_INITIAL_ADMIN_USERNAME: admin@example.com
-          AUTH_INITIAL_ADMIN_PASSWORD: secret
-      frontend:
-        image: ghcr.io/${{ github.repository }}/frontend:commit-${{ github.sha }}
-      caddy-gateway-proxy:
-        image: ghcr.io/${{ github.repository }}/dev-helper/caddy-gateway-proxy:latest
-        ports:
-          - 80:80
-      reis:
-        image: ghcr.io/${{ github.repository }}/reis:commit-${{ github.sha }}
-        options: >-
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 20
-        env:
-          WORKERS: 2
-          BATCH_SIZE: 100
-          STORE_TYPE: pgvector
-          STORE_PGVECTOR_URL: postgresql+psycopg://admin:secret@pgvector:5432/cccc
-          STORE_AZURE_AI_SEARCH_SERVICE_ENDPOINT: ${{ vars.STORE_AZURE_AI_SEARCH_SERVICE_ENDPOINT }}
-          STORE_AZURE_AI_SEARCH_SERVICE_API_KEY: ${{ secrets.STORE_AZURE_AI_SEARCH_SERVICE_API_KEY }}
-          STORE_AZURE_AI_SEARCH_SERVICE_INDEX_NAME: basis-reis-test
-          EMBEDDINGS_TYPE: azure-openai
-          EMBEDDINGS_AZURE_OPENAI_ENDPOINT: ${{ vars.AZURE_OPENAI_ENDPOINT }}
-          EMBEDDINGS_AZURE_OPENAI_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
-          EMBEDDINGS_AZURE_OPENAI_DEPLOYMENT_NAME: text-embedding-ada-002
-          EMBEDDINGS_AZURE_OPENAI_INSTANCE_NAME: cc-sweden-testing
-          EMBEDDINGS_AZURE_OPENAI_MODEL_NAME: text-embedding-ada-002
-          EMBEDDINGS_AZURE_OPENAI_API_VERSION: "2023-05-15"
-      mcp-fetch:
-        image: ghcr.io/${{ github.repository }}/dev-helper/mcp-tool-as-server:latest
-        env:
-          CONFIG: >
-            {
-              "mcpServers": {
-                "mcp-fetch": {
-                  "command": "uvx",
-                  "args": [
-                    "mcp-server-fetch"
-                  ],
-                  "port": 8000
-                }
-              }
-            }
-        ports:
-          - "8000:8000"
     env:
       AZURE_OPEN_AI_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
       TEST_DIR: ./${{ inputs.testdir }}
@@ -99,6 +33,91 @@ jobs:
       MCP_SERVER_ENDPOINT: http://mcp-fetch:8000/sse
     steps:
       - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - run: docker network create test-network
+      - name: start database
+        run: |
+          docker run \
+            -d \
+            --network test-network \
+            --name pgvector \
+            -e POSTGRES_USER="admin" \
+            -e POSTGRES_PASSWORD="secret" \
+            -e POSTGRES_DB="cccc" \
+            pgvector/pgvector:pg16
+      - uses: actions/download-artifact@v4
+        with:
+          name: backend
+          path: /tmp/
+      - name: start backend
+        run: |
+          docker load --input /tmp/backend.tar
+          docker run \
+            -d \
+            --network test-network \
+            --name backend \
+            -e BASE_URL="http://localhost" \
+            -e DB_URL="postgres://admin:secret@pgvector:5432/cccc" \
+            -e C4_DB_RETRY_DELAY="6000" \
+            -e NODE_ENV="development" \
+            -e AUTH_ENABLE_PASSWORD="true" \
+            -e AUTH_INITIAL_ADMIN_USERNAME="admin@example.com" \
+            -e AUTH_INITIAL_ADMIN_PASSWORD="secret" \
+            backend:commit-${{ github.sha }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: reis
+          path: /tmp/
+      - name: start REIS
+        run: |
+          docker load --input /tmp/reis.tar
+          docker run \
+            -d \
+            --network test-network \
+            --name reis \
+            -e WORKERS="2" \
+            -e BATCH_SIZE="100" \
+            -e STORE_TYPE="pgvector" \
+            -e STORE_PGVECTOR_URL="postgresql+psycopg://admin:secret@pgvector:5432/cccc" \
+            -e STORE_AZURE_AI_SEARCH_SERVICE_ENDPOINT="${{ vars.STORE_AZURE_AI_SEARCH_SERVICE_ENDPOINT }}" \
+            -e STORE_AZURE_AI_SEARCH_SERVICE_API_KEY="${{ secrets.STORE_AZURE_AI_SEARCH_SERVICE_API_KEY }}" \
+            -e STORE_AZURE_AI_SEARCH_SERVICE_INDEX_NAME="basis-reis-test" \
+            -e EMBEDDINGS_TYPE="azure-openai" \
+            -e EMBEDDINGS_AZURE_OPENAI_ENDPOINT="${{ vars.AZURE_OPENAI_ENDPOINT }}" \
+            -e EMBEDDINGS_AZURE_OPENAI_API_KEY="${{ secrets.AZURE_OPENAI_API_KEY }}" \
+            -e EMBEDDINGS_AZURE_OPENAI_DEPLOYMENT_NAME="text-embedding-ada-002" \
+            -e EMBEDDINGS_AZURE_OPENAI_INSTANCE_NAME="cc-sweden-testing" \
+            -e EMBEDDINGS_AZURE_OPENAI_MODEL_NAME="text-embedding-ada-002" \
+            -e EMBEDDINGS_AZURE_OPENAI_API_VERSION=""2023-05-15"" \
+            reis:commit-${{ github.sha }}
+      - name: start mcp
+        run: |
+          docker run \
+            -d \
+            --network test-network \
+            --name mcp-fetch \
+            -e CONFIG='{"mcpServers":{"mcp-fetch":{"command":"uvx","args":["mcp-server-fetch"],"port":8000}}}' \
+            ghcr.io/${{ github.repository }}/dev-helper/mcp-tool-as-server:latest
+      - uses: actions/download-artifact@v4
+        with:
+          name: frontend
+          path: /tmp/
+      - name: start frontend
+        run: |
+          docker load --input /tmp/frontend.tar
+          docker run \
+            -d \
+            --network test-network \
+            --name frontend \
+            frontend:commit-${{ github.sha }}
+      - name: start gateway proxy
+        run: |
+          docker run \
+            -d \
+            -p 80:80 \
+            --network test-network \
+            ghcr.io/${{ github.repository }}/dev-helper/caddy-gateway-proxy:latest
+      - run: docker ps
       - uses: actions/setup-node@v4
         with:
           node-version: 24.x

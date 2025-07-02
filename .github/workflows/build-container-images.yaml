@@ -11,13 +11,21 @@ on:
     paths:
       - .github/workflows/build-container-images.yaml
   workflow_call:
+    inputs:
+      push-to-registry:
+        required: false
+        type: boolean
+        default: false
+      tag-prefix:
+        required: false
+        type: string
+        default: ''
 
 jobs:
   build-container:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      packages: write
     strategy:
       matrix:
         service:
@@ -45,9 +53,17 @@ jobs:
         with:
           context: ${{ matrix.service.context }}
           file: ${{ matrix.service.containerfile }}
-          push: true
-          tags: ghcr.io/${{ github.repository }}/${{ matrix.service.name }}:commit-${{ github.sha }}
+          # FIXME
+          push: false
+          # push: ${{ inputs.push-to-registry }}
+          tags: ${{ inputs.tag-prefix }}${{ matrix.service.name }}:commit-${{ github.sha }}
+          outputs: type=docker,dest=/tmp/${{ matrix.service.name }}.tar
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |
             VERSION=${{ github.ref_type == 'tag' && github.ref_name || github.sha }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.service.name }}
+          path: /tmp/${{ matrix.service.name }}.tar
+          retention-days: 2
