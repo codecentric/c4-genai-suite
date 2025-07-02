@@ -1,12 +1,9 @@
-import { Button, Checkbox } from '@mantine/core';
+import { ActionIcon, Button, Checkbox, NativeSelect } from '@mantine/core';
 import { IconEdit, IconLoader, IconTrash, IconUpload } from '@tabler/icons-react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import {
   ColumnDef,
   getCoreRowModel,
-  getFacetedMinMaxValues,
-  getFacetedRowModel,
-  getFacetedUniqueValues,
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
@@ -18,7 +15,7 @@ import { useDropzone } from 'react-dropzone';
 import { useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { BucketDto, BucketDtoTypeEnum, FileDto, useApi } from 'src/api';
-import { ConfirmDialog, FilterableTable, Pagingation } from 'src/components';
+import { ConfirmDialog, FilterableTable, Search, TablePagination } from 'src/components';
 import { useEventCallback, useTransientNavigate } from 'src/hooks';
 import { buildError, formatFileSize } from 'src/lib';
 import { extractType } from 'src/pages/utils';
@@ -35,13 +32,10 @@ declare module '@tanstack/react-table' {
 
 export function FilesPage() {
   const api = useApi();
-  const pageSize = 20;
 
   const bucketParam = useParams<'id'>();
   const bucketId = +bucketParam.id!;
   const [uploading, setUploading] = useState<File[]>([]);
-  const [page, setPage] = useState(0);
-  const [total, setTotal] = useState(0);
   const { files, removeFile, setFile, setFiles } = useFilesStore();
 
   const navigate = useTransientNavigate();
@@ -52,6 +46,10 @@ export function FilesPage() {
   //Tanstack Table
   const [globalFilter, setGlobalFilter] = useState('');
   const [rowSelection, setRowSelection] = useState({});
+  const [pagination, setPagination] = useState({
+    pageIndex: 0,
+    pageSize: 20,
+  });
 
   const { data: bucket } = useQuery({
     queryKey: ['bucket', bucketId],
@@ -86,16 +84,15 @@ export function FilesPage() {
 
   const { data: loadedFiles } = useQuery({
     // we need to requery when the total changed (because we uploaded/deleted one)
-    queryKey: ['files', bucketId, page, pageSize, total],
-    queryFn: () => api.files.getFiles(bucketId, page, pageSize),
+    queryKey: ['files', bucketId],
+    queryFn: () => api.files.getFiles(bucketId),
   });
 
   useEffect(() => {
     if (loadedFiles) {
       setFiles(loadedFiles.items);
-      setTotal(loadedFiles.total);
     }
-  }, [loadedFiles, setFiles, setTotal]);
+  }, [loadedFiles, setFiles]);
 
   const upload = useMutation({
     mutationFn: (file: File) => api.files.postFile(bucketId, file),
@@ -104,7 +101,6 @@ export function FilesPage() {
     },
     onSuccess: (file) => {
       setFile(file);
-      setTotal((t) => t + 1);
     },
     onSettled: (_, __, file) => {
       setUploading((files) => files.filter((f) => f !== file));
@@ -120,7 +116,6 @@ export function FilesPage() {
     },
     onSuccess: (_, bucket) => {
       removeFile(bucket.id);
-      setTotal((t) => t - 1);
       setRowSelection({});
     },
     onError: async (error) => {
@@ -200,26 +195,26 @@ export function FilesPage() {
     state: {
       rowSelection: rowSelection,
       globalFilter: globalFilter,
+      pagination: pagination,
     },
     globalFilterFn: 'includesString',
     onGlobalFilterChange: setGlobalFilter,
     getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(), //client-side filtering
+    getFilteredRowModel: getFilteredRowModel(),
+    getPaginationRowModel: getPaginationRowModel(), //client-side filtering
     getSortedRowModel: getSortedRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getFacetedRowModel: getFacetedRowModel(), // client-side faceting
-    getFacetedUniqueValues: getFacetedUniqueValues(), // generate unique values for select filter/autocomplete
-    getFacetedMinMaxValues: getFacetedMinMaxValues(), // generate min/max values for range filter,
+    onPaginationChange: setPagination,
     enableRowSelection: true,
     onRowSelectionChange: setRowSelection,
     columnResizeDirection: 'ltr',
     columnResizeMode: 'onChange',
+    autoResetPageIndex: false,
   });
 
   return (
     <>
       {thisBucket && (
-        <div className="flex flex-col gap-8">
+        <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-8">
             <div className="flex items-end justify-between">
               <h2 className="text-3xl">{thisBucket.name}</h2>
@@ -258,47 +253,60 @@ export function FilesPage() {
               <div className="my-4 flex">
                 <h2 className="grow text-2xl">{texts.files.headlineSearchable}</h2>
                 {thisBucket.type !== BucketDtoTypeEnum.User && (
-                  <Button onClick={open} disabled={isDragActive || uploading.length > 0} color="black">
+                  <ActionIcon onClick={open} disabled={isDragActive || uploading.length > 0} color="black" size="input-sm">
                     {uploading.length > 0 ? <IconLoader size={20} className="animate-spin" /> : <IconUpload size={20} />}
-                  </Button>
+                  </ActionIcon>
                 )}
               </div>
             )}
           </div>
 
           {thisBucket.type !== BucketDtoTypeEnum.Conversation && (
-            <div className="relative flex w-full flex-col overflow-x-scroll rounded-xl bg-white bg-clip-border p-2 shadow-sm">
+            <div className="relative flex w-full flex-col gap-y-4 overflow-x-scroll rounded-xl bg-white bg-clip-border p-4 pt-6 shadow-sm">
+              <div className="flex items-center justify-between">
+                <Search value={globalFilter ?? ''} onSearch={(value) => setGlobalFilter(String(value))} />
+                <NativeSelect
+                  size="sm"
+                  radius="lg"
+                  data={['10', '15', '20', '25', '30']}
+                  onChange={(e) => table.setPageSize(Number(e.target.value))}
+                  value={String(table.getState().pagination.pageSize)}
+                />
+              </div>
+
               {thisBucket?.type !== BucketDtoTypeEnum.User ? (
                 <div className={isDragActive ? 'rounded-sm bg-gray-50' : ''} {...getRootProps()}>
                   <input {...getInputProps()} />
-                  <FilterableTable table={table} globalFilter={globalFilter} setGlobalFilter={setGlobalFilter} />
+                  <FilterableTable table={table} />
                 </div>
               ) : (
-                <FilterableTable table={table} globalFilter={globalFilter} setGlobalFilter={setGlobalFilter} />
+                <FilterableTable table={table} />
               )}
-              <div className="flex flex-row items-center justify-between gap-x-2 border-t border-gray-300 p-2 text-sm">
-                <div className="text-gray-500">{`${table.getSelectedRowModel().rows.length} Rows Selected`}</div>
-                <ConfirmDialog
-                  title={texts.files.removeFilesConfirmTitle}
-                  text={texts.files.removeFilesConfirmText(table.getSelectedRowModel().rows.length)}
-                  onPerform={() => handleMultiRowDelete()}
-                >
-                  {({ onClick }) => (
-                    <Button
-                      variant="light"
-                      color="red"
-                      onClick={onClick}
-                      size="xs"
-                      disabled={table.getSelectedRowModel().rows.length == 0 ? true : false}
-                    >
-                      {texts.common.remove}
-                    </Button>
-                  )}
-                </ConfirmDialog>
+              <div className="flex flex-row items-center justify-between gap-x-2">
+                <div className="flex flex-row items-center gap-x-4 p-2 text-sm">
+                  <div className="text-gray-500">{texts.common.rowsSelected(table.getSelectedRowModel().rows.length)}</div>
+                  <ConfirmDialog
+                    title={texts.files.removeFilesConfirmTitle}
+                    text={texts.files.removeFilesConfirmText(table.getSelectedRowModel().rows.length)}
+                    onPerform={() => handleMultiRowDelete()}
+                  >
+                    {({ onClick }) => (
+                      <Button
+                        variant="light"
+                        color="red"
+                        onClick={onClick}
+                        size="xs"
+                        disabled={table.getSelectedRowModel().rows.length == 0 ? true : false}
+                      >
+                        {texts.common.remove}
+                      </Button>
+                    )}
+                  </ConfirmDialog>
+                </div>
+                <TablePagination table={table} />
               </div>
             </div>
           )}
-          <Pagingation page={page} pageSize={pageSize} total={total} onPage={setPage} />
         </div>
       )}
 

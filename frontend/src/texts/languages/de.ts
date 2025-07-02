@@ -78,6 +78,7 @@ export const de: typeof en = {
     selectOptions: 'Optionen auswählen',
     addItem: 'Item hinzufügen',
     configurableArguments: 'Konfigurierbar',
+    rowsSelected: '{{rowCount}} Zeile(n) ausgewählt',
   },
   chat: {
     noAccessToConversation: 'Du hast keinen Zugriff auf diese Konversation. Du wirst in Kürze weitergeleitet.',

@@ -76,6 +76,7 @@ export const en = {
     selectOptions: 'Select options',
     addItem: 'Add an item',
     configurableArguments: 'Configurable',
+    rowsSelected: '{{rowCount}} Row(s) Selected',
   },
   chat: {
     noAccessToConversation: "You don't have access to this conversation. You will be redirected shortly.",

@@ -106,6 +106,7 @@ function load() {
       selectOptions: translate('common.selectOptions'),
       addItem: translate('common.addItem'),
       configurableArguments: translate('common.configurableArguments'),
+      rowsSelected: (rowCount: number) => translate('common.rowsSelected', { rowCount }),
     },
     chat: {
       conversationNotFound: translate('chat.conversationNotFound'),
