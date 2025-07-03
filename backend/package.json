@@ -99,7 +99,7 @@
     "@types/express": "5.0.3",
     "@types/express-session": "1.18.2",
     "@types/jest": "29.5.14",
-    "@types/multer": "1.4.12",
+    "@types/multer": "2.0.0",
     "@types/node": "24.0.10",
     "@types/nunjucks": "3.2.6",
     "@types/passport-github2": "1.2.9",
