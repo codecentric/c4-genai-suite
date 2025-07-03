@@ -292,6 +292,21 @@ export async function editWholeFileExtension(page: Page, configuration: { name: 
   await save(page);
 }
 
+export async function addImageToClipboard(page: Page) {
+  await page.evaluate(async () => {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    ctx?.fillText('42', 50, 50);
+    const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve));
+    if (blob) {
+      const item = new ClipboardItem({
+        [blob.type]: blob,
+      });
+      await navigator.clipboard.write([item]);
+    }
+  });
+}
+
 export async function addVisionFileExtensionToConfiguration(page: Page, configuration: { name: string }, matchName?: RegExp) {
   const name = matchName ?? configuration.name;
   await page.getByRole('link', { name: 'Assistants' }).click();
