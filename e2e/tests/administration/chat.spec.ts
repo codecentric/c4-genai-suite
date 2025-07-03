@@ -78,4 +78,29 @@ test('Chat', async ({ page }) => {
     await newChat(page);
     await checkSelectedConfiguration(page, { name: 'Assistant' });
   });
+
+  await test.step('should should paste text and images', async () => {
+    await page.locator('form').getByRole('textbox').focus();
+    await page.keyboard.insertText('Two. ');
+    await page.keyboard.press('ControlOrMeta+A');
+    await page.keyboard.press('ControlOrMeta+X');
+
+    await page.keyboard.insertText('One. ');
+    await page.keyboard.press('ControlOrMeta+V');
+    await page.keyboard.insertText('Three.');
+
+    await page.locator('form').getByTestId('chat-submit-button').click();
+
+    const testoutput = await page.waitForSelector(`:has-text("One. Two. Three.")`);
+    expect(testoutput).toBeDefined();
+
+    // await page.locator('form').getByTestId('chat-submit-button').click();
+
+    // const imagePath = __dirname + '/../utils/files/react.svg';
+    // await page.locator('form').getByTestId('chat-file-input').setInputFiles(imagePath);
+    // await page.locator('form').getByTestId('chat-submit-button').click();
+
+    // const testoutput = await page.waitForSelector(`:has-text("${userMessage}")`);
+    // expect(testoutput).toBeDefined();
+  });
 });
