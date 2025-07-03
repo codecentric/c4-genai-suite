@@ -4,9 +4,9 @@ import { FormEvent, memo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ConversationDto } from 'src/api';
 import { texts } from 'src/texts';
+import { isMobile } from '../utils';
 import { useStateOfSelectedChatId } from './state/chat';
 import { useStateMutateDuplicateChat, useStateMutateRemoveChat, useStateMutateRenameChat } from './state/listOfChats';
-import { isMobile } from '../utils';
 
 const getInputValue = (e: FormEvent<HTMLFormElement>) => (new FormData(e.currentTarget).get('name') as string)?.trim();
 
