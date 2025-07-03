@@ -22,7 +22,7 @@ export const useExtensionContext = (conversationId: number) => {
 
   const query = useQuery({
     queryKey,
-    queryFn: () => api.conversations.getConversation(conversationId).then((data) => data?.extensionUserArguments),
+    queryFn: () => api.conversations.getConversation(conversationId).then((data) => data?.extensionUserArguments || {}),
     enabled: !!conversationId,
   });
 

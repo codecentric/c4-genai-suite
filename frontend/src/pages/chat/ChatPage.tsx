@@ -25,10 +25,10 @@ const CustomResizeHandle = () => (
 const getPanelSizes = (isRightPanelOpen: boolean) => {
   const leftBarRatio = 15;
   const rightBarRatio = 20;
+  const contentRatio = 100 - leftBarRatio - (isRightPanelOpen ? rightBarRatio : 0);
+  const isMobileView = isMobile();
   const mobileSideBarRatio = 90;
   const mobileContentRatio = 100 - mobileSideBarRatio;
-  const contentRatio = isRightPanelOpen ? 100 - leftBarRatio - rightBarRatio : 100 - rightBarRatio;
-  const isMobileView = isMobile();
   return {
     left: {
       defaultSize: isMobileView ? mobileSideBarRatio : leftBarRatio,
@@ -60,7 +60,8 @@ export function ChatPage() {
 
   const [sidebarLeft, setSidebarLeft] = useSidebarState('sidebar-left');
   const [sidebarRight, setSidebarRight] = useSidebarState('sidebar-right');
-  const panelSizes = getPanelSizes(sidebarRight || !!selectedDocument);
+  const rightPanelVisible = !!(sidebarRight && selectedChatId && (userBucket || selectedDocument));
+  const panelSizes = getPanelSizes(rightPanelVisible);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -74,7 +75,6 @@ export function ChatPage() {
   // close the sources tab everytime the user selects another conversation
   useEffect(() => setSelectedDocument(undefined), [selectedChatId]);
 
-  const rightPanelVisible = sidebarRight && selectedChatId && (userBucket || selectedDocument);
   return (
     <div className="flex h-screen flex-col">
       <NavigationBar theme={theme} />
