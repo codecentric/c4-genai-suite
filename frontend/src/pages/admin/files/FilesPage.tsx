@@ -315,7 +315,7 @@ export function FilesPage() {
   );
 }
 
-export function BucketInfoByte(props: { title: string; value: string | number }) {
+function BucketInfoByte(props: { title: string; value: string | number }) {
   return (
     <div className="flex flex-col gap-2">
       <div className="font-semibold">{props.title}</div>

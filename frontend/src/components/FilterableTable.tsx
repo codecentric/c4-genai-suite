@@ -5,7 +5,7 @@ import { cn } from 'src/lib';
 
 export type TData = FileDto;
 
-export type FilterableTableProps = {
+type FilterableTableProps = {
   table: TanTable<TData>;
 };
 

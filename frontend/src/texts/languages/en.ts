@@ -248,7 +248,7 @@ export const en = {
       'Failed to upload file {{fileName}}. Uploading images to the user files bucket is not yet supported.',
     uploadImageFailedUseThePaperclip:
       'Failed to upload file {{fileName}}. Images can be uploaded via the 📎 symbol in the message window.',
-    uploading: 'Uploading File...',
+    uploading: 'Uploading File',
     uploadMultiple: 'Uploading {{fileCount}} files...',
     wholeFileTooLarge: 'The file is larger than the defined file size limit',
   },
