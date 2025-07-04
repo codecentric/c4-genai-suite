@@ -42,7 +42,7 @@
     "@langchain/community": "^0.3.47",
     "@langchain/core": "^0.3.50",
     "@langchain/google-genai": "^0.2.14",
-    "@langchain/google-vertexai": "^0.2.5",
+    "@langchain/google-vertexai": "^0.2.14",
     "@langchain/mistralai": "^0.2.1",
     "@langchain/ollama": "^0.2.3",
     "@langchain/openai": "^0.5.8",
