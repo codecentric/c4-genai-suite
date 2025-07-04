@@ -78,6 +78,7 @@ export const de: typeof en = {
     selectOptions: 'Optionen auswählen',
     addItem: 'Item hinzufügen',
     configurableArguments: 'Konfigurierbar',
+    rowsSelected: '{{rowCount}} Zeile(n) ausgewählt',
   },
   chat: {
     noAccessToConversation: 'Du hast keinen Zugriff auf diese Konversation. Du wirst in Kürze weitergeleitet.',
@@ -225,11 +226,19 @@ export const de: typeof en = {
     perUserQuota: 'Die maximale Anzahl an Dateien, die jeder Benutzer in diesen Bucket hochladen darf.',
     allowedFileTypes: 'Erlaubte Dateitypen',
     invalidEndpointError: 'Verbindung zum Endpunkt fehlgeschlagen',
+    properties: {
+      fileName: 'Dateiname',
+      fileType: 'Dateityp',
+      fileSize: 'Dateigröße',
+      uploadedAt: 'Hochgeladen am',
+    },
     removeBucketConfirmText: 'Möchtest du den Bucket wirklich löschen?',
     removeBucketConfirmTitle: 'Datei löschen',
     removeBucketFailed: 'Löschen des Buckets fehlgeschlagen',
     removeFileConfirmText: 'Möchtest du die Datei wirklich löschen?',
+    removeFilesConfirmText: 'Möchtest du wirklich {{fileCount}} Datei(en) löschen?',
     removeFileConfirmTitle: 'Datei löschen',
+    removeFilesConfirmTitle: 'Datei(en) löschen',
     removeFileFailed: 'Löschen der Datei fehlgeschlagen.',
     selectAll: 'Alles auswählen',
     testFailed: 'Bucket ist nicht gültig',
@@ -243,7 +252,7 @@ export const de: typeof en = {
     uploadImageFailedUseThePaperclip:
       'Datei {{fileName}} konnte nicht hochgeladen werden. Bilder können über das 📎-Symbol im Nachrichtenfenster hochgeladen werden.',
     uploading: 'Datei wird hochgeladen',
-    upload: 'Hochladen...',
+    uploadMultiple: '{{fileCount}} Dateien werden hochgeladen...',
     wholeFileTooLarge: 'Die Datei ist größer als die definierte maximale Dateigröße',
   },
   login: {

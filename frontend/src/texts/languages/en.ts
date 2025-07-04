@@ -76,6 +76,7 @@ export const en = {
     selectOptions: 'Select options',
     addItem: 'Add an item',
     configurableArguments: 'Configurable',
+    rowsSelected: '{{rowCount}} Row(s) Selected',
   },
   chat: {
     noAccessToConversation: "You don't have access to this conversation. You will be redirected shortly.",
@@ -222,11 +223,19 @@ export const en = {
     perUserQuota: 'The maximum number of files each user may upload to this bucket.',
     allowedFileTypes: 'The allowed file types',
     invalidEndpointError: 'Cannot connect to endpoint',
+    properties: {
+      fileName: 'File Name',
+      fileType: 'File Type',
+      fileSize: 'File Size',
+      uploadedAt: 'Uploaded at',
+    },
     removeBucketConfirmText: 'Do you really want to remove the bucket?',
-    removeBucketConfirmTitle: 'Remove file',
+    removeBucketConfirmTitle: 'Remove bucket',
     removeBucketFailed: 'Failed to remove bucket',
+    removeFilesConfirmText: 'Do you really want to remove {{fileCount}} file(s)?',
     removeFileConfirmText: 'Do you really want to remove the file?',
     removeFileConfirmTitle: 'Remove file',
+    removeFilesConfirmTitle: 'Remove file(s)',
     removeFileFailed: 'Failed to delete file.',
     selectAll: 'Select all',
     testFailed: 'Bucket is not valid',
@@ -240,7 +249,7 @@ export const en = {
     uploadImageFailedUseThePaperclip:
       'Failed to upload file {{fileName}}. Images can be uploaded via the 📎 symbol in the message window.',
     uploading: 'Uploading File',
-    upload: 'Uploading...',
+    uploadMultiple: 'Uploading {{fileCount}} files...',
     wholeFileTooLarge: 'The file is larger than the defined file size limit',
   },
   login: {

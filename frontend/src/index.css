@@ -1,7 +1,9 @@
 @import 'tailwindcss';
 
 @plugin "daisyui" {
-  themes: light --default, light --prefersdark;
+  themes:
+    light --default,
+    light --prefersdark;
 }
 @plugin "@tailwindcss/typography";
 @theme {
@@ -39,7 +41,6 @@
     opacity: 0.5;
     scale: 0.5;
   }
-
 }
 .animate-loading-dot {
   animation: loading-dot 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
