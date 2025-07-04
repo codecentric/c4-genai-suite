@@ -19,6 +19,7 @@ export * from './RouteWhenAdmin';
 export * from './RouteWhenPrivate';
 export * from './Search';
 export * from './SiteLinks';
+export * from './TablePagination';
 export * from './ThemeProvider';
 export * from './ThemeStyle';
 export * from './ThemeTitle';
