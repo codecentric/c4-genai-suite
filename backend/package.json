@@ -39,7 +39,7 @@
   },
   "dependencies": {
     "@langchain/aws": "0.1.11",
-    "@langchain/community": "^0.3.47",
+    "@langchain/community": "^0.3.48",
     "@langchain/core": "^0.3.62",
     "@langchain/google-genai": "^0.2.14",
     "@langchain/google-vertexai": "^0.2.14",
