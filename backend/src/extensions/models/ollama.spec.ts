@@ -5,11 +5,12 @@ const instance = {
   invoke: jest.fn().mockReturnThis(),
 };
 
-jest.mock('@langchain/ollama', () => {
+jest.mock('@langchain/openai', () => {
   return {
-    ChatOllama: jest.fn().mockImplementation(() => {
+    ChatOpenAI: jest.fn().mockImplementation(() => {
       return instance;
     }),
   };
 });
+
 describe('OllamaModelExtension', () => modelExtensionTestSuite(OllamaModelExtension, instance));
