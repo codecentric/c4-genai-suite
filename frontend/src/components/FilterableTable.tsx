@@ -22,7 +22,7 @@ export function FilterableTable(props: FilterableTableProps) {
   const containerClass = 'flex flex-row items-center justify-between';
 
   return (
-    <div className="flex w-full flex-col">
+    <div className="flex w-full flex-col overflow-x-scroll">
       <table className="w-full min-w-max table-auto border-collapse">
         <thead>
           {props.table.getHeaderGroups().map((headerGroup) => (

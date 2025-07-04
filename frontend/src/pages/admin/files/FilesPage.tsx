@@ -262,7 +262,7 @@ export function FilesPage() {
           </div>
 
           {thisBucket.type !== BucketDtoTypeEnum.Conversation && (
-            <div className="relative flex w-full flex-col gap-y-4 overflow-x-scroll rounded-xl bg-white bg-clip-border p-4 pt-6 shadow-sm">
+            <div className="relative flex w-full flex-col gap-y-4 overflow-x-hidden rounded-xl bg-white bg-clip-border p-4 pt-6 shadow-sm">
               <div className="flex items-center justify-between">
                 <Search value={globalFilter ?? ''} onSearch={(value) => setGlobalFilter(String(value))} />
                 <NativeSelect
@@ -283,7 +283,7 @@ export function FilesPage() {
                 <FilterableTable table={table} />
               )}
               <div className="flex flex-row items-center justify-between gap-x-2">
-                <div className="flex flex-row items-center gap-x-4 p-2 text-sm">
+                <div className="flex flex-row items-center gap-x-2 p-2 text-sm">
                   <div className="text-gray-500">{texts.common.rowsSelected(table.getSelectedRowModel().rows.length)}</div>
                   <ConfirmDialog
                     title={texts.files.removeFilesConfirmTitle}
