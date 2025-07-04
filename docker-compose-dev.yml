@@ -102,13 +102,13 @@ services:
       retries: 20
 
   oauth:
-    image: ghcr.io/codecentric/company-chat/dev-helper/oauth-mock:latest
+    image: ghcr.io/codecentric/c4-genai-suite/dev-helper/oauth-mock:latest
     ports:
       - "9999:9999"
 
   mcp-fetch:
     hostname: mcp-fetch
-    image: ghcr.io/codecentric/company-chat/dev-helper/mcp-tool-as-server:latest
+    image: ghcr.io/codecentric/c4-genai-suite/dev-helper/mcp-tool-as-server:latest
     environment:
       CONFIG: >
         {
@@ -128,7 +128,7 @@ services:
 
   mcp-tool-servers:
     hostname: mcp-tool-servers
-    image: ghcr.io/codecentric/company-chat/dev-helper/mcp-tool-as-server:latest
+    image: ghcr.io/codecentric/c4-genai-suite/dev-helper/mcp-tool-as-server:latest
     profiles:
       - no-start
     environment:
