@@ -71,6 +71,7 @@
     "nest-winston": "^1.10.2",
     "nestjs-i18n": "^10.5.1",
     "nunjucks": "^3.2.4",
+    "openai": "^5.8.2",
     "passport-custom": "^1.1.1",
     "passport-github2": "^0.1.12",
     "passport-google-oauth2": "^0.2.0",
@@ -126,5 +127,10 @@
     "ts-node": "10.9.2",
     "tsconfig-paths": "4.2.0",
     "typescript": "5.8.3"
+  },
+  "overrides": {
+    "@browserbasehq/stagehand@1.14.0": {
+      "openai": "^5.8.2"
+    }
   }
 }
