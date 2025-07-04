@@ -8,6 +8,7 @@ on:
   push:
     tags:
       - v*
+      - test-workflow-*
 
 jobs:
   backend:
@@ -22,6 +23,12 @@ jobs:
   reis:
     uses: ./.github/workflows/reis.yaml
     secrets: inherit
+  build-container-images:
+    uses: ./.github/workflows/build-container-images.yaml
+    secrets: inherit
+    with:
+      push-to-registry: true
+      tag-prefix: ghcr.io/${{ github.repository }}/
 
   upstream-workflows:
     name: Upstream Workflows

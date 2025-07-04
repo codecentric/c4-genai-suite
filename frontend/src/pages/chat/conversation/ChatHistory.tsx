@@ -1,30 +1,19 @@
 import { FileDto } from 'src/api';
-import { useProfile } from 'src/hooks';
-import { ChatMessage } from '../state';
+import { useStateOfMessages, useStateOfSelectedChatId } from '../state/chat';
 import { ChatItem } from './ChatItem/ChatItem';
 
 type ChatHistoryProps = {
   agentName: string;
-  isWriting?: boolean;
-  messages: ChatMessage[];
-  conversationId: number;
   llmLogo?: string;
-  selectDocument: (conversationId: number, messageId: number, documentUri: string) => void;
-  onSubmit: (input: string, files?: FileDto[], editMessageId?: number) => void;
+  selectDocument: (chatId: number, messageId: number, documentUri: string) => void;
+  editMessage: (input: string, files?: FileDto[], editMessageId?: number) => void;
 };
 
-export function ChatHistory({
-  agentName,
-  conversationId,
-  isWriting,
-  llmLogo,
-  messages,
-  selectDocument,
-  onSubmit,
-}: ChatHistoryProps) {
-  const profile = useProfile();
+export function ChatHistory({ agentName, llmLogo, selectDocument, editMessage }: ChatHistoryProps) {
+  const messages = useStateOfMessages();
   const allMessagesButLastTwo = messages.slice(0, -2);
   const lastTwoMessages = messages.slice(-2);
+  const chatId = useStateOfSelectedChatId();
   const autoScrollContainerForLastMessageExchange = 'grid min-h-full min-w-full max-w-full grid-rows-[max-content_1fr]';
 
   return (
@@ -32,34 +21,28 @@ export function ChatHistory({
       <div className={'grid'}>
         {allMessagesButLastTwo.map((message, i) => (
           <ChatItem
-            key={`${i}_${conversationId}`}
+            key={`${i}_${chatId}`}
             agentName={agentName}
-            conversationId={conversationId}
-            isWriting={isWriting}
             isLast={i === messages.length - 1}
             isBeforeLast={i === messages.length - 2}
             message={message}
-            user={profile}
             llmLogo={llmLogo}
-            selectDocument={(documentUri) => selectDocument(conversationId, message.id, documentUri)}
-            onSubmit={onSubmit}
+            selectDocument={(documentUri) => selectDocument(chatId, message.id, documentUri)}
+            editMessage={editMessage}
           />
         ))}
       </div>
       <div className={autoScrollContainerForLastMessageExchange}>
         {lastTwoMessages.map((message, i) => (
           <ChatItem
-            key={`${i + messages.length - 2}_${conversationId}`}
+            key={`${i + messages.length - 2}_${chatId}`}
             agentName={agentName}
-            conversationId={conversationId}
-            isWriting={isWriting}
             isLast={i === 1}
             isBeforeLast={i === 0}
             message={message}
-            user={profile}
             llmLogo={llmLogo}
-            selectDocument={(documentUri) => selectDocument(conversationId, message.id, documentUri)}
-            onSubmit={onSubmit}
+            selectDocument={(documentUri) => selectDocument(chatId, message.id, documentUri)}
+            editMessage={editMessage}
           />
         ))}
       </div>

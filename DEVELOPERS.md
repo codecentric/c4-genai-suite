@@ -48,13 +48,18 @@ In this step, you might be asked for some API-Keys, e.g., for the REI-S.
 
 ## Run tests
 
-Run tests using `npm run test` (stop anything that could block the ports for frontend or backend before running the tests)
+### Locally
+
+To run them locally use `npm run test` (stop anything that could block the ports for frontend or backend before running the tests).
 
 You can also view the outputs in the `/outputs` directory for services started by the dev/test script.
 
-Some tests use large files stored via `git lfs`. To run these tests, first install `git lfs` on your system via (e.g., `brew install git-lfs` or `apt install git-lfs`)
+Some tests use large files stored via `git lfs`. To run these tests, first install `git lfs` on your system via (e.g., `brew install git-lfs` or `apt install git-lfs`).
 Then pull the large files in the c4 repository via `git lfs pull`.
 
+### On Github
+
+Tests are automatically performed by GitHub Actions when opening a pull request.
 
 ## Run the application for development
 

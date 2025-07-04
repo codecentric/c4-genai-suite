@@ -3,84 +3,48 @@ import { IconArrowDown } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useMemo } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { useNavigate, useParams } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import { FileDto, ResponseError, useApi } from 'src/api';
+import { useParams } from 'react-router-dom';
+import { FileDto, useApi } from 'src/api';
 import { useEventCallback, useTheme } from 'src/hooks';
 import { cn } from 'src/lib';
 import { texts } from 'src/texts';
 import { useScrollToBottom } from '../../../hooks/useScrollToBottom';
-import { useAIConversation, useChatStore } from '../state';
+import { useChatStream, useStateOfChat, useStateOfIsAiWriting, useStateOfMessages } from '../state/chat';
 import { useChatDropzone } from '../useChatDropzone';
 import { ChatHistory } from './ChatHistory';
 import { ChatInput } from './ChatInput';
+import { ChatRating } from './ChatRating';
 import { Configuration } from './Configuration';
-import { ConversationRating } from './ConversationRating';
 import { DragAndDropLayout } from './DragAndDropLayout/DragAndDropLayout';
 
 const transformMimeTypes = (mimeTypes: string[]) => Object.fromEntries(mimeTypes.map((type) => [type, []]));
 
 interface ConversationPageProps {
+  textareaRef: React.RefObject<HTMLTextAreaElement>;
   onConfigurationSelected: (configurationId: number) => void;
-  onConversationSelected: (conversationId: number) => void;
   selectedConfigurationId: number;
-  selectDocument: (conversationId: number, messageId: number, documentUri: string) => void;
+  selectDocument: (chatId: number, messageId: number, documentUri: string) => void;
 }
 
 export function ConversationPage(props: ConversationPageProps) {
-  const { onConversationSelected, selectedConfigurationId, onConfigurationSelected, selectDocument } = props;
+  const { textareaRef, selectedConfigurationId, onConfigurationSelected, selectDocument } = props;
+
   const api = useApi();
+  const chatParam = useParams<'id'>();
+  const chatId = +chatParam.id!;
+  const { sendMessage, isChatLoading } = useChatStream(chatId);
+  const chat = useStateOfChat();
+  const messages = useStateOfMessages();
+  const isAiWriting = useStateOfIsAiWriting();
 
   const { theme } = useTheme();
-  const conversationParam = useParams<'id'>();
-  const conversationId = +conversationParam.id!;
-  const { conversation, messages, isAiWritting, setConversation, setMessages } = useChatStore();
-  const { canScrollToBottom, scrollToBottom, containerRef } = useScrollToBottom([conversation.id], [messages]);
-  const { sendMessage } = useAIConversation();
-  const navigate = useNavigate();
-
-  const { data: loadedConversationAndMessages, error } = useQuery({
-    queryKey: ['conversation', conversationId],
-    queryFn: async () => {
-      return {
-        conversation: await api.conversations.getConversation(conversationId),
-        messages: await api.conversations.getMessages(conversationId),
-      };
-    },
-    refetchOnWindowFocus: false,
-    retry: (failureCount, error: ResponseError) =>
-      // if we receive 404 or 403 from the server, then don't retry. Otherwise retry 3 times (default behavior).
-      error?.response?.status !== 404 && error?.response?.status !== 403 && failureCount < 3,
-  });
-  useEffect(() => {
-    if (error) {
-      if (error.response.status === 403) {
-        toast.error(texts.chat.noAccessToConversation);
-        void navigate('/chat');
-      } else if (error.response.status === 404) {
-        toast.error(texts.chat.conversationNotFound);
-        void navigate('/chat');
-      } else {
-        toast.error(`${texts.chat.errorLoadingMessagesOrConversation} ${texts.common.reloadAndTryAgain}`);
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [error]);
+  const { canScrollToBottom, scrollToBottom, containerRef } = useScrollToBottom([chat.id], [messages]);
 
   const { data: loadedConfigurations } = useQuery({
     queryKey: ['enabled-configurations'],
     queryFn: () => api.extensions.getConfigurations(true),
     refetchOnWindowFocus: false,
   });
-
-  useEffect(() => {
-    if (loadedConversationAndMessages) {
-      setMessages(loadedConversationAndMessages.messages.items);
-      setConversation(loadedConversationAndMessages.conversation);
-      onConversationSelected(loadedConversationAndMessages.conversation.id);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loadedConversationAndMessages, setConversation]);
 
   const configurations = useMemo(() => {
     return loadedConfigurations?.items || [];
@@ -90,11 +54,11 @@ export function ConversationPage(props: ConversationPageProps) {
 
   const configuration = useMemo(() => {
     return (
-      configurations.find((x) => x.id === conversation.configurationId) ||
+      configurations.find((x) => x.id === chat.configurationId) ||
       configurations.find((x) => x.id === selectedConfigurationId) ||
       configurations[0]
     );
-  }, [selectedConfigurationId, configurations, conversation.configurationId]);
+  }, [selectedConfigurationId, configurations, chat.configurationId]);
 
   const llmLogo = configuration?.extensions?.find((x) => x.type === 'llm')?.logo;
 
@@ -108,14 +72,14 @@ export function ConversationPage(props: ConversationPageProps) {
     return configuration?.agentName || theme.agentName || texts.chat.sourceAI;
   }, [configuration?.agentName, theme.agentName]);
 
-  const doSubmit = useEventCallback((input: string, uploadedFiles?: FileDto[], editMessageId?: number) => {
-    sendMessage(conversationId, input, uploadedFiles, editMessageId);
+  const submitMessage = useEventCallback((input: string, uploadedFiles?: FileDto[], editMessageId?: number) => {
+    sendMessage(chatId, input, uploadedFiles, editMessageId);
     setTimeout(() => scrollToBottom(), 500);
     return false;
   });
   const { uploadLimitReached, allowedFileNameExtensions, handleUploadFile, multiple } = useChatDropzone(
     selectedConfigurationId,
-    conversationId,
+    chatId,
   );
   const { getRootProps, getInputProps, isDragActive, isDragAccept, isDragReject } = useDropzone({
     multiple,
@@ -124,11 +88,8 @@ export function ConversationPage(props: ConversationPageProps) {
     noClick: true,
   });
 
-  const isConversationLoading =
-    !conversation || conversation.id !== conversationId || conversation.id !== loadedConversationAndMessages?.conversation.id;
-  const showRateThisConversation =
-    loadedConversationAndMessages && !loadedConversationAndMessages?.conversation?.rating && messages.length > 10;
-  const showScrollToBottomButton = canScrollToBottom && !isAiWritting;
+  const showRateThisConversation = !isChatLoading && !chat.rating && messages.length > 10;
+  const showScrollToBottomButton = canScrollToBottom && !isAiWriting;
   return (
     <div className={'relative mx-auto flex flex-col pb-2'} style={{ height: 'calc(100vh - 48px)' }} {...getRootProps()}>
       <input {...getInputProps()} className="hidden" />
@@ -139,15 +100,9 @@ export function ConversationPage(props: ConversationPageProps) {
         </>
       )}
       <div className="bg-white p-3">
-        <Configuration
-          canEditConfiguration={isNewConversation}
-          conversation={conversation}
-          configuration={configuration}
-          configurations={configurations}
-          onConversationChange={setConversation}
-        />
+        <Configuration canEditConfiguration={isNewConversation} configuration={configuration} configurations={configurations} />
       </div>
-      {isConversationLoading ? (
+      {isChatLoading ? (
         <div className="fade-in w-full bg-white" style={{ height: 'calc(100vh - 4rem)' }} />
       ) : (
         <>
@@ -158,15 +113,7 @@ export function ConversationPage(props: ConversationPageProps) {
               }
               ref={containerRef}
             >
-              <ChatHistory
-                agentName={agentName}
-                conversationId={conversation.id}
-                messages={messages}
-                isWriting={isAiWritting}
-                llmLogo={llmLogo}
-                selectDocument={selectDocument}
-                onSubmit={doSubmit}
-              />
+              <ChatHistory agentName={agentName} llmLogo={llmLogo} selectDocument={selectDocument} editMessage={submitMessage} />
             </div>
           )}
           <div className={`${!messages.length && 'grow'} flex shrink-0 flex-col items-center justify-center px-4`}>
@@ -178,11 +125,12 @@ export function ConversationPage(props: ConversationPageProps) {
               )}
             >
               <ChatInput
-                conversationId={conversation.id}
+                textareaRef={textareaRef}
+                chatId={chat.id}
                 configuration={configuration}
-                isDisabled={isAiWritting}
+                isDisabled={isAiWriting}
                 isEmpty={isNewConversation}
-                onSubmit={doSubmit}
+                submitMessage={submitMessage}
               />
               <div
                 data-testid={'scrollToBottomButton'}
@@ -202,7 +150,7 @@ export function ConversationPage(props: ConversationPageProps) {
                   showRateThisConversation ? 'fade-in opacity-100 delay-200' : 'hidden opacity-0',
                 )}
               >
-                <ConversationRating key={conversationId} conversation={loadedConversationAndMessages.conversation} />
+                <ChatRating key={chatId} chatId={chatId} />
               </div>
             </div>
           </div>

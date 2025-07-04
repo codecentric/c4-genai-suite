@@ -1,23 +1,56 @@
+import { UseMutationResult } from '@tanstack/react-query';
 import { screen } from '@testing-library/react';
 import { addDays, startOfDay } from 'date-fns';
 import { describe, expect, it, vi } from 'vitest';
 import { ConversationDto } from 'src/api';
 import { render } from 'src/pages/admin/test-utils';
-import { Conversations } from 'src/pages/chat/Conversations';
-import { useAIConversation } from 'src/pages/chat/state';
+import { ConversationItems } from './ConversationItems';
+import { useStateOfChats } from './state/listOfChats';
 
 vi.mock('src/api', () => ({
   useApi: () => ({}),
 }));
 
-vi.mock('src/pages/chat/state', () => ({
-  useAIConversation: vi.fn(),
+function mockMutation<TData = unknown, TVariables = void>(): UseMutationResult<TData, Error, TVariables, unknown> {
+  return {
+    data: undefined,
+    error: null,
+    isError: false,
+    isIdle: true,
+    isPaused: false,
+    isSuccess: false,
+    status: 'idle',
+    mutate: vi.fn(),
+    mutateAsync: vi.fn(),
+    reset: vi.fn(),
+    variables: undefined,
+    context: undefined,
+    failureCount: 0,
+    failureReason: null,
+    isPending: false,
+    submittedAt: 0,
+  };
+}
+
+vi.mock('src/pages/chat/state/chat', () => ({
+  useStateOfSelectedChatId: vi.fn(),
+}));
+
+vi.mock('src/pages/chat/state/listOfChats', () => ({
+  useStateOfChats: vi.fn(),
+  useListOfChats: vi.fn(),
+  useStateMutateRenameChat: mockMutation,
+  useMutateNewChat: mockMutation,
+  useStateMutateRemoveAllChats: mockMutation,
+  useStateMutateDuplicateChat: mockMutation,
+  useStateOfChatEmptiness: vi.fn(),
+  useStateMutateRemoveChat: mockMutation,
 }));
 
 describe('Conversations', () => {
   const now = new Date();
 
-  const mockedConversations: ConversationDto[] = [
+  const mockedChats: ConversationDto[] = [
     { id: 1, createdAt: now, configurationId: 1 },
     { id: 4, createdAt: new Date('2023-10-01'), configurationId: 1 },
     { id: 3, createdAt: startOfDay(addDays(now, -20)), configurationId: 1 },
@@ -26,16 +59,9 @@ describe('Conversations', () => {
   ];
 
   it('should render conversations components sorted by date', () => {
-    vi.mocked(useAIConversation).mockImplementation(() => ({
-      conversations: mockedConversations,
-      removeConversation: vi.fn(),
-      setConversation: vi.fn(),
-      setConversations: vi.fn(),
-      sendMessage: vi.fn(),
-      refetch: vi.fn(),
-    }));
+    vi.mocked(useStateOfChats).mockImplementation(() => mockedChats);
 
-    render(<Conversations onConversationDeleted={() => undefined} selectedConversationId={null} />);
+    render(<ConversationItems />);
 
     const todayElement = screen.getByText('Today');
     const previous7DaysElement = screen.getByText('Previous 7 Days');

@@ -1,6 +1,6 @@
 # REI-S
 
-**R**etreival **E**xtraction **I**ngestion **S**erver
+**R**etrieval **E**xtraction **I**ngestion **S**erver
 
 This server offers RAG functionality for c4.
 

@@ -2,9 +2,9 @@ import { useQuery } from '@tanstack/react-query';
 import { useApi } from 'src/api';
 
 export const useDocumentContent = (conversationId: number, messageId: number, documentUri: string) => {
-  const api = useApi();
+  const { conversations } = useApi();
   return useQuery({
-    queryFn: () => api.conversations.getDocumentChunks(conversationId, messageId, documentUri),
+    queryFn: () => conversations.getDocumentChunks(conversationId, messageId, documentUri),
     queryKey: ['files', 'document-content', { messageId }, { documentUri }],
     enabled: !!documentUri,
   });

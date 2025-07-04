@@ -22,7 +22,7 @@ The c4 GenAI Suite supports already many models directly. And if your preferred 
 * Google GenAI models
 * Ollama compatible models
 
-### Retreival Augmented Generation (RAG)
+### Retrieval Augmented Generation (RAG)
 
 The c4 GenAI Suite includes REI-S, a server to prepare files for consumption by the LLM.
 
@@ -143,7 +143,7 @@ For data persistence, the backend uses a **PostgreSQL** database.
 
 ### REI-S
 
-The REI-S (**R**etreival **E**xtraction **I**ngestion **S**erver) is a Python-based server that provides basic RAG (Retrieval-Augmented Generation) capabilities. It allows for file content extraction, indexing and querying, enabling the application to handle large datasets efficiently. The REI-S service is designed to work seamlessly with the backend, providing necessary data for chat functionalities and file searches.
+The REI-S (**R**etrieval **E**xtraction **I**ngestion **S**erver) is a Python-based server that provides basic RAG (Retrieval-Augmented Generation) capabilities. It allows for file content extraction, indexing and querying, enabling the application to handle large datasets efficiently. The REI-S service is designed to work seamlessly with the backend, providing necessary data for chat functionalities and file searches.
 
 The REI-S supports Azure AI Search and pgvector for vector storage, allowing for flexible and scalable data retrieval options. The service can be configured using environment variables to specify the type of vector store and connection details.
 

@@ -1,0 +1,17 @@
+name: Push bleeding edge images
+
+permissions:
+  contents: read
+  packages: write
+
+on:
+  push:
+    branches:
+      - 'main'
+
+jobs:
+  build:
+    uses: ./.github/workflows/build-container-images.yaml
+    with:
+      push-to-registry: true
+      tag-prefix: ghcr.io/${{ github.repository }}/
