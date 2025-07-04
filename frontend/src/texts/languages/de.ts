@@ -130,6 +130,19 @@ export const de: typeof en = {
         fileSize: 'Dateigröße',
       },
     },
+    speechRecognition: {
+      browserNotSupported: 'Der Browser unterstützt keine Spracherkennung.',
+      languages: {
+        de: 'Deutsch',
+        en: 'Englisch',
+      },
+      microphoneNotAvailable: 'Mikrofon ist nicht verfügbar',
+      speechRecognitionFailed:
+        'Fehler bei der Spracherkennung. Der Browser unterstützt keine Spracherkennung oder das Mikrofon ist nicht verfügbar.',
+      stopMicrophone: 'Mikrofon deaktivieren',
+      useMicrophone: 'Mikrofon aktivieren',
+    },
+
     thisMonth: 'Letzte 30 Tage',
     thisWeek: 'Letzte 7 Tage',
     today: 'Heute',

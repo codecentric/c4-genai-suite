@@ -128,6 +128,18 @@ export const en = {
         fileSize: 'File size',
       },
     },
+    speechRecognition: {
+      browserNotSupported: 'Browser does not support speech recognition.',
+      languages: {
+        de: 'German',
+        en: 'English',
+      },
+      microphoneNotAvailable: 'Microphone is not available',
+      speechRecognitionFailed:
+        "Speech recognition error. Browser doesn't support speech recognition or Microphone is not available",
+      stopMicrophone: 'Stop using microphone',
+      useMicrophone: 'Start using microphone',
+    },
     thisMonth: 'Previous 30 Days',
     thisWeek: 'Previous 7 Days',
     today: 'Today',

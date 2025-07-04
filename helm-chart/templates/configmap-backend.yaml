@@ -8,6 +8,7 @@ metadata:
     app.kubernetes.io/component: backend
 data:
   BASE_URL: "{{ .Values.backend.baseUrl }}"
+  PORT: "{{ .Values.backend.port }}"
   AUTH_ENABLE_PASSWORD: "{{ .Values.backend.auth.enablePassword }}"
   AUTH_OAUTH_AUTHORIZATION_URL: "{{ .Values.backend.auth.authorizationUrl }}"
   AUTH_OAUTH_TOKEN_URL: "{{ .Values.backend.auth.tokenUrl }}"

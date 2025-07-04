@@ -1,4 +1,4 @@
-FROM node:22.14.0-alpine3.21 AS base
+FROM node:24.3.0-alpine3.21 AS base
 
 FROM base AS build
 WORKDIR /src

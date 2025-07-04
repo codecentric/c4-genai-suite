@@ -159,6 +159,17 @@ function load() {
           fileSize: translate('chat.sources.metadata.fileSize'),
         },
       },
+      speechRecognition: {
+        browserNotSupported: translate('chat.speechRecognition.browserNotSupported'),
+        languages: {
+          de: translate('chat.speechRecognition.languages.de'),
+          en: translate('chat.speechRecognition.languages.en'),
+        },
+        microphoneNotAvailable: translate('chat.speechRecognition.microphoneNotAvailable'),
+        speechRecognitionFailed: translate('chat.speechRecognition.speechRecognitionFailed'),
+        stopMicrophone: translate('chat.speechRecognition.stopMicrophone'),
+        useMicrophone: translate('chat.speechRecognition.useMicrophone'),
+      },
       thisMonth: translate('chat.thisMonth'),
       thisWeek: translate('chat.thisWeek'),
       today: translate('chat.today'),

@@ -49,7 +49,9 @@ function LoginProviders(props: { welcomeText?: string; authSettings: AuthSetting
       </h2>
 
       <div className="mb-4 w-full">
-        {props.authSettings?.providers.map((p) => <LoginButton key={p.name} name={p.name} label={p.displayName} />)}
+        {props.authSettings?.providers.map((p) => (
+          <LoginButton key={p.name} name={p.name} label={p.displayName} />
+        ))}
       </div>
 
       {props.authSettings?.enablePasswordAuth && <LoginForm />}

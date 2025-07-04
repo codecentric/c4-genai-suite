@@ -75,12 +75,14 @@ reis:
 | `ingress.clusterIssuer`    | The cluster issuer for Let's Encrypt. Should be `letsencrypt-<ENVIRONMENT>` | `""`    |
 | `ingress.host`             | The host for ingress                                                        | `""`    |
 | `ingress.tlsSecretName`    | The TLS secret name. Should be c4-tls-cert                                  | `""`    |
+| `ingress.annotations`      | Map of annotations to add for ingress                                       | `{}`    |
 
 ### Backend
 
 | Name                                                  | Description                                                                                                                                                                                                             | Value                                        |
 | ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
 | `backend.enabled`                                     | Specifies whether c4 should be deployed                                                                                                                                                                                 | `true`                                       |
+| `backend.port`                                        | The backend port                                                                                                                                                                                                        | `3000`                                       |
 | `backend.baseUrl`                                     | Base URL should match `https://{{ingress.host}}`. Required for OpenID Connect or assistants using Dall-E image generation.                                                                                              | `""`                                         |
 | `backend.ssl.rootCertificateConfigMapName`            | Name of the ConfigMap containing the root certificate for the external services.                                                                                                                                        | `""`                                         |
 | `backend.ssl.rootCertificateConfigMapKey`             | Key in the ConfigMap that holds the root certificate for the external services.                                                                                                                                         | `ca.crt`                                     |
@@ -139,6 +141,7 @@ reis:
 | Name                                            | Description                                                                                                             | Value                                         |
 | ----------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
 | `frontend.enabled`                              | Specifies whether the frontend should be deployed                                                                       | `true`                                        |
+| `frontend.port`                                 | The frontend port                                                                                                       | `80`                                          |
 | `frontend.image.repository`                     | The image repository including host, port, repo                                                                         | `ghcr.io/codecentric/c4-genai-suite/frontend` |
 | `frontend.image.tag`                            | The image tag                                                                                                           | `""`                                          |
 | `frontend.replicaCount`                         | The number of replicas to create                                                                                        | `1`                                           |

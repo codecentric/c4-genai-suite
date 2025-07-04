@@ -3,9 +3,23 @@ name: Build Container images
 # this workflow will be triggered manually from workflows needing the images
 on:
   push:
+    branches:
+      - 'main'
+    tags-ignore:
+      - "**"
+  pull_request:
     paths:
       - .github/workflows/build-container-images.yaml
   workflow_call:
+    inputs:
+      push-to-registry:
+        required: false
+        type: boolean
+        default: false
+      tag-prefix:
+        required: false
+        type: string
+        default: ''
 
 jobs:
   build-container:
@@ -17,16 +31,16 @@ jobs:
       matrix:
         service:
           - name: bundled
-            containerfile: Containerfile
+            containerfile: Dockerfile
             context: .
           - name: backend
-            containerfile: backend/Containerfile
+            containerfile: backend/Dockerfile
             context: backend/
           - name: frontend
-            containerfile: frontend/Containerfile
+            containerfile: frontend/Dockerfile
             context: frontend/
           - name: reis
-            containerfile: services/reis/Containerfile
+            containerfile: services/reis/Dockerfile
             context: services/reis/
     steps:
       - uses: actions/checkout@v4
@@ -40,9 +54,14 @@ jobs:
         with:
           context: ${{ matrix.service.context }}
           file: ${{ matrix.service.containerfile }}
-          push: true
-          tags: ghcr.io/${{ github.repository }}/${{ matrix.service.name }}:commit-${{ github.sha }}
+          tags: ${{ inputs.tag-prefix }}${{ matrix.service.name }}:commit-${{ github.sha }}
+          outputs: ${{ inputs.push-to-registry && 'type=registry' || format('type=docker,dest=/tmp/{0}.tar', matrix.service.name) }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |
             VERSION=${{ github.ref_type == 'tag' && github.ref_name || github.sha }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.service.name }}
+          path: /tmp/${{ matrix.service.name }}.tar
+          retention-days: 2

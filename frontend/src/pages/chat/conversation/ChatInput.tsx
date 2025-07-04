@@ -1,15 +1,17 @@
 import { ActionIcon, Button, Portal } from '@mantine/core';
 import { IconFilter, IconPaperclip } from '@tabler/icons-react';
 import { useMutation } from '@tanstack/react-query';
-import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
+import React, { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
 import { toast } from 'react-toastify';
 import { ConfigurationDto, FileDto, useApi } from 'src/api';
 import { Icon, Markdown } from 'src/components';
-import { ExtensionContext, JSONObject, useEventCallback, useExtensionContext, useTheme } from 'src/hooks';
+import { ExtensionContext, JSONObject, useEventCallback, useExtensionContext, usePersistentState, useTheme } from 'src/hooks';
+import { useSpeechRecognitionToggle } from 'src/hooks/useSpeechRecognitionToggle';
 import { buildError } from 'src/lib';
 import { FileItem } from 'src/pages/chat/conversation/FileItem';
 import { FilterModal } from 'src/pages/chat/conversation/FilterModal';
+import { Language, SpeechRecognitionButton } from 'src/pages/chat/conversation/SpeechRecognitionButton';
 import { texts } from 'src/texts';
 import { useChatDropzone } from '../useChatDropzone';
 import { Suggestions } from './Suggestions';
@@ -22,22 +24,23 @@ import {
 } from './chat-input-utils';
 
 interface ChatInputProps {
+  textareaRef?: React.RefObject<HTMLTextAreaElement>;
   configuration?: ConfigurationDto;
-  conversationId: number;
+  chatId: number;
   isDisabled?: boolean;
   isEmpty?: boolean;
-  onSubmit: (input: string, files?: FileDto[]) => void;
+  submitMessage: (input: string, files?: FileDto[]) => void;
 }
-export function ChatInput({ conversationId, configuration, isDisabled, isEmpty, onSubmit }: ChatInputProps) {
+export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEmpty, submitMessage }: ChatInputProps) {
   const api = useApi();
   const extensionsWithFilter = configuration?.extensions?.filter(isExtensionWithUserArgs) ?? [];
-  const { updateContext, context } = useExtensionContext(conversationId);
+  const { updateContext, context } = useExtensionContext(chatId);
   const [defaultValues, setDefaultValues] = useState<UserArgumentDefaultValueByExtensionIDAndName>({});
   const {
     uploadingFiles,
     fullFileSlots,
     allowedFileNameExtensions,
-    conversationFiles,
+    chatFiles,
     handleUploadFile,
     multiple,
     uploadLimitReached,
@@ -45,7 +48,17 @@ export function ChatInput({ conversationId, configuration, isDisabled, isEmpty, 
     uploadMutations,
     upload,
     userBucket,
-  } = useChatDropzone(configuration?.id, conversationId);
+  } = useChatDropzone(configuration?.id, chatId);
+
+  const speechRecognitionLanguages: Language[] = [
+    { name: texts.chat.speechRecognition.languages.de, code: 'de-DE' },
+    { name: texts.chat.speechRecognition.languages.en, code: 'en-US' },
+  ];
+
+  const [speechLanguage, setSpeechLanguage] = usePersistentState<string>(
+    'speechRecognitionLanguage',
+    speechRecognitionLanguages[0].code,
+  );
 
   useEffect(() => {
     const defaultValues = configuration?.extensions?.filter(isExtensionWithUserArgs).reduce(
@@ -63,14 +76,13 @@ export function ChatInput({ conversationId, configuration, isDisabled, isEmpty, 
     setDefaultValues(defaultValues ?? {});
   }, [configuration?.extensions]);
 
-  const textarea = useRef<HTMLTextAreaElement>(null);
   const { theme } = useTheme();
   const [input, setInput] = useState('');
   const [showFilter, setShowFilter] = useState(false);
 
   useEffect(() => {
-    textarea.current?.focus();
-  }, [conversationId]);
+    textareaRef?.current?.focus();
+  }, [chatId, textareaRef]);
 
   const contextWithDefaults = context ?? defaultValues;
   const extensionFilterChips = extensionsWithFilter.map((extension) => ({
@@ -86,9 +98,9 @@ export function ChatInput({ conversationId, configuration, isDisabled, isEmpty, 
     setInput(event.target.value);
   });
 
-  const doSetText = useEventCallback((text: string, conversationFiles?: FileDto[]) => {
+  const doSetText = useEventCallback((text: string, chatFiles?: FileDto[]) => {
     try {
-      onSubmit(text, conversationFiles);
+      submitMessage(text, chatFiles);
     } finally {
       setInput('');
     }
@@ -98,7 +110,7 @@ export function ChatInput({ conversationId, configuration, isDisabled, isEmpty, 
     if (isDisabled || !input || input.length === 0 || upload.status === 'pending') {
       return;
     }
-    doSetText(input, conversationFiles);
+    doSetText(input, chatFiles);
     event.preventDefault();
     void refetchConversationFiles();
   });
@@ -133,9 +145,50 @@ export function ChatInput({ conversationId, configuration, isDisabled, isEmpty, 
       fileInputRef.current.value = '';
     }
   };
+
+  const handleFilePaste = useCallback(
+    (event: ClipboardEvent) => {
+      const items = event.clipboardData?.items;
+      if (!items) {
+        return;
+      }
+
+      const filesToUpload = [] as File[];
+      for (let i = 0; i < items.length; i++) {
+        const blob = items[i].getAsFile();
+
+        if (!blob) {
+          continue;
+        }
+
+        filesToUpload.push(blob);
+      }
+
+      if (filesToUpload.length) {
+        event.preventDefault();
+        handleUploadFile(filesToUpload);
+      }
+    },
+    [handleUploadFile],
+  );
+
+  useEffect(() => {
+    window.addEventListener('paste', handleFilePaste as EventListener);
+
+    return () => {
+      window.removeEventListener('paste', handleFilePaste as EventListener);
+    };
+  }, [handleFilePaste]);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const footer = `${configuration?.chatFooter || ''} ${theme.chatFooter || ''}`.trim();
+
+  const { toggleSpeechRecognition, listening } = useSpeechRecognitionToggle({
+    speechLanguage,
+    onTranscriptUpdate: setInput,
+  });
+
   return (
     <>
       <div className="flex flex-col gap-2">
@@ -148,7 +201,7 @@ export function ChatInput({ conversationId, configuration, isDisabled, isEmpty, 
         {isEmpty && <Suggestions configuration={configuration} theme={theme} onSelect={doSetText} />}
 
         <div className="flex flex-wrap gap-2">
-          {conversationFiles.map((file) => (
+          {chatFiles.map((file) => (
             <FileItem key={file.id} file={file} onRemove={() => deleteFile.mutate(file)} />
           ))}
           {uploadingFiles.map((file) => (
@@ -185,7 +238,7 @@ export function ChatInput({ conversationId, configuration, isDisabled, isEmpty, 
               onChange={doSetInput}
               onKeyDown={doKeyDown}
               placeholder={texts.chat.placeholder(configuration?.name ?? '')}
-              ref={textarea}
+              ref={textareaRef}
             />
             <div className="flex w-full justify-between gap-2">
               <div className="flex items-center gap-2">
@@ -231,14 +284,25 @@ export function ChatInput({ conversationId, configuration, isDisabled, isEmpty, 
                   </Button>
                 )}
               </div>
-              <ActionIcon
-                type="submit"
-                size={'lg'}
-                disabled={!input || isDisabled || uploadMutations.some((m) => m.status === 'pending')}
-                data-testid="chat-submit-button"
-              >
-                <Icon icon="arrow-up" />
-              </ActionIcon>
+              <div className="flex items-center gap-1">
+                {configuration?.extensions?.some((e) => e.name === 'speech-to-text') && (
+                  <SpeechRecognitionButton
+                    listening={listening}
+                    toggleSpeechRecognition={toggleSpeechRecognition}
+                    speechLanguage={speechLanguage}
+                    setSpeechLanguage={setSpeechLanguage}
+                    languages={speechRecognitionLanguages}
+                  />
+                )}
+                <ActionIcon
+                  type="submit"
+                  size="lg"
+                  disabled={!input || isDisabled || uploadMutations.some((m) => m.status === 'pending') || listening}
+                  data-testid="chat-submit-button"
+                >
+                  <Icon icon="arrow-up" />
+                </ActionIcon>
+              </div>
             </div>
           </div>
         </form>

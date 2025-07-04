@@ -7,6 +7,8 @@ updates:
       - "/frontend"
       - "/services/reis"
       - "/dev/caddy-gateway-proxy"
+      - "/dev/mcp-tool-as-server"
+      - "/dev/oauth-mock"
     schedule:
       interval: "weekly"
 

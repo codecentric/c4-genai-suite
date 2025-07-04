@@ -1,8 +1,8 @@
-:80 {
+:{$PORT} {
 	encode
 
 	handle /api/* {
-		reverse_proxy backend:3000 {
+		reverse_proxy backend:{$BACKEND_PORT} {
 			header_up Host {host}
 			header_up X-Real-IP {remote}
 
@@ -17,7 +17,7 @@
 		redir /blobs/* /api{uri} permanent
 	}
 
-	reverse_proxy frontend:80 {
+	reverse_proxy frontend:{$FRONTEND_PORT} {
 		header_up Host {host}
 		header_up X-Real-IP {remote}
 

@@ -8,6 +8,9 @@ metadata:
   name: {{ include "c4genaisuite.fullname" . }}
   annotations:
     cert-manager.io/cluster-issuer: {{ .Values.ingress.clusterIssuer }}
+    {{- if .Values.ingress.annotations }}
+    {{- toYaml .Values.ingress.annotations | nindent 4 }}
+    {{- end }}
   labels:
     {{ include "c4genaisuite.commonLabels" . | nindent 4 }}
     app.kubernetes.io/component: ingress

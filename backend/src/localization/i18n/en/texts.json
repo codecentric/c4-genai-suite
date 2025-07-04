@@ -164,6 +164,10 @@
       "title": "DEV: Simple Input",
       "description": "Asks for input from the user"
     },
+    "speechToText": {
+      "title": "Speech To Text",
+      "description": "Allows speech input via microphone icon"
+    },
     "userArgs": {
       "title": "DEV: User Args",
       "description": "Shows the current user args"

@@ -17,9 +17,10 @@ import { OllamaModelExtension } from './models/ollama';
 import { OpenAIModelExtension } from './models/open-ai';
 import { OpenAICompatibleModelExtension } from './models/open-ai-compatible';
 import { VertexAIModelExtension } from './models/vertex-al';
-import { CustomPromptExtension } from './prompts/custom';
-import { HubPromptExtension } from './prompts/hub';
-import { SummaryPromptExtension } from './prompts/summary';
+import { CustomPromptExtension } from './other/custom';
+import { HubPromptExtension } from './other/hub';
+import { SpeechToTextExtension } from './other/speech-to-text';
+import { SummaryPromptExtension } from './other/summary';
 import { Always42Extension } from './tools/always-42';
 import { AzureAISearchExtension } from './tools/azure-ai-search';
 import { AzureDallEExtension } from './tools/azure-dall-e';
@@ -101,33 +102,34 @@ export class ExtensionLibraryModule {
       imports: [ConfigModule, AuthModule, CqrsModule, TypeOrmModule.forFeature([CacheEntity, BucketEntity, FileEntity])],
       providers: [
         ...dynamicProviders,
-        AzureOpenAIModelExtension,
-        AzureOpenAIReasoningModelExtension,
-        BedrockModelExtension,
-        GoogleGenAIModelExtension,
-        MistralModelExtension,
-        OllamaModelExtension,
-        OpenAIModelExtension,
-        OpenAICompatibleModelExtension,
-        VertexAIModelExtension,
-        CustomPromptExtension,
-        HubPromptExtension,
-        SummaryPromptExtension,
         Always42Extension,
         AzureAISearchExtension,
         AzureDallEExtension,
+        AzureOpenAIModelExtension,
+        AzureOpenAIReasoningModelExtension,
+        BedrockModelExtension,
         BingWebSearchExtension,
         CalculatorExtension,
         ConfirmExtension,
-        DallEExtension,
-        FilesExtension,
-        FilesConversationExtension,
-        FilesVisionExtension,
-        MCPToolsExtension,
-        OpenApiExtension,
         ContextExtension,
+        CustomPromptExtension,
+        DallEExtension,
+        FilesConversationExtension,
+        FilesExtension,
+        FilesVisionExtension,
+        GoogleGenAIModelExtension,
+        HubPromptExtension,
+        MCPToolsExtension,
+        MistralModelExtension,
+        OllamaModelExtension,
+        OpenAICompatibleModelExtension,
+        OpenAIModelExtension,
+        OpenApiExtension,
         SimpleInputExtension,
+        SpeechToTextExtension,
+        SummaryPromptExtension,
         UserArgsExtension,
+        VertexAIModelExtension,
         WholeFilesExtension,
       ],
     };

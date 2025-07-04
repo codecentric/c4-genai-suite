@@ -25,7 +25,7 @@ export class ConversationRepository extends Repository<ConversationEntity> {
           SELECT
               ${dateTrunc(groupBy, dateColumn)} as "date",
               COUNT(distinct c."userId") AS total
-          FROM messages m 
+          FROM messages m
           LEFT JOIN conversations c on c.id = m."conversationId"
           WHERE ${condition}
           GROUP BY ${dateTrunc(groupBy, dateColumn)}
@@ -37,10 +37,12 @@ export class ConversationRepository extends Repository<ConversationEntity> {
            ORDER BY s."date"
     `;
 
-    const rawResults = (await this.query(sql, params)) as Array<{
-      date: Date;
-      total: string;
-    }>;
+    const rawResults = await this.query<
+      Array<{
+        date: Date;
+        total: string;
+      }>
+    >(sql, params);
 
     return rawResults.map((x) => ({
       ...x,

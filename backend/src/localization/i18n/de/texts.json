@@ -164,6 +164,10 @@
       "title": "DEV: Simple Input",
       "description": "Fragt nach einer Eingabe vom Benutzer"
     },
+    "speechToText": {
+      "title": "Spracheingabe",
+      "description": "Erlaubt Spracheingaben über ein Mikrofon-Icon"
+    },
     "userArgs": {
       "title": "DEV: User Args",
       "description": "Zeigt die aktuellen Benutzerargumente"

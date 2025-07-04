@@ -59,6 +59,11 @@
                     "type": "string",
                     "description": "The TLS secret name. Should be c4-tls-cert",
                     "default": "\"\""
+                },
+                "annotations": {
+                    "type": "object",
+                    "description": "Map of annotations to add for ingress",
+                    "default": {}
                 }
             }
         },
@@ -69,6 +74,11 @@
                     "type": "boolean",
                     "description": "Specifies whether c4 should be deployed",
                     "default": true
+                },
+                "port": {
+                    "type": "number",
+                    "description": "The backend port",
+                    "default": 3000
                 },
                 "baseUrl": {
                     "type": "string",
@@ -387,6 +397,11 @@
                     "type": "boolean",
                     "description": "Specifies whether the frontend should be deployed",
                     "default": true
+                },
+                "port": {
+                    "type": "number",
+                    "description": "The frontend port",
+                    "default": 80
                 },
                 "image": {
                     "type": "object",

@@ -3,14 +3,10 @@ permissions:
   contents: read
 
 on:
-  push:
+  pull_request:
     paths:
       - .github/workflows/reis.yaml
       - services/reis/**
-    branches:
-      - '**'
-    tags-ignore:
-      - "**"
   workflow_call:
 
 defaults:
@@ -93,7 +89,7 @@ jobs:
           STT_AZURE_OPENAI_WHISPER_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
           STT_AZURE_OPENAI_WHISPER_DEPLOYMENT_NAME: whisper
           STT_AZURE_OPENAI_WHISPER_API_VERSION: "2024-06-01"
-        run: poetry run pytest -rs --cov=rei_s --cov-report=xml --cov-report=term --error-for-skips
+        run: poetry run pytest -rs --cov=rei_s --cov-report=xml --cov-report=term ${{ secrets.AZURE_OPENAI_API_KEY && '--error-for-skips' || '' }}
       - uses: irongut/CodeCoverageSummary@51cc3a756ddcd398d447c044c02cb6aa83fdae95 # v1.3.0
         with:
           badge: true

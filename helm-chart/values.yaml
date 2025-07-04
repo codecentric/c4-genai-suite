@@ -24,11 +24,15 @@ ingress:
   host: ""
   ## @param ingress.tlsSecretName [string] The TLS secret name. Should be c4-tls-cert
   tlsSecretName: ""
+  ## @param ingress.annotations Map of annotations to add for ingress
+  annotations: {}
 
 ## @section Backend
 backend:
   ## @param backend.enabled Specifies whether c4 should be deployed
   enabled: true
+  ## @param backend.port The backend port
+  port: 3000
   ## @param backend.baseUrl [string] Base URL should match `https://{{ingress.host}}`. Required for OpenID Connect or assistants using Dall-E image generation.
   baseUrl: ""
   ssl:
@@ -91,7 +95,7 @@ backend:
     ## @param backend.image.repository The image repository including host, port, repo
     repository: "ghcr.io/codecentric/c4-genai-suite/backend"
     ## @param backend.image.tag [string] The image tag
-    tag: "v8.2.0"
+    tag: "v8.4.3"
   ## @param backend.extraEnvVars An extra list of environment variables to add to the deployment.
   extraEnvVars: []
   ## @param backend.extraVolumes An extra list of volumes to add to the deployment.
@@ -155,11 +159,13 @@ backend:
 frontend:
   ## @param frontend.enabled Specifies whether the frontend should be deployed
   enabled: true
+  ## @param frontend.port The frontend port
+  port: 80
   image:
     ## @param frontend.image.repository The image repository including host, port, repo
     repository: "ghcr.io/codecentric/c4-genai-suite/frontend"
     ## @param frontend.image.tag [string] The image tag
-    tag: "v8.2.0"
+    tag: "v8.4.3"
   ## @param frontend.replicaCount The number of replicas to create
   replicaCount: 1
   ## @param frontend.updateStrategy.type Frontend deployment strategy type
@@ -228,7 +234,7 @@ reis:
     ## @param reis.image.repository The image repository including host, port, repo
     repository: "ghcr.io/codecentric/c4-genai-suite/reis"
     ## @param reis.image.tag [string] The image tag
-    tag: "v8.2.0"
+    tag: "v8.4.3"
   metrics:
     ## @param reis.metrics.enabled Specifies whether a service for REIS metrics should be created
     enabled: false
