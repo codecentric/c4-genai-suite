@@ -20,7 +20,7 @@ import { InAppDocsProvider } from './components/InAppDocsProvider';
 import { MantineThemeProvider } from './components/MantineThemeProvider';
 import { RouteWhenLoggedOut } from './components/RouteWhenLoggedOut';
 import { AdminPage } from './pages/admin/AdminPage';
-import { ChatPage } from './pages/chat/ChatPage';
+import { ChatOrWelcomePage } from './pages/chat/ChatOrWelcomePage';
 import { LoginPage } from './pages/login/LoginPage';
 import { i18next } from './texts/i18n';
 
@@ -51,46 +51,48 @@ export function App() {
         <BrowserRouter>
           <TransientProvider>
             <ThemeProviders>
-              <InAppDocsProvider>
-                <Routes>
-                  <Route
-                    path="/*"
-                    element={
-                      <Routes>
-                        <Route
-                          path="/chat/*"
-                          element={
-                            <RouteWhenPrivate>
-                              <ChatPage />
-                            </RouteWhenPrivate>
-                          }
-                        />
-                        <Route
-                          path="/admin/*"
-                          element={
-                            <RouteWhenPrivate>
+              <Routes>
+                <Route
+                  path="/*"
+                  element={
+                    <Routes>
+                      <Route
+                        path="/chat/*"
+                        element={
+                          <RouteWhenPrivate>
+                            <InAppDocsProvider>
+                              <ChatOrWelcomePage />
+                            </InAppDocsProvider>
+                          </RouteWhenPrivate>
+                        }
+                      />
+                      <Route
+                        path="/admin/*"
+                        element={
+                          <RouteWhenPrivate>
+                            <InAppDocsProvider>
                               <RouteWhenAdmin>
                                 <AdminPage />
                               </RouteWhenAdmin>
-                            </RouteWhenPrivate>
-                          }
-                        />
-                        <Route path="*" element={<TransientNavigate to="/chat" />} />
-                      </Routes>
-                    }
-                  />
+                            </InAppDocsProvider>
+                          </RouteWhenPrivate>
+                        }
+                      />
+                      <Route path="*" element={<TransientNavigate to="/chat" />} />
+                    </Routes>
+                  }
+                />
 
-                  <Route
-                    path="/login"
-                    element={
-                      <RouteWhenLoggedOut>
-                        <LoginPage />
-                      </RouteWhenLoggedOut>
-                    }
-                  />
-                  <Route path="*" element={<TransientNavigate to="/" />} />
-                </Routes>
-              </InAppDocsProvider>
+                <Route
+                  path="/login"
+                  element={
+                    <RouteWhenLoggedOut>
+                      <LoginPage />
+                    </RouteWhenLoggedOut>
+                  }
+                />
+                <Route path="*" element={<TransientNavigate to="/" />} />
+              </Routes>
             </ThemeProviders>
           </TransientProvider>
         </BrowserRouter>
