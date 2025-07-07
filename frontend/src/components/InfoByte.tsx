@@ -1,4 +1,4 @@
-export type InfoByteProps = {
+type InfoByteProps = {
   title: string;
   value: string | number;
 };
