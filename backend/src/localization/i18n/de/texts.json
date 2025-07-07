@@ -54,7 +54,7 @@
       "description": "Mistral LLM-Integration"
     },
     "ollama": {
-      "title": "DEV: Ollama",
+      "title": "Ollama",
       "description": "Ollama LLM-Integration"
     },
     "openai": {
@@ -63,7 +63,7 @@
       "endpointHint": "Basis-URL des OpenAI-Endpunkts"
     },
     "openaiCompatible": {
-      "title": "DEV: OpenAI kompatibel",
+      "title": "OpenAI kompatibel",
       "description": "OpenAI-kompatible LLM-Integration"
     },
     "vertexai": {
