@@ -1,6 +1,5 @@
 import { expect, test } from '@playwright/test';
 import {
-  addVisionFileExtensionToConfiguration,
   checkSelectedConfiguration,
   createConfiguration,
   enterUserArea,
@@ -43,7 +42,7 @@ test('Chat', async ({ page, browserName }) => {
     await save(page);
   });
 
-  await test.step('should add empty configuration', async () => {
+  await test.step('should add a new configuration', async () => {
     await page.getByRole('link', { name: 'Assistants' }).click();
     await page
       .locator('*')
@@ -56,7 +55,8 @@ test('Chat', async ({ page, browserName }) => {
   });
 
   await test.step('should add vision extension to configuration', async () => {
-    await addVisionFileExtensionToConfiguration(page, { name: assistantName });
+    await page.getByRole('heading', { name: 'Files Vision', exact: true }).click();
+    await save(page);
   });
 
   await test.step('should upload avatar logo', async () => {
@@ -83,7 +83,9 @@ test('Chat', async ({ page, browserName }) => {
   await test.step('should add more configurations', async () => {
     await navigateToConfigurationAdministration(page);
     await createConfiguration(page, { name: 'Assistant', description: 'Assistant Description' });
+    await page.getByRole('dialog', { name: 'Create Extension' }).getByRole('button').click();
     await createConfiguration(page, { name: 'Other Assistant', description: 'Other Assistant Description' });
+    await page.getByRole('dialog', { name: 'Create Extension' }).getByRole('button').click();
     await enterUserArea(page);
   });
 

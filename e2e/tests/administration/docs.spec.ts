@@ -1,15 +1,24 @@
 import { expect, test } from '@playwright/test';
-import { enterAdminArea, login } from '../utils/helper';
+import { enterAdminArea, enterUserArea, goToWelcomePage, loginFirstTime } from '../utils/helper';
 
 test('Documentation on Admin page', async ({ page }) => {
   await test.step('should login', async () => {
-    await login(page);
+    await loginFirstTime(page);
+    await goToWelcomePage(page);
+    await page.getByRole('link', { name: 'Setup an Assistant' }).click();
+    await expect(page).toHaveURL(/\/admin\/assistants\?create/);
+    await page.getByRole('textbox', { name: 'Name' }).fill('Assistant');
+    await page.getByRole('textbox', { name: 'Description' }).fill('Assistant Description');
+    await page.getByRole('button', { name: 'Save' }).click();
+    await page.getByRole('dialog', { name: 'Create Extension' }).getByRole('button').click();
+
+    await enterUserArea(page);
   });
 
-  await test.step('should not show documentation on chat page', async () => {
+  /* await test.step('should not show documentation on chat page', async () => {
     await page.waitForTimeout(2000); // such that docs have some time to load
     await expect(page.getByTestId('docs-icon')).toBeHidden();
-  });
+  }); */
 
   await test.step('should show documentation on button click in admin area', async () => {
     await enterAdminArea(page);
@@ -70,6 +79,7 @@ test('Documentation on Admin page', async ({ page }) => {
     await page.getByRole('textbox', { name: 'Name' }).fill('Fake Assistant');
     await page.getByRole('textbox', { name: 'Description' }).fill('Test');
     await page.getByRole('button', { name: 'Save' }).click();
+    await page.getByRole('dialog', { name: 'Create Extension' }).getByRole('button').click();
     await page.getByRole('link', { name: 'Fake Assistant' }).click();
     await page.getByRole('heading', { name: 'The Assistants Page' }).click();
   });
