@@ -15,7 +15,7 @@ import { useDropzone } from 'react-dropzone';
 import { useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { BucketDto, BucketDtoTypeEnum, FileDto, useApi } from 'src/api';
-import { ConfirmDialog, FilterableTable, Search, TablePagination } from 'src/components';
+import { ConfirmDialog, FilterableTable, InfoByte, Search, TablePagination } from 'src/components';
 import { useEventCallback, useTransientNavigate } from 'src/hooks';
 import { buildError, formatFileSize } from 'src/lib';
 import { extractType } from 'src/pages/utils';
@@ -236,17 +236,13 @@ export function FilesPage() {
               </div>
             </div>
             <div className="flex min-h-full grow flex-wrap items-center gap-x-10 gap-y-2">
-              {thisBucket.type === BucketDtoTypeEnum.General && (
-                <BucketInfoByte title={texts.files.bucketType} value={'General'} />
-              )}
-              {thisBucket.type === BucketDtoTypeEnum.Conversation && (
-                <BucketInfoByte title={texts.files.bucketType} value={'Chat'} />
-              )}
+              {thisBucket.type === BucketDtoTypeEnum.General && <InfoByte title={texts.files.bucketType} value={'General'} />}
+              {thisBucket.type === BucketDtoTypeEnum.Conversation && <InfoByte title={texts.files.bucketType} value={'Chat'} />}
               {thisBucket.type === BucketDtoTypeEnum.User && (
-                <BucketInfoByte title={texts.files.bucketType} value={texts.common.userBucketBadge} />
+                <InfoByte title={texts.files.bucketType} value={texts.common.userBucketBadge} />
               )}
-              <BucketInfoByte title={texts.common.endpoint} value={thisBucket.endpoint} />
-              {thisBucket.indexName && <BucketInfoByte title={texts.common.indexName} value={thisBucket.indexName} />}
+              <InfoByte title={texts.common.endpoint} value={thisBucket.endpoint} />
+              {thisBucket.indexName && <InfoByte title={texts.common.indexName} value={thisBucket.indexName} />}
             </div>
             {/* Don't show the Searchable Files heading for conversation buckets */}
             {thisBucket.type !== BucketDtoTypeEnum.Conversation && (
@@ -312,14 +308,5 @@ export function FilesPage() {
 
       {toUpdate && <UpsertBucketDialog onClose={doClose} onCreate={() => {}} target={thisBucket} onUpdate={setBucket} />}
     </>
-  );
-}
-
-function BucketInfoByte(props: { title: string; value: string | number }) {
-  return (
-    <div className="flex flex-col gap-2">
-      <div className="font-semibold">{props.title}</div>
-      <div className="font-normal">{props.value}</div>
-    </div>
   );
 }
