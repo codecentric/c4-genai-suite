@@ -45,7 +45,7 @@
     "@langchain/google-vertexai": "^0.2.14",
     "@langchain/mistralai": "^0.2.1",
     "@langchain/ollama": "^0.2.3",
-    "@langchain/openai": "^0.5.16",
+    "@langchain/openai": "^0.5.18",
     "@modelcontextprotocol/sdk": "^1.13.3",
     "@n8n/json-schema-to-zod": "^1.1.0",
     "@nestjs/common": "^11.1.3",
