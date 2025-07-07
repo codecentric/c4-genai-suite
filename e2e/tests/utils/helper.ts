@@ -2,13 +2,22 @@ import path from 'path';
 import { expect, Locator, Page } from '@playwright/test';
 import { config } from './config';
 
-export async function login(page: Page, user?: { email: string; password: string }) {
+export async function loginFirstTime(page: Page, user?: { email: string; password: string }) {
   await page.goto(`${config.URL}/login`);
   await page.getByPlaceholder('Email').fill(user?.email ?? 'admin@example.com');
   await page.getByPlaceholder('Password').fill(user?.password ?? 'secret');
   await page.getByRole('button', { name: 'Login' }).click();
+}
+
+export async function login(page: Page, user?: { email: string; password: string }) {
+  await loginFirstTime(page, user);
   await page.waitForURL(`${config.URL}/chat`);
   await page.getByTestId('menu user').waitFor({ state: 'visible' });
+}
+
+export async function goToWelcomePage(page: Page) {
+  await page.waitForURL(`${config.URL}/chat`);
+  await expect(page.getByText('Welcome to c4 genai suite')).toBeVisible();
 }
 
 export async function enterAdminArea(page: Page) {
@@ -48,7 +57,7 @@ export async function sendMessage(page: Page, configuration: { name: string }, c
   await page.waitForLoadState('networkidle', { timeout: 30000 });
 }
 
-async function save(page: Page, expectDetached = true) {
+export async function save(page: Page, expectDetached = true) {
   const button = page.getByRole('button', { name: 'Save' });
   await button.click();
   if (expectDetached) {
