@@ -4,6 +4,7 @@ import { config } from '../tests/utils/config';
 import {
   addAzureModelToWizardConfiguration,
   cleanup,
+  createAssistant,
   enterUserArea,
   goToWelcomePage,
   login,
@@ -25,12 +26,7 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
 
     await test.step('add assistant', async () => {
       configuration.name = `Azure-OpenAI-Chat-${randomInt(10000)}`;
-      configuration.description = `Description for ${configuration.name}`;
-      await page.getByRole('link', { name: 'Setup an Assistant' }).click();
-      await expect(page).toHaveURL(/\/admin\/assistants\?create/);
-      await page.getByRole('textbox', { name: 'Name' }).fill(configuration.name);
-      await page.getByRole('textbox', { name: 'Description' }).fill(configuration.description);
-      await page.getByRole('button', { name: 'Save' }).click();
+      await createAssistant(page, configuration.name);
     });
 
     await test.step('add model', async () => {

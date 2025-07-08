@@ -387,29 +387,7 @@ export async function addAzureModelToWizardConfiguration(page: Page, azure: { de
     .first()
     .click();
 
-  await page.getByLabel('API Key').click();
-  await page.getByLabel('API Key').fill(config.AZURE_OPEN_AI_API_KEY);
-  await page.getByLabel('Deployment Name').fill(azure.deployment);
-  await page.getByLabel('Instance Name').fill('cccc-testing');
-  await page.getByLabel('Seed').fill('42');
-  await page.getByLabel('Temperature').fill('0');
-  await selectOption(page, 'API Version', '2023-05-15');
-  await page.getByRole('button', { name: 'Test' }).click();
-  const loader = page.locator('.mantine-Button-loader');
-  await loader.waitFor({ state: 'visible' });
-
-  if (azure.configurable?.length) {
-    await selectMultipleOptions(page, 'Configurable', azure.configurable);
-  }
-
-  await page
-    .getByRole('alert')
-    .filter({ hasText: /^Extension is valid./ })
-    .click();
-
-  await loader.waitFor({ state: 'detached' });
-
-  await save(page);
+  await fillAzureModelExtension(page, azure);
 }
 
 export async function addAzureModelToConfiguration(
@@ -427,6 +405,10 @@ export async function addAzureModelToConfiguration(
     .filter({ hasText: /^Azure OpenAIOpen AI LLM integration.*$/ })
     .nth(1)
     .click();
+  await fillAzureModelExtension(page, azure);
+}
+
+async function fillAzureModelExtension(page: Page, azure: { deployment: string; configurable?: string[] }) {
   await page.getByLabel('API Key').click();
   await page.getByLabel('API Key').fill(config.AZURE_OPEN_AI_API_KEY);
   await page.getByLabel('Deployment Name').fill(azure.deployment);
@@ -668,4 +650,13 @@ export async function expectElementInYRange(element: Locator, min: number, max: 
   const lowestPointY = box && box.y + box.height;
   expect(highestPointY).toBeGreaterThan(min);
   expect(lowestPointY).toBeLessThan(max);
+}
+
+export async function createAssistant(page: Page, name: string) {
+  const description = `Description for ${name}`;
+  await page.getByRole('link', { name: 'Setup an Assistant' }).click();
+  await expect(page).toHaveURL(/\/admin\/assistants\?create/);
+  await page.getByRole('textbox', { name: 'Name' }).fill(name);
+  await page.getByRole('textbox', { name: 'Description' }).fill(description);
+  await page.getByRole('button', { name: 'Save' }).click();
 }
