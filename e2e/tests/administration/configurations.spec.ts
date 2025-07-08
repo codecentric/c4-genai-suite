@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker';
 import { expect, test } from '@playwright/test';
-import { cleanup, login } from '../utils/helper';
+import { cleanup, goToWelcomePage, login } from '../utils/helper';
 
 const configName = faker.commerce.productName();
 const configDescription = faker.commerce.productDescription();
@@ -11,6 +11,7 @@ test('Configuration Management', async ({ page }) => {
   await test.step('should login', async () => {
     await login(page);
     await cleanup(page);
+    await goToWelcomePage(page);
   });
 
   await test.step('should add a new assistant when login the first time', async () => {

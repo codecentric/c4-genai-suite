@@ -2,11 +2,10 @@ import { randomInt } from 'crypto';
 import test, { expect } from '@playwright/test';
 import { config } from '../tests/utils/config';
 import {
-  addAzureModelToConfiguration,
+  addAzureModelToWizardConfiguration,
   cleanup,
-  createConfiguration,
-  enterAdminArea,
   enterUserArea,
+  goToWelcomePage,
   login,
   newChat,
   selectConfiguration,
@@ -21,17 +20,21 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
     await test.step('should login', async () => {
       await login(page);
       await cleanup(page);
+      await goToWelcomePage(page);
     });
 
     await test.step('add assistant', async () => {
       configuration.name = `Azure-OpenAI-Chat-${randomInt(10000)}`;
       configuration.description = `Description for ${configuration.name}`;
-      await enterAdminArea(page);
-      await createConfiguration(page, configuration);
+      await page.getByRole('link', { name: 'Setup an Assistant' }).click();
+      await expect(page).toHaveURL(/\/admin\/assistants\?create/);
+      await page.getByRole('textbox', { name: 'Name' }).fill(configuration.name);
+      await page.getByRole('textbox', { name: 'Description' }).fill(configuration.description);
+      await page.getByRole('button', { name: 'Save' }).click();
     });
 
     await test.step('add model', async () => {
-      await addAzureModelToConfiguration(page, configuration, { deployment: 'gpt-4o-mini' });
+      await addAzureModelToWizardConfiguration(page, { deployment: 'gpt-4o-mini' });
     });
 
     await test.step('should start chat in new configuration', async () => {

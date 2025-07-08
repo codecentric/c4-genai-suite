@@ -50,6 +50,7 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
       configuration.description = `Description for ${configuration.name}`;
       await enterAdminArea(page);
       await createConfiguration(page, configuration);
+      await page.getByRole('dialog', { name: 'Create Extension' }).getByRole('button').click();
     });
 
     await test.step('add model', async () => {

@@ -11,6 +11,7 @@ import {
   enterAdminArea,
   enterUserArea,
   expectElementInYRange,
+  goToWelcomePage,
   login,
   selectConfiguration,
   sendMessage,
@@ -27,10 +28,14 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
     await test.step('should login', async () => {
       await login(page);
       await cleanup(page);
+      await goToWelcomePage(page);
     });
     await test.step('should not add Configuration without required fields', async () => {
-      await enterAdminArea(page);
-      await createConfiguration(page, configuration, { detached: false });
+      await page.getByRole('link', { name: 'Setup an Assistant' }).click();
+      await expect(page).toHaveURL(/\/admin\/assistants\?create/);
+      await page.getByRole('textbox', { name: 'Name' }).fill(configuration.name);
+      await page.getByRole('textbox', { name: 'Description' }).fill(configuration.description);
+      await page.getByRole('button', { name: 'Save' }).click();
 
       const testoutput = await page.waitForSelector(`:has-text("String must contain at least")`);
       expect(testoutput).toBeDefined();
@@ -41,6 +46,7 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
     await test.step('should add Configuration', async () => {
       configuration.description = `Example for the ${configuration.name}`;
       await createConfiguration(page, configuration);
+      await page.getByRole('dialog', { name: 'Create Extension' }).getByRole('button').click();
     });
 
     await test.step('should add OpenAI LLM Extension', async () => {

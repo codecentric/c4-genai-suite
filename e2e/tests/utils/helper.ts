@@ -380,6 +380,38 @@ export async function wait(timeout: number) {
   await new Promise((resolve) => setTimeout(resolve, timeout));
 }
 
+export async function addAzureModelToWizardConfiguration(page: Page, azure: { deployment: string; configurable?: string[] }) {
+  await page
+    .locator('div')
+    .filter({ hasText: /^Azure OpenAIOpen AI LLM integrationllm$/ })
+    .first()
+    .click();
+
+  await page.getByLabel('API Key').click();
+  await page.getByLabel('API Key').fill(config.AZURE_OPEN_AI_API_KEY);
+  await page.getByLabel('Deployment Name').fill(azure.deployment);
+  await page.getByLabel('Instance Name').fill('cccc-testing');
+  await page.getByLabel('Seed').fill('42');
+  await page.getByLabel('Temperature').fill('0');
+  await selectOption(page, 'API Version', '2023-05-15');
+  await page.getByRole('button', { name: 'Test' }).click();
+  const loader = page.locator('.mantine-Button-loader');
+  await loader.waitFor({ state: 'visible' });
+
+  if (azure.configurable?.length) {
+    await selectMultipleOptions(page, 'Configurable', azure.configurable);
+  }
+
+  await page
+    .getByRole('alert')
+    .filter({ hasText: /^Extension is valid./ })
+    .click();
+
+  await loader.waitFor({ state: 'detached' });
+
+  await save(page);
+}
+
 export async function addAzureModelToConfiguration(
   page: Page,
   configuration: { name: string },
@@ -388,7 +420,7 @@ export async function addAzureModelToConfiguration(
   await page.getByRole('link', { name: 'Assistants' }).click();
   await page.getByRole('link').filter({ hasText: configuration.name }).click();
 
-  await page.getByRole('button', { name: 'Add Extension' }).click();
+  await page.getByRole('button', { name: 'Add Extension' }).first().click();
 
   await page
     .locator('*')
@@ -437,7 +469,7 @@ export async function addSystemPromptToConfiguration(
   await page.getByRole('link', { name: 'Assistants' }).click();
   await page.getByRole('link').filter({ hasText: configuration.name }).click();
 
-  await page.getByRole('button', { name: 'Add Extension' }).click();
+  await page.getByRole('button', { name: 'Add Extension' }).first().click();
 
   await page
     .locator('*')
