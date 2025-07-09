@@ -1,0 +1,25 @@
+FROM node:24.3.0-alpine AS build
+WORKDIR /src
+
+# Nur package files für besseres Layer-Caching
+COPY package*.json ./
+RUN npm ci --include=dev --no-audit --no-fund && \
+    npm cache clean --force
+
+COPY . .
+RUN npm run build && \
+    rm -rf node_modules
+
+FROM node:24.3.0-alpine
+WORKDIR /srv
+
+ENV NODE_ENV=production
+
+# Production dependencies installieren
+COPY package*.json ./
+RUN npm ci --omit=dev --no-audit --no-fund && \
+    npm cache clean --force
+
+COPY --from=build /src/dist /srv/dist
+
+CMD ["node", "dist/main.js"]

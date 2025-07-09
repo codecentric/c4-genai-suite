@@ -20,4 +20,4 @@ jobs:
       - run: >-
           set -o pipefail;
           git config --global --add safe.directory "$(pwd)";
-          gitleaks git -v --redact=80 --platform github --log-opts="HEAD" --no-color 2>&1 | tee $GITHUB_STEP_SUMMARY
+          gitleaks git -v --config ./.gitleaks.toml --redact=80 --platform github --log-opts="HEAD" --no-color 2>&1 | tee $GITHUB_STEP_SUMMARY

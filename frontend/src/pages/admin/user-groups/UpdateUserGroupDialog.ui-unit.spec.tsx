@@ -12,8 +12,8 @@ describe('UpdateUserGroupDialog', () => {
     name: 'St1',
     isAdmin: false,
     isBuiltIn: false,
-    monthlyTokens: 0,
-    monthlyUserTokens: 0,
+    monthlyTokens: undefined,
+    monthlyUserTokens: undefined,
   };
 
   const defaultProps: UpdateUserGroupDialogProps = {
@@ -27,8 +27,8 @@ describe('UpdateUserGroupDialog', () => {
     render(<UpdateUserGroupDialog {...defaultProps} />);
 
     expect(screen.getByLabelText(required(texts.common.groupName))).toHaveValue(mockUserGroup.name);
-    expect(screen.getByLabelText(texts.common.monthlyTokens)).toHaveValue(mockUserGroup.monthlyTokens);
-    expect(screen.getByLabelText(texts.common.monthlyUserTokens)).toHaveValue(mockUserGroup.monthlyUserTokens);
+    expect(screen.getByLabelText(texts.common.monthlyTokens)).toHaveValue(null);
+    expect(screen.getByLabelText(texts.common.monthlyUserTokens)).toHaveValue(null);
   });
 
   it('should call onClose when cancel button is clicked', async () => {

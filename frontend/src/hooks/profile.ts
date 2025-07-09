@@ -11,7 +11,7 @@ export function useLogoutUrl() {
   const api = useApi();
 
   return useMemo(() => {
-    return `${api.url}/auth/logout`;
+    return `${api.url}/api/auth/logout`;
   }, [api.url]);
 }
 
@@ -19,6 +19,6 @@ export function useLoginUrl(provider: string) {
   const api = useApi();
 
   return useMemo(() => {
-    return `${api.url}/auth/login/${provider}`;
+    return `${api.url}/api/auth/login/${provider}`;
   }, [api.url, provider]);
 }

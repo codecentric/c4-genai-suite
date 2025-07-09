@@ -115,7 +115,13 @@ backend:
   updateStrategy:
     type: RollingUpdate
   ## @param backend.resources [object] Set container requests and limits for different resources like CPU or memory
-  resources: {}
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "128Mi"
+    limits:
+      cpu: "500m"
+      memory: "512Mi"
   ## @param backend.sessionSecret [string] The secret used to sign the session cookie
   sessionSecret: ""
   ## @param backend.existingSessionSecret [string] The name of the existing k8s secret. `sessionSecret` will be ignored. The key must be `sessionSecret`
@@ -179,7 +185,13 @@ frontend:
   updateStrategy:
     type: RollingUpdate
   ## @param frontend.resources [object] Set container requests and limits for different resources like CPU or memory
-  resources: {}
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "128Mi"
+    limits:
+      cpu: "500m"
+      memory: "512Mi"
   ## @param frontend.extraEnvVars An extra list of environment variables to add to the deployment
   metrics:
     ## @param frontend.metrics.enabled Specifies whether a service for REIS metrics should be created.
@@ -302,7 +314,13 @@ reis:
   ## @param reis.extraVolumeMounts An extra list of volume mounts to add to the deployment.
   extraVolumeMounts: []
   ## @param reis.resources [object] Set container requests and limits for different resources like CPU or memory
-  resources: {}
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "128Mi"
+    limits:
+      cpu: "500m"
+      memory: "512Mi"
   vectorDatabase:
     ## @param reis.vectorDatabase.type [string] The search api type to use, one of: azure-ai-search, pgvector
     type: ""

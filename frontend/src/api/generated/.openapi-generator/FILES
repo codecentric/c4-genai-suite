@@ -1,8 +1,12 @@
 .openapi-generator-ignore
+apis/AdminPromptCategoriesApi.ts
 apis/AuthApi.ts
 apis/ConversationApi.ts
 apis/ExtensionsApi.ts
 apis/FilesApi.ts
+apis/PromptCategoriesApi.ts
+apis/PromptRatingsApi.ts
+apis/PromptsApi.ts
 apis/SettingsApi.ts
 apis/UsagesApi.ts
 apis/UsersApi.ts

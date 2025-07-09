@@ -1,8 +1,9 @@
-import { Button } from '@mantine/core';
-import { IconEdit } from '@tabler/icons-react';
+import { Button, Tabs } from '@mantine/core';
+import { IconBulb, IconEdit, IconMessageCircle } from '@tabler/icons-react';
 import { useEffect, useRef, useState } from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes, useNavigate } from 'react-router-dom';
+import { Prompt } from 'src/api/prompts';
 import { CollapseButton, ProfileButton } from 'src/components';
 import { NavigationBar } from 'src/components/NavigationBar';
 import { useSidebarState, useTheme } from 'src/hooks';
@@ -13,6 +14,8 @@ import { NewChatRedirect } from './NewChatRedirect';
 import { DocumentSource, SourcesChunkPreview } from './SourcesChunkPreview';
 import { ConversationPage } from './conversation/ConversationPage';
 import { Files } from './files/Files';
+import { CreatePromptModal } from './prompts/CreatePromptModal';
+import { PromptLibrary, PromptSidebar } from './prompts/PromptLibrary';
 import { useStateOfSelectedChatId } from './state/chat';
 import { useListOfChatsInit, useMutateNewChat, useStateMutateRemoveAllChats, useStateOfChatEmptiness } from './state/listOfChats';
 import { useUserBucket } from './useUserBucket';
@@ -22,6 +25,7 @@ const CustomResizeHandle = () => (
     <div className="h-6 w-full rounded group-hover:bg-white" />
   </PanelResizeHandle>
 );
+
 const getPanelSizes = (isRightPanelOpen: boolean) => {
   const leftBarRatio = 15;
   const rightBarRatio = 20;
@@ -46,8 +50,10 @@ const getPanelSizes = (isRightPanelOpen: boolean) => {
     },
   };
 };
+
 export function ChatPage() {
   const { theme } = useTheme();
+  const navigate = useNavigate();
   const isMobileView = isMobile();
   useListOfChatsInit();
 
@@ -60,15 +66,35 @@ export function ChatPage() {
 
   const [sidebarLeft, setSidebarLeft] = useSidebarState('sidebar-left');
   const [sidebarRight, setSidebarRight] = useSidebarState('sidebar-right');
-  const rightPanelVisible = !!(sidebarRight && selectedChatId && (userBucket || selectedDocument));
+  const [leftSidebarTab, setLeftSidebarTab] = useState<string | null>('conversations');
+  const [createPromptModalOpen, setCreatePromptModalOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string | null>('all');
+  const [minRating, setMinRating] = useState(0);
+  const [sortBy, setSortBy] = useState('newest');
+
+  const rightPanelVisible = !!(
+    sidebarRight &&
+    selectedChatId &&
+    (userBucket || selectedDocument) &&
+    leftSidebarTab === 'conversations'
+  );
   const panelSizes = getPanelSizes(rightPanelVisible);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const openNewChatIfNeeded = async () => {
+  const openNewChatIfNeeded = () => {
     if (selectedChatId) {
-      if (await checkIfEmptyChat(selectedChatId)) textareaRef.current?.focus();
-      else createNewChat.mutate();
+      void checkIfEmptyChat(selectedChatId)
+        .then((isEmpty) => {
+          if (isEmpty) textareaRef.current?.focus();
+          else {
+            void createNewChat.mutate();
+          }
+        })
+        .catch(() => {
+          // Ignore errors in chat emptiness check
+        });
     }
   };
 
@@ -77,7 +103,18 @@ export function ChatPage() {
 
   return (
     <div className="flex h-screen flex-col">
-      <NavigationBar theme={theme} />
+      <NavigationBar theme={theme}>
+        <Tabs value={leftSidebarTab} onChange={setLeftSidebarTab} className="ml-8 flex">
+          <Tabs.List>
+            <Tabs.Tab value="conversations" leftSection={<IconMessageCircle size={16} />}>
+              Chats
+            </Tabs.Tab>
+            <Tabs.Tab value="prompts" leftSection={<IconBulb size={16} />}>
+              Prompts
+            </Tabs.Tab>
+          </Tabs.List>
+        </Tabs>
+      </NavigationBar>
       <PanelGroup direction="horizontal">
         {sidebarLeft && (
           <>
@@ -91,26 +128,42 @@ export function ChatPage() {
               }}
               {...panelSizes.left}
             >
-              <div className="p-2">
-                <Button
-                  className="justify-start"
-                  variant="subtle"
-                  p="xs"
-                  onClick={openNewChatIfNeeded}
-                  fullWidth
-                  justify="space-between"
-                  rightSection={<IconEdit className="w-4" />}
-                >
-                  {texts.chat.newChat}
-                </Button>
-              </div>
+              {leftSidebarTab === 'conversations' ? (
+                <div className="flex h-full flex-col">
+                  <div className="p-2">
+                    <Button
+                      className="justify-start"
+                      variant="subtle"
+                      p="xs"
+                      onClick={openNewChatIfNeeded}
+                      fullWidth
+                      justify="space-between"
+                      rightSection={<IconEdit className="w-4" />}
+                    >
+                      {texts.chat.newChat}
+                    </Button>
+                  </div>
 
-              <div className="grow overflow-y-auto p-2">
-                <ConversationItems />
-              </div>
-              <div className="p-2" onClick={(e) => e.stopPropagation()}>
-                <ProfileButton section="chat" onClearConversations={removeAllChats.mutate} />
-              </div>
+                  <div className="grow overflow-y-auto p-2">
+                    <ConversationItems />
+                  </div>
+                  <div className="p-2" onClick={(e) => e.stopPropagation()}>
+                    <ProfileButton section="chat" onClearConversations={removeAllChats.mutate} />
+                  </div>
+                </div>
+              ) : (
+                <PromptSidebar
+                  onCreatePrompt={() => setCreatePromptModalOpen(true)}
+                  searchTerm={searchTerm}
+                  setSearchTerm={setSearchTerm}
+                  selectedCategory={selectedCategory}
+                  setSelectedCategory={setSelectedCategory}
+                  minRating={minRating}
+                  setMinRating={setMinRating}
+                  sortBy={sortBy}
+                  setSortBy={setSortBy}
+                />
+              )}
             </Panel>
             {!isMobileView && <CustomResizeHandle />}
           </>
@@ -123,9 +176,23 @@ export function ChatPage() {
                 className="h-screen w-screen bg-gray-300"
                 onClick={() => (sidebarLeft ? setSidebarLeft(!sidebarLeft) : setSidebarRight(!sidebarRight))}
               ></div>
+            ) : leftSidebarTab === 'prompts' ? (
+              <PromptLibrary
+                onPromptSelect={(prompt: Prompt) => {
+                  // Navigate to new chat with the selected prompt
+                  void navigate('/chat/new', { state: { initialPrompt: prompt.content } });
+                  setLeftSidebarTab('conversations');
+                }}
+                onCreatePrompt={() => setCreatePromptModalOpen(true)}
+                searchTerm={searchTerm}
+                selectedCategory={selectedCategory}
+                minRating={minRating}
+                sortBy={sortBy}
+              />
             ) : (
               <Routes>
                 <Route path="" element={<NewChatRedirect />} />
+                <Route path="new" element={<NewChatRedirect />} />
                 <Route
                   path=":id"
                   element={
@@ -149,11 +216,13 @@ export function ChatPage() {
                 isToggled={!sidebarLeft}
                 onClick={() => setSidebarLeft(!sidebarLeft)}
                 tooltip={
-                  sidebarLeft ? texts.common.hide(texts.common.conversations) : texts.common.show(texts.common.conversations)
+                  sidebarLeft
+                    ? texts.common.hide(leftSidebarTab === 'conversations' ? texts.common.conversations : 'Prompts')
+                    : texts.common.show(leftSidebarTab === 'conversations' ? texts.common.conversations : 'Prompts')
                 }
               />
             )}
-            {(!isMobileView || !sidebarLeft) && userBucket && (
+            {(!isMobileView || !sidebarLeft) && userBucket && leftSidebarTab === 'conversations' && (
               <CollapseButton
                 className="absolute top-[40%] right-2"
                 side="right"
@@ -183,6 +252,8 @@ export function ChatPage() {
           </>
         )}
       </PanelGroup>
+
+      <CreatePromptModal opened={createPromptModalOpen} onClose={() => setCreatePromptModalOpen(false)} />
     </div>
   );
 }

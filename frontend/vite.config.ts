@@ -15,6 +15,50 @@ export default defineConfig({
       src: path.resolve(dirName, './src'),
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          // Vendor libraries
+          if (id.includes('node_modules')) {
+            if (id.includes('react') || id.includes('react-dom') || id.includes('react-router')) {
+              return 'vendor-react';
+            }
+            if (id.includes('@mantine')) {
+              return 'vendor-ui';
+            }
+            if (id.includes('@tabler/icons-react')) {
+              return 'vendor-icons';
+            }
+            if (id.includes('recharts')) {
+              return 'vendor-charts';
+            }
+            if (id.includes('lodash') || id.includes('date-fns') || id.includes('clsx')) {
+              return 'vendor-utils';
+            }
+            if (id.includes('react-markdown') || id.includes('remark-') || id.includes('rehype-')) {
+              return 'vendor-markdown';
+            }
+            if (id.includes('@tanstack/react-query')) {
+              return 'vendor-query';
+            }
+            return 'vendor';
+          }
+          
+          // App chunks
+          if (id.includes('src/pages/admin')) {
+            return 'admin';
+          }
+          if (id.includes('src/pages/chat/prompts')) {
+            return 'prompts';
+          }
+        }
+      }
+    },
+    chunkSizeWarningLimit: 1000,
+    sourcemap: false,
+    minify: 'esbuild'
+  },
   test: {
     include: ['src/**/*.ui-unit.spec.*', 'src/**/*.integration.spec.*'],
     environment: 'jsdom',

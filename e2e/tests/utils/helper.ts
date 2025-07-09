@@ -37,6 +37,12 @@ export async function enterUserArea(page: Page) {
 }
 
 export async function newChat(page: Page) {
+  // Ensure we're on the conversations tab first
+  const chatsTab = page.getByRole('tab', { name: 'Chats' });
+  if (await chatsTab.isVisible()) {
+    await chatsTab.click();
+  }
+
   await page.getByRole('button', { name: 'New chat' }).click();
   await page.waitForURL('**/chat/*');
 }

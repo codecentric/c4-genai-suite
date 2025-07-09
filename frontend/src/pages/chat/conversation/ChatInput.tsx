@@ -30,8 +30,18 @@ interface ChatInputProps {
   isDisabled?: boolean;
   isEmpty?: boolean;
   submitMessage: (input: string, files?: FileDto[]) => void;
+  initialValue?: string;
 }
-export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEmpty, submitMessage }: ChatInputProps) {
+
+export function ChatInput({
+  textareaRef,
+  chatId,
+  configuration,
+  isDisabled,
+  isEmpty,
+  submitMessage,
+  initialValue,
+}: ChatInputProps) {
   const api = useApi();
   const extensionsWithFilter = configuration?.extensions?.filter(isExtensionWithUserArgs) ?? [];
   const { updateContext, context } = useExtensionContext(chatId);
@@ -77,12 +87,17 @@ export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEm
   }, [configuration?.extensions]);
 
   const { theme } = useTheme();
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState(initialValue ? `${initialValue}\n\n` : '');
   const [showFilter, setShowFilter] = useState(false);
 
   useEffect(() => {
     textareaRef?.current?.focus();
-  }, [chatId, textareaRef]);
+    // Position cursor at the end when initial value is provided
+    if (initialValue && textareaRef?.current) {
+      const length = textareaRef.current.value.length;
+      textareaRef.current.setSelectionRange(length, length);
+    }
+  }, [chatId, textareaRef, initialValue]);
 
   const contextWithDefaults = context ?? defaultValues;
   const extensionFilterChips = extensionsWithFilter.map((extension) => ({

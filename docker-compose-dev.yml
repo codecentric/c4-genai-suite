@@ -16,6 +16,8 @@ services:
       context: backend
       dockerfile: Dockerfile
     hostname: c4-backend
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     environment:
       AUTH_ENABLE_PASSWORD: true
       BASE_URL: http://localhost:3333
@@ -24,6 +26,8 @@ services:
       DB_URL: postgres://admin:secret@postgres:5432/cccc
       NODE_ENV: production
       SESSION_SECRET: random
+      # Ollama configuration for localhost access
+      OLLAMA_ENDPOINT: http://host.docker.internal:11434
       # settings related to oicd
       AUTH_OAUTH_AUTHORIZATION_URL: http://localhost:9999/default/authorize
       AUTH_OAUTH_BRAND_NAME: Local OICD
@@ -41,54 +45,54 @@ services:
       timeout: 1s
       retries: 100
 
-  reis:
-    hostname: reis
-    build:
-      context: ./services/reis
-    environment:
-      EMBEDDINGS_TYPE: ollama
-      EMBEDDINGS_OLLAMA_ENDPOINT: http://ollama:11434
-      EMBEDDINGS_OLLAMA_MODEL_NAME: all-minilm
-      STORE_TYPE: pgvector
-      STORE_PGVECTOR_URL: postgresql+psycopg://admin:secret@postgres:5432/cccc
-      STORE_PGVECTOR_INDEX_NAME: basisreistest
-    ports:
-      - "3201:3201"
-      - "3202:3202"
-    depends_on:
-      ollama:
-        condition: service_healthy
-      ollama-models-pull:
-        condition: service_completed_successfully
-    healthcheck:
-      # debian slim based image has no curl/wget
-      test: python3 -c "import urllib.request, sys; sys.exit(0) if urllib.request.urlopen('http://localhost:3201/health').status == 200 else sys.exit(1)" || exit 2
-      interval: 1s
-      timeout: 1s
-      retries: 20
+  # reis:
+  #   hostname: reis
+  #   build:
+  #     context: ./services/reis
+  #   environment:
+  #     EMBEDDINGS_TYPE: ollama
+  #     EMBEDDINGS_OLLAMA_ENDPOINT: http://ollama:11434
+  #     EMBEDDINGS_OLLAMA_MODEL_NAME: all-minilm
+  #     STORE_TYPE: pgvector
+  #     STORE_PGVECTOR_URL: postgresql+psycopg://admin:secret@postgres:5432/cccc
+  #     STORE_PGVECTOR_INDEX_NAME: basisreistest
+  #   ports:
+  #     - "3201:3201"
+  #     - "3202:3202"
+  #   depends_on:
+  #     ollama:
+  #       condition: service_healthy
+  #     ollama-models-pull:
+  #       condition: service_completed_successfully
+  #   healthcheck:
+  #     # debian slim based image has no curl/wget
+  #     test: python3 -c "import urllib.request, sys; sys.exit(0) if urllib.request.urlopen('http://localhost:3201/health').status == 200 else sys.exit(1)" || exit 2
+  #     interval: 1s
+  #     timeout: 1s
+  #     retries: 20
 
-  ollama:
-    image: ollama/ollama:latest
-    restart: unless-stopped
-    volumes:
-      - ollama-data:/root/.ollama
-    ports:
-      - "11434:11434"
-    healthcheck:
-      test: [ "CMD", "ollama", "list" ]
-      interval: 10s
-      timeout: 30s
-      retries: 5
-      start_period: 60s
+  # ollama:
+  #   image: ollama/ollama:latest
+  #   restart: unless-stopped
+  #   volumes:
+  #     - ollama-data:/root/.ollama
+  #   ports:
+  #     - "11434:11434"
+  #   healthcheck:
+  #     test: [ "CMD", "ollama", "list" ]
+  #     interval: 10s
+  #     timeout: 30s
+  #     retries: 5
+  #     start_period: 60s
 
-  ollama-models-pull:
-    image: curlimages/curl:latest
-    depends_on:
-      ollama:
-        condition: service_healthy
-    command: >
-      curl -X POST ollama:11434/api/pull -d '{"name" : "llama3.2"}'
-        --next -X POST ollama:11434/api/pull -d '{"name" : "all-minilm"}'
+  # ollama-models-pull:
+  #   image: curlimages/curl:latest
+  #   depends_on:
+  #     ollama:
+  #       condition: service_healthy
+  #   command: >
+  #     curl -X POST ollama:11434/api/pull -d '{"name" : "llama3.2"}'
+  #       --next -X POST ollama:11434/api/pull -d '{"name" : "all-minilm"}'
 
   postgres:
     hostname: postgres

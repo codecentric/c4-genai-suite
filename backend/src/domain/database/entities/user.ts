@@ -35,7 +35,6 @@ export class UserEntity {
   @OneToMany(() => ConfigurationUserEntity, (uc) => uc.user)
   configurations!: ConfigurationUserEntity[];
 
-  //TODO: make this non nullable
   @Column({ nullable: true })
   userGroupId!: string;
 

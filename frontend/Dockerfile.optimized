@@ -1,0 +1,27 @@
+FROM node:24.3.0-alpine AS build
+ARG VERSION
+WORKDIR /src
+
+# Nur package files für besseres Layer-Caching
+COPY package*.json ./
+RUN npm ci --only=production --no-audit --no-fund && \
+    npm cache clean --force
+
+COPY . .
+RUN VITE_VERSION="$VERSION" npm run build && \
+    rm -rf node_modules
+
+FROM caddy:2.10.0-alpine
+
+RUN setcap -r /usr/bin/caddy
+
+WORKDIR /srv
+
+COPY Caddyfile /etc/caddy/Caddyfile
+COPY --from=build /src/dist /srv
+
+ENV PORT=80
+
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

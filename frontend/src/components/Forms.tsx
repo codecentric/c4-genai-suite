@@ -506,13 +506,25 @@ const FormDescription = ({ className, hints }: { className?: string; hints?: Rea
   );
 };
 
-const InputText = ({ className, name, ...other }: FormEditorProps<string> & HTMLProps<HTMLInputElement>) => {
+const InputText = ({
+  className,
+  name,
+  vertical,
+  refreshable,
+  hideError,
+  hints,
+  label,
+  required,
+  defaultValue,
+  ...other
+}: FormEditorProps<string> & HTMLProps<HTMLInputElement>) => {
   const { field, fieldState, formState } = useController({ name });
 
   return (
     <input
       id={name}
       {...field}
+      value={field.value || ''}
       {...other}
       className={cn('input input-bordered w-full', className, { 'input-error': isInvalid(fieldState, formState) })}
     />

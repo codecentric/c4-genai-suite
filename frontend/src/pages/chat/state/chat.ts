@@ -38,9 +38,15 @@ export const useChatStream = (chatId: number) => {
       };
     },
     refetchOnWindowFocus: false,
-    retry: (failureCount, error: ResponseError) =>
+    retry: (failureCount, error: ResponseError) => {
       // if we receive 404 or 403 from the server, then don't retry. Otherwise retry 3 times (default behavior).
-      error?.response?.status !== 404 && error?.response?.status !== 403 && failureCount < 3,
+      if (error?.response?.status === 404 || error?.response?.status === 403) {
+        return false;
+      }
+      // For new chats, retry a few more times as they might not be immediately available
+      return failureCount < 5;
+    },
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 3000),
   });
   useEffect(() => {
     if (error) {

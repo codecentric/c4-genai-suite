@@ -7,6 +7,7 @@ import { texts } from 'src/texts';
 import { DashboardPage } from './dashboard/DashboardPage';
 import { ConfigurationPage } from './extensions/ConfigurationPage.tsx';
 import { BucketsPage } from './files/BucketsPage';
+import { PromptCategoriesPage } from './prompt-categories/PromptCategoriesPage';
 import { ThemePage } from './theme/ThemePage';
 import { UserGroupsPage } from './user-groups/UserGroupsPage';
 import { UsersPage } from './users/UsersPage';
@@ -43,6 +44,11 @@ export function AdminPage() {
                   </TransientNavLink>
                 </li>
                 <li>
+                  <TransientNavLink className="block" to="/admin/task-categories">
+                    {texts.admin.promptCategories.sidebarTitle}
+                  </TransientNavLink>
+                </li>
+                <li>
                   <TransientNavLink className="block" to="/admin/users">
                     {texts.users.headline}
                   </TransientNavLink>
@@ -73,6 +79,8 @@ export function AdminPage() {
             <Route path="/user-groups" element={<UserGroupsPage />} />
 
             <Route path="/assistants/*" element={<ConfigurationPage />} />
+
+            <Route path="/task-categories" element={<PromptCategoriesPage />} />
 
             <Route path="*" element={<TransientNavigate to="/admin/dashboard" />} />
           </Routes>

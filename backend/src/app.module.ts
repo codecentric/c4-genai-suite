@@ -6,6 +6,7 @@ import { MulterModule } from '@nestjs/platform-express';
 import { TerminusModule } from '@nestjs/terminus';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
+import { AdminPromptCategoriesController } from './controllers/admin/prompt-categories.controller';
 import { AuthController } from './controllers/auth/auth.controller';
 import { BlobsController } from './controllers/blobs/blobs.controller';
 import { ConversationsController } from './controllers/conversations/conversations.controller';
@@ -14,6 +15,9 @@ import { ExtensionsController } from './controllers/extensions/extensions.contro
 import { FilesController } from './controllers/files/files.controller';
 import { UserFilesController } from './controllers/files/user-files.controller';
 import { HealthController } from './controllers/health/health.controller';
+import { PromptCategoriesController } from './controllers/prompts/prompt-categories.controller';
+import { PromptRatingsController } from './controllers/prompts/prompt-ratings.controller';
+import { PromptsController } from './controllers/prompts/prompts.controller';
 import { SettingsController } from './controllers/settings/settings.controller';
 import { UsagesController } from './controllers/usages/usages.controller';
 import { UserGroupsController } from './controllers/users/user-groups.controller';
@@ -23,7 +27,9 @@ import { ChatModule } from './domain/chat';
 import { UserEntity } from './domain/database';
 import { ExtensionModule } from './domain/extensions';
 import { FilesModule } from './domain/files';
+import { PromptsModule } from './domain/prompts/module';
 import { SettingsModule } from './domain/settings';
+import { TasksModule } from './domain/tasks/module';
 import { UsersModule } from './domain/users/module';
 import { ExtensionLibraryModule } from './extensions';
 import { I18nModule } from './localization/i18n.module';
@@ -46,6 +52,8 @@ import { PrometheusModule } from './metrics/prometheus.module';
       },
     }),
     PrometheusModule.forRoot(),
+    PromptsModule,
+    TasksModule,
     SettingsModule,
     UsersModule,
     TerminusModule,
@@ -71,6 +79,7 @@ import { PrometheusModule } from './metrics/prometheus.module';
     }),
   ],
   controllers: [
+    AdminPromptCategoriesController,
     AuthController,
     BlobsController,
     HealthController,
@@ -78,6 +87,9 @@ import { PrometheusModule } from './metrics/prometheus.module';
     ConfigurationsController,
     ExtensionsController,
     FilesController,
+    PromptsController,
+    PromptCategoriesController,
+    PromptRatingsController,
     SettingsController,
     UsagesController,
     UserFilesController,

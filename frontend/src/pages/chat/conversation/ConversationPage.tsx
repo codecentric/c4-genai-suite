@@ -3,7 +3,7 @@ import { IconArrowDown } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useMemo } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import { FileDto, useApi } from 'src/api';
 import { useEventCallback, useTheme } from 'src/hooks';
 import { cn } from 'src/lib';
@@ -32,6 +32,8 @@ export function ConversationPage(props: ConversationPageProps) {
   const api = useApi();
   const chatParam = useParams<'id'>();
   const chatId = +chatParam.id!;
+  const location = useLocation();
+  const initialPrompt = (location.state as { initialPrompt?: string } | null)?.initialPrompt;
   const { sendMessage, isChatLoading } = useChatStream(chatId);
   const chat = useStateOfChat();
   const messages = useStateOfMessages();
@@ -131,6 +133,7 @@ export function ConversationPage(props: ConversationPageProps) {
                 isDisabled={isAiWriting}
                 isEmpty={isNewConversation}
                 submitMessage={submitMessage}
+                initialValue={initialPrompt}
               />
               <div
                 data-testid={'scrollToBottomButton'}

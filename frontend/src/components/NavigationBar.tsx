@@ -13,7 +13,7 @@ interface NavigationBarProps extends PropsWithChildren {
   redirectTo?: string;
 }
 
-export function NavigationBar({ theme, redirectTo }: NavigationBarProps) {
+export function NavigationBar({ theme, redirectTo, children }: NavigationBarProps) {
   const { isDocsButtonVisible, toggleDocs } = useDocsContext();
   const content = theme.logoUrl ? <Logo key={theme.key} size={{ height: '60%' }} url={theme.logoUrl} /> : theme.name;
   const className = 'flex h-12 items-center text-xl font-bold px-0';
@@ -26,6 +26,7 @@ export function NavigationBar({ theme, redirectTo }: NavigationBarProps) {
       ) : (
         <div className={className}>{content}</div>
       )}
+      {children}
       {isDocsButtonVisible && (
         <div className="ml-auto">
           <ActionIcon onClick={toggleDocs} size="xl" variant="subtle" color="primary">

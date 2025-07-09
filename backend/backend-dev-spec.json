@@ -1,6 +1,64 @@
 {
   "openapi": "3.0.0",
   "paths": {
+    "/api/admin/prompt-categories": {
+      "post": {
+        "operationId": "AdminPromptCategoriesController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CreatePromptCategoryDto" } } }
+        },
+        "responses": { "201": { "description": "Category created successfully" } },
+        "summary": "Create a new prompt category",
+        "tags": ["admin-prompt-categories"]
+      },
+      "get": {
+        "operationId": "AdminPromptCategoriesController_findAll",
+        "parameters": [],
+        "responses": { "200": { "description": "List of categories" } },
+        "summary": "Get all prompt categories",
+        "tags": ["admin-prompt-categories"]
+      }
+    },
+    "/api/admin/prompt-categories/with-counts": {
+      "get": {
+        "operationId": "AdminPromptCategoriesController_findAllWithCounts",
+        "parameters": [],
+        "responses": { "200": { "description": "List of categories with prompt counts" } },
+        "summary": "Get all categories with prompt counts",
+        "tags": ["admin-prompt-categories"]
+      }
+    },
+    "/api/admin/prompt-categories/{id}": {
+      "get": {
+        "operationId": "AdminPromptCategoriesController_findOne",
+        "parameters": [{ "name": "id", "required": true, "in": "path", "schema": { "type": "number" } }],
+        "responses": { "200": { "description": "Category details" }, "404": { "description": "Category not found" } },
+        "summary": "Get category by ID",
+        "tags": ["admin-prompt-categories"]
+      },
+      "put": {
+        "operationId": "AdminPromptCategoriesController_update",
+        "parameters": [{ "name": "id", "required": true, "in": "path", "schema": { "type": "number" } }],
+        "responses": {
+          "200": { "description": "Category updated successfully" },
+          "404": { "description": "Category not found" }
+        },
+        "summary": "Update category",
+        "tags": ["admin-prompt-categories"]
+      },
+      "delete": {
+        "operationId": "AdminPromptCategoriesController_delete",
+        "parameters": [{ "name": "id", "required": true, "in": "path", "schema": { "type": "number" } }],
+        "responses": {
+          "200": { "description": "Category deleted successfully" },
+          "404": { "description": "Category not found" }
+        },
+        "summary": "Delete category",
+        "tags": ["admin-prompt-categories"]
+      }
+    },
     "/api/auth/settings": {
       "get": {
         "description": "The settings.",
@@ -860,6 +918,269 @@
         "tags": ["files"]
       }
     },
+    "/api/prompts": {
+      "post": {
+        "operationId": "PromptsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CreatePromptDto" } } }
+        },
+        "responses": { "201": { "description": "Prompt created successfully" } },
+        "summary": "Create a new prompt",
+        "tags": ["prompts"]
+      },
+      "get": {
+        "operationId": "PromptsController_findAll",
+        "parameters": [
+          { "name": "categoryId", "required": true, "in": "query", "schema": { "type": "number" } },
+          { "name": "search", "required": true, "in": "query", "schema": { "type": "string" } },
+          { "name": "minRating", "required": true, "in": "query", "schema": { "type": "number" } },
+          { "name": "page", "required": true, "in": "query", "schema": { "type": "number" } },
+          { "name": "limit", "required": true, "in": "query", "schema": { "type": "number" } },
+          { "name": "sortBy", "required": true, "in": "query", "schema": { "type": "string" } },
+          { "name": "sortOrder", "required": true, "in": "query", "schema": { "type": "string" } }
+        ],
+        "responses": { "200": { "description": "List of prompts" } },
+        "summary": "Get all public prompts and own private prompts",
+        "tags": ["prompts"]
+      }
+    },
+    "/api/prompts/my": {
+      "get": {
+        "operationId": "PromptsController_findMy",
+        "parameters": [
+          { "name": "page", "required": true, "in": "query", "schema": { "type": "number" } },
+          { "name": "limit", "required": true, "in": "query", "schema": { "type": "number" } },
+          { "name": "sortBy", "required": true, "in": "query", "schema": { "type": "string" } },
+          { "name": "sortOrder", "required": true, "in": "query", "schema": { "type": "string" } }
+        ],
+        "responses": { "200": { "description": "List of user prompts" } },
+        "summary": "Get current user prompts",
+        "tags": ["prompts"]
+      }
+    },
+    "/api/prompts/popular": {
+      "get": {
+        "operationId": "PromptsController_getPopular",
+        "parameters": [{ "name": "limit", "required": true, "in": "query", "schema": { "type": "number" } }],
+        "responses": { "200": { "description": "List of popular prompts" } },
+        "summary": "Get popular prompts",
+        "tags": ["prompts"]
+      }
+    },
+    "/api/prompts/recent": {
+      "get": {
+        "operationId": "PromptsController_getRecent",
+        "parameters": [{ "name": "limit", "required": true, "in": "query", "schema": { "type": "number" } }],
+        "responses": { "200": { "description": "List of recent prompts" } },
+        "summary": "Get recent prompts",
+        "tags": ["prompts"]
+      }
+    },
+    "/api/prompts/{id}": {
+      "get": {
+        "operationId": "PromptsController_findOne",
+        "parameters": [{ "name": "id", "required": true, "in": "path", "schema": { "type": "number" } }],
+        "responses": { "200": { "description": "Prompt details" }, "404": { "description": "Prompt not found" } },
+        "summary": "Get prompt by ID",
+        "tags": ["prompts"]
+      },
+      "put": {
+        "operationId": "PromptsController_update",
+        "parameters": [{ "name": "id", "required": true, "in": "path", "schema": { "type": "number" } }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UpdatePromptDto" } } }
+        },
+        "responses": { "200": { "description": "Prompt updated successfully" }, "404": { "description": "Prompt not found" } },
+        "summary": "Update prompt (creates new version)",
+        "tags": ["prompts"]
+      },
+      "delete": {
+        "operationId": "PromptsController_delete",
+        "parameters": [{ "name": "id", "required": true, "in": "path", "schema": { "type": "number" } }],
+        "responses": { "200": { "description": "Prompt deleted successfully" }, "404": { "description": "Prompt not found" } },
+        "summary": "Delete prompt",
+        "tags": ["prompts"]
+      }
+    },
+    "/api/prompts/{id}/clone": {
+      "post": {
+        "operationId": "PromptsController_clone",
+        "parameters": [{ "name": "id", "required": true, "in": "path", "schema": { "type": "number" } }],
+        "responses": { "201": { "description": "Prompt cloned successfully" }, "404": { "description": "Prompt not found" } },
+        "summary": "Clone a prompt",
+        "tags": ["prompts"]
+      }
+    },
+    "/api/prompts/{id}/use": {
+      "post": {
+        "operationId": "PromptsController_recordUsage",
+        "parameters": [{ "name": "id", "required": true, "in": "path", "schema": { "type": "number" } }],
+        "responses": { "200": { "description": "Usage recorded successfully" } },
+        "summary": "Record prompt usage",
+        "tags": ["prompts"]
+      }
+    },
+    "/api/prompts/{id}/visibility": {
+      "put": {
+        "operationId": "PromptsController_toggleVisibility",
+        "parameters": [{ "name": "id", "required": true, "in": "path", "schema": { "type": "number" } }],
+        "responses": {
+          "200": { "description": "Visibility updated successfully" },
+          "404": { "description": "Prompt not found" }
+        },
+        "summary": "Toggle prompt visibility (public/private)",
+        "tags": ["prompts"]
+      }
+    },
+    "/api/prompts/{id}/versions": {
+      "get": {
+        "operationId": "PromptsController_getVersions",
+        "parameters": [{ "name": "id", "required": true, "in": "path", "schema": { "type": "number" } }],
+        "responses": { "200": { "description": "List of prompt versions" } },
+        "summary": "Get all versions of a prompt",
+        "tags": ["prompts"]
+      }
+    },
+    "/api/prompts/{id}/versions/{version}": {
+      "get": {
+        "operationId": "PromptsController_getVersion",
+        "parameters": [
+          { "name": "id", "required": true, "in": "path", "schema": { "type": "number" } },
+          { "name": "version", "required": true, "in": "path", "schema": { "type": "number" } }
+        ],
+        "responses": { "200": { "description": "Prompt version details" }, "404": { "description": "Version not found" } },
+        "summary": "Get specific version of a prompt",
+        "tags": ["prompts"]
+      }
+    },
+    "/api/prompts/{id}/restore/{version}": {
+      "post": {
+        "operationId": "PromptsController_restoreVersion",
+        "parameters": [
+          { "name": "id", "required": true, "in": "path", "schema": { "type": "number" } },
+          { "name": "version", "required": true, "in": "path", "schema": { "type": "number" } }
+        ],
+        "responses": { "200": { "description": "Version restored successfully" }, "404": { "description": "Version not found" } },
+        "summary": "Restore a specific version of a prompt",
+        "tags": ["prompts"]
+      }
+    },
+    "/api/prompt-categories": {
+      "post": {
+        "operationId": "TaskCategoriesController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CreatePromptCategoryDto" } } }
+        },
+        "responses": { "201": { "description": "Category created successfully" } },
+        "summary": "Create a new prompt category",
+        "tags": ["prompt-categories"]
+      },
+      "get": {
+        "operationId": "TaskCategoriesController_findAll",
+        "parameters": [],
+        "responses": { "200": { "description": "List of categories" } },
+        "summary": "Get all prompt categories",
+        "tags": ["prompt-categories"]
+      }
+    },
+    "/api/prompt-categories/with-counts": {
+      "get": {
+        "operationId": "TaskCategoriesController_findAllWithCounts",
+        "parameters": [],
+        "responses": { "200": { "description": "List of categories with prompt counts" } },
+        "summary": "Get all categories with prompt counts",
+        "tags": ["prompt-categories"]
+      }
+    },
+    "/api/prompt-categories/{id}": {
+      "get": {
+        "operationId": "TaskCategoriesController_findOne",
+        "parameters": [{ "name": "id", "required": true, "in": "path", "schema": { "type": "number" } }],
+        "responses": { "200": { "description": "Category details" }, "404": { "description": "Category not found" } },
+        "summary": "Get category by ID",
+        "tags": ["prompt-categories"]
+      },
+      "put": {
+        "operationId": "TaskCategoriesController_update",
+        "parameters": [{ "name": "id", "required": true, "in": "path", "schema": { "type": "number" } }],
+        "responses": {
+          "200": { "description": "Category updated successfully" },
+          "404": { "description": "Category not found" }
+        },
+        "summary": "Update category",
+        "tags": ["prompt-categories"]
+      },
+      "delete": {
+        "operationId": "TaskCategoriesController_delete",
+        "parameters": [{ "name": "id", "required": true, "in": "path", "schema": { "type": "number" } }],
+        "responses": {
+          "200": { "description": "Category deleted successfully" },
+          "404": { "description": "Category not found" }
+        },
+        "summary": "Delete category",
+        "tags": ["prompt-categories"]
+      }
+    },
+    "/api/prompts/{promptId}/ratings": {
+      "post": {
+        "operationId": "PromptRatingsController_create",
+        "parameters": [{ "name": "promptId", "required": true, "in": "path", "schema": { "type": "number" } }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CreatePromptRatingDto" } } }
+        },
+        "responses": {
+          "201": { "description": "Rating created successfully" },
+          "400": { "description": "User has already rated this prompt" }
+        },
+        "summary": "Rate a prompt",
+        "tags": ["prompt-ratings"]
+      },
+      "get": {
+        "operationId": "PromptRatingsController_findByPrompt",
+        "parameters": [{ "name": "promptId", "required": true, "in": "path", "schema": { "type": "number" } }],
+        "responses": { "200": { "description": "List of ratings" } },
+        "summary": "Get all ratings for a prompt",
+        "tags": ["prompt-ratings"]
+      },
+      "put": {
+        "operationId": "PromptRatingsController_update",
+        "parameters": [{ "name": "promptId", "required": true, "in": "path", "schema": { "type": "number" } }],
+        "responses": { "200": { "description": "Rating updated successfully" }, "404": { "description": "Rating not found" } },
+        "summary": "Update user rating for a prompt",
+        "tags": ["prompt-ratings"]
+      },
+      "delete": {
+        "operationId": "PromptRatingsController_delete",
+        "parameters": [{ "name": "promptId", "required": true, "in": "path", "schema": { "type": "number" } }],
+        "responses": { "200": { "description": "Rating deleted successfully" }, "404": { "description": "Rating not found" } },
+        "summary": "Delete user rating for a prompt",
+        "tags": ["prompt-ratings"]
+      }
+    },
+    "/api/prompts/{promptId}/ratings/my": {
+      "get": {
+        "operationId": "PromptRatingsController_findMyRating",
+        "parameters": [{ "name": "promptId", "required": true, "in": "path", "schema": { "type": "number" } }],
+        "responses": { "200": { "description": "User rating" }, "404": { "description": "Rating not found" } },
+        "summary": "Get current user rating for a prompt",
+        "tags": ["prompt-ratings"]
+      }
+    },
+    "/api/prompts/{promptId}/ratings/stats": {
+      "get": {
+        "operationId": "PromptRatingsController_getStats",
+        "parameters": [{ "name": "promptId", "required": true, "in": "path", "schema": { "type": "number" } }],
+        "responses": { "200": { "description": "Rating statistics" } },
+        "summary": "Get rating statistics for a prompt",
+        "tags": ["prompt-ratings"]
+      }
+    },
     "/api/settings/{imageType}": {
       "get": {
         "description": "Gets the logo.",
@@ -1299,6 +1620,7 @@
   "servers": [],
   "components": {
     "schemas": {
+      "CreatePromptCategoryDto": { "type": "object", "properties": {} },
       "AuthProviderDto": {
         "type": "object",
         "properties": {
@@ -2201,6 +2523,9 @@
         },
         "required": ["items", "total"]
       },
+      "CreatePromptDto": { "type": "object", "properties": {} },
+      "UpdatePromptDto": { "type": "object", "properties": {} },
+      "CreatePromptRatingDto": { "type": "object", "properties": {} },
       "SiteLinkDto": {
         "type": "object",
         "properties": {
