@@ -63,7 +63,11 @@ export class ConfigurationsController {
   })
   @ApiOkResponse({ type: ConfigurationsDto })
   async getConfigurations(@Req() req: Request, @Query('enabled') enabled?: boolean) {
-    const result: GetConfigurationsResponse = await this.queryBus.execute(new GetConfigurations(req.user, !!enabled, true));
+    const fetchEnabledWithExtensions = enabled ?? false;
+
+    const result: GetConfigurationsResponse = await this.queryBus.execute(
+      new GetConfigurations(req.user, fetchEnabledWithExtensions, fetchEnabledWithExtensions),
+    );
     return ConfigurationsDto.fromDomain(result.configurations);
   }
 
