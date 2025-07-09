@@ -3,6 +3,7 @@ import test, { expect } from '@playwright/test';
 import { config } from '../tests/utils/config';
 import {
   addAzureModelToConfiguration,
+  checkSelectedConfiguration,
   cleanup,
   createConfiguration,
   enterAdminArea,
@@ -12,6 +13,8 @@ import {
   selectConfiguration,
   sendMessage,
 } from '../tests/utils/helper';
+
+const secondAssistantName = 'Second Assistant';
 
 if (!config.AZURE_OPEN_AI_API_KEY) {
   test.skip('should configure Azure OpenAI-Open AI LLM for chats [skipped due to missing API_KEY in env]', () => {});
@@ -28,10 +31,12 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
       configuration.description = `Description for ${configuration.name}`;
       await enterAdminArea(page);
       await createConfiguration(page, configuration);
+      await createConfiguration(page, { ...configuration, name: secondAssistantName });
     });
 
     await test.step('add model', async () => {
       await addAzureModelToConfiguration(page, configuration, { deployment: 'gpt-4o-mini' });
+      await addAzureModelToConfiguration(page, { ...configuration, name: secondAssistantName }, { deployment: 'gpt-4o-mini' });
     });
 
     await test.step('should start chat in new configuration', async () => {
@@ -59,7 +64,7 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
       await expect(page.getByRole('navigation')).toHaveCount(1);
     });
 
-    await test.step('should not create multiple empty conversations via multiple clicks one the new chat button', async () => {
+    await test.step('should not create multiple empty conversations via multiple clicks on the new chat button', async () => {
       await page.getByRole('button', { name: 'New chat' }).click();
       await page.waitForLoadState('networkidle');
       const firstChatUrl = page.url();
@@ -68,6 +73,20 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
       const secondChatUrl = page.url();
       expect(secondChatUrl).toBe(firstChatUrl);
       await expect(page.getByRole('navigation')).toHaveCount(1);
+    });
+
+    await test.step('should keep selected assistant in new chat when a conversation is deleted', async () => {
+      const assistant = { name: secondAssistantName };
+      await selectConfiguration(page, assistant);
+      await sendMessage(page, assistant, {
+        message: 'Answer as short as possible: What is the answer to life, the universe and everything?',
+      });
+      await page.locator('svg.tabler-icon-dots').click();
+      const dropdown = page.locator('.mantine-Menu-dropdown');
+      await expect(dropdown).toBeVisible();
+      await dropdown.locator('text=Delete').click();
+      await expect(page.getByText('How may I help you?')).toBeVisible();
+      await checkSelectedConfiguration(page, assistant);
     });
   });
 }

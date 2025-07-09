@@ -144,7 +144,7 @@ test('When using suggestions c4', async ({ page }) => {
     await page.getByRole('group').getByRole('button', { name: 'Save' }).click();
   });
 
-  await test.step('will list saved suggestions in chat when using an assistant without suggestions', async () => {
+  await test.step('will list saved global suggestions in chat when using an assistant without suggestions', async () => {
     await enterUserArea(page);
     await newChat(page);
     await selectConfiguration(page, { name: ASSISTANT_NAME_GLOBAL });

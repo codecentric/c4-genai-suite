@@ -11,7 +11,7 @@ export async function login(page: Page, user?: { email: string; password: string
   await page.getByTestId('menu user').waitFor({ state: 'visible' });
 }
 
-export async function goto(page: Page, relativePath: string) {
+export async function goto(page: Page, relativePath: `/${string}` | '') {
   await page.goto(`${config.URL}${relativePath}`);
 }
 
@@ -43,6 +43,7 @@ export async function enterUserArea(page: Page) {
 export async function newChat(page: Page) {
   await page.getByRole('button', { name: 'New chat' }).click();
   await page.waitForURL('**/chat/*');
+  await expect(page.getByText('How may I help you?')).toBeVisible();
 }
 
 export async function sendMessage(page: Page, configuration: { name: string }, content: { message: string }) {
@@ -479,8 +480,7 @@ export async function checkSelectedConfiguration(page: Page, configuration: { na
 
 export async function selectConfiguration(page: Page, configuration: { name: string }) {
   await page.getByTestId('chat-assistent-select').click();
-
-  const element = page.locator(`p`).getByText(configuration.name, { exact: true });
+  const element = page.locator('p').getByText(configuration.name, { exact: true });
   await expect(element).toBeVisible();
   await element.click();
   await page.waitForLoadState('networkidle');

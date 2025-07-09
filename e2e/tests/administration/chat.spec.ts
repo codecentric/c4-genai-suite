@@ -203,12 +203,4 @@ test('Chat', async ({ page, browserName }) => {
 
     await checkSelectedConfiguration(page, { name: thirdAssistant });
   });
-
-  await test.step('should keep selected assistant when a conversation is deleted', async () => {
-    //TODO: move to llm test
-  });
-
-  await test.step('should stop showing auto-scroll button, if new chat is opened, while button was visible', async () => {
-    //TODO: move to llm test
-  });
 });
