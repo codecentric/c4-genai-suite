@@ -43,7 +43,8 @@ export async function enterUserArea(page: Page) {
 export async function newChat(page: Page) {
   await page.getByRole('button', { name: 'New chat' }).click();
   await page.waitForURL('**/chat/*');
-  await expect(page.getByText('How may I help you?')).toBeVisible();
+  const welcomeText = page.getByText('How may I help you?');
+  await welcomeText.waitFor();
 }
 
 export async function sendMessage(page: Page, configuration: { name: string }, content: { message: string }) {
