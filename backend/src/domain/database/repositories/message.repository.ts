@@ -33,11 +33,10 @@ export class MessageRepository extends Repository<MessageEntity> {
         break;
       }
 
-      result.push(message);
+      result.unshift(message);
       messageId = message.parentId;
     }
 
-    result.reverse();
     return result;
   }
 

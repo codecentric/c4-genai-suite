@@ -61,24 +61,35 @@ export async function initSchemaIfNotExistsAndMoveMigrations(url: string, schema
     migrationsRun: false,
   });
 
-  await dataSource.initialize();
-  const queryRunner = dataSource.createQueryRunner();
-  await queryRunner.query(`
-          BEGIN;
-          DO $$
-          BEGIN
-              CREATE SCHEMA IF NOT EXISTS ${schema};
-              IF EXISTS (
-                SELECT 1
-                    FROM information_schema.tables
-                    WHERE table_schema = 'public'
-                    AND table_name = 'migrations'
-                ) THEN
-                  ALTER TABLE public.migrations SET SCHEMA ${schema};
-              END IF;
-          END $$;
-          COMMIT;
-        `);
-  await queryRunner.release();
-  await dataSource.destroy();
+  try {
+    await dataSource.initialize();
+    const queryRunner = dataSource.createQueryRunner();
+    await queryRunner.startTransaction();
+
+    try {
+      await queryRunner.query(`
+        DO $$
+        BEGIN
+            CREATE SCHEMA IF NOT EXISTS ${schema};
+            IF EXISTS (
+              SELECT 1
+                  FROM information_schema.tables
+                  WHERE table_schema = 'public'
+                  AND table_name = 'migrations'
+              ) THEN
+                ALTER TABLE public.migrations SET SCHEMA ${schema};
+            END IF;
+        END $$;
+      `);
+
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
+  } finally {
+    await dataSource.destroy();
+  }
 }
