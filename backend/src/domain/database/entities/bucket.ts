@@ -1,4 +1,5 @@
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, Repository, UpdateDateColumn } from 'typeorm';
+import { schema } from '../typeorm.helper';
 import { FileEntity } from './file';
 
 export type BucketRepository = Repository<BucketEntity>;
@@ -9,7 +10,7 @@ export type FileSizeLimits = {
   general: number;
 } & Record<string, number>;
 
-@Entity({ name: 'bucket' })
+@Entity({ name: 'bucket', schema })
 export class BucketEntity {
   @PrimaryGeneratedColumn()
   id!: number;

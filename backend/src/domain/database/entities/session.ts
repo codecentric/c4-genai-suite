@@ -1,10 +1,11 @@
 import { SessionData } from 'express-session';
 import { Column, Entity, ManyToOne, PrimaryColumn, Repository } from 'typeorm';
+import { schema } from '../typeorm.helper';
 import { UserEntity } from './user';
 
 export type SessionRepository = Repository<SessionEntity>;
 
-@Entity({ name: 'sessions' })
+@Entity({ name: 'sessions', schema })
 export class SessionEntity {
   @PrimaryColumn()
   id!: string;

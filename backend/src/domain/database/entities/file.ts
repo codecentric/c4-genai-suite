@@ -8,6 +8,7 @@ import {
   Repository,
   UpdateDateColumn,
 } from 'typeorm';
+import { schema } from '../typeorm.helper';
 import { BlobEntity } from './blob';
 import { BucketEntity } from './bucket';
 import { ConversationEntity } from './conversation';
@@ -23,7 +24,7 @@ export enum FileUploadStatus {
   Successful = 'successful',
 }
 
-@Entity({ name: 'files' })
+@Entity({ name: 'files', schema })
 export class FileEntity {
   @PrimaryGeneratedColumn()
   id!: number;

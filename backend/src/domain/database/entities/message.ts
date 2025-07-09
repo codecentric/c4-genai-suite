@@ -1,10 +1,11 @@
 import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { Source } from 'src/domain/chat';
+import { schema } from '../typeorm.helper';
 import { ConversationEntity } from './conversation';
 
 export type ExtensionSource = Source & { extensionExternalId: string };
 
-@Entity({ name: 'messages' })
+@Entity({ name: 'messages', schema })
 export class MessageEntity {
   @PrimaryGeneratedColumn()
   id!: number;

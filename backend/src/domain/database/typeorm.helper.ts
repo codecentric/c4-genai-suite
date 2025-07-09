@@ -49,3 +49,5 @@ export function interval(groupBy: GroupBy): string {
       throw new BadRequestException('invalid groupBy');
   }
 }
+
+export const schema = 'company_chat';

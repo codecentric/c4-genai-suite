@@ -1,7 +1,8 @@
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 import { UsageRepository } from '../repositories/usage.repository';
+import { schema } from '../typeorm.helper';
 
-@Entity({ name: 'usages' })
+@Entity({ name: 'usages', schema })
 export class UsageEntity {
   @PrimaryColumn({ type: 'timestamptz' })
   date!: Date;
