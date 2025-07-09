@@ -312,4 +312,12 @@ export const de: typeof en = {
     welcomeText: 'Willkommenstext',
     welcomeTextHints: 'Wird nur auf der Anmeldeseite angezeigt.',
   },
+  welcome: {
+    title: 'Willkommen bei der c4 GenAI Suite',
+    subtitle: 'Ein KI-Chatbot mit Integration des Model Context Providers (MCP). Bereitgestellt von Langchain.',
+    setupAnAssistant: 'Assistent einrichten',
+    noAssistantIsSetUpYet:
+      'Es ist noch kein Assistent eingerichtet. Bitte deinen Administrator, einen Assistenten einzurichten, um loszulegen.',
+    setupAnAssistantOnDesktop: 'Bitte richte einen ersten Assistenten über die Desktop-Seite ein.',
+  },
 };

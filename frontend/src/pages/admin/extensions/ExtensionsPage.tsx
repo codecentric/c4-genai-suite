@@ -3,7 +3,7 @@ import { IconPlus } from '@tabler/icons-react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useApi } from 'src/api';
 import { BucketDto, ExtensionDto } from 'src/api/generated';
@@ -23,7 +23,19 @@ export function ExtensionsPage() {
 
   const configurationParam = useParams<'id'>();
   const configurationId = +configurationParam.id!;
-  const [toCreate, setToCreate] = useState<boolean>();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const setToCreate = (paramExists: boolean) => {
+    const newParams = new URLSearchParams(searchParams);
+    if (paramExists) {
+      newParams.set('add-extension', 'true');
+    } else {
+      newParams.delete('add-extension');
+    }
+    setSearchParams(newParams);
+  };
+  const toCreate = searchParams.has('add-extension');
+
   const [toUpdate, setToUpdate] = useState<ExtensionDto | null>();
   const { extensions, specs, removeExtension, setExtension, setExtensions } = useExtensionsStore();
 
@@ -116,7 +128,13 @@ export function ExtensionsPage() {
         <div className="flex flex-col gap-2">
           <h3 className="text-xl">{texts.extensions.typeModels}</h3>
 
-          {numModels === 0 && isFetched && <Alert text={texts.extensions.warningNoModel} />}
+          {numModels === 0 && isFetched && (
+            <Alert text={texts.extensions.warningNoModel}>
+              <Button color="red" variant="light" size="compact-xs" mt="sm" onClick={() => setToCreate(true)}>
+                {texts.extensions.add}
+              </Button>
+            </Alert>
+          )}
 
           {numModels > 1 && isFetched && <Alert text={texts.extensions.warningTooManyModels} />}
 

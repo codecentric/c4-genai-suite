@@ -2,11 +2,11 @@ import { randomInt } from 'crypto';
 import test, { expect } from '@playwright/test';
 import { config } from '../tests/utils/config';
 import {
-  addAzureModelToConfiguration,
+  addAzureModelToWizardConfiguration,
   cleanup,
-  createConfiguration,
-  enterAdminArea,
+  createAssistant,
   enterUserArea,
+  goToWelcomePage,
   login,
   newChat,
   selectConfiguration,
@@ -21,17 +21,16 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
     await test.step('should login', async () => {
       await login(page);
       await cleanup(page);
+      await goToWelcomePage(page);
     });
 
     await test.step('add assistant', async () => {
       configuration.name = `Azure-OpenAI-Chat-${randomInt(10000)}`;
-      configuration.description = `Description for ${configuration.name}`;
-      await enterAdminArea(page);
-      await createConfiguration(page, configuration);
+      await createAssistant(page, configuration.name);
     });
 
     await test.step('add model', async () => {
-      await addAzureModelToConfiguration(page, configuration, { deployment: 'gpt-4o-mini' });
+      await addAzureModelToWizardConfiguration(page, { deployment: 'gpt-4o-mini' });
     });
 
     await test.step('should start chat in new configuration', async () => {

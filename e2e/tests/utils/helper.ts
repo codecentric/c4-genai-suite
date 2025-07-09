@@ -2,13 +2,22 @@ import path from 'path';
 import { expect, Locator, Page } from '@playwright/test';
 import { config } from './config';
 
-export async function login(page: Page, user?: { email: string; password: string }) {
+export async function loginFirstTime(page: Page, user?: { email: string; password: string }) {
   await page.goto(`${config.URL}/login`);
   await page.getByPlaceholder('Email').fill(user?.email ?? 'admin@example.com');
   await page.getByPlaceholder('Password').fill(user?.password ?? 'secret');
   await page.getByRole('button', { name: 'Login' }).click();
+}
+
+export async function login(page: Page, user?: { email: string; password: string }) {
+  await loginFirstTime(page, user);
   await page.waitForURL(`${config.URL}/chat`);
   await page.getByTestId('menu user').waitFor({ state: 'visible' });
+}
+
+export async function goToWelcomePage(page: Page) {
+  await page.waitForURL(`${config.URL}/chat`);
+  await expect(page.getByText('Welcome to c4 genai suite')).toBeVisible();
 }
 
 export async function enterAdminArea(page: Page) {
@@ -48,7 +57,7 @@ export async function sendMessage(page: Page, configuration: { name: string }, c
   await page.waitForLoadState('networkidle', { timeout: 30000 });
 }
 
-async function save(page: Page, expectDetached = true) {
+export async function save(page: Page, expectDetached = true) {
   const button = page.getByRole('button', { name: 'Save' });
   await button.click();
   if (expectDetached) {
@@ -371,6 +380,16 @@ export async function wait(timeout: number) {
   await new Promise((resolve) => setTimeout(resolve, timeout));
 }
 
+export async function addAzureModelToWizardConfiguration(page: Page, azure: { deployment: string; configurable?: string[] }) {
+  await page
+    .locator('div')
+    .filter({ hasText: /^Azure OpenAIOpen AI LLM integrationllm$/ })
+    .first()
+    .click();
+
+  await fillAzureModelExtension(page, azure);
+}
+
 export async function addAzureModelToConfiguration(
   page: Page,
   configuration: { name: string },
@@ -379,13 +398,17 @@ export async function addAzureModelToConfiguration(
   await page.getByRole('link', { name: 'Assistants' }).click();
   await page.getByRole('link').filter({ hasText: configuration.name }).click();
 
-  await page.getByRole('button', { name: 'Add Extension' }).click();
+  await page.getByRole('button', { name: 'Add Extension' }).first().click();
 
   await page
     .locator('*')
     .filter({ hasText: /^Azure OpenAIOpen AI LLM integration.*$/ })
     .nth(1)
     .click();
+  await fillAzureModelExtension(page, azure);
+}
+
+async function fillAzureModelExtension(page: Page, azure: { deployment: string; configurable?: string[] }) {
   await page.getByLabel('API Key').click();
   await page.getByLabel('API Key').fill(config.AZURE_OPEN_AI_API_KEY);
   await page.getByLabel('Deployment Name').fill(azure.deployment);
@@ -428,7 +451,7 @@ export async function addSystemPromptToConfiguration(
   await page.getByRole('link', { name: 'Assistants' }).click();
   await page.getByRole('link').filter({ hasText: configuration.name }).click();
 
-  await page.getByRole('button', { name: 'Add Extension' }).click();
+  await page.getByRole('button', { name: 'Add Extension' }).first().click();
 
   await page
     .locator('*')
@@ -627,4 +650,13 @@ export async function expectElementInYRange(element: Locator, min: number, max: 
   const lowestPointY = box && box.y + box.height;
   expect(highestPointY).toBeGreaterThan(min);
   expect(lowestPointY).toBeLessThan(max);
+}
+
+export async function createAssistant(page: Page, name: string) {
+  const description = `Description for ${name}`;
+  await page.getByRole('link', { name: 'Setup an Assistant' }).click();
+  await expect(page).toHaveURL(/\/admin\/assistants\?create/);
+  await page.getByRole('textbox', { name: 'Name' }).fill(name);
+  await page.getByRole('textbox', { name: 'Description' }).fill(description);
+  await page.getByRole('button', { name: 'Save' }).click();
 }

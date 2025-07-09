@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker';
 import { expect, test } from '@playwright/test';
-import { cleanup, login, navigateToConfigurationAdministration } from '../utils/helper';
+import { cleanup, goToWelcomePage, login } from '../utils/helper';
 
 const configName = faker.commerce.productName();
 const configDescription = faker.commerce.productDescription();
@@ -11,24 +11,18 @@ test('Configuration Management', async ({ page }) => {
   await test.step('should login', async () => {
     await login(page);
     await cleanup(page);
+    await goToWelcomePage(page);
   });
 
-  await test.step('will navigate to configuration administration page', async () => {
-    await navigateToConfigurationAdministration(page);
-  });
-
-  await test.step('create a configuration', async () => {
-    await page
-      .locator('div')
-      .filter({ hasText: /^Assistants$/ })
-      .getByRole('button')
-      .click();
-    await page.getByLabel('Name').click();
-    await page.getByLabel('Name').fill(configName);
-    await page.getByLabel('Description').click();
-    await page.getByLabel('Description').fill(configDescription);
-
+  await test.step('should add a new assistant when login the first time', async () => {
+    await page.getByRole('link', { name: 'Setup an Assistant' }).click();
+    await expect(page).toHaveURL(/\/admin\/assistants\?create/);
+    await page.getByRole('textbox', { name: 'Name' }).fill(configName);
+    await page.getByRole('textbox', { name: 'Description' }).fill(configDescription);
     await page.getByRole('button', { name: 'Save' }).click();
+
+    await page.getByRole('dialog', { name: 'Create Extension' }).getByRole('button').click();
+
     const createConfigurationModal = page.getByRole('heading', { name: 'Create Configuration' });
 
     await createConfigurationModal.waitFor({ state: 'detached' });
@@ -71,7 +65,7 @@ test('Configuration Management', async ({ page }) => {
     await page.getByRole('list', { name: 'assistants' }).getByRole('listitem').filter({ hasText: configNewName }).click();
 
     await page.getByRole('heading', { name: 'Extensions' }).waitFor();
-    await page.getByRole('button', { name: 'Add Extension' }).click();
+    await page.getByRole('button', { name: 'Add Extension' }).first().click();
     await page
       .locator('div')
       .filter({ hasText: /^OpenAIOpen AI LLM integrationllm$/ })
@@ -103,7 +97,7 @@ test('Configuration Management', async ({ page }) => {
 
   await test.step('alert when API Key is empty and Model field is not selected with an option', async () => {
     await page.getByRole('list', { name: 'assistants' }).getByRole('listitem').filter({ hasText: configNewName }).click();
-    await page.getByRole('button', { name: 'Add Extension' }).click();
+    await page.getByRole('button', { name: 'Add Extension' }).first().click();
     await page.getByRole('group').getByRole('heading', { name: 'OpenAI', exact: true }).click();
     await page.getByRole('button', { name: 'Save' }).click();
 
@@ -117,7 +111,7 @@ test('Configuration Management', async ({ page }) => {
     await page.getByRole('list', { name: 'assistants' }).getByRole('listitem').filter({ hasText: configNewName }).click();
 
     await page.getByRole('heading', { name: 'Extensions' }).waitFor();
-    await page.getByRole('button', { name: 'Add Extension' }).click();
+    await page.getByRole('button', { name: 'Add Extension' }).first().click();
     await page
       .locator('div')
       .filter({ hasText: /^OpenAIOpen AI LLM integrationllm$/ })

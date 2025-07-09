@@ -33,7 +33,7 @@ const InAppDocsLayout: React.FC<InAppDocsLayoutProps> = ({ docsMarkdown, isDocsV
       <div className="flex flex-1 overflow-hidden">
         <div className={`flex-grow ${isDocsVisible ? 'w-0 xl:w-2/3' : 'w-full'} overflow-auto`}>{children}</div>
         {isDocsVisible && (
-          <div className="bg-base-100 text-base-content flex h-full w-full flex-col xl:w-1/3">
+          <div className="bg-base-100 text-base-content flex h-full w-full flex-col border-l xl:w-1/3">
             <div className="bg-primary text-primary-content flex h-12 items-center justify-between p-4">
               <h2 className="text-lg font-semibold">{texts.common.docsHeader}</h2>
               <ActionIcon onClick={toggleDocs} size="xl" mr="xs" variant="subtle" color="primary-content">
@@ -66,19 +66,18 @@ export const InAppDocsProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   };
 
   const location = useLocation();
-  const query = useQuery<string, unknown>({
+  const { data: docsMarkdown, isSuccess: isDocsAvailable } = useQuery<string, unknown>({
     queryKey: ['docs', location.pathname],
     queryFn: () => fetchMarkdown(location.pathname),
   });
   const [isDocsOpen, setIsDocsOpen] = useState(false);
 
   const toggleDocs = () => setIsDocsOpen((prev) => !prev);
-  const isDocsAvailable = query.isSuccess;
   const isDocsButtonVisible = isDocsAvailable && !isDocsOpen;
 
   return (
     <DocsContext.Provider value={{ isDocsButtonVisible, toggleDocs }}>
-      <InAppDocsLayout docsMarkdown={query.data || ''} isDocsVisible={isDocsOpen && isDocsAvailable} toggleDocs={toggleDocs}>
+      <InAppDocsLayout docsMarkdown={docsMarkdown || ''} isDocsVisible={isDocsOpen && isDocsAvailable} toggleDocs={toggleDocs}>
         {children}
       </InAppDocsLayout>
     </DocsContext.Provider>

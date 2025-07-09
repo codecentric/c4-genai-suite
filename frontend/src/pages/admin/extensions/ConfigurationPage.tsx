@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { ConfigurationDto, useApi } from 'src/api';
 import { Icon, Page } from 'src/components';
@@ -19,7 +19,19 @@ export function ConfigurationPage() {
   const { i18n } = useTranslation();
 
   const navigate = useTransientNavigate();
-  const [toCreate, setToCreate] = useState<boolean>();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const setToCreate = (createParamExists: boolean) => {
+    const newParams = new URLSearchParams(searchParams);
+    if (createParamExists) {
+      newParams.set('create', 'true');
+    } else {
+      newParams.delete('create');
+    }
+    setSearchParams(newParams);
+  };
+  const toCreate = searchParams.has('create');
+
   const [toUpdate, setToUpdate] = useState<ConfigurationDto | null>(null);
   const { configurations, removeConfiguration, setConfiguration, setConfigurations } = useConfigurationStore();
 

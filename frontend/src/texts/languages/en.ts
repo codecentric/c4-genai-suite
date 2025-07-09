@@ -310,4 +310,11 @@ export const en = {
     welcomeText: 'Welcome Text',
     welcomeTextHints: 'Only shown on the login page.',
   },
+  welcome: {
+    title: 'Welcome to c4 GenAI Suite',
+    subtitle: 'An AI chatbot with Model Context Provider (MCP) integration. Powered by Langchain.',
+    setupAnAssistant: 'Setup an Assistant',
+    noAssistantIsSetUpYet: 'No Assistant is set up yet. Ask your administrator to set up an assistant.',
+    setupAnAssistantOnDesktop: 'Please configure a first Assistant via the desktop page.',
+  },
 };

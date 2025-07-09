@@ -1,29 +1,48 @@
 import { expect, test } from '@playwright/test';
 import {
-  addVisionFileExtensionToConfiguration,
   checkSelectedConfiguration,
-  cleanup,
   createConfiguration,
   enterUserArea,
-  login,
+  goToWelcomePage,
+  loginFirstTime,
   navigateToConfigurationAdministration,
   newChat,
+  save,
   selectConfiguration,
+  selectOption,
 } from '../utils/helper';
 
 const assistantName = 'Configuration without llm';
 
 test('Chat', async ({ page, browserName }) => {
   await test.step('should login', async () => {
-    await login(page);
-    await cleanup(page);
+    await loginFirstTime(page);
+    await goToWelcomePage(page);
   });
 
-  await test.step('will navigate to configuration administration page', async () => {
-    await navigateToConfigurationAdministration(page);
+  await test.step('should add a new assistant when login the first time', async () => {
+    await page.getByRole('link', { name: 'Setup an Assistant' }).click();
+    await expect(page).toHaveURL(/\/admin\/assistants\?create/);
+    await page.getByRole('textbox', { name: 'Name' }).fill('First Assistant');
+    await page.getByRole('textbox', { name: 'Description' }).fill('First Assistant Description');
+    await page.getByRole('button', { name: 'Save' }).click();
   });
 
-  await test.step('should add empty configuration', async () => {
+  await test.step('should add a new model', async () => {
+    await page
+      .locator('div')
+      .filter({ hasText: /^Azure OpenAIOpen AI LLM integrationllm$/ })
+      .first()
+      .click();
+    await page.getByLabel('API Key').click();
+    await page.getByLabel('API Key').fill('123');
+    await page.getByLabel('Deployment Name').fill('deployment');
+    await page.getByLabel('Instance Name').fill('cccc-testing');
+    await selectOption(page, 'API Version', '2023-05-15');
+    await save(page);
+  });
+
+  await test.step('should add a new configuration', async () => {
     await page.getByRole('link', { name: 'Assistants' }).click();
     await page
       .locator('*')
@@ -35,8 +54,9 @@ test('Chat', async ({ page, browserName }) => {
     await page.getByRole('button', { name: 'Save' }).click();
   });
 
-  await test.step('should add empty configuration', async () => {
-    await addVisionFileExtensionToConfiguration(page, { name: assistantName });
+  await test.step('should add vision extension to configuration', async () => {
+    await page.getByRole('heading', { name: 'Files Vision', exact: true }).click();
+    await save(page);
   });
 
   await test.step('should upload avatar logo', async () => {
@@ -63,7 +83,9 @@ test('Chat', async ({ page, browserName }) => {
   await test.step('should add more configurations', async () => {
     await navigateToConfigurationAdministration(page);
     await createConfiguration(page, { name: 'Assistant', description: 'Assistant Description' });
+    await page.getByRole('dialog', { name: 'Create Extension' }).getByRole('button').click();
     await createConfiguration(page, { name: 'Other Assistant', description: 'Other Assistant Description' });
+    await page.getByRole('dialog', { name: 'Create Extension' }).getByRole('button').click();
     await enterUserArea(page);
   });
 

@@ -1,13 +1,13 @@
 import { expect, test } from '@playwright/test';
 import { config } from '../tests/utils/config';
 import {
-  addAzureModelToConfiguration,
+  addAzureModelToWizardConfiguration,
   addSystemPromptToConfiguration,
   configureAssistantByUser,
-  createConfiguration,
-  enterAdminArea,
+  createAssistant,
   enterUserArea,
-  login,
+  goToWelcomePage,
+  loginFirstTime,
   newChat,
   selectConfiguration,
   sendMessage,
@@ -20,18 +20,17 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
     const configuration = { name: '', description: '' };
 
     await test.step('should login', async () => {
-      await login(page);
+      await loginFirstTime(page);
+      await goToWelcomePage(page);
     });
 
     await test.step('add assistant', async () => {
       configuration.name = `E2E-Test-Configurable-Arguments-${Date.now()}`;
-      configuration.description = `Description for ${configuration.name}`;
-      await enterAdminArea(page);
-      await createConfiguration(page, configuration);
+      await createAssistant(page, configuration.name);
     });
 
     await test.step('add model', async () => {
-      await addAzureModelToConfiguration(page, configuration, { deployment: 'gpt-4o-mini' });
+      await addAzureModelToWizardConfiguration(page, { deployment: 'gpt-4o-mini' });
     });
 
     await test.step('add prompt', async () => {

@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { config } from '../tests/utils/config';
 import {
-  addAzureModelToConfiguration,
+  addAzureModelToWizardConfiguration,
   addMCPToConfiguration,
   addSystemPromptToConfiguration,
   createConfiguration,
@@ -31,7 +31,7 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
     });
 
     await test.step('add model', async () => {
-      await addAzureModelToConfiguration(page, configuration, { deployment: 'gpt-4o-mini' });
+      await addAzureModelToWizardConfiguration(page, { deployment: 'gpt-4o-mini' });
     });
 
     await test.step('add prompt', async () => {

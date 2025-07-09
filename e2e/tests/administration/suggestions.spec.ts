@@ -39,6 +39,7 @@ test('When using suggestions c4', async ({ page }) => {
     await page.getByLabel(/^Name/).fill(ASSISTANT_NAME_GLOBAL);
     await page.getByLabel(/^Description/).fill('without llm');
     await page.getByRole('button', { name: 'Save' }).click();
+    await page.getByRole('dialog', { name: 'Create Extension' }).getByRole('button').click();
   });
 
   await test.step('will open create dialog for new assistant', async () => {
@@ -77,6 +78,7 @@ test('When using suggestions c4', async ({ page }) => {
 
   await test.step('will allow saving the maximum amount of assistant suggestions', async () => {
     await page.getByRole('button', { name: 'Save' }).click();
+    await page.getByRole('dialog', { name: 'Create Extension' }).getByRole('button').click();
   });
 
   await test.step('will list saved suggestions in chat with correct assistant', async () => {

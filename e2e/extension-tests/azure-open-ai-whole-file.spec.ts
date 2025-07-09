@@ -2,12 +2,13 @@ import { randomInt } from 'crypto';
 import { expect, Locator, test } from '@playwright/test';
 import { config } from './../tests/utils/config';
 import {
-  addAzureModelToConfiguration,
+  addAzureModelToWizardConfiguration,
   addFilesInChatExtensionToConfiguration,
   addSystemPromptToConfiguration,
   addVisionFileExtensionToConfiguration,
   addWholeFileExtensionToConfiguration,
   cleanup,
+  createAssistant,
   createBucket,
   createConfiguration,
   deactivateFileInChatExtensionToConfiguration,
@@ -16,6 +17,7 @@ import {
   editBucket,
   enterAdminArea,
   enterUserArea,
+  goToWelcomePage,
   login,
   newChat,
   selectConfiguration,
@@ -38,17 +40,16 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
     await test.step('should login', async () => {
       await login(page);
       await cleanup(page);
+      await goToWelcomePage(page);
     });
 
     await test.step('add assistant', async () => {
       configuration.name = `E2E-Whole-File-${randomInt(10000)}`;
-      configuration.description = `Description for ${configuration.name}`;
-      await enterAdminArea(page);
-      await createConfiguration(page, configuration);
+      await createAssistant(page, configuration.name);
     });
 
     await test.step('add model', async () => {
-      await addAzureModelToConfiguration(page, configuration, { deployment: 'gpt-4o-mini' });
+      await addAzureModelToWizardConfiguration(page, { deployment: 'gpt-4o-mini' });
     });
 
     await test.step('add prompt', async () => {
@@ -180,7 +181,8 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
       configuration.name = `E2E-Test-Other-${Date.now()}`;
       configuration.description = `Description for ${configuration.name}`;
       await createConfiguration(page, configuration);
-      await addAzureModelToConfiguration(page, configuration, { deployment: 'gpt-4o-mini' });
+      //await addAzureModelToConfiguration(page, configuration, { deployment: 'gpt-4o-mini' });
+      await addAzureModelToWizardConfiguration(page, { deployment: 'gpt-4o-mini' });
       await addSystemPromptToConfiguration(page, configuration, { text: 'Your are a helpful assistant.' });
       await editBucket(page, { name: conversationFilesBucket, fileSizeLimits: { general: 10 } });
     });

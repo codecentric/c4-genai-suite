@@ -335,5 +335,12 @@ function load() {
       welcomeText: translate('theme.welcomeText'),
       welcomeTextHints: translate('theme.welcomeTextHints'),
     },
+    welcome: {
+      title: translate('welcome.title'),
+      subtitle: translate('welcome.subtitle'),
+      setupAnAssistant: translate('welcome.setupAnAssistant'),
+      noAssistantIsSetUpYet: translate('welcome.noAssistantIsSetUpYet'),
+      setupAnAssistantOnDesktop: translate('welcome.setupAnAssistantOnDesktop'),
+    },
   };
 }
