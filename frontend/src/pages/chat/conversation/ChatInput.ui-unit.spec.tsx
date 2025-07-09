@@ -143,7 +143,7 @@ describe('ChatInput', () => {
       ],
     };
 
-    render(<ChatInput conversationId={0} onSubmit={mockOnSubmit} configuration={chatInputConfiguration} isEmpty={true} />);
+    render(<ChatInput chatId={0} submitMessage={mockOnSubmit} configuration={chatInputConfiguration} isEmpty={true} />);
 
     const suggestionButton = screen.getByText('Suggestion Title');
 
