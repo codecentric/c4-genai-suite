@@ -24,7 +24,7 @@ ffmpeg-python = "^0.2.0"
 aiofiles = "^24.1.0"
 prometheus-fastapi-instrumentator = "^7.0.0"
 fastmcp = "^2.10.4"
-langchain-ollama = "^0.3.3"
+langchain-ollama = "^0.3.4"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "0.12.2"
