@@ -1,3 +1,34 @@
+
+<div align="right">
+  <details>
+    <summary >🌐 Language</summary>
+    <div>
+      <div align="right">
+        <p><a href="https://openaitx.github.io/view.html?user=codecentric&project=c4-genai-suite&lang=en">English</a></p>
+        <p><a href="https://openaitx.github.io/view.html?user=codecentric&project=c4-genai-suite&lang=zh-CN">简体中文</a></p>
+        <p><a href="https://openaitx.github.io/view.html?user=codecentric&project=c4-genai-suite&lang=zh-TW">繁體中文</a></p>
+        <p><a href="https://openaitx.github.io/view.html?user=codecentric&project=c4-genai-suite&lang=ja">日本語</a></p>
+        <p><a href="https://openaitx.github.io/view.html?user=codecentric&project=c4-genai-suite&lang=ko">한국어</a></p>
+        <p><a href="https://openaitx.github.io/view.html?user=codecentric&project=c4-genai-suite&lang=hi">हिन्दी</a></p>
+        <p><a href="https://openaitx.github.io/view.html?user=codecentric&project=c4-genai-suite&lang=th">ไทย</a></p>
+        <p><a href="https://openaitx.github.io/view.html?user=codecentric&project=c4-genai-suite&lang=fr">Français</a></p>
+        <p><a href="https://openaitx.github.io/view.html?user=codecentric&project=c4-genai-suite&lang=de">Deutsch</a></p>
+        <p><a href="https://openaitx.github.io/view.html?user=codecentric&project=c4-genai-suite&lang=es">Español</a></p>
+        <p><a href="https://openaitx.github.io/view.html?user=codecentric&project=c4-genai-suite&lang=it">Itapano</a></p>
+        <p><a href="https://openaitx.github.io/view.html?user=codecentric&project=c4-genai-suite&lang=ru">Русский</a></p>
+        <p><a href="https://openaitx.github.io/view.html?user=codecentric&project=c4-genai-suite&lang=pt">Português</a></p>
+        <p><a href="https://openaitx.github.io/view.html?user=codecentric&project=c4-genai-suite&lang=nl">Nederlands</a></p>
+        <p><a href="https://openaitx.github.io/view.html?user=codecentric&project=c4-genai-suite&lang=pl">Polski</a></p>
+        <p><a href="https://openaitx.github.io/view.html?user=codecentric&project=c4-genai-suite&lang=ar">العربية</a></p>
+        <p><a href="https://openaitx.github.io/view.html?user=codecentric&project=c4-genai-suite&lang=fa">فارسی</a></p>
+        <p><a href="https://openaitx.github.io/view.html?user=codecentric&project=c4-genai-suite&lang=tr">Türkçe</a></p>
+        <p><a href="https://openaitx.github.io/view.html?user=codecentric&project=c4-genai-suite&lang=vi">Tiếng Việt</a></p>
+        <p><a href="https://openaitx.github.io/view.html?user=codecentric&project=c4-genai-suite&lang=id">Bahasa Indonesia</a></p>
+      </div>
+    </div>
+  </details>
+</div>
+
 # c4 GenAI Suite
 
 An AI chatbot application with Model Context Provider (MCP) integration, powered by Langchain and compatibility for all major Large Language Models (LLMs) and Embedding Models.
