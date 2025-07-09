@@ -2,7 +2,7 @@ import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class MoveTablesToCompanyChatSchema1751955322727 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(`CREATE SCHEMA company_chat`);
+    await queryRunner.query(`CREATE SCHEMA IF NOT EXISTS company_chat;`);
 
     const tables = [
       'blobs',
@@ -32,7 +32,7 @@ export class MoveTablesToCompanyChatSchema1751955322727 implements MigrationInte
       BEGIN
         FOR r IN (SELECT conname, conrelid::regclass, confrelid::regclass
                   FROM pg_constraint
-                  WHERE connamespace = 'public'::regnamespace and conrelid::regclass <> 'migrations'::regclass) LOOP
+                  WHERE connamespace = 'public'::regnamespace) LOOP
           EXECUTE format('ALTER TABLE %s.%s DROP CONSTRAINT %s',
                          'company_chat',
                          r.conrelid,
