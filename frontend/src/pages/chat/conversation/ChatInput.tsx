@@ -6,7 +6,7 @@ import TextareaAutosize from 'react-textarea-autosize';
 import { toast } from 'react-toastify';
 import { ConfigurationDto, FileDto, useApi } from 'src/api';
 import { Icon, Markdown } from 'src/components';
-import { ExtensionContext, JSONObject, useEventCallback, useExtensionContext, useTheme } from 'src/hooks';
+import { ExtensionContext, JSONObject, useEventCallback, useExtensionContext, usePersistentState, useTheme } from 'src/hooks';
 import { useSpeechRecognitionToggle } from 'src/hooks/useSpeechRecognitionToggle';
 import { buildError } from 'src/lib';
 import { FileItem } from 'src/pages/chat/conversation/FileItem';
@@ -55,7 +55,10 @@ export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEm
     { name: texts.chat.speechRecognition.languages.en, code: 'en-US' },
   ];
 
-  const [speechLanguage, setSpeechLanguage] = useState<string>(speechRecognitionLanguages[0].code);
+  const [speechLanguage, setSpeechLanguage] = usePersistentState<string>(
+    'speechRecognitionLanguage',
+    speechRecognitionLanguages[0].code,
+  );
 
   useEffect(() => {
     const defaultValues = configuration?.extensions?.filter(isExtensionWithUserArgs).reduce(

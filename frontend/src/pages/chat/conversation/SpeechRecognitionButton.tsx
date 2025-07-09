@@ -22,6 +22,9 @@ export function SpeechRecognitionButton({
   setSpeechLanguage,
   languages,
 }: SpeechRecognitionWrapperProps) {
+  const buttonText = listening ? texts.chat.speechRecognition.stopMicrophone : texts.chat.speechRecognition.useMicrophone;
+  const toolTipText = `${buttonText} (${speechLanguage})`;
+
   return (
     <>
       <div className="flex" style={{ width: 'fit-content' }}>
@@ -32,9 +35,9 @@ export function SpeechRecognitionButton({
             color={listening ? 'red' : 'black'}
             className={`border-gray-200 ${listening ? 'animate-pulse' : ''} rounded-r-none border-r-0`}
             onClick={toggleSpeechRecognition}
-            title={listening ? texts.chat.speechRecognition.stopMicrophone : texts.chat.speechRecognition.useMicrophone}
+            title={toolTipText}
             style={{ borderTopRightRadius: 0, borderBottomRightRadius: 0, width: '36px' }}
-            aria-label={listening ? texts.chat.speechRecognition.stopMicrophone : texts.chat.speechRecognition.useMicrophone}
+            aria-label={toolTipText}
           >
             <IconMicrophone className="w-4" />
           </ActionIcon>

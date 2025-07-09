@@ -17,7 +17,7 @@
 ## Getting Started
 
 ```bash
-helm install codecentric-company-chat oci://ghcr.io/codecentric/company-chat/charts/c4-genai-suite -f values.yaml
+helm install codecentric-c4-genai-suite oci://ghcr.io/codecentric/c4-genai-suite/charts/c4-genai-suite -f values.yaml
 ```
 
 ### Example `values.yaml`
