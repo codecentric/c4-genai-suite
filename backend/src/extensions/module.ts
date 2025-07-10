@@ -19,6 +19,7 @@ import { OpenAICompatibleModelExtension } from './models/open-ai-compatible';
 import { VertexAIModelExtension } from './models/vertex-al';
 import { CustomPromptExtension } from './other/custom';
 import { HubPromptExtension } from './other/hub';
+import { LangfuseExtension } from './other/langfuse';
 import { SpeechToTextExtension } from './other/speech-to-text';
 import { SummaryPromptExtension } from './other/summary';
 import { Always42Extension } from './tools/always-42';
@@ -119,6 +120,7 @@ export class ExtensionLibraryModule {
         FilesVisionExtension,
         GoogleGenAIModelExtension,
         HubPromptExtension,
+        LangfuseExtension,
         MCPToolsExtension,
         MistralModelExtension,
         OllamaModelExtension,

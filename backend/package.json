@@ -67,6 +67,7 @@
     "express-session": "^1.18.1",
     "json-diff-ts": "^4.6.3",
     "langchain": "^0.3.29",
+    "langfuse-langchain": "^3.38.4",
     "logform": "^2.7.0",
     "nest-winston": "^1.10.2",
     "nestjs-i18n": "^10.5.1",
