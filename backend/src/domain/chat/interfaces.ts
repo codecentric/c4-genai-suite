@@ -5,7 +5,7 @@ import { type ChatPromptTemplate } from '@langchain/core/prompts';
 import { type RunnableSequence } from '@langchain/core/runnables';
 import { type StructuredToolInterface } from '@langchain/core/tools';
 import { Subject } from 'rxjs';
-import { ConfigurationModel } from '../extensions';
+import { ConfigurationModel, ExtensionArgument } from '../extensions';
 import { UploadedFile } from '../files';
 import { User } from '../users';
 
@@ -51,12 +51,19 @@ export interface ChatCache {
   clean(): void;
 }
 
-export interface ChatUI {
-  // Shows a confirm UI.
-  confirm(text: string): Promise<boolean>;
+export enum FormActionType {
+  ACCEPT = 'accept',
+  REJECT = 'reject',
+  CANCEL = 'cancel',
+}
 
-  // Shows an input UI.
-  input(text: string): Promise<string>;
+export interface ChatUICallbackResult {
+  action: FormActionType;
+  data?: Record<string, any>;
+}
+
+export interface ChatUI {
+  form(text: string, schema: ExtensionArgument): Promise<ChatUICallbackResult>;
 }
 
 export interface AgentArgument {
@@ -183,28 +190,24 @@ export type NormalizedMessageContentImageUrl = {
 export type NormalizedMessageContent = NormalizedMessageContentImageUrl | NormalizedMessageContentText;
 export type NormalizedMessageContents = NormalizedMessageContent[];
 
-export type ConversationRating = 'good' | 'bad' | 'unrated';
+export const CONVERSATION_RATINGS = ['good', 'bad', 'unrated'] as const;
 
-export const CONVERSATION_RATINGS: ConversationRating[] = ['good', 'bad', 'unrated'];
+export type ConversationRating = (typeof CONVERSATION_RATINGS)[number];
 
-export type MessageRating = 'lazy' | 'insufficient_style' | 'incorrect' | 'instructions_not_followed' | 'refused' | 'other';
-
-export const MESSAGE_RATINGS: MessageRating[] = [
+export const MESSAGE_RATINGS = [
   'lazy',
   'insufficient_style',
   'incorrect',
   'instructions_not_followed',
   'refused',
   'other',
-];
+] as const;
 
-export type MessageType = 'human' | 'ai';
+export type MessageRating = (typeof MESSAGE_RATINGS)[number];
 
-export const MESSAGE_TYPES: MessageType[] = ['ai', 'human'];
+export const MESSAGE_TYPES = ['ai', 'human'] as const;
 
-export type StreamUIRequestType = 'boolean' | 'string';
-
-export const STREAM_UI_TYPES: StreamUIRequestType[] = ['boolean', 'string'];
+export type MessageType = (typeof MESSAGE_TYPES)[number];
 
 export type StreamEvent =
   | StreamSummaryEvent
@@ -282,8 +285,8 @@ export interface ChatUIRequest {
   // The text in markdown info.
   text: string;
 
-  // The type of the request.
-  type: StreamUIRequestType;
+  // The schema of the form
+  schema?: ExtensionArgument;
 }
 
 export interface ChatMetadata {

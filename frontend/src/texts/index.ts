@@ -36,6 +36,7 @@ function load() {
       appName: translate('common.appName'),
       builtIn: translate('common.builtIn'),
       cancel: translate('common.cancel'),
+      reject: translate('common.reject'),
       chat: translate('common.chat'),
       chatUser: translate('common.chatUser'),
       confirm: translate('common.confirm'),

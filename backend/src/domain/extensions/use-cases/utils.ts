@@ -46,6 +46,12 @@ function getZodArgumentType(arg: ExtensionArgument): z.ZodType | undefined {
     type EnumStringType = [string, ...string[]];
     let type: DynamicZodType<z.ZodString | z.ZodEnum<EnumStringType>> = z.string().describe(arg.title);
 
+    if (arg.format === 'email') {
+      type = type.email();
+    } else if (arg.format === 'date') {
+      type = type.date();
+    }
+
     if (arg.enum?.length) {
       type = z.enum(arg.enum as EnumStringType);
     }
@@ -81,12 +87,12 @@ function getZodArgumentType(arg: ExtensionArgument): z.ZodType | undefined {
   }
 }
 
-export function validateObjectArgument(configuration: ExtensionConfiguration, e: ExtensionObjectArgument) {
+export function validateObjectArgument(data: ExtensionConfiguration, schema: ExtensionObjectArgument) {
   try {
-    const validate = getZodArgumentType(e)!;
-    return validate.parse(configuration) as ExtensionConfiguration;
-  } catch (e) {
-    const zodError = e as z.ZodError;
+    const validate = getZodArgumentType(schema)!;
+    return validate.parse(data) as ExtensionConfiguration;
+  } catch (err) {
+    const zodError = err as z.ZodError;
     throw new BadRequestException(zodError.errors.map((x) => `${x.path.join('.')}: ${x.message}`));
   }
 }

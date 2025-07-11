@@ -45,7 +45,7 @@ export function ExtensionForm(props: ExtensionFormProps) {
             }
           >
             {Object.entries(spec.arguments).map(([name, spec]) => (
-              <Argument key={name} buckets={buckets} name={name} argument={spec} />
+              <Argument namePrefix={'values.'} key={name} buckets={buckets} name={name} argument={spec} />
             ))}
           </Fieldset>
         </>
@@ -78,7 +78,7 @@ export function Argument({
   buckets,
   name,
   argument,
-  namePrefix = 'values.',
+  namePrefix = '',
   vertical,
   refreshable,
 }: {
@@ -288,7 +288,7 @@ export function Argument({
   if (type === 'number') {
     const min = argument.minimum;
     const max = argument.maximum;
-    const step = argument.multipleOf ?? ((max || 100) - (min || 0)) / 100;
+    const step = argument.multipleOf;
 
     return (
       <Forms.Number

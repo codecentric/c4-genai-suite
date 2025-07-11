@@ -3,13 +3,19 @@ import { DynamicStructuredTool } from '@langchain/core/tools';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { SSEClientTransport } from '@modelcontextprotocol/sdk/client/sse.js';
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
-import { CallToolRequest, CallToolResultSchema, ListToolsResultSchema, McpError } from '@modelcontextprotocol/sdk/types.js';
+import {
+  CallToolRequest,
+  CallToolResultSchema,
+  ElicitRequestSchema,
+  ListToolsResultSchema,
+  McpError,
+} from '@modelcontextprotocol/sdk/types.js';
 import { JsonSchemaObject, jsonSchemaToZod } from '@n8n/json-schema-to-zod';
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { diff } from 'json-diff-ts';
 import { renderString } from 'nunjucks';
 import { z } from 'zod';
-import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from 'src/domain/chat';
+import { ChatContext, ChatMiddleware, ChatNextDelegate, FormActionType, GetContext } from 'src/domain/chat';
 import {
   Extension,
   ExtensionArgument,
@@ -74,41 +80,49 @@ const passwordKeys = ['apiKey', 'api-key', 'password', 'credentials'];
 
 function toExtensionArgument(
   schema: JsonSchemaObject & { title?: string; description?: string },
-  attributeKey?: string,
+  options: { key?: string; required?: boolean; forceRequired?: boolean },
 ): ExtensionArgument | undefined {
+  const required = options.forceRequired ?? options.required ?? false;
+
   if (schema.type === 'number' || schema.type === 'integer') {
     return {
       type: 'number',
-      title: '',
+      title: schema.title ?? options.key ?? '',
       format: schema.format as 'input',
       minimum: schema.minimum,
       maximum: schema.maximum,
-      required: false,
+      multipleOf: schema.type === 'number' ? schema.multipleOf : 1,
+      required,
     };
   } else if (schema.type === 'string') {
-    const format = attributeKey && passwordKeys.includes(attributeKey) ? 'password' : (schema.format as 'input');
+    const format = options.key && passwordKeys.includes(options.key) ? 'password' : (schema.format as 'input');
 
     return {
       type: 'string',
-      title: '',
+      title: schema.title ?? options.key ?? '',
       enum: schema.enum as string[],
       format,
-      required: false,
+      required,
     };
   } else if (schema.type === 'boolean') {
     return {
       type: 'boolean',
-      title: '',
-      required: false,
+      title: schema.title ?? options.key ?? '',
+      required,
     };
   } else if (schema.type === 'object') {
     return {
       type: 'object',
-      title: '',
-      required: false,
+      title: schema.title ?? options.key ?? '',
+      required,
       properties: Object.entries(schema.properties ?? {}).reduce(
         (prev, [key, type]) => {
-          const propertyType = toExtensionArgument(type as JsonSchemaObject, key);
+          const propertyRequired = options.forceRequired ?? (Array.isArray(schema.required) && schema.required.includes(key));
+          const propertyType = toExtensionArgument(type as JsonSchemaObject, {
+            key,
+            required: propertyRequired,
+            forceRequired: options.forceRequired,
+          });
           if (propertyType) {
             prev[key] = propertyType;
           }
@@ -118,15 +132,18 @@ function toExtensionArgument(
       ),
     };
   } else if (schema.type === 'array') {
-    const arrayItemType = toExtensionArgument(schema.items as JsonSchemaObject);
+    const arrayItemType = toExtensionArgument(schema.items as JsonSchemaObject, {
+      required: true,
+      forceRequired: options.forceRequired,
+    });
     if (!arrayItemType || (arrayItemType.type !== 'string' && arrayItemType.type !== 'number')) {
       return;
     }
 
     return {
       type: 'array',
-      title: '',
-      required: false,
+      title: schema.title ?? options?.key ?? '',
+      required,
       items: arrayItemType,
       default: schema.default as any[],
     };
@@ -140,7 +157,7 @@ function toArguments(i18n: I18nService, tools: MCPListToolsResultSchema['tools']
       toolObject.properties[tool.name] = Object.entries(methodSchema.properties ?? {}).reduce(
         (methodObject, [name, type]) => {
           const methodType = type as JsonSchemaObject;
-          const innerMethodType = toExtensionArgument(methodType, name);
+          const innerMethodType = toExtensionArgument(methodType, { key: name, forceRequired: false });
           if (!innerMethodType) {
             return methodObject;
           }
@@ -374,6 +391,27 @@ export class MCPToolsExtension implements Extension<Configuration> {
     );
   }
 
+  private enableElicitRequests(client: Client, context: ChatContext) {
+    client.setRequestHandler(ElicitRequestSchema, async (request) => {
+      this.logger.log('Received elicit request', { request });
+      const schema = toExtensionArgument(request.params.requestedSchema as JsonSchemaObject, {});
+      if (schema) {
+        const userResponse = await context.ui.form(request.params.message, schema);
+        this.logger.log('Received ui response', { userResponse });
+        return {
+          action: userResponse.action,
+          content: userResponse.action === FormActionType.ACCEPT ? userResponse.data : undefined,
+        };
+      }
+
+      // the schema is invalid or not supported
+      return {
+        action: 'cancel',
+        content: undefined,
+      };
+    });
+  }
+
   async getMiddlewares(
     _user: User,
     extension: ExtensionEntity<Configuration>,
@@ -382,6 +420,7 @@ export class MCPToolsExtension implements Extension<Configuration> {
     const middleware = {
       invoke: async (context: ChatContext, _: GetContext, next: ChatNextDelegate): Promise<any> => {
         const { tools, client } = (await this.getTools(extension.values)) ?? [];
+        this.enableElicitRequests(client, context);
         const schemaData = extension.values.schema ?? {};
 
         const filteredTools = tools.filter((x) => schemaData[x.name]?.enabled);
@@ -452,7 +491,9 @@ export class MCPToolsExtension implements Extension<Configuration> {
         version: '1.0.0',
       },
       {
-        capabilities: {},
+        capabilities: {
+          elicitation: {},
+        },
       },
     );
 
