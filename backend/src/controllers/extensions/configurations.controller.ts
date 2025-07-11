@@ -15,6 +15,8 @@ import {
   DuplicateConfiguration,
   GetBucketAvailability,
   GetBucketAvailabilityResponse,
+  GetConfiguration,
+  GetConfigurationResponse,
   GetConfigurations,
   GetConfigurationsResponse,
   GetExtensions,
@@ -69,6 +71,21 @@ export class ConfigurationsController {
       new GetConfigurations(req.user, fetchEnabledWithExtensions, fetchEnabledWithExtensions),
     );
     return ConfigurationsDto.fromDomain(result.configurations);
+  }
+
+  @Get(':id')
+  @ApiOperation({ operationId: 'getConfiguration', description: 'Gets a configuration with the given id.' })
+  @ApiOkResponse({ type: ConfigurationDto })
+  @ApiParam({
+    name: 'id',
+    description: 'The ID of the configuration',
+    required: true,
+    type: Number,
+  })
+  async getConfiguration(@Param('id') id: number) {
+    const result: GetConfigurationResponse = await this.queryBus.execute(new GetConfiguration(id));
+
+    return ConfigurationDto.fromDomain(result.configuration);
   }
 
   @Post('')

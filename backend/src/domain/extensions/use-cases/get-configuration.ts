@@ -1,3 +1,4 @@
+import { NotFoundException } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ConfigurationEntity, ConfigurationRepository } from 'src/domain/database';
@@ -9,7 +10,7 @@ export class GetConfiguration {
 }
 
 export class GetConfigurationResponse {
-  constructor(public configuration?: ConfigurationModel) {}
+  constructor(public readonly configuration: ConfigurationModel) {}
 }
 
 @QueryHandler(GetConfiguration)
@@ -25,7 +26,7 @@ export class GetConfigurationHandler implements IQueryHandler<GetConfiguration, 
     const entity = await this.extensions.findOneBy({ id });
 
     if (!entity) {
-      return new GetConfigurationResponse();
+      throw new NotFoundException(`Configuration with id ${id} was not found`);
     }
 
     const result = await buildConfiguration(entity);
