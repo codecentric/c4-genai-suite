@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { Source } from 'src/domain/chat';
 import { ConversationEntity } from './conversation';
 
@@ -35,6 +35,15 @@ export class MessageEntity {
 
   @ManyToOne(() => ConversationEntity, (conversation) => conversation.messages, { onDelete: 'CASCADE' })
   conversation!: ConversationEntity;
+
+  @Column({ nullable: true })
+  parentId?: number;
+
+  @ManyToOne(() => MessageEntity, (message) => message.children, { onDelete: 'CASCADE', nullable: true })
+  parent?: MessageEntity;
+
+  @OneToMany(() => MessageEntity, (message) => message.parent, { onDelete: 'CASCADE', cascade: true })
+  children!: MessageEntity[];
 
   @Column()
   conversationId!: number;

@@ -6,6 +6,7 @@ import { Route, Routes } from 'react-router-dom';
 import { CollapseButton, ProfileButton } from 'src/components';
 import { NavigationBar } from 'src/components/NavigationBar';
 import { useSidebarState, useTheme } from 'src/hooks';
+import { useListOfAssistantsInit } from 'src/pages/chat/state/listOfAssistants';
 import { texts } from 'src/texts';
 import { isMobile } from '../utils';
 import { ConversationItems } from './ConversationItems';
@@ -13,7 +14,7 @@ import { NewChatRedirect } from './NewChatRedirect';
 import { DocumentSource, SourcesChunkPreview } from './SourcesChunkPreview';
 import { ConversationPage } from './conversation/ConversationPage';
 import { Files } from './files/Files';
-import { useStateOfSelectedChatId } from './state/chat';
+import { useStateOfSelectedAssistantId, useStateOfSelectedChatId } from './state/chat';
 import { useListOfChatsInit, useMutateNewChat, useStateMutateRemoveAllChats, useStateOfChatEmptiness } from './state/listOfChats';
 import { useUserBucket } from './useUserBucket';
 
@@ -49,10 +50,12 @@ const getPanelSizes = (isRightPanelOpen: boolean) => {
 export function ChatPage() {
   const { theme } = useTheme();
   const isMobileView = isMobile();
+  useListOfAssistantsInit();
   useListOfChatsInit();
 
   const [selectedDocument, setSelectedDocument] = useState<DocumentSource | undefined>();
-  const { userBucket, selectedConfigurationId, setSelectedConfigurationId } = useUserBucket();
+  const selectedAssistantId = useStateOfSelectedAssistantId();
+  const { userBucket } = useUserBucket(selectedAssistantId);
   const checkIfEmptyChat = useStateOfChatEmptiness();
   const selectedChatId = useStateOfSelectedChatId();
   const removeAllChats = useStateMutateRemoveAllChats();
@@ -68,7 +71,7 @@ export function ChatPage() {
   const openNewChatIfNeeded = async () => {
     if (selectedChatId) {
       if (await checkIfEmptyChat(selectedChatId)) textareaRef.current?.focus();
-      else createNewChat.mutate();
+      else createNewChat.mutate(selectedAssistantId);
     }
   };
 
@@ -131,8 +134,6 @@ export function ChatPage() {
                   element={
                     <ConversationPage
                       textareaRef={textareaRef}
-                      selectedConfigurationId={selectedConfigurationId}
-                      onConfigurationSelected={setSelectedConfigurationId}
                       selectDocument={(conversationId, messageId, documentUri) => {
                         setSelectedDocument({ conversationId, messageId, documentUri });
                         setSidebarRight(true);
@@ -176,7 +177,7 @@ export function ChatPage() {
                 <SourcesChunkPreview onClose={() => setSelectedDocument(undefined)} document={selectedDocument} />
               ) : (
                 userBucket && (
-                  <Files configurationId={selectedConfigurationId} userBucket={userBucket} conversationId={selectedChatId} />
+                  <Files configurationId={selectedAssistantId} userBucket={userBucket} conversationId={selectedChatId} />
                 )
               )}
             </Panel>

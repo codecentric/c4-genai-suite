@@ -183,5 +183,6 @@ export const useStateMutateMessageRating = (messageId: number) => {
 
 export const useStateOfChat = () => useChatStore((s) => s.chat);
 export const useStateOfSelectedChatId = () => useChatStore((s) => s.chat.id);
+export const useStateOfSelectedAssistantId = () => useChatStore((s) => s.chat.configurationId);
 export const useStateOfMessages = () => useChatStore((s) => s.messages);
 export const useStateOfIsAiWriting = () => useChatStore((s) => s.isAiWriting);

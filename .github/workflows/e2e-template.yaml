@@ -119,7 +119,6 @@ jobs:
             -p 80:80 \
             --network test-network \
             ghcr.io/codecentric/c4-genai-suite/dev-helper/caddy-gateway-proxy:latest
-      - run: docker ps
       - uses: actions/setup-node@v4
         with:
           node-version: 24.x

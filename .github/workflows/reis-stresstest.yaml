@@ -13,44 +13,42 @@ jobs:
     permissions:
       contents: read
       packages: read
-    services:
-      pgvector:
-        image: pgvector/pgvector:pg16
-        env:
-          POSTGRES_USER: admin
-          POSTGRES_PASSWORD: secret
-          POSTGRES_DB: cccc
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
-      reis:
-        image: ghcr.io/${{ github.repository }}/reis:commit-${{ github.sha }}
-        credentials:
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-        options: >-
-          --cpus 2
-          --memory 2g
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 20
-        env:
-          WORKERS: 2
-          BATCH_SIZE: 100
-          EMBEDDINGS_TYPE: random-test-embeddings
-          STORE_TYPE: pgvector
-          STORE_PGVECTOR_URL: postgresql+psycopg://admin:secret@pgvector:5432/cccc
-          STORE_PGVECTOR_INDEX_NAME: stresstest
-        ports:
-          - 3201:3201
     steps:
       - uses: actions/checkout@v4
         with:
           lfs: true
+      - run: docker network create stresstest-network
+      - name: start database
+        run: |
+          docker run \
+            -d \
+            --network stresstest-network \
+            --name pgvector \
+            -e POSTGRES_USER="admin" \
+            -e POSTGRES_PASSWORD="secret" \
+            -e POSTGRES_DB="cccc" \
+            pgvector/pgvector:pg16
+      - uses: actions/download-artifact@v4
+        with:
+          name: reis
+          path: /tmp/
+      - name: start REIS
+        run: |
+          docker load --input /tmp/reis.tar
+          docker run \
+            -d \
+            --network stresstest-network \
+            --name reis \
+            -p 3201:3201 \
+            --cpus 2 \
+            --memory 2g \
+            -e WORKERS="2" \
+            -e BATCH_SIZE="100" \
+            -e STORE_TYPE="pgvector" \
+            -e STORE_PGVECTOR_URL="postgresql+psycopg://admin:secret@pgvector:5432/cccc" \
+            -e STORE_PGVECTOR_INDEX_NAME="stresstest" \
+            -e EMBEDDINGS_TYPE="random-test-embeddings" \
+            reis:commit-${{ github.sha }}
       - run: pipx install poetry
       - uses: actions/setup-python@v5
         with:

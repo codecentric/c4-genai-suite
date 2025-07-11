@@ -1,4 +1,4 @@
-FROM node:24.3.0-alpine3.21 AS base
+FROM node:24.3.0-alpine3.22 AS base
 
 FROM base AS backend_build
 WORKDIR /src/backend
@@ -19,7 +19,7 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=80
 
-RUN apk add --no-cache caddy=2.8.4-r7 tini=0.19.0-r3
+RUN apk add --no-cache caddy=2.10.0-r0 tini=0.19.0-r3
 COPY Caddyfile /etc/caddy/Caddyfile
 
 COPY --from=backend_build /src/backend/dist /app/backend/dist

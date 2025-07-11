@@ -12,6 +12,7 @@ import {
   enterUserArea,
   expectElementInYRange,
   login,
+  newChat,
   selectConfiguration,
   sendMessage,
   uploadFileWhileInChat,
@@ -136,6 +137,18 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
       expect(await autoScrollButton.evaluate((el) => getComputedStyle(el).opacity)).toBe('0');
     });
 
+    await test.step('should stop showing auto-scroll button, if new chat is opened, while button was visible', async () => {
+      await sendMessage(page, configuration, {
+        message: 'Write a one-column table with the upper case letters from A to Z in the rows.',
+      });
+      await page.waitForTimeout(3500);
+      const autoScrollButton = page.locator('[data-testid="scrollToBottomButton"]');
+      expect(await autoScrollButton.evaluate((el) => getComputedStyle(el).opacity)).toBe('1');
+      await newChat(page);
+      await page.waitForTimeout(3500);
+      expect(await autoScrollButton.evaluate((el) => getComputedStyle(el).opacity)).toBe('0');
+    });
+
     await test.step('should create bucket', async () => {
       await enterAdminArea(page);
       await createBucket(page, {
@@ -158,6 +171,7 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
 
     await test.step('should reject large file', async () => {
       await enterUserArea(page);
+      await newChat(page);
       await selectConfiguration(page, configuration);
       await uploadFileWhileInChat(page, 'birthdays.pptx', true);
       await page

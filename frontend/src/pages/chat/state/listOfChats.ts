@@ -4,8 +4,8 @@ import { toast } from 'react-toastify';
 import { ConversationDto, useApi } from 'src/api';
 import { useTransientContext, useTransientNavigate } from 'src/hooks';
 import { buildError } from 'src/lib';
+import { useStateOfAssistants } from 'src/pages/chat/state/listOfAssistants';
 import { texts } from 'src/texts';
-import { useUserBucket } from '../useUserBucket';
 import { useChatStore } from './zustand/chatStore';
 import { useListOfChatsStore } from './zustand/listOfChatsStore';
 
@@ -68,6 +68,7 @@ export const useStateMutateRenameChat = () => {
 export const useStateMutateRemoveChat = () => {
   const api = useApi();
   const chatId = useChatStore((s) => s.chat.id);
+  const assistantId = useChatStore((s) => s.chat.configurationId);
   const removeChat = useListOfChatsStore((s) => s.removeChat);
   const createNewChat = useMutateNewChat();
 
@@ -76,7 +77,7 @@ export const useStateMutateRemoveChat = () => {
     onSuccess: (_, deletedId) => {
       removeChat(deletedId);
       if (deletedId === chatId) {
-        createNewChat.mutate();
+        createNewChat.mutate(assistantId);
       }
     },
     onError: async () => {
@@ -87,6 +88,7 @@ export const useStateMutateRemoveChat = () => {
 
 export const useStateMutateRemoveAllChats = () => {
   const api = useApi();
+  const assistantId = useChatStore((s) => s.chat.configurationId);
   const setChats = useListOfChatsStore((s) => s.setChats);
   const createNewChat = useMutateNewChat();
 
@@ -94,7 +96,7 @@ export const useStateMutateRemoveAllChats = () => {
     mutationFn: () => api.conversations.deleteConversations(),
     onSuccess: () => {
       setChats([]);
-      createNewChat.mutate();
+      createNewChat.mutate(assistantId);
     },
     onError: async (error) => {
       toast.error(await buildError(texts.chat.clearConversationsFailed, error));
@@ -106,17 +108,12 @@ export const useMutateNewChat = () => {
   const api = useApi();
   const context = useTransientContext();
   const navigate = useTransientNavigate();
-  const { selectedConfigurationId } = useUserBucket();
-  const { data: loadedConfigurations } = useQuery({
-    queryKey: ['enabled-configurations'],
-    queryFn: () => api.extensions.getConfigurations(true),
-    refetchOnWindowFocus: false,
-  });
+  const assistants = useStateOfAssistants();
 
   return useMutation({
-    mutationFn: () =>
+    mutationFn: (assistantId?: number) =>
       api.conversations.postConversation({
-        configurationId: loadedConfigurations?.items.find((x) => x.id === selectedConfigurationId)?.id,
+        configurationId: assistants.find((x) => x.id === assistantId)?.id ?? assistants?.[0].id,
         context,
       }),
     onSuccess: (chat) => navigate(`/chat/${chat.id}`),

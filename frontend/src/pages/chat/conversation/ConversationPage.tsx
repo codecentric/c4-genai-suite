@@ -1,14 +1,14 @@
 import { ActionIcon } from '@mantine/core';
 import { IconArrowDown } from '@tabler/icons-react';
-import { useQuery } from '@tanstack/react-query';
-import { useEffect, useMemo } from 'react';
+import { RefObject, useMemo } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useParams } from 'react-router-dom';
-import { FileDto, useApi } from 'src/api';
+import { FileDto } from 'src/api';
 import { useEventCallback, useTheme } from 'src/hooks';
+import { useScrollToBottom } from 'src/hooks/useScrollToBottom';
 import { cn } from 'src/lib';
+import { useStateOfSelectedAssistant } from 'src/pages/chat/state/listOfAssistants';
 import { texts } from 'src/texts';
-import { useScrollToBottom } from '../../../hooks/useScrollToBottom';
 import { useChatStream, useStateOfChat, useStateOfIsAiWriting, useStateOfMessages } from '../state/chat';
 import { useChatDropzone } from '../useChatDropzone';
 import { ChatHistory } from './ChatHistory';
@@ -20,67 +20,38 @@ import { DragAndDropLayout } from './DragAndDropLayout/DragAndDropLayout';
 const transformMimeTypes = (mimeTypes: string[]) => Object.fromEntries(mimeTypes.map((type) => [type, []]));
 
 interface ConversationPageProps {
-  textareaRef: React.RefObject<HTMLTextAreaElement>;
-  onConfigurationSelected: (configurationId: number) => void;
-  selectedConfigurationId: number;
+  textareaRef: RefObject<HTMLTextAreaElement>;
   selectDocument: (chatId: number, messageId: number, documentUri: string) => void;
 }
 
 export function ConversationPage(props: ConversationPageProps) {
-  const { textareaRef, selectedConfigurationId, onConfigurationSelected, selectDocument } = props;
+  const { textareaRef, selectDocument } = props;
 
-  const api = useApi();
   const chatParam = useParams<'id'>();
   const chatId = +chatParam.id!;
   const { sendMessage, isChatLoading } = useChatStream(chatId);
   const chat = useStateOfChat();
   const messages = useStateOfMessages();
   const isAiWriting = useStateOfIsAiWriting();
+  const assistant = useStateOfSelectedAssistant();
 
   const { theme } = useTheme();
   const { canScrollToBottom, scrollToBottom, containerRef } = useScrollToBottom([chat.id], [messages]);
 
-  const { data: loadedConfigurations } = useQuery({
-    queryKey: ['enabled-configurations'],
-    queryFn: () => api.extensions.getConfigurations(true),
-    refetchOnWindowFocus: false,
-  });
-
-  const configurations = useMemo(() => {
-    return loadedConfigurations?.items || [];
-  }, [loadedConfigurations]);
-
   const isNewConversation = messages.length === 0 && !!history;
 
-  const configuration = useMemo(() => {
-    return (
-      configurations.find((x) => x.id === chat.configurationId) ||
-      configurations.find((x) => x.id === selectedConfigurationId) ||
-      configurations[0]
-    );
-  }, [selectedConfigurationId, configurations, chat.configurationId]);
-
-  const llmLogo = configuration?.extensions?.find((x) => x.type === 'llm')?.logo;
-
-  useEffect(() => {
-    if (configuration) {
-      onConfigurationSelected(configuration.id);
-    }
-  }, [onConfigurationSelected, configuration]);
+  const llmLogo = assistant?.extensions?.find((x) => x.type === 'llm')?.logo;
 
   const agentName = useMemo(() => {
-    return configuration?.agentName || theme.agentName || texts.chat.sourceAI;
-  }, [configuration?.agentName, theme.agentName]);
+    return assistant?.agentName || theme.agentName || texts.chat.sourceAI;
+  }, [assistant?.agentName, theme.agentName]);
 
   const submitMessage = useEventCallback((input: string, uploadedFiles?: FileDto[], editMessageId?: number) => {
     sendMessage(chatId, input, uploadedFiles, editMessageId);
     setTimeout(() => scrollToBottom(), 500);
     return false;
   });
-  const { uploadLimitReached, allowedFileNameExtensions, handleUploadFile, multiple } = useChatDropzone(
-    selectedConfigurationId,
-    chatId,
-  );
+  const { uploadLimitReached, allowedFileNameExtensions, handleUploadFile, multiple } = useChatDropzone();
   const { getRootProps, getInputProps, isDragActive, isDragAccept, isDragReject } = useDropzone({
     multiple,
     onDrop: handleUploadFile,
@@ -100,7 +71,7 @@ export function ConversationPage(props: ConversationPageProps) {
         </>
       )}
       <div className="bg-white p-3">
-        <Configuration canEditConfiguration={isNewConversation} configuration={configuration} configurations={configurations} />
+        <Configuration canEditConfiguration={isNewConversation} />
       </div>
       {isChatLoading ? (
         <div className="fade-in w-full bg-white" style={{ height: 'calc(100vh - 4rem)' }} />
@@ -127,7 +98,7 @@ export function ConversationPage(props: ConversationPageProps) {
               <ChatInput
                 textareaRef={textareaRef}
                 chatId={chat.id}
-                configuration={configuration}
+                configuration={assistant}
                 isDisabled={isAiWriting}
                 isEmpty={isNewConversation}
                 submitMessage={submitMessage}

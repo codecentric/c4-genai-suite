@@ -7,10 +7,13 @@ import { useConversationFiles } from 'src/hooks/api/files';
 import { buildError } from 'src/lib';
 import { texts } from 'src/texts';
 import { filterFilesByFileNameExtensions, matchExtension } from './conversation/chat-input-utils';
+import { useStateOfSelectedAssistantId, useStateOfSelectedChatId } from './state/chat';
 
-export const useChatDropzone = (configurationId: number | undefined, chatId: number) => {
+export const useChatDropzone = () => {
   const api = useApi();
-  const { data: userBucket } = useConversationBucketAvailabilities(configurationId);
+  const assistantId = useStateOfSelectedAssistantId();
+  const chatId = useStateOfSelectedChatId();
+  const { data: userBucket } = useConversationBucketAvailabilities(assistantId);
   const upload = useMutation({
     mutationKey: ['upload-files-in-chat'],
     mutationFn: async (data: { file: File; extensionId: number }) => {

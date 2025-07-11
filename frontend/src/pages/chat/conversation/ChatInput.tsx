@@ -48,7 +48,7 @@ export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEm
     uploadMutations,
     upload,
     userBucket,
-  } = useChatDropzone(configuration?.id, chatId);
+  } = useChatDropzone();
 
   const speechRecognitionLanguages: Language[] = [
     { name: texts.chat.speechRecognition.languages.de, code: 'de-DE' },

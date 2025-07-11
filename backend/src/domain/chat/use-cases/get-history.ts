@@ -41,14 +41,7 @@ export class GetHistoryHandler implements IQueryHandler<GetHistory, GetHistoryRe
       throw new ForbiddenException();
     }
 
-    const entities = await this.messages.find({
-      where: {
-        conversationId: conversation.id,
-      },
-      order: {
-        id: 'ASC',
-      },
-    });
+    const entities = await this.messages.getMessageThread(conversationId);
 
     const result = entities.map((m: { id: number; type: string; data: MessageEntityData }) => ({
       ...m,

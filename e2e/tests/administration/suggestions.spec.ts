@@ -1,8 +1,10 @@
 import { expect, test } from '@playwright/test';
 import {
+  enterUserArea,
   login,
   navigateToConfigurationAdministration,
   navigateToThemeAdministration,
+  newChat,
   selectConfiguration,
   selectOption,
 } from '../utils/helper';
@@ -111,8 +113,8 @@ test('When using suggestions c4', async ({ page }) => {
   await test.step('will allow saving and using the global suggestion', async () => {
     const i = 1;
     await page.getByRole('group').getByRole('button', { name: 'Save' }).click();
-    await page.getByTestId('logo-link').waitFor();
-    await page.getByTestId('logo-link').click();
+    await enterUserArea(page);
+    await newChat(page);
     await selectConfiguration(page, { name: ASSISTANT_NAME });
     await page.getByText(`Global ${i}Sub ${i}`).click();
     await expect(page.getByText(`Text ${i}`)).toBeInViewport();
@@ -142,8 +144,9 @@ test('When using suggestions c4', async ({ page }) => {
     await page.getByRole('group').getByRole('button', { name: 'Save' }).click();
   });
 
-  await test.step('will list saved suggestions in chat when using an assistant without suggestions', async () => {
-    await page.getByTestId('logo-link').click();
+  await test.step('will list saved global suggestions in chat when using an assistant without suggestions', async () => {
+    await enterUserArea(page);
+    await newChat(page);
     await selectConfiguration(page, { name: ASSISTANT_NAME_GLOBAL });
     for (let i = 1; i <= MAX_SUGGESTIONS; i++) {
       await page.getByText(`Global ${i}Sub ${i}`).scrollIntoViewIfNeeded();

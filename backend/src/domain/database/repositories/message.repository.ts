@@ -9,6 +9,38 @@ export interface MessagesCount {
 }
 
 export class MessageRepository extends Repository<MessageEntity> {
+  async getMessageThread(conversationId: number, messageId?: number) {
+    const messages = await this.findBy({ conversationId });
+    const map = new Map<number, MessageEntity>(messages.map((message) => [message.id, message]));
+
+    if (!messageId) {
+      // if no message is given we just assume it is the latest one in the conversation
+      const message = await this.findOne({
+        where: {
+          conversationId,
+        },
+        order: {
+          id: 'DESC',
+        },
+      });
+      messageId = message?.id;
+    }
+
+    const result: MessageEntity[] = [];
+    while (messageId != null) {
+      const message = map.get(messageId);
+      if (!message) {
+        break;
+      }
+
+      result.push(message);
+      messageId = message.parentId;
+    }
+
+    result.sort((a, b) => a.id - b.id);
+    return result;
+  }
+
   async getMessageCount(since: Date | undefined, groupBy: GroupBy): Promise<MessagesCount[]> {
     const dateColumn = 'm."createdAt"';
     const condition = since ? `m.type = 'human' AND ${dateColumn} >= $1` : `m.type = 'human'`;

@@ -1,26 +1,20 @@
-import { useEffect, useState } from 'react';
-import { BucketDtoTypeEnum, type ExtensionBucketSettingsDto, useApi } from 'src/api';
-import { usePersistentState } from 'src/hooks';
+import { useQuery } from '@tanstack/react-query';
+import { BucketDtoTypeEnum, useApi } from 'src/api';
 
-export function useUserBucket() {
+export function useUserBucket(assistantId: number) {
   const api = useApi();
-  const [selectedConfigurationId, setSelectedConfigurationId] = usePersistentState<number>('configurationId', 0);
-  const [userBucket, setUserBucket] = useState<ExtensionBucketSettingsDto>();
 
-  useEffect(() => {
-    if (selectedConfigurationId) {
-      setUserBucket(undefined);
-      api.extensions
-        .getBucketAvailability(selectedConfigurationId, BucketDtoTypeEnum.User)
-        .then((response) => {
-          if (response.extensions.length) {
-            const extension = response.extensions[0];
-            setUserBucket(extension);
-          }
-        })
-        .catch(() => {});
-    }
-  }, [selectedConfigurationId, api.extensions]);
+  const query = useQuery({
+    queryKey: ['userBucket', assistantId],
+    queryFn: async () => {
+      const response = await api.extensions.getBucketAvailability(assistantId, BucketDtoTypeEnum.User);
+      return response.extensions?.[0];
+    },
+    enabled: !!assistantId,
+  });
 
-  return { userBucket, selectedConfigurationId, setSelectedConfigurationId };
+  const userBucket = query.isSuccess ? query.data : undefined;
+  const { data: _, ...rest } = query;
+
+  return { userBucket, ...rest };
 }

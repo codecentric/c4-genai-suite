@@ -77,8 +77,8 @@
 
 ## Langfuse
 
-| Env Variable        | Required  | Default   | Description |
-|---------------------|-----------|-----------|-------------|
-| LANGFUSE_PUBLIC_KEY | No        | None      |             |
-| LANGFUSE_BASE_URL   | No        | None      |             |
-| LANGFUSE_SECRET_KEY | No        | None      |             |
+| Env Variable        | Required  | Default                    | Description |
+|---------------------|-----------|----------------------------|-------------|
+| LANGFUSE_PUBLIC_KEY | No        | None                       |             |
+| LANGFUSE_BASE_URL   | No        | https://cloud.langfuse.com |             |
+| LANGFUSE_SECRET_KEY | No        | None                       |             |

@@ -1,20 +1,20 @@
 import { ActionIcon, Select, SelectProps, Text } from '@mantine/core';
 import { IconSettings } from '@tabler/icons-react';
 import { useState } from 'react';
-import { ConfigurationDto } from 'src/api';
 import { ConfigurationUserValuesModal } from 'src/pages/chat/conversation/ConfigurationUserValuesModal';
+import { useStateOfAssistants, useStateOfSelectedAssistant } from 'src/pages/chat/state/listOfAssistants';
 import { isMobile } from 'src/pages/utils';
 import { useStateMutateChat, useStateOfChat } from '../state/chat';
 
 interface ConfigurationProps {
-  configuration: ConfigurationDto;
-  configurations: ConfigurationDto[];
   canEditConfiguration?: boolean;
 }
 
-export const Configuration = ({ canEditConfiguration, configuration, configurations }: ConfigurationProps) => {
+export const Configuration = ({ canEditConfiguration }: ConfigurationProps) => {
   const chat = useStateOfChat();
   const updateChat = useStateMutateChat(chat.id);
+  const assistants = useStateOfAssistants();
+  const assistant = useStateOfSelectedAssistant();
 
   const [showModal, setShowModal] = useState(false);
 
@@ -22,7 +22,7 @@ export const Configuration = ({ canEditConfiguration, configuration, configurati
     <div>
       <Text>{option.label}</Text>
       <Text size="xs" c="dimmed">
-        {configurations.find((c) => c.id + '' === option.value)?.description}
+        {assistants.find((c) => c.id + '' === option.value)?.description}
       </Text>
     </div>
   );
@@ -37,20 +37,20 @@ export const Configuration = ({ canEditConfiguration, configuration, configurati
         comboboxProps={{ radius: 'md' }}
         renderOption={renderSelectOption}
         onChange={(value) => value && updateChat.mutate({ configurationId: +value })}
-        value={configuration?.id + ''}
-        data={configurations.map((c) => ({ value: c.id + '', label: c.name }))}
+        value={assistant?.id + ''}
+        data={assistants.map((c) => ({ value: c.id + '', label: c.name }))}
         disabled={!canEditConfiguration}
         size="md"
         data-testid="chat-assistent-select"
         scrollAreaProps={{ type: 'always' }}
       />
-      {configuration?.configurableArguments && (
+      {assistant?.configurableArguments && (
         <ActionIcon data-testid="assistent-user-configuration" onClick={() => setShowModal(true)} size="xl" variant="subtle">
           <IconSettings data-testid="configuration-settings-icon" />
         </ActionIcon>
       )}
-      {configuration?.configurableArguments && showModal && (
-        <ConfigurationUserValuesModal configuration={configuration} onSubmit={close} onClose={close} />
+      {assistant?.configurableArguments && showModal && (
+        <ConfigurationUserValuesModal configuration={assistant} onSubmit={close} onClose={close} />
       )}
     </div>
   );

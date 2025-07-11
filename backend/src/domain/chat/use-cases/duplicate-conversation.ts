@@ -3,7 +3,15 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Like } from 'typeorm';
 import * as uuid from 'uuid';
-import { BlobEntity, ConversationEntity, ConversationRepository, FileEntity, FileRepository } from '../../database';
+import {
+  BlobEntity,
+  ConversationEntity,
+  ConversationRepository,
+  FileEntity,
+  FileRepository,
+  MessageEntity,
+  MessageRepository,
+} from '../../database';
 import { Conversation } from '../interfaces';
 
 export class DuplicateConversationResponse {
@@ -21,6 +29,8 @@ export class DuplicateConversationHandler implements ICommandHandler<DuplicateCo
     private readonly conversationRepository: ConversationRepository,
     @InjectRepository(FileEntity)
     private readonly fileRepository: FileRepository,
+    @InjectRepository(MessageEntity)
+    private readonly messageRepository: MessageRepository,
   ) {}
 
   async execute(command: DuplicateConversation): Promise<DuplicateConversationResponse> {
@@ -38,8 +48,6 @@ export class DuplicateConversationHandler implements ICommandHandler<DuplicateCo
     const sortedMessages = [...conversationEntity.messages].sort((a, b) => a.id - b.id);
     const sortedFiles = conversationEntity.files?.sort((a, b) => a.id - b.id) ?? [];
 
-    const newMessages = sortedMessages.map((message) => ({ ...message, id: undefined }));
-
     const newFiles = await Promise.all(
       (sortedFiles || []).map(async (file) => {
         const newFile = this.fileRepository.create({
@@ -49,9 +57,7 @@ export class DuplicateConversationHandler implements ICommandHandler<DuplicateCo
           docId: file.docId,
         });
 
-        const savedFile = await this.fileRepository.save(newFile);
-
-        return savedFile;
+        return this.fileRepository.save(newFile);
       }),
     );
 
@@ -72,11 +78,22 @@ export class DuplicateConversationHandler implements ICommandHandler<DuplicateCo
       id: undefined,
       name: generateNameForDuplicate(conversationEntity.name, conflictingNames),
       isNameSetManually: true,
-      messages: newMessages,
       files: newFiles,
+      messages: [],
     });
 
     const saved = await this.conversationRepository.save(newConversation);
+
+    const messageIdMap = new Map<number, number>();
+    for (const { id, parentId, ...message } of sortedMessages) {
+      const newMessage = await this.messageRepository.save({
+        ...message,
+        parentId: messageIdMap.get(parentId ?? 0),
+        conversationId: saved.id,
+      });
+      messageIdMap.set(id, newMessage.id);
+    }
+
     return new DuplicateConversationResponse(saved);
   }
 }

@@ -5,30 +5,36 @@ const SCROLL_TRESHOLD = 200;
 
 export const useScrollToBottom = (instantScrollTiggers: unknown[], animatedScrollTriggers: unknown[]) => {
   const [showButton, setShowButton] = useState(false);
-  const messagesContainerRef = useEventListener<keyof HTMLElementEventMap, HTMLDivElement>('scroll', () => {
+
+  const updateScrollButtonVisibility = (messagesContainerRef: RefObject<HTMLDivElement | null>) => {
     if (!messagesContainerRef.current) return;
     const { scrollTop, scrollHeight, clientHeight } = messagesContainerRef.current;
 
     const isAtBottom = scrollHeight - scrollTop - clientHeight <= SCROLL_TRESHOLD;
     setShowButton(!isAtBottom);
+  };
+
+  const messagesContainerRef = useEventListener<keyof HTMLElementEventMap, HTMLDivElement>('scroll', () => {
+    updateScrollButtonVisibility(messagesContainerRef);
   });
+
+  useEffect(() => {
+    updateScrollButtonVisibility(messagesContainerRef);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, animatedScrollTriggers);
+
   const scrollToBottom = (instant?: boolean) =>
     messagesContainerRef.current?.scrollTo({
       top: messagesContainerRef.current?.scrollHeight,
       behavior: instant ? 'instant' : 'smooth',
     });
-  useEffect(() => {
-    if (!messagesContainerRef.current) return;
-    const { scrollTop, scrollHeight, clientHeight } = messagesContainerRef.current;
 
-    const isAtBottom = scrollHeight - scrollTop - clientHeight <= SCROLL_TRESHOLD;
-    setShowButton(!isAtBottom);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, animatedScrollTriggers);
   useEffect(() => {
     scrollToBottom(true);
+    setShowButton(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, instantScrollTiggers);
+
   return {
     canScrollToBottom: showButton,
     scrollToBottom,

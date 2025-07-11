@@ -10,7 +10,6 @@ import {
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { onErrorResumeNextWith } from 'rxjs';
-import { MoreThan } from 'typeorm';
 import { ExtensionSource, MessageEntity, MessageRepository } from 'src/domain/database';
 import { is } from 'src/lib';
 import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext, MessagesHistory, Source } from '../interfaces';
@@ -31,10 +30,6 @@ export class GetHistoryMiddleware implements ChatMiddleware {
 
     const history = new InternalChatHistory(conversationId, context, this.messages);
 
-    if (context.editMessageId) {
-      await history.removeOutdatedMessages(context.editMessageId);
-    }
-
     await history.addMessage(
       new HumanMessage({
         content: context.input,
@@ -54,6 +49,7 @@ class InternalChatHistory extends BaseListChatMessageHistory implements Messages
   private readonly debug: string[] = [];
   private sources: ExtensionSource[] = [];
   private stored?: BaseMessage[];
+  private currentParentId?: number;
 
   lc_namespace!: string[];
 
@@ -83,37 +79,12 @@ class InternalChatHistory extends BaseListChatMessageHistory implements Messages
     );
   }
 
-  async getMessages(): Promise<BaseMessage[]> {
-    if (this.stored) {
-      return this.stored;
-    }
-
-    // The history is created on demand.
+  getMessages(): Promise<BaseMessage[]> {
     if (this.conversationId <= 0) {
-      return [];
+      return Promise.resolve([]);
     }
 
-    const entities = await this.messages.find({
-      where: {
-        conversationId: this.conversationId,
-      },
-      order: {
-        id: 'ASC',
-      },
-    });
-
-    // ignore last human message since it is added before
-    this.stored = mapStoredMessagesToChatMessages(entities.slice(0, -1));
-
-    return this.stored;
-  }
-
-  async removeOutdatedMessages(messageId: number) {
-    await this.messages.delete({
-      conversationId: this.conversationId,
-      id: MoreThan(messageId),
-    });
-    this.stored = undefined;
+    return Promise.resolve(this.stored ?? []);
   }
 
   private publishSourcesReferences() {
@@ -149,12 +120,35 @@ class InternalChatHistory extends BaseListChatMessageHistory implements Messages
     try {
       if (isAIMessage(message)) {
         this.publishSourcesReferences();
-        const entity = await this.messages.save(data[0]);
-        this.stored?.push(message);
+        const entity = await this.messages.save({
+          ...data[0],
+          parentId: this.currentParentId,
+        });
+        this.currentParentId = entity.id;
         // Notifo the UI about the message ID, because it is needed to rate messages.
         this.context.result.next({ type: 'saved', messageId: entity.id, messageType: 'ai' });
       } else if (persistHuman) {
-        const entity = await this.messages.save({ id: editMessageId, ...data[0] });
+        if (editMessageId) {
+          const message = await this.messages.findOneBy({ id: editMessageId });
+          this.currentParentId = message?.parentId;
+        } else {
+          // we actually need a replyToMessageId
+          const message = await this.messages.findOne({
+            where: {
+              conversationId: this.conversationId,
+            },
+            order: {
+              id: 'DESC',
+            },
+          });
+          this.currentParentId = message?.id;
+        }
+
+        this.stored = mapStoredMessagesToChatMessages(
+          await this.messages.getMessageThread(this.conversationId, this.currentParentId),
+        );
+        const entity = await this.messages.save({ parentId: this.currentParentId, ...data[0] });
+        this.currentParentId = entity.id;
         this.context.result.next({ type: 'saved', messageId: entity.id, messageType: 'human' });
       }
     } catch (err) {

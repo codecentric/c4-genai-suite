@@ -49,6 +49,14 @@
       "title": "Azure OpenAI Reasoning",
       "description": "OpenAI LLM-Integration für Reasoning-Modelle"
     },
+    "langfuse": {
+      "title": "DEV: Langfuse",
+      "description": "Langfuse-Integration",
+      "baseUrl": "Base url",
+      "baseUrlHint": "Basis-URL von Langfuse (wenn self-hosted)",
+      "secretKey": "Secret key",
+      "publicKey": "Public key"
+    },
     "mistral": {
       "title": "Mistral",
       "description": "Mistral LLM-Integration"
