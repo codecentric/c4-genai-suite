@@ -27,7 +27,7 @@ fastmcp = "^2.10.4"
 langchain-ollama = "^0.3.4"
 
 [tool.poetry.group.dev.dependencies]
-ruff = "0.12.2"
+ruff = "0.12.3"
 mypy = "1.16.1"
 pre-commit = "4.2.0"
 pytest = "8.4.1"
