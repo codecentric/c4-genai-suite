@@ -1,6 +1,6 @@
 import { ActionIcon, Button, Checkbox, NativeSelect } from '@mantine/core';
 import { IconEdit, IconLoader, IconTrash, IconUpload } from '@tabler/icons-react';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import {
   ColumnDef,
   getCoreRowModel,
@@ -13,14 +13,14 @@ import { formatDate } from 'date-fns';
 import { useEffect, useMemo, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useParams } from 'react-router-dom';
-import { toast } from 'react-toastify';
 import { BucketDto, BucketDtoTypeEnum, FileDto, useApi } from 'src/api';
 import { ConfirmDialog, FilterableTable, InfoByte, Search, TablePagination, TData } from 'src/components';
 import { useEventCallback, useTransientNavigate } from 'src/hooks';
-import { buildError, formatFileSize } from 'src/lib';
+import { formatFileSize } from 'src/lib';
 import { extractType } from 'src/pages/utils';
 import { texts } from 'src/texts';
 import { UpsertBucketDialog } from './UpsertBucketDialog';
+import { useDeletingBucket, useDeletingFile, useUploadingFile } from './hooks';
 import { useBucketstore, useFilesStore } from './state';
 
 export function FilesPage() {
@@ -58,17 +58,10 @@ export function FilesPage() {
     }
   }, [bucket, buckets]);
 
-  const deletingBucket = useMutation({
-    mutationFn: (bucket: BucketDto) => {
-      return api.files.deleteBucket(bucket.id);
-    },
-    onSuccess: (_, bucket) => {
-      removeBucket(bucket.id);
-      navigate('/admin/files/');
-    },
-    onError: async (error) => {
-      toast.error(await buildError(texts.files.removeBucketFailed, error));
-    },
+  const deletingBucket = useDeletingBucket({
+    apiCall: (id) => api.files.deleteBucket(id),
+    removeBucket,
+    navigation: () => navigate('/admin/files/'),
   });
 
   const doClose = useEventCallback(() => {
@@ -87,33 +80,18 @@ export function FilesPage() {
     }
   }, [loadedFiles, setFiles]);
 
-  const upload = useMutation({
-    mutationFn: (file: File) => api.files.postFile(bucketId, file),
-    onMutate: (file) => {
-      setUploading((files) => [...files, file]);
-    },
-    onSuccess: (file) => {
-      setFile(file);
-    },
-    onSettled: (_, __, file) => {
-      setUploading((files) => files.filter((f) => f !== file));
-    },
-    onError: async (error, file) => {
-      toast.error(await buildError(`${texts.files.uploadFailed} '${file.name}'`, error));
-    },
+  const upload = useUploadingFile({
+    bucketId,
+    apiCall: (bucketId, file) => api.files.postFile(bucketId, file),
+    setUploading,
+    setFile,
   });
 
-  const deleting = useMutation({
-    mutationFn: (file: FileDto) => {
-      return api.files.deleteFile(bucketId, file.id);
-    },
-    onSuccess: (_, bucket) => {
-      removeFile(bucket.id);
-      setRowSelection({});
-    },
-    onError: async (error) => {
-      toast.error(await buildError(texts.files.removeFileFailed, error));
-    },
+  const deleting = useDeletingFile({
+    bucketId,
+    apiCall: (bucketId, fileId) => api.files.deleteFile(bucketId, fileId),
+    removeFile,
+    setRowSelection,
   });
 
   const handleMultiRowDelete = () => {

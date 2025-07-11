@@ -1,17 +1,16 @@
 import { IconPlus } from '@tabler/icons-react';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { Route, Routes } from 'react-router-dom';
-import { toast } from 'react-toastify';
 import { BucketDto, useApi } from 'src/api';
 import { Page } from 'src/components';
 import { useEventCallback, useTransientNavigate } from 'src/hooks';
-import { buildError } from 'src/lib';
 import { texts } from 'src/texts';
 import { Bucket } from './Bucket';
 import { EmptyPage } from './EmptyPage';
 import { FilesPage } from './FilesPage';
 import { UpsertBucketDialog } from './UpsertBucketDialog';
+import { useDeletingBucket } from './hooks';
 import { useBucketstore } from './state';
 
 export function BucketsPage() {
@@ -33,17 +32,10 @@ export function BucketsPage() {
     }
   }, [loadedBuckets, setBuckets]);
 
-  const deleting = useMutation({
-    mutationFn: (bucket: BucketDto) => {
-      return api.files.deleteBucket(bucket.id);
-    },
-    onSuccess: (_, bucket) => {
-      removeBucket(bucket.id);
-      navigate('/admin/files/');
-    },
-    onError: async (error) => {
-      toast.error(await buildError(texts.files.removeBucketFailed, error));
-    },
+  const deleting = useDeletingBucket({
+    apiCall: (id) => api.files.deleteBucket(id),
+    removeBucket,
+    navigation: () => navigate('/admin/files/'),
   });
 
   const doCreate = useEventCallback((bucket: BucketDto) => {
