@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { addMilliseconds, addYears } from 'date-fns';
 import { MoreThan } from 'typeorm';
 import { z } from 'zod';
-import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from 'src/domain/chat';
+import { ChatContext, ChatMiddleware, ChatNextDelegate, FormActionType, GetContext } from 'src/domain/chat';
 import { CacheEntity, CacheRepository } from 'src/domain/database';
 import { Extension, ExtensionConfiguration, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions';
 import { User } from 'src/domain/users';
@@ -172,7 +172,8 @@ class InternalTool extends StructuredTool {
 
     const ui = this.tool.ui;
     if (ui?.type === 'confirm' && ui.label) {
-      confirmed = await this.context.ui.confirm(ui.label);
+      const formResult = await this.context.ui.form(ui.label, { type: 'object', title: this.displayName, properties: {} });
+      confirmed = formResult.action === FormActionType.ACCEPT;
     } else if (ui?.type === 'input' && ui.label) {
       const now = new Date();
       // The cached value is specific for this extension and the user.
@@ -184,7 +185,15 @@ class InternalTool extends StructuredTool {
       if (cached) {
         input = cached.value;
       } else {
-        input = await this.context.ui.input(ui.label);
+        const formResult = await this.context.ui.form(ui.label, {
+          type: 'object',
+          title: this.displayName,
+          properties: {
+            text: { type: 'string', title: 'Text' },
+          },
+        });
+
+        input = formResult.action === FormActionType.ACCEPT ? (formResult.data?.text as string) : undefined;
 
         let expires: Date;
         if (ui.cacheDuration > 0) {

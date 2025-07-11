@@ -85,6 +85,10 @@ function getType(arg: ExtensionUserInfoDtoUserArgumentsValue): Yup.AnySchema | u
       type = type.transform((value: string, originalValue: string) => (originalValue === '' ? undefined : value));
     }
 
+    if (arg.format === 'email') {
+      type = type.email();
+    }
+
     return type;
   } else if (arg.type === 'array') {
     const itemType = getType(arg.items);
@@ -116,8 +120,7 @@ function getType(arg: ExtensionUserInfoDtoUserArgumentsValue): Yup.AnySchema | u
 }
 
 function getSchema(args?: Record<string, ExtensionUserInfoDtoUserArgumentsValue>) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const extensionValues: { [name: string]: any } = {};
+  const extensionValues: { [name: string]: Yup.AnySchema } = {};
   for (const [name, arg] of Object.entries(args || {})) {
     const type = getType(arg);
     if (type != null) {
@@ -130,18 +133,8 @@ function getSchema(args?: Record<string, ExtensionUserInfoDtoUserArgumentsValue>
 
 export function useArgumentObjectSpecResolver(argumentObject: ExtensionArgumentObjectSpecDto | undefined) {
   return useMemo(() => {
-    const values: { [id: string]: Yup.AnySchema } = {};
-
-    for (const [id, argument] of Object.entries(argumentObject?.properties ?? {})) {
-      const type = getType(argument);
-      if (type) {
-        values[id] = type;
-      }
-    }
-
-    const schema = Yup.object().shape(values);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return yupResolver<any>(schema);
+    const schema = getSchema(argumentObject?.properties);
+    return yupResolver(schema);
   }, [argumentObject]);
 }
 

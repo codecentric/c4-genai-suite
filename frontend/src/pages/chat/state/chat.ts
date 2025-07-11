@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import {
+  ChatUICallbackResultDto,
   ConversationDtoRatingEnum,
   FileDto,
   MessageDtoRatingEnum,
@@ -144,13 +145,14 @@ export const useStateMutateChat = (chatId: number) => {
 
 export const useConfirmAiAction = (requestId: string) => {
   const api = useApi();
+  const updateLastMessage = useChatStore((s) => s.updateLastMessage);
 
   return useMutation({
-    // Fix type in backend to reflect boolean|string instead of using any (see usages)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    mutationFn: (result: any) => {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      return api.conversations.confirm(requestId, { result });
+    mutationFn: (result: ChatUICallbackResultDto) => {
+      return api.conversations.confirm(requestId, result);
+    },
+    onSuccess: () => {
+      updateLastMessage({ ui: undefined });
     },
   });
 };

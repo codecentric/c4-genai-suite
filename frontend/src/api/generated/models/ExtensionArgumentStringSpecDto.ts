@@ -98,6 +98,7 @@ export const ExtensionArgumentStringSpecDtoFormatEnum = {
     Password: 'password',
     Select: 'select',
     Date: 'date',
+    Email: 'email',
     C4Ui: 'c4-ui'
 } as const;
 export type ExtensionArgumentStringSpecDtoFormatEnum = typeof ExtensionArgumentStringSpecDtoFormatEnum[keyof typeof ExtensionArgumentStringSpecDtoFormatEnum];

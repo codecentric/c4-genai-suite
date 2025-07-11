@@ -45,6 +45,7 @@ export const en = {
     passwordConfirm: 'Confirm Password',
     passwordsDoNotMatch: 'Passwords do not match.',
     reloadAndTryAgain: 'Reload the page and try again.',
+    reject: 'Reject',
     remove: 'Delete',
     rename: 'Rename',
     required: 'Required field',

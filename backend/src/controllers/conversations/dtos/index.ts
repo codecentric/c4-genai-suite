@@ -1,30 +1,39 @@
 import { ApiExtraModels, ApiProperty, getSchemaPath } from '@nestjs/swagger';
-import { IsBoolean, IsDefined, IsIn, IsNumber, IsObject, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsDefined, IsEnum, IsIn, IsNumber, IsObject, IsOptional, IsString } from 'class-validator';
 import { MessageContentDto, MessageContentImageUrlDto, MessageContentTextDto, SourceDto } from 'src/controllers/shared';
 import {
   Conversation,
   CONVERSATION_RATINGS,
   ConversationRating,
+  FormActionType,
   Message,
   MESSAGE_RATINGS,
   MESSAGE_TYPES,
   MessageRating,
   MessageType,
   NormalizedMessageContents,
-  STREAM_UI_TYPES,
   StreamEvent,
-  StreamUIRequestType,
 } from 'src/domain/chat';
+import { ExtensionArgumentObjectSpecDto } from '../../extensions/dtos';
 import { FileDto } from '../../files/dtos';
 
-export class ConfirmDto {
+export class ChatUICallbackResultDto {
   @ApiProperty({
-    description: 'The result.',
+    description: 'The action taken in the form.',
     required: true,
+    enum: FormActionType,
+  })
+  @IsEnum(FormActionType)
+  action!: FormActionType;
+
+  @ApiProperty({
+    description: 'Additional data related to the action.',
+    required: false,
     type: Object,
   })
-  @IsDefined()
-  result!: any;
+  @IsOptional()
+  @IsObject()
+  data?: Record<string, any>;
 }
 
 export class RateMessageDto {
@@ -335,11 +344,11 @@ export class StreamUIRequestDto {
   text!: string;
 
   @ApiProperty({
-    description: 'The type of the request',
+    description: 'The schema.',
     required: true,
-    enum: STREAM_UI_TYPES,
+    type: ExtensionArgumentObjectSpecDto,
   })
-  type!: StreamUIRequestType;
+  schema!: ExtensionArgumentObjectSpecDto;
 }
 
 export class StreamMetadataDto {
