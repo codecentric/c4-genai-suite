@@ -1,4 +1,5 @@
 import { Column, Entity, ManyToOne, PrimaryColumn, Repository } from 'typeorm';
+import { schema } from '../typeorm.helper';
 import { FileEntity } from './file';
 import { UserEntity } from './user';
 
@@ -11,7 +12,7 @@ export enum BlobCategory {
   LOGO = 'logo',
 }
 
-@Entity({ name: 'blobs' })
+@Entity({ name: 'blobs', schema })
 export class BlobEntity {
   @PrimaryColumn()
   id!: string;

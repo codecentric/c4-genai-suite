@@ -1,8 +1,9 @@
 import { Column, Entity, PrimaryColumn, Repository } from 'typeorm';
+import { schema } from '../typeorm.helper';
 
 export type CacheRepository = Repository<CacheEntity>;
 
-@Entity({ name: 'cache' })
+@Entity({ name: 'cache', schema })
 export class CacheEntity {
   @PrimaryColumn()
   key!: string;

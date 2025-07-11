@@ -1,7 +1,7 @@
 import { Repository } from 'typeorm';
 import { getStartDate, GroupBy } from '../../chat/statistics';
 import { UsageEntity } from '../entities';
-import { dateTrunc, interval } from '../typeorm.helper';
+import { dateTrunc, interval, schema } from '../typeorm.helper';
 
 export interface UsagesCount {
   date: Date;
@@ -23,7 +23,7 @@ export class UsageRepository extends Repository<UsageEntity> {
 
     const start = since
       ? dateTrunc(groupBy, '($1)::date')
-      : dateTrunc(groupBy, `(SELECT MIN(${dateColumn}) FROM usages WHERE ${condition})`);
+      : dateTrunc(groupBy, `(SELECT MIN(${dateColumn}) FROM ${schema}.usages WHERE ${condition})`);
     const end = dateTrunc(groupBy, 'NOW()');
 
     const sql = `
@@ -42,7 +42,7 @@ export class UsageRepository extends Repository<UsageEntity> {
                    ${dateTrunc(groupBy, dateColumn)} as "date",
                    "key" AS category,
                    SUM("count") AS "total"
-               FROM usages
+               FROM ${schema}.usages
                WHERE ${condition}
                GROUP BY ${dateTrunc(groupBy, dateColumn)}, "key"
            ) AS aggregated
@@ -77,8 +77,8 @@ export class UsageRepository extends Repository<UsageEntity> {
 
     const start = since
       ? dateTrunc(groupBy, '($1)::date')
-      : dateTrunc(groupBy, `(SELECT MIN("date") FROM usages WHERE ${condition})`);
-    const end = dateTrunc(groupBy, `(SELECT MAX("date") FROM usages WHERE ${condition})`);
+      : dateTrunc(groupBy, `(SELECT MIN("date") FROM ${schema}.usages WHERE ${condition})`);
+    const end = dateTrunc(groupBy, `(SELECT MAX("date") FROM ${schema}.usages WHERE ${condition})`);
 
     const sql = `
       WITH series AS (SELECT generate_series(
@@ -96,7 +96,7 @@ export class UsageRepository extends Repository<UsageEntity> {
                      ${dateTrunc(groupBy, dateColumn)} as "date",
                      "key" || ' / ' || "subKey" AS model,
                      SUM("count") AS "total"
-                 FROM usages
+                 FROM ${schema}.usages
                  WHERE ${condition}
                  GROUP BY ${dateTrunc(groupBy, dateColumn)}, "key", "subKey"
              ) AS aggregated

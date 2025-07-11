@@ -1,4 +1,5 @@
 import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { schema } from '../typeorm.helper';
 import { ConfigurationEntity } from './configuration';
 import { FileEntity } from './file';
 import { MessageEntity } from './message';
@@ -10,7 +11,7 @@ export type ExtensionUserArguments = Record<string, Record<string, any>>;
 
 export type ConversationRating = 'good' | 'bad' | 'unrated';
 
-@Entity({ name: 'conversations' })
+@Entity({ name: 'conversations', schema })
 export class ConversationEntity {
   @PrimaryGeneratedColumn()
   id!: number;

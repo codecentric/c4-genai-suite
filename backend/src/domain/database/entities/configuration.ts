@@ -11,6 +11,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { ChatSuggestion } from 'src/domain/shared';
+import { schema } from '../typeorm.helper';
 import { ConfigurationUserEntity } from './configuration-user';
 import { ConversationEntity } from './conversation';
 import { ExtensionEntity } from './extension';
@@ -18,7 +19,7 @@ import { UserGroupEntity } from './user-group';
 
 export type ConfigurationRepository = Repository<ConfigurationEntity>;
 
-@Entity({ name: 'configurations' })
+@Entity({ name: 'configurations', schema })
 export class ConfigurationEntity {
   @PrimaryGeneratedColumn()
   id!: number;

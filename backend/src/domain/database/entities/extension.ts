@@ -1,5 +1,6 @@
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, Repository, UpdateDateColumn } from 'typeorm';
 import { ExtensionObjectArgument } from 'src/domain/extensions';
+import { schema } from '../typeorm.helper';
 import { ConfigurationEntity } from './configuration';
 
 export type ExtensionRepository = Repository<ExtensionEntity>;
@@ -10,7 +11,7 @@ export type ExtensionState = {
   [key: string]: any;
 };
 
-@Entity({ name: 'extensions' })
+@Entity({ name: 'extensions', schema })
 export class ExtensionEntity {
   @PrimaryGeneratedColumn()
   id!: number;

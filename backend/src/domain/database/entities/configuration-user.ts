@@ -1,4 +1,5 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Repository, Unique } from 'typeorm';
+import { schema } from '../typeorm.helper';
 import { ConfigurationEntity } from './configuration';
 import { UserEntity } from './user';
 
@@ -6,7 +7,7 @@ export type ConfigurationValues = { [id: string]: Record<string, any> };
 
 export type ConfigurationUserRepository = Repository<ConfigurationUserEntity>;
 
-@Entity({ name: 'configurations_users' })
+@Entity({ name: 'configurations_users', schema })
 @Unique(['user.id', 'configuration.id', 'isDefault'])
 export class ConfigurationUserEntity {
   @PrimaryGeneratedColumn()

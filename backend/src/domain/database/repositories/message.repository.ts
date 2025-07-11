@@ -1,7 +1,7 @@
 import { Repository } from 'typeorm';
 import { getStartDate, GroupBy } from '../../chat/statistics';
 import { MessageEntity } from '../entities';
-import { dateTrunc, interval } from '../typeorm.helper';
+import { dateTrunc, interval, schema } from '../typeorm.helper';
 
 export interface MessagesCount {
   total: number;
@@ -33,11 +33,10 @@ export class MessageRepository extends Repository<MessageEntity> {
         break;
       }
 
-      result.push(message);
+      result.unshift(message);
       messageId = message.parentId;
     }
 
-    result.sort((a, b) => a.id - b.id);
     return result;
   }
 
@@ -48,7 +47,7 @@ export class MessageRepository extends Repository<MessageEntity> {
 
     const start = since
       ? dateTrunc(groupBy, '($1)::date')
-      : dateTrunc(groupBy, `(SELECT MIN(${dateColumn}) FROM messages m WHERE ${condition})`);
+      : dateTrunc(groupBy, `(SELECT MIN(${dateColumn}) FROM ${schema}.messages m WHERE ${condition})`);
     const end = dateTrunc(groupBy, 'NOW()');
 
     const sql = `
@@ -61,7 +60,7 @@ export class MessageRepository extends Repository<MessageEntity> {
           SELECT
               ${dateTrunc(groupBy, dateColumn)} as "date",
               COUNT(*) AS total
-          FROM messages m
+          FROM ${schema}.messages m
           WHERE ${condition}
           GROUP BY ${dateTrunc(groupBy, dateColumn)}
       )

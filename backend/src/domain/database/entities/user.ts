@@ -1,4 +1,5 @@
 import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryColumn, Repository, UpdateDateColumn } from 'typeorm';
+import { schema } from '../typeorm.helper';
 import { ConfigurationUserEntity } from './configuration-user';
 import { ConversationEntity } from './conversation';
 import { FileEntity } from './file';
@@ -6,7 +7,7 @@ import { UserGroupEntity } from './user-group';
 
 export type UserRepository = Repository<UserEntity>;
 
-@Entity({ name: 'users' })
+@Entity({ name: 'users', schema })
 export class UserEntity {
   @PrimaryColumn()
   id!: string;

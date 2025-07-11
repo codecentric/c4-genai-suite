@@ -21,6 +21,7 @@ import { UsersController } from './controllers/users/users.controller';
 import { AuthModule } from './domain/auth/module';
 import { ChatModule } from './domain/chat';
 import { UserEntity } from './domain/database';
+import { initSchemaIfNotExistsAndMoveMigrations, schema } from './domain/database/typeorm.helper';
 import { ExtensionModule } from './domain/extensions';
 import { FilesModule } from './domain/files';
 import { SettingsModule } from './domain/settings';
@@ -53,9 +54,11 @@ import { PrometheusModule } from './metrics/prometheus.module';
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (config: ConfigService) => {
+      useFactory: async (config: ConfigService) => {
+        const url = config.getOrThrow<string>('DB_URL');
+        await initSchemaIfNotExistsAndMoveMigrations(url, schema);
         return {
-          url: config.getOrThrow('DB_URL'),
+          url,
           type: 'postgres',
           retryAttempts: 10,
           retryDelay: config.get('C4_DB_RETRY_DELAY', 100),
@@ -63,6 +66,7 @@ import { PrometheusModule } from './metrics/prometheus.module';
           migrationsRun: true,
           entities: [path.join(__dirname, 'domain', 'database', 'entities', '*{.ts,.js}')],
           migrations: [path.join(__dirname, 'migrations', '*{.ts,.js}')],
+          schema,
         };
       },
       dataSourceFactory: async (options) => {

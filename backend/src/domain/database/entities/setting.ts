@@ -1,9 +1,10 @@
 import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, Repository, UpdateDateColumn } from 'typeorm';
 import { ChatSuggestion, SiteLink } from 'src/domain/shared';
+import { schema } from '../typeorm.helper';
 
 export type SettingRepository = Repository<SettingEntity>;
 
-@Entity({ name: 'settings' })
+@Entity({ name: 'settings', schema })
 export class SettingEntity {
   @PrimaryGeneratedColumn()
   id!: number;

@@ -136,3 +136,51 @@ jobs:
       - run: npm run migration:run
       # changes the return code from 1 to 0 in case no schema was changed and vice versa
       - run: sh -c "! npm run migration:generate --name=test"
+
+  run-backend-without-schema-permissions:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17.5
+        env:
+          POSTGRES_USER: admin
+          POSTGRES_PASSWORD: secret
+          POSTGRES_DB: cccc
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    env:
+      BASE_URL: 'https://example.com'
+      DB_URL: postgres://admin:secret@localhost:5432/cccc
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.x
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+      - run: npm install
+      - run: sudo apt-get update && sudo apt-get install --yes --no-install-recommends postgresql-client
+      - name: Create event trigger to prevent schema creation
+        run: |
+          psql postgres://admin:secret@localhost:5432/cccc <<'EOF'
+            CREATE OR REPLACE FUNCTION prevent_schema_creation()
+            RETURNS event_trigger AS $function$
+            BEGIN
+            IF current_user = 'admin' THEN
+            RAISE EXCEPTION 'Schema creation not allowed for user admin';
+            END IF;
+            END;
+            $function$ LANGUAGE plpgsql;
+            
+            CREATE EVENT TRIGGER prevent_schema_creation_trigger
+            ON ddl_command_start
+            WHEN TAG IN ('CREATE SCHEMA')
+            EXECUTE FUNCTION prevent_schema_creation();
+          EOF
+      - name: Expect backend start to fail
+        run: sh -c "! npm run dev"
