@@ -215,11 +215,9 @@ export function FilesPage() {
               <InfoByte title={texts.common.endpoint} value={thisBucket.endpoint} />
               {thisBucket.indexName && <InfoByte title={texts.common.indexName} value={thisBucket.indexName} />}
             </div>
-            {/* Don't show the Searchable Files heading for conversation buckets */}
-            {/* {thisBucket.type !== BucketDtoTypeEnum.Conversation && ( */}
             <div className="my-4 flex">
               <h2 className="grow text-2xl">{texts.files.headlineSearchable}</h2>
-              {thisBucket.type !== BucketDtoTypeEnum.User && (
+              {thisBucket.type !== BucketDtoTypeEnum.User && thisBucket.type !== BucketDtoTypeEnum.Conversation && (
                 <ActionIcon onClick={open} disabled={isDragActive || uploading.length > 0} color="black" size="input-sm">
                   {uploading.length > 0 ? <IconLoader size={20} className="animate-spin" /> : <IconUpload size={20} />}
                 </ActionIcon>
@@ -227,52 +225,50 @@ export function FilesPage() {
             </div>
           </div>
 
-          {thisBucket.type !== BucketDtoTypeEnum.Conversation && (
-            <div className="relative flex w-full flex-col gap-y-4 overflow-x-hidden rounded-xl bg-white bg-clip-border p-4 pt-6 shadow-sm">
-              <div className="flex items-center justify-between">
-                <Search value={globalFilter ?? ''} onSearch={(value) => setGlobalFilter(String(value))} />
-                <NativeSelect
-                  size="sm"
-                  radius="lg"
-                  data={['10', '15', '20', '25', '30']}
-                  onChange={(e) => table.setPageSize(Number(e.target.value))}
-                  value={String(table.getState().pagination.pageSize)}
-                />
-              </div>
-
-              {thisBucket?.type !== BucketDtoTypeEnum.User ? (
-                <div className={isDragActive ? 'rounded-sm bg-gray-50' : ''} {...getRootProps()}>
-                  <input {...getInputProps()} />
-                  <FilterableTable table={table} />
-                </div>
-              ) : (
-                <FilterableTable table={table} />
-              )}
-              <div className="flex flex-row items-center justify-between gap-x-2">
-                <div className="flex flex-row items-center gap-x-2 p-2 text-sm">
-                  <div className="text-gray-500">{texts.common.rowsSelected(table.getSelectedRowModel().rows.length)}</div>
-                  <ConfirmDialog
-                    title={texts.files.removeFilesConfirmTitle}
-                    text={texts.files.removeFilesConfirmText(table.getSelectedRowModel().rows.length)}
-                    onPerform={() => handleMultiRowDelete()}
-                  >
-                    {({ onClick }) => (
-                      <Button
-                        variant="light"
-                        color="red"
-                        onClick={onClick}
-                        size="xs"
-                        disabled={table.getSelectedRowModel().rows.length == 0 ? true : false}
-                      >
-                        {texts.common.remove}
-                      </Button>
-                    )}
-                  </ConfirmDialog>
-                </div>
-                <TablePagination table={table} />
-              </div>
+          <div className="relative flex w-full flex-col gap-y-4 overflow-x-hidden rounded-xl bg-white bg-clip-border p-4 pt-6 shadow-sm">
+            <div className="flex items-center justify-between">
+              <Search value={globalFilter ?? ''} onSearch={(value) => setGlobalFilter(String(value))} />
+              <NativeSelect
+                size="sm"
+                radius="lg"
+                data={['10', '15', '20', '25', '30']}
+                onChange={(e) => table.setPageSize(Number(e.target.value))}
+                value={String(table.getState().pagination.pageSize)}
+              />
             </div>
-          )}
+
+            {thisBucket?.type !== BucketDtoTypeEnum.User && thisBucket?.type !== BucketDtoTypeEnum.Conversation ? (
+              <div className={isDragActive ? 'rounded-sm bg-gray-50' : ''} {...getRootProps()}>
+                <input {...getInputProps()} />
+                <FilterableTable table={table} />
+              </div>
+            ) : (
+              <FilterableTable table={table} />
+            )}
+            <div className="flex flex-row items-center justify-between gap-x-2">
+              <div className="flex flex-row items-center gap-x-2 p-2 text-sm">
+                <div className="text-gray-500">{texts.common.rowsSelected(table.getSelectedRowModel().rows.length)}</div>
+                <ConfirmDialog
+                  title={texts.files.removeFilesConfirmTitle}
+                  text={texts.files.removeFilesConfirmText(table.getSelectedRowModel().rows.length)}
+                  onPerform={() => handleMultiRowDelete()}
+                >
+                  {({ onClick }) => (
+                    <Button
+                      variant="light"
+                      color="red"
+                      onClick={onClick}
+                      size="xs"
+                      disabled={table.getSelectedRowModel().rows.length == 0 ? true : false}
+                    >
+                      {texts.common.remove}
+                    </Button>
+                  )}
+                </ConfirmDialog>
+              </div>
+              <TablePagination table={table} />
+            </div>
+          </div>
         </div>
       )}
 
