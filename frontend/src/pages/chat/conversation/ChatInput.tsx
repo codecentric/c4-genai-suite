@@ -198,7 +198,7 @@ export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEm
           </div>
         ))}
 
-        {isEmpty && <Suggestions configuration={configuration} theme={theme} onSelect={doSetText} />}
+        {isEmpty && <Suggestions configuration={configuration} theme={theme} onSelect={setInput} />}
 
         <div className="flex flex-wrap gap-2">
           {chatFiles.map((file) => (
