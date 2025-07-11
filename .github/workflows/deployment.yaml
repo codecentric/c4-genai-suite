@@ -1,0 +1,66 @@
+name: codecentric in-house deployment
+
+on: 
+  push:
+    branches:
+      - main
+      - ci/continuous-deployment-poc # TODO remove this line before merging into `main`
+
+jobs:
+  update-gitlab-repo:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get commit short SHA
+        id: get_sha
+        run: echo "sha=$(echo ${GITHUB_SHA::7})" >> $GITHUB_OUTPUT
+
+      - name: Clone GitLab repository
+        run: |
+          git clone https://oauth2:${{ secrets.GITLAB_INFRASTRUCTURE_PAT }}@${{ secrets.GITLAB_URL }}/cc-chatgpt/infrastructure.git
+          cd infrastructure
+
+      - name: Create new branch
+        id: branch_name
+        working-directory: ./infrastructure
+        run: |
+          BRANCH_NAME="chore/update-c4-helm-chart-version-${{ steps.get_sha.outputs.sha }}"
+          echo "name=$BRANCH_NAME" >> $GITHUB_OUTPUT
+          git checkout -b $BRANCH_NAME
+
+      - name: Update Pulumi.dev.yaml
+        working-directory: ./infrastructure
+        run: |
+          yq -i '.config."c4-codecentric:helmChartVersion" = "${{ steps.get_sha.outputs.sha }}"' projects/team-c4/c4-codecentric/Pulumi.dev.yaml
+
+      - name: Commit and push changes
+        id: commit_push
+        working-directory: ./infrastructure
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add projects/team-c4/c4-codecentric/Pulumi.dev.yaml
+          if git diff --staged --quiet; then
+            echo "No changes to commit."
+            echo "pushed=false" >> $GITHUB_OUTPUT
+          else
+            git commit -m "feat(helm): Update helmChartVersion to ${{ steps.get_sha.outputs.sha }}"
+            git push --set-upstream origin ${{ steps.branch_name.outputs.name }}
+            echo "pushed=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create GitLab Merge Request
+        if: steps.commit_push.outputs.pushed == 'true'
+        run: |
+          TITLE="chore(c4-codecentric): update c4 helm chart to to ${{ steps.get_sha.outputs.sha }}"
+          DESCRIPTION="This MR was created automatically by a GitHub Action to update the Helm Chart version to commit ${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}."
+
+          curl --request POST --header "PRIVATE-TOKEN: ${{ secrets.GITLAB_INFRASTRUCTURE_PAT }}" \
+               --header "Content-Type: application/json" \
+               --data "{
+                 \"source_branch\": \"${{ steps.branch_name.outputs.name }}\",
+                 \"target_branch\": \"main\",
+                 \"title\": \"$TITLE\",
+                 \"description\": \"$DESCRIPTION\",
+                 \"remove_source_branch\": true
+               }" \
+               "https://${{ secrets.GITLAB_URL }}/api/v4/projects/${{ secrets.GITLAB_INFRASTRUCTURE_PROJECT_ID }}/merge_requests"
