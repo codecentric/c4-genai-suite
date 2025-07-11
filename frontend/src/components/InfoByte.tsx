@@ -1,6 +1,6 @@
 type InfoByteProps = {
   title: string;
-  value: string | number;
+  value: string | number | JSX.Element;
 };
 
 export function InfoByte(props: InfoByteProps) {

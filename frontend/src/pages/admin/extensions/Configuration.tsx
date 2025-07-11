@@ -23,7 +23,7 @@ export const Configuration = memo((props: ConfigurationProps) => {
   const { configuration, onDelete, onUpdate, onDuplicate } = props;
 
   return (
-    <li className="group flex items-center !px-0">
+    <li className="group flex items-center rounded-lg px-2 py-1 hover:bg-gray-100 focus:font-semibold">
       <TransientNavLink
         className={cn('text-normal block min-w-0 grow truncate text-ellipsis', { 'opacity-25': !configuration.enabled })}
         to={`/admin/assistants/${configuration.id}`}
@@ -33,7 +33,7 @@ export const Configuration = memo((props: ConfigurationProps) => {
       <Menu>
         <Menu.Target>
           <ActionIcon className="opacity-0 group-hover:opacity-100" variant="subtle" data-testid={'more-actions'}>
-            <IconDots size={14} />
+            <IconDots size={16} />
           </ActionIcon>
         </Menu.Target>
 

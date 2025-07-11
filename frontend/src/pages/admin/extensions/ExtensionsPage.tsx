@@ -1,20 +1,21 @@
 import { Button, Fieldset } from '@mantine/core';
-import { IconPlus } from '@tabler/icons-react';
+import { IconCopy, IconEdit, IconPlus, IconTrash } from '@tabler/icons-react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useApi } from 'src/api';
-import { BucketDto, ExtensionDto } from 'src/api/generated';
-import { Alert, Icon } from 'src/components';
-import { useEventCallback } from 'src/hooks';
-import { buildError } from 'src/lib';
+import { BucketDto, ConfigurationDto, ExtensionDto } from 'src/api/generated';
+import { Alert, ConfirmDialog, Icon } from 'src/components';
+import { useEventCallback, useTransientNavigate } from 'src/hooks';
+import { buildError, cn } from 'src/lib';
 import { Argument } from 'src/pages/admin/extensions/ExtensionForm';
 import { texts } from 'src/texts';
 import { ExtensionCard } from './ExtensionCard';
+import { UpsertConfigurationDialog } from './UpsertConfigurationDialog';
 import { UpsertExtensionDialog } from './UpsertExtensionDialog';
-import { useExtensionsStore } from './state';
+import { useConfigurationStore, useExtensionsStore } from './state';
 
 const EMPTY_BUCKETS: BucketDto[] = [];
 
@@ -26,6 +27,55 @@ export function ExtensionsPage() {
   const [toCreate, setToCreate] = useState<boolean>();
   const [toUpdate, setToUpdate] = useState<ExtensionDto | null>();
   const { extensions, specs, removeExtension, setExtension, setExtensions } = useExtensionsStore();
+
+  const navigate = useTransientNavigate();
+  const [toUpdateConfiguration, setToUpdateConfiguration] = useState<boolean>();
+  const [thisConfiguration, setThisConfiguration] = useState<ConfigurationDto | null>(null);
+  const { configurations, removeConfiguration, setConfiguration } = useConfigurationStore();
+
+  const { data: configuration } = useQuery({
+    queryKey: ['configuration', configurationId],
+    queryFn: () => api.extensions.getConfiguration(configurationId),
+  });
+
+  useEffect(() => {
+    if (configuration) {
+      const updatedConfiguration = configurations.find((c) => c.id == configuration.id);
+      if (updatedConfiguration) {
+        setThisConfiguration(updatedConfiguration);
+      }
+    }
+  }, [configuration, configurations]);
+
+  const deletingConfiguration = useMutation({
+    mutationFn: (configuration: ConfigurationDto) => {
+      return api.extensions.deleteConfiguration(configuration.id);
+    },
+    onSuccess: (_, configuration) => {
+      removeConfiguration(configuration.id);
+      navigate('/admin/assistants/');
+    },
+    onError: async (error) => {
+      toast.error(await buildError(texts.extensions.removeConfigurationFailed, error));
+    },
+  });
+
+  const duplicateConfiguration = useMutation({
+    mutationFn: (configuration: ConfigurationDto) => {
+      return api.extensions.duplicateConfiguration(configuration.id);
+    },
+    onSuccess: (configuration) => {
+      setConfiguration(configuration);
+      navigate(`/admin/assistants/${configuration.id}`);
+    },
+    onError: async (error) => {
+      toast.error(await buildError(texts.extensions.duplicateConfigurationFailed, error));
+    },
+  });
+
+  const doCloseConfiguration = useEventCallback(() => {
+    setToUpdateConfiguration(false);
+  });
 
   const { data: loadedBuckets } = useQuery({
     queryKey: ['buckets'],
@@ -104,135 +154,176 @@ export function ExtensionsPage() {
 
   return (
     <>
-      <div className="flex flex-col gap-8">
-        <div className="flex">
-          <h2 className="grow text-2xl">{texts.extensions.headline}</h2>
-
-          <Button leftSection={<IconPlus />} onClick={() => setToCreate(true)}>
-            {texts.extensions.add}
-          </Button>
-        </div>
-
-        <div className="flex flex-col gap-2">
-          <h3 className="text-xl">{texts.extensions.typeModels}</h3>
-
-          {numModels === 0 && isFetched && <Alert text={texts.extensions.warningNoModel} />}
-
-          {numModels > 1 && isFetched && <Alert text={texts.extensions.warningTooManyModels} />}
-
-          <ul aria-label={'extensionList'} className="grid grid-cols-1 gap-4 xl:grid-cols-2">
-            {asModels.map((extension) => (
-              <ExtensionCard
-                key={extension.id}
-                buckets={buckets}
-                extension={extension}
-                onClick={(_, extension) => setToUpdate(extension)}
-                onDelete={deleting.mutate}
-                spec={extension.spec}
-              />
-            ))}
-          </ul>
-        </div>
-
-        {asOthers.length > 0 && (
-          <div className="flex flex-col gap-2">
-            <h3 className="text-xl">{texts.extensions.typeOther}</h3>
-
-            <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
-              {asOthers.map((extension) => (
-                <ExtensionCard
-                  key={extension.id}
-                  buckets={buckets}
-                  extension={extension}
-                  onClick={(_, extension) => setToUpdate(extension)}
-                  onDelete={deleting.mutate}
-                  spec={extension.spec}
-                />
-              ))}
-            </div>
-          </div>
-        )}
-
-        {asTools.length > 0 && (
-          <div className="flex flex-col gap-2">
-            <h3 className="text-xl">{texts.extensions.typeTools}</h3>
-
-            {incompatibleToolPairsNames.map(([title, other]) => (
-              <div
-                key={title + other}
-                role="alert"
-                className="alert alert-warning"
-                aria-label={'warning'}
-                data-testid="incompatibleToolAlert"
-              >
-                <Icon icon="alert" />
-                <span>{texts.extensions.warningIncompatibleFilesTools(title, other)}</span>
+      {thisConfiguration && (
+        <>
+          <div className="flex flex-col gap-8">
+            <div className="flex items-start justify-between">
+              <div className="flex flex-col gap-y-2">
+                <div className="flex items-center gap-x-4">
+                  <span className={cn('status status-lg', thisConfiguration.enabled ? 'status-success' : 'status-error')}></span>
+                  <h2 className="text-3xl">{thisConfiguration.name}</h2>
+                </div>
+                <div className="text-gray-400">{thisConfiguration.description}</div>
               </div>
-            ))}
 
-            <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
-              {asTools.map((extension) => (
-                <ExtensionCard
-                  key={extension.id}
-                  buckets={buckets}
-                  extension={extension}
-                  onClick={(_, extension) => setToUpdate(extension)}
-                  onDelete={deleting.mutate}
-                  spec={extension.spec}
-                />
-              ))}
+              <div className="flex gap-2">
+                <Button leftSection={<IconEdit size={20} />} onClick={() => setToUpdateConfiguration(true)}>
+                  {texts.common.edit}
+                </Button>
+                <Button leftSection={<IconCopy size={20} />} onClick={() => duplicateConfiguration.mutate(thisConfiguration)}>
+                  {texts.common.duplicate}
+                </Button>
+                <ConfirmDialog
+                  title={texts.extensions.removeConfigurationConfirmTitle}
+                  text={texts.extensions.removeConfigurationConfirmText}
+                  onPerform={() => deletingConfiguration.mutate(thisConfiguration)}
+                >
+                  {({ onClick }) => (
+                    <Button variant="light" onClick={onClick} color="red" leftSection={<IconTrash size={20} />}>
+                      {texts.common.remove}
+                    </Button>
+                  )}
+                </ConfirmDialog>
+              </div>
             </div>
-          </div>
-        )}
+            <div className="mt-4 flex">
+              <h2 className="grow text-2xl">{texts.extensions.headline}</h2>
 
-        {extensions.some((x) => x.configurableArguments) && (
-          <FormProvider {...form}>
-            <form>
+              <Button leftSection={<IconPlus />} onClick={() => setToCreate(true)}>
+                {texts.extensions.add}
+              </Button>
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <h3 className="text-xl">{texts.extensions.typeModels}</h3>
+
+              {numModels === 0 && isFetched && <Alert text={texts.extensions.warningNoModel} />}
+
+              {numModels > 1 && isFetched && <Alert text={texts.extensions.warningTooManyModels} />}
+
+              <ul aria-label={'extensionList'} className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+                {asModels.map((extension) => (
+                  <ExtensionCard
+                    key={extension.id}
+                    buckets={buckets}
+                    extension={extension}
+                    onClick={(_, extension) => setToUpdate(extension)}
+                    onDelete={deleting.mutate}
+                    spec={extension.spec}
+                  />
+                ))}
+              </ul>
+            </div>
+
+            {asOthers.length > 0 && (
               <div className="flex flex-col gap-2">
-                <h3 className="text-xl">{texts.common.configurableArguments}</h3>
+                <h3 className="text-xl">{texts.extensions.typeOther}</h3>
 
-                {extensions
-                  .filter((x) => x.configurableArguments)
-                  .map((x) => (
-                    <Fieldset
-                      key={x.id}
-                      legend={
-                        <div className="flex items-center">
-                          <h4 className="mr-2.5 font-bold">{x.configurableArguments?.title}</h4>
-                          <p className="text-xs">{x.configurableArguments?.description}</p>
-                        </div>
-                      }
-                    >
-                      {Object.entries(x.configurableArguments!.properties).map(([name, spec]) => (
-                        <Argument
-                          namePrefix={`${x.id}.`}
-                          refreshable
-                          vertical
-                          key={`${x.id}-${name}`}
-                          buckets={[]}
-                          name={name}
-                          argument={spec}
-                        />
-                      ))}
-                    </Fieldset>
+                <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+                  {asOthers.map((extension) => (
+                    <ExtensionCard
+                      key={extension.id}
+                      buckets={buckets}
+                      extension={extension}
+                      onClick={(_, extension) => setToUpdate(extension)}
+                      onDelete={deleting.mutate}
+                      spec={extension.spec}
+                    />
                   ))}
+                </div>
               </div>
-            </form>
-          </FormProvider>
-        )}
-      </div>
+            )}
 
-      {(toCreate || toUpdate) && (
-        <UpsertExtensionDialog
-          selected={toUpdate ?? undefined}
-          buckets={buckets}
-          configurationId={configurationId}
-          onClose={doClose}
-          onCreate={setExtension}
-          onDelete={removeExtension}
-          onUpdate={setExtension}
-          specs={specs}
-        />
+            {asTools.length > 0 && (
+              <div className="flex flex-col gap-2">
+                <h3 className="text-xl">{texts.extensions.typeTools}</h3>
+
+                {incompatibleToolPairsNames.map(([title, other]) => (
+                  <div
+                    key={title + other}
+                    role="alert"
+                    className="alert alert-warning"
+                    aria-label={'warning'}
+                    data-testid="incompatibleToolAlert"
+                  >
+                    <Icon icon="alert" />
+                    <span>{texts.extensions.warningIncompatibleFilesTools(title, other)}</span>
+                  </div>
+                ))}
+
+                <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+                  {asTools.map((extension) => (
+                    <ExtensionCard
+                      key={extension.id}
+                      buckets={buckets}
+                      extension={extension}
+                      onClick={(_, extension) => setToUpdate(extension)}
+                      onDelete={deleting.mutate}
+                      spec={extension.spec}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {extensions.some((x) => x.configurableArguments) && (
+              <FormProvider {...form}>
+                <form>
+                  <div className="flex flex-col gap-2">
+                    <h3 className="text-xl">{texts.common.configurableArguments}</h3>
+
+                    {extensions
+                      .filter((x) => x.configurableArguments)
+                      .map((x) => (
+                        <Fieldset
+                          key={x.id}
+                          legend={
+                            <div className="flex items-center">
+                              <h4 className="mr-2.5 font-bold">{x.configurableArguments?.title}</h4>
+                              <p className="text-xs">{x.configurableArguments?.description}</p>
+                            </div>
+                          }
+                        >
+                          {Object.entries(x.configurableArguments!.properties).map(([name, spec]) => (
+                            <Argument
+                              namePrefix={`${x.id}.`}
+                              refreshable
+                              vertical
+                              key={`${x.id}-${name}`}
+                              buckets={[]}
+                              name={name}
+                              argument={spec}
+                            />
+                          ))}
+                        </Fieldset>
+                      ))}
+                  </div>
+                </form>
+              </FormProvider>
+            )}
+          </div>
+
+          {(toCreate || toUpdate) && (
+            <UpsertExtensionDialog
+              selected={toUpdate ?? undefined}
+              buckets={buckets}
+              configurationId={configurationId}
+              onClose={doClose}
+              onCreate={setExtension}
+              onDelete={removeExtension}
+              onUpdate={setExtension}
+              specs={specs}
+            />
+          )}
+          {toUpdateConfiguration && (
+            <UpsertConfigurationDialog
+              onClose={doCloseConfiguration}
+              onCreate={() => {}}
+              target={thisConfiguration}
+              onUpdate={setConfiguration}
+            />
+          )}
+        </>
       )}
     </>
   );

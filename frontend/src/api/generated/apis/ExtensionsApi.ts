@@ -68,6 +68,10 @@ export interface GetBucketAvailabilityRequest {
     type: GetBucketAvailabilityTypeEnum;
 }
 
+export interface GetConfigurationRequest {
+    id: number;
+}
+
 export interface GetConfigurationUserValuesRequest {
     id: number;
 }
@@ -267,6 +271,41 @@ export class ExtensionsApi extends runtime.BaseAPI {
      */
     async getBucketAvailability(id: number, type: GetBucketAvailabilityTypeEnum, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BucketAvailabilityDto> {
         const response = await this.getBucketAvailabilityRaw({ id: id, type: type }, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Gets a configuration with the given id.
+     * 
+     */
+    async getConfigurationRaw(requestParameters: GetConfigurationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ConfigurationDto>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling getConfiguration().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/configurations/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ConfigurationDtoFromJSON(jsonValue));
+    }
+
+    /**
+     * Gets a configuration with the given id.
+     * 
+     */
+    async getConfiguration(id: number, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ConfigurationDto> {
+        const response = await this.getConfigurationRaw({ id: id }, initOverrides);
         return await response.value();
     }
 
