@@ -1,6 +1,6 @@
 import { StructuredTool } from '@langchain/core/tools';
 import { z } from 'zod';
-import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from 'src/domain/chat';
+import { ChatContext, ChatMiddleware, ChatNextDelegate, FormActionType, GetContext } from 'src/domain/chat';
 import { Extension, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions';
 import { User } from 'src/domain/users';
 import { I18nService } from '../../localization/i18n.service';
@@ -34,7 +34,7 @@ export class SimpleInputExtension implements Extension {
 
 class InternalTool extends StructuredTool {
   readonly name: string;
-  readonly description = 'Hnadles a user input';
+  readonly description = 'Handles a user input';
   readonly displayName = 'Simple Input';
 
   get lc_id() {
@@ -57,12 +57,18 @@ class InternalTool extends StructuredTool {
       setTimeout(resolve, 2000);
     });
 
-    const text = await this.context.ui.input('Please enter some text?');
+    const text = await this.context.ui.form('Please enter some text', {
+      type: 'object',
+      title: this.displayName,
+      properties: {
+        text: { type: 'string', title: 'Input' },
+      },
+    });
 
-    if (!text) {
+    if (text.action !== FormActionType.ACCEPT) {
       return 'No input';
     }
 
-    return `You have entered ${text}"`;
+    return `You have entered ${text.data?.text}"`;
   }
 }
