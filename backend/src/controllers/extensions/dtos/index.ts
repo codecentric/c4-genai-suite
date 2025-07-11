@@ -574,6 +574,7 @@ export class ExtensionUserInfoDto {
     result.description = spec.description;
     result.logo = spec.logo;
     result.name = spec.name;
+    result.type = spec.type;
 
     const userArguments = spec.userArguments;
     result.title = userArguments?.title ?? spec.title;

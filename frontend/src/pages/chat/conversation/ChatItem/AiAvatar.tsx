@@ -1,3 +1,4 @@
+import { Avatar } from '@mantine/core';
 import { Logo } from 'src/components';
 import { useTheme } from 'src/hooks';
 
@@ -10,9 +11,9 @@ export const AiAvatar = ({ llmLogo }: { llmLogo?: string }) => {
       {avatarLogoUrl && <Logo url={avatarLogoUrl} />}
       {!avatarLogoUrl && llmLogo && <Logo previewLogo={llmLogo} />}
       {!avatarLogoUrl && !llmLogo && (
-        <div className="avatar placeholder">
-          <div className="bg-cc h-full w-full rounded-full fill-black/60">AI</div>
-        </div>
+        <Avatar size={'xs'} variant="filled" color="dark">
+          AI
+        </Avatar>
       )}
     </div>
   );
