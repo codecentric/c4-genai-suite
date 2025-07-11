@@ -68,7 +68,7 @@ export function BucketsPage() {
           </div>
 
           <div className="grow overflow-y-auto p-4 pt-4">
-            <div className="nav-menu flex flex-col">
+            <div aria-labelledby={texts.files.buckets} className="nav-menu flex flex-col">
               {buckets.map((bucket) => (
                 <Bucket key={bucket.id} bucket={bucket} onDelete={deleting.mutate} onUpdate={setToUpdate} />
               ))}

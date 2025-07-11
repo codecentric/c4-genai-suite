@@ -9,14 +9,14 @@ type FilterableTableProps = {
   table: TanTable<TData>;
 };
 
-export function FilterableTable(props: FilterableTableProps) {
+export function FilterableTable({ table }: FilterableTableProps) {
   const containerClass = 'flex flex-row items-center justify-between';
 
   return (
     <div className="flex w-full flex-col overflow-x-scroll">
       <table className="w-full min-w-max table-auto border-collapse">
         <thead>
-          {props.table.getHeaderGroups().map((headerGroup) => (
+          {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
               {headerGroup.headers.map((header) => {
                 return (
@@ -52,7 +52,7 @@ export function FilterableTable(props: FilterableTableProps) {
           ))}
         </thead>
         <tbody>
-          {props.table.getRowModel().rows.map((row) => {
+          {table.getRowModel().rows.map((row) => {
             return (
               <tr key={row.id} className="border-t border-gray-200 hover:bg-gray-50">
                 {row.getVisibleCells().map((cell) => {

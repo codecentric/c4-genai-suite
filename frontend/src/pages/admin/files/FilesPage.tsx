@@ -15,20 +15,13 @@ import { useDropzone } from 'react-dropzone';
 import { useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { BucketDto, BucketDtoTypeEnum, FileDto, useApi } from 'src/api';
-import { ConfirmDialog, FilterableTable, InfoByte, Search, TablePagination } from 'src/components';
+import { ConfirmDialog, FilterableTable, InfoByte, Search, TablePagination, TData } from 'src/components';
 import { useEventCallback, useTransientNavigate } from 'src/hooks';
 import { buildError, formatFileSize } from 'src/lib';
 import { extractType } from 'src/pages/utils';
 import { texts } from 'src/texts';
 import { UpsertBucketDialog } from './UpsertBucketDialog';
 import { useBucketstore, useFilesStore } from './state';
-declare module '@tanstack/react-table' {
-  //allows us to define custom properties for our columns
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  interface ColumnMeta<TData, TValue> {
-    filterVariant?: 'text' | 'range' | 'select';
-  }
-}
 
 export function FilesPage() {
   const api = useApi();
@@ -189,7 +182,7 @@ export function FilesPage() {
     [],
   );
 
-  const table = useReactTable({
+  const table = useReactTable<TData>({
     data: files,
     columns: columns,
     state: {
@@ -245,16 +238,15 @@ export function FilesPage() {
               {thisBucket.indexName && <InfoByte title={texts.common.indexName} value={thisBucket.indexName} />}
             </div>
             {/* Don't show the Searchable Files heading for conversation buckets */}
-            {thisBucket.type !== BucketDtoTypeEnum.Conversation && (
-              <div className="my-4 flex">
-                <h2 className="grow text-2xl">{texts.files.headlineSearchable}</h2>
-                {thisBucket.type !== BucketDtoTypeEnum.User && (
-                  <ActionIcon onClick={open} disabled={isDragActive || uploading.length > 0} color="black" size="input-sm">
-                    {uploading.length > 0 ? <IconLoader size={20} className="animate-spin" /> : <IconUpload size={20} />}
-                  </ActionIcon>
-                )}
-              </div>
-            )}
+            {/* {thisBucket.type !== BucketDtoTypeEnum.Conversation && ( */}
+            <div className="my-4 flex">
+              <h2 className="grow text-2xl">{texts.files.headlineSearchable}</h2>
+              {thisBucket.type !== BucketDtoTypeEnum.User && (
+                <ActionIcon onClick={open} disabled={isDragActive || uploading.length > 0} color="black" size="input-sm">
+                  {uploading.length > 0 ? <IconLoader size={20} className="animate-spin" /> : <IconUpload size={20} />}
+                </ActionIcon>
+              )}
+            </div>
           </div>
 
           {thisBucket.type !== BucketDtoTypeEnum.Conversation && (
