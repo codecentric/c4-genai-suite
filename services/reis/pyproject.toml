@@ -18,7 +18,7 @@ psycopg = {extras = ["binary"], version = "^3.2.9"}
 fastapi = {extras = ["standard"], version = "0.116.1"}
 azure-search-documents = "11.5.3"
 azure-identity = "1.23.0"
-unstructured = {extras = ["docx", "md", "pptx", "xlsx"], version = "0.18.5"}
+unstructured = {extras = ["docx", "md", "pptx", "xlsx"], version = "0.18.6"}
 pdfminer-six = "^20250506"
 ffmpeg-python = "^0.2.0"
 aiofiles = "^24.1.0"
