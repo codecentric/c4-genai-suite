@@ -1,5 +1,5 @@
-import { Button, Fieldset } from '@mantine/core';
-import { IconCopy, IconEdit, IconPlus, IconTrash } from '@tabler/icons-react';
+import { Button, Fieldset, Tabs } from '@mantine/core';
+import { IconBlocks, IconBrain, IconCopy, IconEdit, IconPlus, IconTool, IconTrash } from '@tabler/icons-react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
@@ -9,7 +9,7 @@ import { useApi } from 'src/api';
 import { BucketDto, ConfigurationDto, ExtensionDto } from 'src/api/generated';
 import { Alert, ConfirmDialog, Icon } from 'src/components';
 import { useEventCallback, useTransientNavigate } from 'src/hooks';
-import { buildError, cn } from 'src/lib';
+import { buildError } from 'src/lib';
 import { Argument } from 'src/pages/admin/extensions/ExtensionForm';
 import { texts } from 'src/texts';
 import { ExtensionCard } from './ExtensionCard';
@@ -21,6 +21,8 @@ const EMPTY_BUCKETS: BucketDto[] = [];
 
 export function ExtensionsPage() {
   const api = useApi();
+
+  const [activeTab, setActiveTab] = useState<string | null>('models');
 
   const configurationParam = useParams<'id'>();
   const configurationId = +configurationParam.id!;
@@ -160,7 +162,6 @@ export function ExtensionsPage() {
             <div className="flex items-start justify-between">
               <div className="flex flex-col gap-y-2">
                 <div className="flex items-center gap-x-4">
-                  <span className={cn('status status-lg', thisConfiguration.enabled ? 'status-success' : 'status-error')}></span>
                   <h2 className="text-3xl">{thisConfiguration.name}</h2>
                 </div>
                 <div className="text-gray-400">{thisConfiguration.description}</div>
@@ -188,83 +189,95 @@ export function ExtensionsPage() {
             </div>
             <div className="mt-4 flex">
               <h2 className="grow text-2xl">{texts.extensions.headline}</h2>
-
               <Button leftSection={<IconPlus />} onClick={() => setToCreate(true)}>
                 {texts.extensions.add}
               </Button>
             </div>
 
-            <div className="flex flex-col gap-2">
-              <h3 className="text-xl">{texts.extensions.typeModels}</h3>
+            <div>
+              <Tabs
+                variant="outline"
+                radius="lg"
+                onChange={setActiveTab}
+                value={activeTab}
+                classNames={{ tab: 'custom-tab', tabLabel: 'custom-tabLabel', panel: 'custom-tab-panel' }}
+              >
+                <Tabs.List grow>
+                  <Tabs.Tab value="models" leftSection={<IconBrain size={18} />}>
+                    {texts.extensions.typeModels}
+                  </Tabs.Tab>
+                  <Tabs.Tab value="tools" leftSection={<IconTool size={18} />}>
+                    {texts.extensions.typeTools}
+                  </Tabs.Tab>
+                  <Tabs.Tab value="others" leftSection={<IconBlocks size={18} />}>
+                    {texts.extensions.typeOther}
+                  </Tabs.Tab>
+                </Tabs.List>
+                <Tabs.Panel value="models">
+                  {numModels === 0 && isFetched && <Alert text={texts.extensions.warningNoModel} />}
 
-              {numModels === 0 && isFetched && <Alert text={texts.extensions.warningNoModel} />}
+                  {numModels > 1 && isFetched && <Alert text={texts.extensions.warningTooManyModels} />}
 
-              {numModels > 1 && isFetched && <Alert text={texts.extensions.warningTooManyModels} />}
-
-              <ul aria-label={'extensionList'} className="grid grid-cols-1 gap-4 xl:grid-cols-2">
-                {asModels.map((extension) => (
-                  <ExtensionCard
-                    key={extension.id}
-                    buckets={buckets}
-                    extension={extension}
-                    onClick={(_, extension) => setToUpdate(extension)}
-                    onDelete={deleting.mutate}
-                    spec={extension.spec}
-                  />
-                ))}
-              </ul>
-            </div>
-
-            {asOthers.length > 0 && (
-              <div className="flex flex-col gap-2">
-                <h3 className="text-xl">{texts.extensions.typeOther}</h3>
-
-                <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
-                  {asOthers.map((extension) => (
-                    <ExtensionCard
-                      key={extension.id}
-                      buckets={buckets}
-                      extension={extension}
-                      onClick={(_, extension) => setToUpdate(extension)}
-                      onDelete={deleting.mutate}
-                      spec={extension.spec}
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {asTools.length > 0 && (
-              <div className="flex flex-col gap-2">
-                <h3 className="text-xl">{texts.extensions.typeTools}</h3>
-
-                {incompatibleToolPairsNames.map(([title, other]) => (
-                  <div
-                    key={title + other}
-                    role="alert"
-                    className="alert alert-warning"
-                    aria-label={'warning'}
-                    data-testid="incompatibleToolAlert"
-                  >
-                    <Icon icon="alert" />
-                    <span>{texts.extensions.warningIncompatibleFilesTools(title, other)}</span>
+                  <div aria-label={'extensionList'} className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+                    {asModels.map((extension) => (
+                      <ExtensionCard
+                        key={extension.id}
+                        buckets={buckets}
+                        extension={extension}
+                        onClick={(_, extension) => setToUpdate(extension)}
+                        onDelete={deleting.mutate}
+                        spec={extension.spec}
+                      />
+                    ))}
                   </div>
-                ))}
+                </Tabs.Panel>
+                <Tabs.Panel value="tools">
+                  {asTools.length == 0 && isFetched && <div className="p-2 text-sm">{texts.extensions.noTools}</div>}
 
-                <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
-                  {asTools.map((extension) => (
-                    <ExtensionCard
-                      key={extension.id}
-                      buckets={buckets}
-                      extension={extension}
-                      onClick={(_, extension) => setToUpdate(extension)}
-                      onDelete={deleting.mutate}
-                      spec={extension.spec}
-                    />
+                  {incompatibleToolPairsNames.map(([title, other]) => (
+                    <div
+                      key={title + other}
+                      role="alert"
+                      className="alert alert-warning"
+                      aria-label={'warning'}
+                      data-testid="incompatibleToolAlert"
+                    >
+                      <Icon icon="alert" />
+                      <span>{texts.extensions.warningIncompatibleFilesTools(title, other)}</span>
+                    </div>
                   ))}
-                </div>
-              </div>
-            )}
+
+                  <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+                    {asTools.map((extension) => (
+                      <ExtensionCard
+                        key={extension.id}
+                        buckets={buckets}
+                        extension={extension}
+                        onClick={(_, extension) => setToUpdate(extension)}
+                        onDelete={deleting.mutate}
+                        spec={extension.spec}
+                      />
+                    ))}
+                  </div>
+                </Tabs.Panel>
+                <Tabs.Panel value="others">
+                  {asOthers.length == 0 && isFetched && <div className="p-2 text-sm">{texts.extensions.noOthers}</div>}
+
+                  <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+                    {asOthers.map((extension) => (
+                      <ExtensionCard
+                        key={extension.id}
+                        buckets={buckets}
+                        extension={extension}
+                        onClick={(_, extension) => setToUpdate(extension)}
+                        onDelete={deleting.mutate}
+                        spec={extension.spec}
+                      />
+                    ))}
+                  </div>
+                </Tabs.Panel>
+              </Tabs>
+            </div>
 
             {extensions.some((x) => x.configurableArguments) && (
               <FormProvider {...form}>

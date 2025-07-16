@@ -180,6 +180,8 @@ export const en = {
       'The executor is a special service that handles the complete chat flow and only provides the answer. For special cases, where full control over the chat is needed.',
     executorHeaders: 'Executor Headers',
     headline: 'Extensions',
+    noTools: 'There are currently no tools configured for this assistant.',
+    noOthers: 'There are currently no other extensions configured for this assistant.',
     rebuildSchemaFailed: 'Refresh Schema failed',
     rebuildSchema: 'Refresh schema',
     removeConfigurationConfirmText: 'Do you really want to remove the assistant?',

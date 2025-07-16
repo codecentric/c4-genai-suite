@@ -1,5 +1,5 @@
-import { Alert, Button, Divider, Portal } from '@mantine/core';
-import { IconInfoCircle, IconRefresh, IconTrash } from '@tabler/icons-react';
+import { Alert, Button, Divider, Portal, Tabs } from '@mantine/core';
+import { IconBlocks, IconBrain, IconInfoCircle, IconRefresh, IconTool, IconTrash } from '@tabler/icons-react';
 import { useMutation } from '@tanstack/react-query';
 import { useEffect, useRef, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
@@ -196,35 +196,44 @@ export function UpsertExtensionDialog(props: UpsertExtensionDialogProps) {
                 </>
               ) : (
                 <div className="flex flex-col gap-6">
-                  <div>
-                    <h3 className="mb-2 text-lg">{texts.extensions.typeModels}</h3>
-
-                    <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
-                      {asModels.map((spec) => (
-                        <ExtensionCard key={spec.name} buckets={buckets} spec={spec} onClick={setSpec} />
-                      ))}
-                    </div>
-                  </div>
-
-                  <div>
-                    <h3 className="mb-2 text-lg">{texts.extensions.typeOther}</h3>
-
-                    <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
-                      {asOthers.map((spec) => (
-                        <ExtensionCard key={spec.name} buckets={buckets} spec={spec} onClick={setSpec} />
-                      ))}
-                    </div>
-                  </div>
-
-                  <div>
-                    <h3 className="mb-2 text-lg">{texts.extensions.typeTools}</h3>
-
-                    <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
-                      {asTools.map((spec) => (
-                        <ExtensionCard key={spec.name} buckets={buckets} spec={spec} onClick={setSpec} />
-                      ))}
-                    </div>
-                  </div>
+                  <Tabs
+                    color={'blue'}
+                    classNames={{ tabLabel: 'custom-tabLabel', panel: 'dialogue-tab-panel' }}
+                    defaultValue={'models'}
+                  >
+                    <Tabs.List grow>
+                      <Tabs.Tab value="models" leftSection={<IconBrain size={18} />}>
+                        {texts.extensions.typeModels}
+                      </Tabs.Tab>
+                      <Tabs.Tab value="tools" leftSection={<IconTool size={18} />}>
+                        {texts.extensions.typeTools}
+                      </Tabs.Tab>
+                      <Tabs.Tab value="others" leftSection={<IconBlocks size={18} />}>
+                        {texts.extensions.typeOther}
+                      </Tabs.Tab>
+                    </Tabs.List>
+                    <Tabs.Panel value="models">
+                      <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+                        {asModels.map((spec) => (
+                          <ExtensionCard key={spec.name} buckets={buckets} spec={spec} onClick={setSpec} />
+                        ))}
+                      </div>
+                    </Tabs.Panel>
+                    <Tabs.Panel value="tools">
+                      <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+                        {asTools.map((spec) => (
+                          <ExtensionCard key={spec.name} buckets={buckets} spec={spec} onClick={setSpec} />
+                        ))}
+                      </div>
+                    </Tabs.Panel>
+                    <Tabs.Panel value="others">
+                      <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+                        {asOthers.map((spec) => (
+                          <ExtensionCard key={spec.name} buckets={buckets} spec={spec} onClick={setSpec} />
+                        ))}
+                      </div>
+                    </Tabs.Panel>
+                  </Tabs>
                 </div>
               )}
             </fieldset>

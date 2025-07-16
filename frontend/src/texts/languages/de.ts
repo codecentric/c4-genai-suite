@@ -183,6 +183,8 @@ export const de: typeof en = {
       'Der Executor ist ein spezieller Dienst, der den gesamten Chat-Ablauf steuert und nur die Antwort bereitstellt. Für spezielle Fälle, in denen vollständige Kontrolle über den Chat benötigt wird.',
     executorHeaders: 'Executor-Header',
     headline: 'Erweiterungen',
+    noTools: 'Es sind aktuell keine Tools für diesen Assitenten konfiguriert',
+    noOthers: 'Es sind aktuell keine anderen Erweiterungen für diesen Assistenten konfiguriert',
     removeConfigurationConfirmText: 'Möchtest du diesen Assistenten wirklich löschen?',
     removeConfigurationConfirmTitle: 'Assistent löschen',
     removeConfigurationFailed: 'Löschen des Assistenten fehlgeschlagen',
