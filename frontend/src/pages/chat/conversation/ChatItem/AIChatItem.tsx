@@ -38,7 +38,7 @@ export const AIChatItem = ({ agentName, message, isLast, llmLogo, selectDocument
       </div>
       {message.error && <Alert text={message.error} className="mt-1" />}
       <ChatItemTools tools={message.toolsInUse || {}} />
-      {message.ui && <ChatItemUserInput request={message.ui} />}
+      {message.ui && <ChatItemUserInput key={message.ui.id} request={message.ui} />}
       <Markdown animateText={isLast && newReply} className="box-border max-w-full">
         {textContent}
       </Markdown>

@@ -43,7 +43,7 @@ import {
   UpdateConversationResponse,
 } from 'src/domain/chat';
 import {
-  ConfirmDto,
+  ChatUICallbackResultDto,
   ConversationDto,
   ConversationsDto,
   CreateConversationDto,
@@ -325,7 +325,7 @@ export class ConversationsController {
     type: String,
   })
   @ApiNoContentResponse()
-  confirmBoolean(@Param('id') id: string, @Body() request: ConfirmDto) {
-    this.callbacks.complete(id, request.result);
+  confirm(@Param('id') id: string, @Body() result: ChatUICallbackResultDto) {
+    this.callbacks.complete(id, result);
   }
 }

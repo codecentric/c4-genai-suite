@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { ExtensionArgument } from '../../extensions';
 import { ChatContext, ChatMiddleware, ChatNextDelegate, ChatUI, GetContext } from '../interfaces';
 import { CallbackService } from '../services/callback-service';
 
@@ -20,23 +21,12 @@ class ChatUIImpl implements ChatUI {
     private readonly callbacks: CallbackService,
   ) {}
 
-  confirm(text: string): Promise<boolean> {
-    const { id, result } = this.callbacks.confirm();
+  form(text: string, schema: ExtensionArgument) {
+    const { id, result } = this.callbacks.form();
 
     this.context.result.next({
       type: 'ui',
-      request: { id, text, type: 'boolean' },
-    });
-
-    return result;
-  }
-
-  input(text: string): Promise<string> {
-    const { id, result } = this.callbacks.input();
-
-    this.context.result.next({
-      type: 'ui',
-      request: { id, text, type: 'string' },
+      request: { id, text, schema },
     });
 
     return result;

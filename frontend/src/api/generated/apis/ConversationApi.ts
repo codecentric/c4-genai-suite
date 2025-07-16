@@ -16,7 +16,7 @@
 
 import * as runtime from '../runtime';
 import type {
-  ConfirmDto,
+  ChatUICallbackResultDto,
   ConversationDto,
   ConversationsDto,
   CreateConversationDto,
@@ -26,8 +26,8 @@ import type {
   UpdateConversationDto,
 } from '../models/index';
 import {
-    ConfirmDtoFromJSON,
-    ConfirmDtoToJSON,
+    ChatUICallbackResultDtoFromJSON,
+    ChatUICallbackResultDtoToJSON,
     ConversationDtoFromJSON,
     ConversationDtoToJSON,
     ConversationsDtoFromJSON,
@@ -46,7 +46,7 @@ import {
 
 export interface ConfirmRequest {
     id: string;
-    confirmDto: ConfirmDto;
+    chatUICallbackResultDto: ChatUICallbackResultDto;
 }
 
 export interface DeleteConversationRequest {
@@ -113,10 +113,10 @@ export class ConversationApi extends runtime.BaseAPI {
             );
         }
 
-        if (requestParameters['confirmDto'] == null) {
+        if (requestParameters['chatUICallbackResultDto'] == null) {
             throw new runtime.RequiredError(
-                'confirmDto',
-                'Required parameter "confirmDto" was null or undefined when calling confirm().'
+                'chatUICallbackResultDto',
+                'Required parameter "chatUICallbackResultDto" was null or undefined when calling confirm().'
             );
         }
 
@@ -131,7 +131,7 @@ export class ConversationApi extends runtime.BaseAPI {
             method: 'DELETE',
             headers: headerParameters,
             query: queryParameters,
-            body: ConfirmDtoToJSON(requestParameters['confirmDto']),
+            body: ChatUICallbackResultDtoToJSON(requestParameters['chatUICallbackResultDto']),
         }, initOverrides);
 
         return new runtime.VoidApiResponse(response);
@@ -140,8 +140,8 @@ export class ConversationApi extends runtime.BaseAPI {
     /**
      * 
      */
-    async confirm(id: string, confirmDto: ConfirmDto, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.confirmRaw({ id: id, confirmDto: confirmDto }, initOverrides);
+    async confirm(id: string, chatUICallbackResultDto: ChatUICallbackResultDto, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.confirmRaw({ id: id, chatUICallbackResultDto: chatUICallbackResultDto }, initOverrides);
     }
 
     /**
