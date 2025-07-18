@@ -47,11 +47,7 @@ test('Configuration Management', async ({ page }) => {
     const createConfigurationModal = page.getByRole('heading', { name: 'Update Configuration' });
     await createConfigurationModal.waitFor({ state: 'detached' });
 
-    const configurationName = await page
-      .getByRole('list', { name: 'assistants' })
-      .getByRole('listitem')
-      .getByText(configNewName)
-      .textContent();
+    const configurationName = await page.getByLabel('assistants').getByRole('listitem').getByText(configNewName).textContent();
     expect(configurationName).toEqual(configNewName);
   });
 
@@ -68,7 +64,7 @@ test('Configuration Management', async ({ page }) => {
   });
 
   await test.step('create an extension', async () => {
-    await page.getByRole('list', { name: 'assistants' }).getByRole('listitem').filter({ hasText: configNewName }).click();
+    await page.getByLabel('assistants').getByRole('listitem').filter({ hasText: configNewName }).click();
 
     await page.getByRole('heading', { name: 'Extensions' }).waitFor();
     await page.getByRole('button', { name: 'Add Extension' }).click();
@@ -79,19 +75,19 @@ test('Configuration Management', async ({ page }) => {
       .click();
     await page.getByLabel('API Key').click();
     await page.getByLabel('API Key').fill(apiKey);
-    await page.getByLabel('Model').fill('gpt-3.5-turbo');
+    await page.getByLabel('Model Name').fill('gpt-3.5-turbo');
 
     await page.getByRole('button', { name: 'Save' }).click();
 
-    await page.getByRole('list', { name: 'extensionList' }).waitFor();
+    await page.getByLabel('extensionList').waitFor();
 
-    const extensions = page.getByRole('list', { name: 'extensionList' });
+    const extensions = page.getByLabel('extensionList');
     await expect(extensions).toHaveCount(1);
   });
 
   await test.step('should edit the extension', async () => {
-    await page.getByRole('list', { name: 'extensionList' }).getByRole('listitem').first().click();
-    await page.getByLabel('Model').fill('gpt-4-0613');
+    await page.getByLabel('extensionList').getByRole('listitem').first().click();
+    await page.getByLabel('Model Name').fill('gpt-4-0613');
     await page.getByRole('button', { name: 'Save' }).click();
 
     const updateExtensionModal = page.getByRole('heading', { name: 'Update Extension' });
@@ -102,7 +98,7 @@ test('Configuration Management', async ({ page }) => {
   });
 
   await test.step('alert when API Key is empty and Model field is not selected with an option', async () => {
-    await page.getByRole('list', { name: 'assistants' }).getByRole('listitem').filter({ hasText: configNewName }).click();
+    await page.getByLabel('assistants').getByRole('listitem').filter({ hasText: configNewName }).click();
     await page.getByRole('button', { name: 'Add Extension' }).click();
     await page.getByRole('group').getByRole('heading', { name: 'OpenAI', exact: true }).click();
     await page.getByRole('button', { name: 'Save' }).click();
@@ -114,7 +110,7 @@ test('Configuration Management', async ({ page }) => {
   });
 
   await test.step('alert when there are more than one model', async () => {
-    await page.getByRole('list', { name: 'assistants' }).getByRole('listitem').filter({ hasText: configNewName }).click();
+    await page.getByLabel('assistants').getByRole('listitem').filter({ hasText: configNewName }).click();
 
     await page.getByRole('heading', { name: 'Extensions' }).waitFor();
     await page.getByRole('button', { name: 'Add Extension' }).click();
@@ -125,7 +121,7 @@ test('Configuration Management', async ({ page }) => {
       .click();
     await page.getByLabel('API Key').click();
     await page.getByLabel('API Key').fill(apiKey);
-    await page.getByLabel('Model').fill('gpt-3.5-turbo');
+    await page.getByLabel('Model Name').fill('gpt-3.5-turbo');
     await page.getByRole('button', { name: 'Save' }).click();
 
     await page.getByLabel('extensionList').waitFor();
@@ -137,10 +133,10 @@ test('Configuration Management', async ({ page }) => {
   });
 
   await test.step('should delete the extension', async () => {
-    const extensionToBeDeleted = page.getByRole('list', { name: 'extensionList' }).getByRole('listitem').first();
+    const extensionToBeDeleted = page.getByLabel('extensionList').getByRole('listitem').first();
     await extensionToBeDeleted.click();
 
-    await page.getByRole('button', { name: 'Delete' }).click();
+    await page.getByLabel('Update Extension').getByRole('button', { name: 'Delete' }).click();
     await page.getByRole('button', { name: 'Confirm' }).click();
 
     const updateExtensionModal = page.getByRole('heading', { name: 'Update Extension' });
@@ -148,14 +144,14 @@ test('Configuration Management', async ({ page }) => {
     await page.getByLabel('extensionList').waitFor();
 
     const deletedRows = page
-      .getByRole('list', { name: 'extensionList' })
+      .getByLabel('extensionList')
       .getByRole('listitem')
       .filter({ hasText: (await extensionToBeDeleted.textContent()) || '' });
     await expect(deletedRows).toHaveCount(1);
   });
 
   await test.step('delete a configuration', async () => {
-    const configList = page.getByRole('list', { name: 'assistants' });
+    const configList = page.getByLabel('assistants');
 
     const configToBeDeleted = configList.getByRole('link', { name: configNewName, exact: true });
     await configToBeDeleted.click();

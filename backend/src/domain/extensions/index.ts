@@ -8,6 +8,8 @@ export {
   DeleteConfiguration,
   DeleteConfigurationHandler,
   DeleteExtension,
+  GetConfiguration,
+  GetConfigurationResponse,
   GetConfigurations,
   GetConfigurationsResponse,
   GetExtension,

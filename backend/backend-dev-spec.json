@@ -374,6 +374,27 @@
       }
     },
     "/api/configurations/{id}": {
+      "get": {
+        "description": "Gets a configuration with the given id.",
+        "operationId": "getConfiguration",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "The ID of the configuration",
+            "schema": { "type": "number" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ConfigurationDto" } } }
+          }
+        },
+        "summary": "",
+        "tags": ["extensions"]
+      },
       "put": {
         "description": "Updates an extension.",
         "operationId": "putConfiguration",

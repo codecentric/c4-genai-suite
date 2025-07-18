@@ -84,8 +84,8 @@ export function ConfigurationPage() {
             </button>
           </div>
 
-          <div className="grow overflow-y-auto p-8 pt-4">
-            <ul aria-labelledby={texts.extensions.configurations} className="nav-menu nav-menu-dotted">
+          <div className="grow overflow-y-auto p-4 pt-4">
+            <div aria-labelledby={texts.extensions.configurations} className="nav-menu flex flex-col">
               {configurations.map((configuration) => (
                 <Configuration
                   key={configuration.id}
@@ -95,7 +95,7 @@ export function ConfigurationPage() {
                   onDuplicate={duplicate.mutate}
                 />
               ))}
-            </ul>
+            </div>
 
             {configurations.length === 0 && isFetched && (
               <div className="pt-4 text-sm text-gray-400">{texts.extensions.configurationsEmpty}</div>

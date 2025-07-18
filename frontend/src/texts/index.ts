@@ -209,6 +209,8 @@ function load() {
       executorEndpointHints: translate('extensions.executorEndpointHints'),
       executorHeaders: translate('extensions.executorHeaders'),
       headline: translate('extensions.headline'),
+      noOthers: translate('extensions.noOthers'),
+      noTools: translate('extensions.noTools'),
       removeConfigurationConfirmText: translate('extensions.removeConfigurationConfirmText'),
       removeConfigurationConfirmTitle: translate('extensions.removeConfigurationConfirmTitle'),
       removeConfigurationFailed: translate('extensions.removeConfigurationFailed'),
