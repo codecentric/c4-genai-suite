@@ -208,7 +208,8 @@ export const de: typeof en = {
     userGroupsHints: 'Beschränke den Zugriff auf den Assistenten auf bestimmte Benutzergruppen.',
     warningIncompatibleFilesTools:
       'Die folgenden Tools sind nicht kompatibel: `{{tool}}` und `{{otherTool}}`. Bitte wählen Sie eine der beiden Tooltypen aus.',
-    warningNoModel: 'Du musst mindestens ein Modell konfigurieren oder aktivieren.',
+    warningNoModel:
+      'Du musst mindestens ein Modell konfigurieren oder aktivieren. Klicken Sie auf Erweiterung hinzufügen um ein Modell hinzuzufügen.',
     warningTooManyModels: 'Du hast mehr als ein Modell aktiviert. Das erste Modell wird standardmäßig für neue Chats ausgewählt.',
   },
   files: {
