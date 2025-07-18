@@ -1887,6 +1887,7 @@
             "description": "The editor.",
             "enum": ["input", "textarea", "password", "select", "date", "c4-ui"]
           },
+          "examples": { "description": "The examples.", "type": "array", "items": { "type": "string" } },
           "enum": { "description": "The allowed values.", "type": "array", "items": { "type": "string" } },
           "default": { "type": "string", "description": "The selected value." }
         },

@@ -59,6 +59,8 @@ export interface ExtensionStringArgument extends ExtensionArgumentBase {
 
   format?: ExtensionStringArgumentFormat;
 
+  examples?: string[];
+
   enum?: string[];
 
   default?: string;

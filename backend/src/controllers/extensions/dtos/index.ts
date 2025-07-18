@@ -120,6 +120,13 @@ export class ExtensionArgumentStringSpecDto extends ExtensionArgumentSpecDto imp
   format?: ExtensionStringArgumentFormat;
 
   @ApiProperty({
+    description: 'The examples.',
+    required: false,
+    type: [String],
+  })
+  examples?: string[];
+
+  @ApiProperty({
     description: 'The allowed values.',
     required: false,
     type: [String],

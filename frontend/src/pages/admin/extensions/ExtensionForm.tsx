@@ -169,8 +169,8 @@ export function Argument({
     );
   }
 
-  if (type === 'string' && argument._enum) {
-    const options = argument._enum.map((x) => ({ value: x, label: x }));
+  if (type === 'string' && (argument._enum?.length || argument.examples?.length)) {
+    const options = (argument._enum?.length ? argument._enum : (argument.examples ?? [])).map((x) => ({ value: x, label: x }));
 
     return (
       <Forms.Select
@@ -183,6 +183,7 @@ export function Argument({
         hints={hints()}
         vertical={vertical}
         defaultValue={argument._default}
+        autocomplete={!!argument.examples?.length}
       />
     );
   }

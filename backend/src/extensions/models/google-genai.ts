@@ -24,7 +24,7 @@ export class GoogleGenAIModelExtension implements Extension<VertexAIModelExtensi
           title: this.i18n.t('texts.extensions.common.modelName'),
           required: true,
           format: 'select',
-          enum: [
+          examples: [
             'gemini-2.5-pro',
             'gemini-2.5-flash',
             'gemini-2.5-flash-preview-04-17',
