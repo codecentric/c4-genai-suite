@@ -218,7 +218,7 @@ export function ExtensionsPage() {
 
                   {numModels > 1 && isFetched && <Alert text={texts.extensions.warningTooManyModels} />}
 
-                  <div aria-label={'extensionList'} className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+                  <ul aria-label={'extensionList'} className="grid grid-cols-1 gap-4 xl:grid-cols-2">
                     {asModels.map((extension) => (
                       <ExtensionCard
                         key={extension.id}
@@ -229,7 +229,7 @@ export function ExtensionsPage() {
                         spec={extension.spec}
                       />
                     ))}
-                  </div>
+                  </ul>
                 </Tabs.Panel>
                 <Tabs.Panel value="tools">
                   {asTools.length == 0 && isFetched && <div className="p-2 text-sm">{texts.extensions.noTools}</div>}
