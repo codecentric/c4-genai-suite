@@ -25,7 +25,7 @@ export class AzureDallEExtension extends DallEExtension {
           title: this.i18n.t('texts.extensions.common.apiVersion'),
           required: true,
           format: 'select',
-          enum: ['2024-02-01'],
+          examples: ['2024-02-01'],
         },
       },
     };
