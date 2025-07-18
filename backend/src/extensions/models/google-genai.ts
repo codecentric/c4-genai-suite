@@ -25,7 +25,8 @@ export class GoogleGenAIModelExtension implements Extension<VertexAIModelExtensi
           required: true,
           format: 'select',
           enum: [
-            'gemini-2.5-flash-preview-04-17',
+            'gemini-2.5-flash',
+            'gemini-2.5-pro',
             'gemini-2.5-pro-preview-03-25',
             'gemini-2.0-flash-lite-001',
             'gemini-2.0-flash-001',
