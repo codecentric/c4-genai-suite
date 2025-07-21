@@ -216,6 +216,7 @@
     },
     "mcpTools": {
       "title": "MCP Tools",
+      "headersHint": "One header per line as Key=Value",
       "description": "MCP Server Integration",
       "serverName": "Server Name",
       "serverNameHint": "Name of the server used for display in the chat.",
