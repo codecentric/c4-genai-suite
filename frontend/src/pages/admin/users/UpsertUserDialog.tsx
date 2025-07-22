@@ -75,6 +75,7 @@ function UpsertUserDialog(props: UpsertUserDialogProps) {
   const form = useForm<UpsertUserDto>({ resolver: RESOLVER, defaultValues });
   const watchUserGroup = form.watch('userGroupId') === 'admin';
   const watchApiKey = form.watch('apiKey');
+  const hasApiKey = !isCreating && props.target.hasApiKey;
 
   return (
     <Portal>
@@ -90,7 +91,7 @@ function UpsertUserDialog(props: UpsertUserDialogProps) {
                     {texts.common.cancel}
                   </Button>
 
-                  {!watchUserGroup && watchApiKey ? (
+                  {!watchUserGroup && (watchApiKey || hasApiKey) ? (
                     <ConfirmDialog
                       title={texts.users.update}
                       text={texts.users.warningNotAdminWithKey}
@@ -134,7 +135,7 @@ function UpsertUserDialog(props: UpsertUserDialogProps) {
               <Forms.Row name="apiKey" label={texts.common.apiKey} hints={!watchUserGroup && texts.users.apiKeyHint}>
                 <div className="flex gap-2">
                   <div className="grow">
-                    <Forms.Text vertical name="apiKey" disabled={!watchUserGroup} />
+                    <Forms.Text vertical name="apiKey" disabled={true} />
                   </div>
 
                   <GenerateApiKeyButton disabled={!watchUserGroup} />
