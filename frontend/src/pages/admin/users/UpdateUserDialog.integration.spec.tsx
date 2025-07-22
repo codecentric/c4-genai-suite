@@ -21,6 +21,7 @@ describe('UpdateUserDialog', () => {
     name: 'tester',
     email: 'testuser@example.com',
     userGroupId: 'admin',
+    hasApiKey: false,
     hasPassword: false,
   };
 

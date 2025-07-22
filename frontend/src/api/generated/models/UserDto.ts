@@ -62,6 +62,12 @@ export interface UserDto {
      * @memberof UserDto
      */
     hasPassword: boolean;
+    /**
+     * Indicates if the user has an api key configured.
+     * @type {boolean}
+     * @memberof UserDto
+     */
+    hasApiKey: boolean;
 }
 
 /**
@@ -73,6 +79,7 @@ export function instanceOfUserDto(value: object): value is UserDto {
     if (!('email' in value) || value['email'] === undefined) return false;
     if (!('userGroupId' in value) || value['userGroupId'] === undefined) return false;
     if (!('hasPassword' in value) || value['hasPassword'] === undefined) return false;
+    if (!('hasApiKey' in value) || value['hasApiKey'] === undefined) return false;
     return true;
 }
 
@@ -93,6 +100,7 @@ export function UserDtoFromJSONTyped(json: any, ignoreDiscriminator: boolean): U
         'apiKey': json['apiKey'] == null ? undefined : json['apiKey'],
         'userGroupId': json['userGroupId'],
         'hasPassword': json['hasPassword'],
+        'hasApiKey': json['hasApiKey'],
     };
 }
 
@@ -109,6 +117,7 @@ export function UserDtoToJSON(value?: UserDto | null): any {
         'apiKey': value['apiKey'],
         'userGroupId': value['userGroupId'],
         'hasPassword': value['hasPassword'],
+        'hasApiKey': value['hasApiKey'],
     };
 }
 

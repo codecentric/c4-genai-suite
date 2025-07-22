@@ -13,7 +13,7 @@ describe('UpdateUserDialog', () => {
     email: 'testuser@example.com',
     userGroupId: 'admin',
     hasPassword: false,
-    apiKey: '123',
+    hasApiKey: true,
   };
 
   const mockUserGroups: UserGroupDto[] = [

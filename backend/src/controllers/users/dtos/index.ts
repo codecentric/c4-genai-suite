@@ -89,12 +89,19 @@ export class UserDto {
   })
   hasPassword!: boolean;
 
+  @ApiProperty({
+    description: 'Indicates if the user has an api key configured.',
+    required: true,
+  })
+  hasApiKey!: boolean;
+
   static fromDomain(this: void, source: User) {
     const result = new UserDto();
     result.id = source.id;
     result.apiKey = source.apiKey;
     result.email = source.email;
     result.hasPassword = source.hasPassword ?? false;
+    result.hasApiKey = source.hasApiKey ?? false;
     result.name = source.name;
     result.userGroupId = source.userGroupId;
 

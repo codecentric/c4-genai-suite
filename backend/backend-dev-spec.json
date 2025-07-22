@@ -2354,9 +2354,10 @@
           "picture": { "type": "string", "description": " The URL to an external picture." },
           "apiKey": { "type": "string", "description": "The API Key." },
           "userGroupId": { "type": "string", "description": "The user group ID." },
-          "hasPassword": { "type": "boolean", "description": "Indicates if the user has a password configured." }
+          "hasPassword": { "type": "boolean", "description": "Indicates if the user has a password configured." },
+          "hasApiKey": { "type": "boolean", "description": "Indicates if the user has an api key configured." }
         },
-        "required": ["id", "name", "email", "userGroupId", "hasPassword"]
+        "required": ["id", "name", "email", "userGroupId", "hasPassword", "hasApiKey"]
       },
       "UsersDto": {
         "type": "object",
