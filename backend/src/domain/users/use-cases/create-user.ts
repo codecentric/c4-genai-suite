@@ -1,3 +1,4 @@
+import { createHash } from 'crypto';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
@@ -34,8 +35,12 @@ export class CreateUserHandler implements ICommandHandler<CreateUser, CreateUser
       entity.passwordHash = await bcrypt.hash(password, 10);
     }
 
+    if (apiKey) {
+      entity.apiKey = createHash('sha256').update(apiKey).digest('hex');
+    }
+
     // Assign the object manually to avoid updating unexpected values.
-    assignDefined(entity, { apiKey, email, name, userGroupId });
+    assignDefined(entity, { email, name, userGroupId });
 
     // Use the save method otherwise we would not get previous values.
     const created = await this.users.save(entity);

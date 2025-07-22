@@ -49,7 +49,7 @@ export interface UpsertUserDto {
      * @type {string}
      * @memberof UpsertUserDto
      */
-    apiKey?: string;
+    apiKey?: string | null;
 }
 
 /**

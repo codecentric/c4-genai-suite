@@ -18,7 +18,7 @@ export class UserEntity {
   @Column({ length: 100, unique: true })
   email!: string;
 
-  @Column({ length: 100, nullable: true })
+  @Column({ length: 100, nullable: true, unique: true })
   apiKey?: string;
 
   @Column({ nullable: true })

@@ -1,3 +1,4 @@
+import { createHash } from 'crypto';
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -23,7 +24,8 @@ export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
     const apiKey = this.findApiKey(request);
 
     if (apiKey) {
-      return await this.userRepository.findOneBy({ apiKey });
+      const hashedApiKey = createHash('sha256').update(apiKey).digest('hex');
+      return await this.userRepository.findOneBy({ apiKey: hashedApiKey });
     } else if (request.session.user) {
       return request.session.user;
     }

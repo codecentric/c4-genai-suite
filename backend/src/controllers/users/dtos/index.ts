@@ -40,6 +40,7 @@ export class UpsertUserDto {
   @ApiProperty({
     description: 'The API Key.',
     required: false,
+    nullable: true,
   })
   @IsOptional()
   @IsString()

@@ -2374,7 +2374,7 @@
           "email": { "type": "string", "description": "The email address." },
           "password": { "type": "string", "description": "The optional password." },
           "userGroupId": { "type": "string", "description": "The user group ID." },
-          "apiKey": { "type": "string", "description": "The API Key." }
+          "apiKey": { "type": "string", "description": "The API Key.", "nullable": true }
         },
         "required": ["name", "email", "userGroupId"]
       }
