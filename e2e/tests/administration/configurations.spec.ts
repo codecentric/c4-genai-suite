@@ -157,7 +157,7 @@ test('Configuration Management', async ({ page }) => {
     await configToBeDeleted.click();
 
     await page.locator('li').filter({ hasText: configNewName }).getByTestId('more-actions').click();
-    await page.getByText('Delete').click();
+    await page.getByRole('button', { name: 'Delete' }).click();
     await page.getByRole('button', { name: 'Confirm' }).click();
 
     const createConfigurationModal = page.getByRole('heading', { name: 'Remove Configuration' });
