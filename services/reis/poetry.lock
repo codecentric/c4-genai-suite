@@ -496,7 +496,7 @@ version = "5.2.0"
 description = "Universal encoding detector for Python 3"
 optional = false
 python-versions = ">=3.7"
-groups = ["main", "dev"]
+groups = ["dev"]
 files = [
     {file = "chardet-5.2.0-py3-none-any.whl", hash = "sha256:e1cf59446890a00105fe7b7912492ea04b6e6f06d4b742b2c788469e34c82970"},
     {file = "chardet-5.2.0.tar.gz", hash = "sha256:1b3b6ff479a8c414bc3fa2c0852995695c4a026dcd6d0633b2dd092ca39c1cf7"},
@@ -5132,20 +5132,20 @@ files = [
 
 [[package]]
 name = "unstructured"
-version = "0.18.9"
+version = "0.18.11"
 description = "A library that prepares raw documents for downstream ML tasks."
 optional = false
 python-versions = ">=3.10.0"
 groups = ["main"]
 files = [
-    {file = "unstructured-0.18.9-py3-none-any.whl", hash = "sha256:15fd47a491546ba8e6b70d990c09ca2624170009d67fa6a6421c8f5d5888aef3"},
-    {file = "unstructured-0.18.9.tar.gz", hash = "sha256:1e0df6f01248a05d31dc6b23ca7c99d17fd0e123438a0e0b6c95d4626b133871"},
+    {file = "unstructured-0.18.11-py3-none-any.whl", hash = "sha256:85aec87032177b826ec278e57e3f74ef3a2aa7e887ab137875e572293cf9659b"},
+    {file = "unstructured-0.18.11.tar.gz", hash = "sha256:cf177d2a212a8bcd3a5a6750d8400c079764d30dabdb6605e7ba0a65679e00a0"},
 ]
 
 [package.dependencies]
 backoff = "*"
 beautifulsoup4 = "*"
-chardet = "*"
+charset-normalizer = "*"
 dataclasses-json = "*"
 emoji = "*"
 filetype = "*"
@@ -5861,4 +5861,4 @@ cffi = ["cffi (>=1.11)"]
 [metadata]
 lock-version = "2.1"
 python-versions = "<4.0,>=3.12.0"
-content-hash = "90cfc21a4c712fa5718e0ba36f813c467b52f220e2af8fbd6d723be3095ee64c"
+content-hash = "438ae58124bdee012dfccfc4b03cdbec82f1bf51a8f38409c759b6e2d3383136"
