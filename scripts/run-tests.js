@@ -2,6 +2,7 @@ import {
   execute,
   isPortAvailabe,
   killAllAndExit,
+  dockerCleanups,
 } from './process-management.js';
 
 // --------------------------------------------------------------------------------
@@ -94,11 +95,11 @@ const statusCommands = [
     : `echo`,
   `printf 'Tip: run "nvm i && npm i" before this script to fix setup issues.'`,
   'echo',
-  `${waitForPostgres} && printf "localhost:${portForPostgres} <== postgres is up"`,
-  `${waitForBackend}  && printf "localhost:${portForBackend} <== backend is up"`,
-  `${waitForFrontend} && printf "localhost:${portForFrontend} <== frontend is up"`,
-  `${waitForREIS} && printf "localhost:${portForREIS} <== REIS is up"`,
-  `${waitForMcpTool} && printf "localhost:${portForMcpTool} <== MCP-Tool is up"`,
+  `${waitForPostgres} && printf "==> localhost:${portForPostgres} <== postgres is up"`,
+  `${waitForBackend}  && printf "==> localhost:${portForBackend} <== backend is up"`,
+  `${waitForFrontend} && printf "==> localhost:${portForFrontend} <== frontend is up"`,
+  `${waitForREIS} && printf "==> localhost:${portForREIS} <== REIS is up"`,
+  `${waitForMcpTool} && printf "==> localhost:${portForMcpTool} <== MCP-Tool is up"`,
 ];
 
 const installPlaywright =
@@ -151,10 +152,9 @@ const mainScript = async () => {
       await isPortAvailabe(portForMcpTool, 'MCP-Tool', true),
     ].includes(false);
     if (somePortNotAvailable) {
-      console.log(' ==> kill running processes before restarting. Check "docker ps" for c4 related processes to stop.');
-      console.log(
-        '     (or: with ":force" you can dangerously force using the running processes instead.'
-      );
+      console.log(' ==> kill running processes before restarting.');
+      console.log('     (or: with ":force" you can dangerously force using the running processes instead.');
+      await dockerCleanups();
       process.exit(1);
     }
   }

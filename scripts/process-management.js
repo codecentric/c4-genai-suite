@@ -38,9 +38,8 @@ const executeQuery = (command) => {
 export const execute = (command, output = 'forward', onClose = null) => {
   const nvmPrefix =
     'export NVM_DIR="$HOME/.nvm"; ' +
-    '[ -s "$NVM_DIR/nvm.sh" ] && echo "[DEBUG] Sourcing nvm.sh..." && source "$NVM_DIR/nvm.sh"; ' +
-    'echo "[DEBUG] source exit code: $?"; ' +
-    'nvm install && echo "[DEBUG] nvm install done." || echo "[ERROR] nvm.sh not found or failed to source."; ';
+    '[ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh"; ' +
+    'nvm use > /dev/null; ';
 
   // Enable debugging via vscode terminal
   const insideVscode =
@@ -50,7 +49,6 @@ export const execute = (command, output = 'forward', onClose = null) => {
 
   const linuxShell = insideVscode ? 'bash' : 'sh';
   const fullCommand = insideVscode ? `${nvmPrefix} ${command}` : command;
-  console.log(`linuxShell: ${linuxShell}, fullCommand: ${fullCommand}`);
 
   const shell = process.platform === 'win32' ? 'cmd.exe' : linuxShell;
   const flag = process.platform === 'win32' ? '/c' : '-c';
@@ -93,3 +91,52 @@ export const isPortAvailabe = async (wantedPort, serviceName, verbose = false) =
     console.log(`${warn} Port ${wantedPort} is ${status} for ${serviceName}`);
   return isAvailabe;
 };
+
+export async function dockerCleanups() {
+  const { execSync } = await import('child_process');
+  try {
+    let containers = [];
+    try {
+      const result = execSync(
+        'docker ps --format "{{.Names}}" | grep "^c4-"',
+        { encoding: 'utf8' }
+      );
+      containers = result
+        .split('\n')
+        .filter((name) => name.trim().length > 0);
+    } catch (err) {
+      // grep returns exit code 1 if no matches; that's not a real error here
+      containers = [];
+    }
+
+    if (containers.length > 0) {
+      console.log('\n[ERROR!] The following containers may be blocking required ports:');
+      containers.forEach((name) => console.log('  -', name));
+      const readline = await import('readline');
+      const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout,
+      });
+      rl.question(
+        '\nWould you like to stop these containers now? [y/N]: ',
+        (answer) => {
+          if (answer.trim().toLowerCase() === 'y') {
+            try {
+              execSync(`docker stop ${containers.join(' ')}`, { stdio: 'inherit' });
+              console.log('\nContainers stopped. Please re-run the script.');
+            } catch (err) {
+              console.error('Failed to stop containers:', err);
+            }
+          } else {
+            console.log('No containers stopped. Exiting.');
+          }
+          rl.close();
+          process.exit(1);
+        }
+      );
+    }
+  } catch (err) {
+    return;
+  }
+  return;
+}
