@@ -1,0 +1,4 @@
+atlassian-python-api
+markitdown
+requests
+pytest
