@@ -441,6 +441,8 @@ export async function addSystemPromptToConfiguration(
 
   await page.getByRole('button', { name: 'Add Extension' }).click();
 
+  await page.getByLabel('Create Extension').getByRole('tab', { name: 'Others' }).click();
+
   await page
     .locator('*')
     .filter({ hasText: /^Prompt/ })

@@ -40,7 +40,7 @@ test('Configuration Management', async ({ page }) => {
     await page.getByRole('link', { name: configName, exact: true }).click();
     await page.locator('li').filter({ hasText: configName }).getByTestId('more-actions').click();
     await page.getByText('Duplicate').waitFor();
-    await page.getByText('Edit').click();
+    await page.getByRole('button', { name: 'Edit' }).click();
     await page.getByLabel('Name').fill(configNewName);
     await page.getByRole('button', { name: 'Save' }).click();
 
@@ -125,7 +125,7 @@ test('Configuration Management', async ({ page }) => {
     await page.getByRole('button', { name: 'Save' }).click();
 
     await page.getByLabel('extensionList').waitFor();
-    const getAlert = page.getByRole('alert');
+    const getAlert = page.getByRole('tabpanel', { name: 'models' }).getByRole('alert');
 
     await expect(getAlert).toHaveText(
       'You have more than one model enabled, the first model will be chosen by default for new chats.',
