@@ -197,7 +197,7 @@ export class FilesController {
     @Query('query') query?: string,
   ) {
     const result: GetFilesResponse = await this.queryBus.execute(
-      new GetFiles({ user: req.user, bucketIdOrType: +id, page: page || 0, pageSize: pageSize || 20, query }),
+      new GetFiles({ user: req.user, bucketIdOrType: +id, page: page || 0, pageSize: pageSize, query }),
     );
     return FilesDto.fromDomain(result.files, result.total);
   }

@@ -17,7 +17,7 @@ export class GetFiles {
       user: User;
       bucketIdOrType: number | BucketType;
       page: number;
-      pageSize: number;
+      pageSize?: number;
       query?: string;
       conversationId?: number;
       extensionId?: number;
@@ -98,8 +98,10 @@ export class GetFilesHandler implements IQueryHandler<GetFiles, GetFilesResponse
     const options: FindManyOptions<FileEntity> = { where };
     const total = await this.files.count(options);
 
-    options.skip = pageSize * page;
-    options.take = pageSize;
+    if (pageSize) {
+      options.skip = pageSize * page;
+      options.take = pageSize;
+    }
     options.order = { fileName: 'ASC' };
 
     if (withContent) {
