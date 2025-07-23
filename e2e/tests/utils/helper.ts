@@ -218,6 +218,7 @@ export async function addBucketToConfiguration(
   await page.getByRole('link', { name: 'Assistants' }).click();
   await page.getByRole('link', { name: configuration.name }).click();
   await page.getByRole('button', { name: 'Add Extension' }).click();
+  await page.getByLabel('Create Extension').getByRole('tab', { name: 'Tools' }).click();
   await page.getByRole('heading', { name: 'Search Files', exact: true }).click();
   await page.getByLabel('Description').fill(files.description);
   await selectOption(page, 'Bucket', files.bucketName);
@@ -229,6 +230,7 @@ export async function addUserArgsToConfiguration(page: Page, configuration: { na
   await page.getByRole('link', { name: 'Assistants' }).click();
   await page.getByRole('link').filter({ hasText: configuration.name }).click();
   await page.getByRole('button', { name: 'Add Extension' }).click();
+  await page.getByLabel('Create Extension').getByRole('tab', { name: 'Tools' }).click();
   await page
     .locator('*')
     .filter({ hasText: /^DEV: User ArgsShows the current user argstool$/ })
@@ -245,6 +247,7 @@ export async function addMCPToConfiguration(
   await page.getByRole('link', { name: 'Assistants' }).click();
   await page.getByRole('link').filter({ hasText: configuration.name }).click();
   await page.getByRole('button', { name: 'Add Extension' }).click();
+  await page.getByLabel('Create Extension').getByRole('tab', { name: 'Tools' }).click();
   await page
     .locator('*')
     .filter({ hasText: /^MCP ToolsMCP Server Integrationtool$/ })
@@ -270,6 +273,7 @@ export async function addMCPToConfiguration(
 export async function disableUserArgsInConfiguration(page: Page, configuration: { name: string }) {
   await page.getByRole('link', { name: 'Assistants' }).click();
   await page.getByRole('link').filter({ hasText: configuration.name }).click();
+  await page.getByTestId('sidebar-admin').getByRole('tab', { name: 'Tools' }).click();
   await page.getByRole('heading', { name: 'DEV: User Args', exact: true }).click();
   await page.getByRole('checkbox').uncheck();
 
