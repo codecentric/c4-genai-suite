@@ -41,6 +41,15 @@ let playwrightFlags = '--project="chromium" ';
 if (process.argv.includes('--ui')) playwrightFlags += '--ui ';
 if (process.argv.includes('--debug')) playwrightFlags += '--debug ';
 
+const insideVscode =
+  'VSCODE_PID' in process.env ||
+  'TERM_PROGRAM' in process.env && process.env.TERM_PROGRAM === 'vscode' ||
+  'VSCODE_CWD' in process.env;
+
+if (insideVscode) {
+  process.env.PWDEBUG = '1';
+}
+
 const portForPostgres = devSetup ? '5432' : '5433';
 const portForBackend = '3000';
 const portForFrontend = '5173';
@@ -142,7 +151,7 @@ const mainScript = async () => {
       await isPortAvailabe(portForMcpTool, 'MCP-Tool', true),
     ].includes(false);
     if (somePortNotAvailable) {
-      console.log(' ==> kill running processes before restarting');
+      console.log(' ==> kill running processes before restarting. Check "docker ps" for c4 related processes to stop.');
       console.log(
         '     (or: with ":force" you can dangerously force using the running processes instead.'
       );

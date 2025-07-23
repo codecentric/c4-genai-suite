@@ -36,10 +36,26 @@ const executeQuery = (command) => {
 };
 
 export const execute = (command, output = 'forward', onClose = null) => {
-  const shell = process.platform === 'win32' ? 'cmd.exe' : 'sh';
+  const nvmPrefix =
+    'export NVM_DIR="$HOME/.nvm"; ' +
+    '[ -s "$NVM_DIR/nvm.sh" ] && echo "[DEBUG] Sourcing nvm.sh..." && source "$NVM_DIR/nvm.sh"; ' +
+    'echo "[DEBUG] source exit code: $?"; ' +
+    'nvm install && echo "[DEBUG] nvm install done." || echo "[ERROR] nvm.sh not found or failed to source."; ';
+
+  // Enable debugging via vscode terminal
+  const insideVscode =
+    'VSCODE_PID' in process.env ||
+    'TERM_PROGRAM' in process.env && process.env.TERM_PROGRAM === 'vscode' ||
+    'VSCODE_CWD' in process.env;
+
+  const linuxShell = insideVscode ? 'bash' : 'sh';
+  const fullCommand = insideVscode ? `${nvmPrefix} ${command}` : command;
+  console.log(`linuxShell: ${linuxShell}, fullCommand: ${fullCommand}`);
+
+  const shell = process.platform === 'win32' ? 'cmd.exe' : linuxShell;
   const flag = process.platform === 'win32' ? '/c' : '-c';
 
-  const child = spawn(shell, [flag, command]);
+  const child = spawn(shell, [flag, fullCommand]);
 
   if (output === 'forward') {
     child.stdout.on('data', (data) => console.log(data.toString()));

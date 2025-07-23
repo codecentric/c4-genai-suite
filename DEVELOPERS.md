@@ -46,13 +46,27 @@ In this step, you might be asked for some API-Keys, e.g., for the REI-S.
 > [!TIP]
 > Update your `.env` files using the same script later if a default may have changed. You will be asked to pick between overwriting or keeping your current setting.
 
+### 5. Verify your setup and start developing
+
+Run `npm run dev` in the root of the repository to start all components locally and try them out. This will use docker for some components like the postgres database. 
+Other components will directly run on your system, and **your systems ports will be used if available**. Live reloading is enabled for the react frontend.
+
+To debug any issues, checkout the `./output` during, or after the run of `npm run dev`.
+Read [the dev script documentation](./scripts/README.md) to learn more.
+
 ## Run tests
 
 ### Locally
 
-To run them locally use `npm run test` (stop anything that could block the ports for frontend or backend before running the tests).
+To run them locally use `npm run test`.
 
-You can also view the outputs in the `/outputs` directory for services started by the dev/test script.
+The [E2E tests script](./scripts/README.md) is the same script we use to run `npm run dev` (just run in its E2E configuration).
+
+To **debug the E2E tests with breakpoints** you need to run VS-Code with the Playwright extension (by Microsoft).
+Inside VS-Code press `CTRL+SHIFT+D` to open the debug panel. You will see a drop down next to a green arrow.
+Select one of these options, and run it:
+- **All-E2Es**: Run with Playwright Debug
+- **Current-E2E**: Debug Currently Open Test File
 
 Some tests use large files stored via `git lfs`. To run these tests, first install `git lfs` on your system via (e.g., `brew install git-lfs` or `apt install git-lfs`).
 Then pull the large files in the c4 repository via `git lfs pull`.

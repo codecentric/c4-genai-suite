@@ -28,6 +28,34 @@
       ],
       "jinja": true,
       "justMyCode": true
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "All-E2Es: Run with Playwright Debug",
+      "program": "${workspaceFolder}/scripts/run-tests.js",
+      "args": ["--debug"],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "env": {
+          "PWDEBUG": "1"
+      }
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Current-E2E: Debug Currently Open Test File",
+      "program": "${workspaceFolder}/scripts/run-tests.js",
+      "args": [
+          "--debug",
+          "--file",
+          "${relativeFile}"
+      ],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "env": {
+          "PWDEBUG": "1"
+      }
     }
   ]
 }
