@@ -42,7 +42,9 @@ async function startServers(config: MultipleServerConfig) {
             version: "1.0.0",
           },
           {
-            capabilities: {},
+            capabilities: {
+              elicitation: {},
+            },
           },
       );
 

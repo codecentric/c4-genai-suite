@@ -34,7 +34,7 @@ export class BedrockModelExtension implements Extension<BedrockConverseExtension
           title: this.i18n.t('texts.extensions.common.modelName'),
           required: true,
           format: 'select',
-          enum: [
+          examples: [
             'anthropic.claude-3-haiku-20240307-v1:0',
             'anthropic.claude-3-5-sonnet-20240620-v1:0',
             'eu.anthropic.claude-3-7-sonnet-20250219-v1:0',

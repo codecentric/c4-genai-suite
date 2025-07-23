@@ -39,7 +39,7 @@ export class AzureOpenAIReasoningModelExtension implements Extension<AzureOpenAI
           title: this.i18n.t('texts.extensions.common.apiVersion'),
           required: true,
           format: 'select',
-          enum: ['2024-12-01-preview'],
+          examples: ['2024-12-01-preview'],
         },
       },
     };

@@ -63,6 +63,12 @@ export interface ExtensionArgumentStringSpecDto {
      */
     format?: ExtensionArgumentStringSpecDtoFormatEnum;
     /**
+     * The examples.
+     * @type {Array<string>}
+     * @memberof ExtensionArgumentStringSpecDto
+     */
+    examples?: Array<string>;
+    /**
      * The allowed values.
      * @type {Array<string>}
      * @memberof ExtensionArgumentStringSpecDto
@@ -98,6 +104,7 @@ export const ExtensionArgumentStringSpecDtoFormatEnum = {
     Password: 'password',
     Select: 'select',
     Date: 'date',
+    Email: 'email',
     C4Ui: 'c4-ui'
 } as const;
 export type ExtensionArgumentStringSpecDtoFormatEnum = typeof ExtensionArgumentStringSpecDtoFormatEnum[keyof typeof ExtensionArgumentStringSpecDtoFormatEnum];
@@ -129,6 +136,7 @@ export function ExtensionArgumentStringSpecDtoFromJSONTyped(json: any, ignoreDis
         'showInList': json['showInList'] == null ? undefined : json['showInList'],
         'documentationUrl': json['documentationUrl'] == null ? undefined : json['documentationUrl'],
         'format': json['format'] == null ? undefined : json['format'],
+        'examples': json['examples'] == null ? undefined : json['examples'],
         '_enum': json['enum'] == null ? undefined : json['enum'],
         '_default': json['default'] == null ? undefined : json['default'],
     };
@@ -147,6 +155,7 @@ export function ExtensionArgumentStringSpecDtoToJSON(value?: ExtensionArgumentSt
         'showInList': value['showInList'],
         'documentationUrl': value['documentationUrl'],
         'format': value['format'],
+        'examples': value['examples'],
         'enum': value['_enum'],
         'default': value['_default'],
     };

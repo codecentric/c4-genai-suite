@@ -46,6 +46,7 @@ export const de: typeof en = {
     passwordConfirm: 'Passwort bestätigen',
     passwordsDoNotMatch: 'Passwörter stimmen nicht überein.',
     reloadAndTryAgain: 'Seite neu laden erneut versuchen.',
+    reject: 'Ablehnen',
     remove: 'Löschen',
     rename: 'Umbenennen',
     required: 'Pflichtfeld',

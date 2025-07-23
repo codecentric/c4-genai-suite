@@ -49,3 +49,47 @@ export function interval(groupBy: GroupBy): string {
       throw new BadRequestException('invalid groupBy');
   }
 }
+
+export const schema = 'company_chat';
+
+// this is needed to ensure that migrations exists in the target schema (company_chat)
+export async function initSchemaIfNotExistsAndMoveMigrations(url: string, schema: string) {
+  const dataSource = new DataSource({
+    url,
+    type: 'postgres',
+    synchronize: false,
+    migrationsRun: false,
+  });
+
+  try {
+    await dataSource.initialize();
+    const queryRunner = dataSource.createQueryRunner();
+    await queryRunner.startTransaction();
+
+    try {
+      await queryRunner.query(`
+        DO $$
+        BEGIN
+            CREATE SCHEMA IF NOT EXISTS ${schema};
+            IF EXISTS (
+              SELECT 1
+                  FROM information_schema.tables
+                  WHERE table_schema = 'public'
+                  AND table_name = 'migrations'
+              ) THEN
+                ALTER TABLE public.migrations SET SCHEMA ${schema};
+            END IF;
+        END $$;
+      `);
+
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
+  } finally {
+    await dataSource.destroy();
+  }
+}

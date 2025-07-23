@@ -1,6 +1,6 @@
 import { StructuredTool } from '@langchain/core/tools';
 import { z } from 'zod';
-import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from 'src/domain/chat';
+import { ChatContext, ChatMiddleware, ChatNextDelegate, FormActionType, GetContext } from 'src/domain/chat';
 import { Extension, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions';
 import { User } from 'src/domain/users';
 import { I18nService } from '../../localization/i18n.service';
@@ -64,9 +64,14 @@ class InternalTool extends StructuredTool {
       setTimeout(resolve, 2000);
     });
 
-    const complete = await this.context.ui.confirm('Do really want to make the calculation?');
+    const confirm = await this.context.ui.form('Do really want to make the calculation?', {
+      type: 'object',
+      title: '',
+      description: '',
+      properties: {},
+    });
 
-    if (!complete) {
+    if (confirm.action !== FormActionType.ACCEPT) {
       return 'Not confirmed';
     }
 

@@ -3,13 +3,19 @@ import { DynamicStructuredTool } from '@langchain/core/tools';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { SSEClientTransport } from '@modelcontextprotocol/sdk/client/sse.js';
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
-import { CallToolRequest, CallToolResultSchema, ListToolsResultSchema, McpError } from '@modelcontextprotocol/sdk/types.js';
+import {
+  CallToolRequest,
+  CallToolResultSchema,
+  ElicitRequestSchema,
+  ListToolsResultSchema,
+  McpError,
+} from '@modelcontextprotocol/sdk/types.js';
 import { JsonSchemaObject, jsonSchemaToZod } from '@n8n/json-schema-to-zod';
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { diff } from 'json-diff-ts';
 import { renderString } from 'nunjucks';
 import { z } from 'zod';
-import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from 'src/domain/chat';
+import { ChatContext, ChatMiddleware, ChatNextDelegate, FormActionType, GetContext } from 'src/domain/chat';
 import {
   Extension,
   ExtensionArgument,
@@ -43,6 +49,7 @@ type ConfigurationAttributes = Record<
 interface Configuration {
   serverName: string;
   endpoint: string;
+  headers?: string;
   transport: Transport;
   schema?: Record<
     // one record per method
@@ -74,41 +81,49 @@ const passwordKeys = ['apiKey', 'api-key', 'password', 'credentials'];
 
 function toExtensionArgument(
   schema: JsonSchemaObject & { title?: string; description?: string },
-  attributeKey?: string,
+  options: { key?: string; required?: boolean; forceRequired?: boolean },
 ): ExtensionArgument | undefined {
+  const required = options.forceRequired ?? options.required ?? false;
+
   if (schema.type === 'number' || schema.type === 'integer') {
     return {
       type: 'number',
-      title: '',
+      title: schema.title ?? options.key ?? '',
       format: schema.format as 'input',
       minimum: schema.minimum,
       maximum: schema.maximum,
-      required: false,
+      multipleOf: schema.type === 'number' ? schema.multipleOf : 1,
+      required,
     };
   } else if (schema.type === 'string') {
-    const format = attributeKey && passwordKeys.includes(attributeKey) ? 'password' : (schema.format as 'input');
+    const format = options.key && passwordKeys.includes(options.key) ? 'password' : (schema.format as 'input');
 
     return {
       type: 'string',
-      title: '',
+      title: schema.title ?? options.key ?? '',
       enum: schema.enum as string[],
       format,
-      required: false,
+      required,
     };
   } else if (schema.type === 'boolean') {
     return {
       type: 'boolean',
-      title: '',
-      required: false,
+      title: schema.title ?? options.key ?? '',
+      required,
     };
   } else if (schema.type === 'object') {
     return {
       type: 'object',
-      title: '',
-      required: false,
+      title: schema.title ?? options.key ?? '',
+      required,
       properties: Object.entries(schema.properties ?? {}).reduce(
         (prev, [key, type]) => {
-          const propertyType = toExtensionArgument(type as JsonSchemaObject, key);
+          const propertyRequired = options.forceRequired ?? (Array.isArray(schema.required) && schema.required.includes(key));
+          const propertyType = toExtensionArgument(type as JsonSchemaObject, {
+            key,
+            required: propertyRequired,
+            forceRequired: options.forceRequired,
+          });
           if (propertyType) {
             prev[key] = propertyType;
           }
@@ -118,15 +133,18 @@ function toExtensionArgument(
       ),
     };
   } else if (schema.type === 'array') {
-    const arrayItemType = toExtensionArgument(schema.items as JsonSchemaObject);
+    const arrayItemType = toExtensionArgument(schema.items as JsonSchemaObject, {
+      required: true,
+      forceRequired: options.forceRequired,
+    });
     if (!arrayItemType || (arrayItemType.type !== 'string' && arrayItemType.type !== 'number')) {
       return;
     }
 
     return {
       type: 'array',
-      title: '',
-      required: false,
+      title: schema.title ?? options?.key ?? '',
+      required,
       items: arrayItemType,
       default: schema.default as any[],
     };
@@ -140,7 +158,7 @@ function toArguments(i18n: I18nService, tools: MCPListToolsResultSchema['tools']
       toolObject.properties[tool.name] = Object.entries(methodSchema.properties ?? {}).reduce(
         (methodObject, [name, type]) => {
           const methodType = type as JsonSchemaObject;
-          const innerMethodType = toExtensionArgument(methodType, name);
+          const innerMethodType = toExtensionArgument(methodType, { key: name, forceRequired: false });
           if (!innerMethodType) {
             return methodObject;
           }
@@ -246,7 +264,7 @@ export class MCPToolsExtension implements Extension<Configuration> {
       logo: '<svg fill="currentColor" fill-rule="evenodd" height="1em" style="flex:none;line-height:1" viewBox="0 0 24 24" width="1em" xmlns="http://www.w3.org/2000/svg"><title>ModelContextProtocol</title><path d="M15.688 2.343a2.588 2.588 0 00-3.61 0l-9.626 9.44a.863.863 0 01-1.203 0 .823.823 0 010-1.18l9.626-9.44a4.313 4.313 0 016.016 0 4.116 4.116 0 011.204 3.54 4.3 4.3 0 013.609 1.18l.05.05a4.115 4.115 0 010 5.9l-8.706 8.537a.274.274 0 000 .393l1.788 1.754a.823.823 0 010 1.18.863.863 0 01-1.203 0l-1.788-1.753a1.92 1.92 0 010-2.754l8.706-8.538a2.47 2.47 0 000-3.54l-.05-.049a2.588 2.588 0 00-3.607-.003l-7.172 7.034-.002.002-.098.097a.863.863 0 01-1.204 0 .823.823 0 010-1.18l7.273-7.133a2.47 2.47 0 00-.003-3.537z"></path><path d="M14.485 4.703a.823.823 0 000-1.18.863.863 0 00-1.204 0l-7.119 6.982a4.115 4.115 0 000 5.9 4.314 4.314 0 006.016 0l7.12-6.982a.823.823 0 000-1.18.863.863 0 00-1.204 0l-7.119 6.982a2.588 2.588 0 01-3.61 0 2.47 2.47 0 010-3.54l7.12-6.982z"></path></svg>',
       description: this.i18n.t('texts.extensions.mcpTools.description'),
       type: 'tool',
-      triggers: ['endpoint'],
+      triggers: ['endpoint', 'transport', 'headers'],
       arguments: {
         serverName: {
           type: 'string',
@@ -268,6 +286,13 @@ export class MCPToolsExtension implements Extension<Configuration> {
           required: false,
           default: 'sse',
           enum: Object.values(Transport),
+        },
+        headers: {
+          type: 'string',
+          title: this.i18n.t('texts.extensions.common.headers'),
+          description: this.i18n.t('texts.extensions.mcpTools.headersHint'),
+          format: 'textarea',
+          required: false,
         },
       },
     };
@@ -374,6 +399,25 @@ export class MCPToolsExtension implements Extension<Configuration> {
     );
   }
 
+  private enableElicitRequests(client: Client, context: ChatContext) {
+    client.setRequestHandler(ElicitRequestSchema, async (request) => {
+      const schema = toExtensionArgument(request.params.requestedSchema as JsonSchemaObject, {});
+      if (schema) {
+        const userResponse = await context.ui.form(request.params.message, schema);
+        return {
+          action: userResponse.action,
+          content: userResponse.action === FormActionType.ACCEPT ? userResponse.data : undefined,
+        };
+      }
+
+      // the schema is invalid or not supported
+      return {
+        action: 'cancel',
+        content: undefined,
+      };
+    });
+  }
+
   async getMiddlewares(
     _user: User,
     extension: ExtensionEntity<Configuration>,
@@ -382,6 +426,7 @@ export class MCPToolsExtension implements Extension<Configuration> {
     const middleware = {
       invoke: async (context: ChatContext, _: GetContext, next: ChatNextDelegate): Promise<any> => {
         const { tools, client } = (await this.getTools(extension.values)) ?? [];
+        this.enableElicitRequests(client, context);
         const schemaData = extension.values.schema ?? {};
 
         const filteredTools = tools.filter((x) => schemaData[x.name]?.enabled);
@@ -452,15 +497,37 @@ export class MCPToolsExtension implements Extension<Configuration> {
         version: '1.0.0',
       },
       {
-        capabilities: {},
+        capabilities: {
+          elicitation: {},
+        },
       },
     );
 
     const url = new URL(configuration.endpoint);
+
+    const headers =
+      configuration.headers?.split(/\r?\n/).reduce<Record<string, string>>((prev, pair) => {
+        const index = pair.indexOf('=');
+
+        if (index >= 0) {
+          const key = pair.substring(0, index).trim();
+          const value = pair.substring(index + 1).trim();
+          if (key && value) {
+            prev[key.trim()] = value.trim();
+          }
+        }
+
+        return prev;
+      }, {}) ?? {};
+
     const transport =
       configuration.transport === Transport.STREAMABLE_HTTP
-        ? new StreamableHTTPClientTransport(url)
-        : new SSEClientTransport(url);
+        ? new StreamableHTTPClientTransport(url, {
+            requestInit: { headers },
+          })
+        : new SSEClientTransport(new URL(url), {
+            requestInit: { headers },
+          });
     await client.connect(transport);
     const { tools } = await client.request({ method: 'tools/list' }, ListToolsResultSchema);
     return { tools, client };

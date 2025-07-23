@@ -14,6 +14,13 @@
  */
 
 import { mapValues } from '../runtime';
+import type { ExtensionArgumentObjectSpecDto } from './ExtensionArgumentObjectSpecDto';
+import {
+    ExtensionArgumentObjectSpecDtoFromJSON,
+    ExtensionArgumentObjectSpecDtoFromJSONTyped,
+    ExtensionArgumentObjectSpecDtoToJSON,
+} from './ExtensionArgumentObjectSpecDto';
+
 /**
  * 
  * @export
@@ -33,23 +40,12 @@ export interface StreamUIRequestDto {
      */
     text: string;
     /**
-     * The type of the request
-     * @type {string}
+     * The schema.
+     * @type {ExtensionArgumentObjectSpecDto}
      * @memberof StreamUIRequestDto
      */
-    type: StreamUIRequestDtoTypeEnum;
+    schema: ExtensionArgumentObjectSpecDto;
 }
-
-
-/**
- * @export
- */
-export const StreamUIRequestDtoTypeEnum = {
-    Boolean: 'boolean',
-    String: 'string'
-} as const;
-export type StreamUIRequestDtoTypeEnum = typeof StreamUIRequestDtoTypeEnum[keyof typeof StreamUIRequestDtoTypeEnum];
-
 
 /**
  * Check if a given object implements the StreamUIRequestDto interface.
@@ -57,7 +53,7 @@ export type StreamUIRequestDtoTypeEnum = typeof StreamUIRequestDtoTypeEnum[keyof
 export function instanceOfStreamUIRequestDto(value: object): value is StreamUIRequestDto {
     if (!('id' in value) || value['id'] === undefined) return false;
     if (!('text' in value) || value['text'] === undefined) return false;
-    if (!('type' in value) || value['type'] === undefined) return false;
+    if (!('schema' in value) || value['schema'] === undefined) return false;
     return true;
 }
 
@@ -73,7 +69,7 @@ export function StreamUIRequestDtoFromJSONTyped(json: any, ignoreDiscriminator: 
         
         'id': json['id'],
         'text': json['text'],
-        'type': json['type'],
+        'schema': ExtensionArgumentObjectSpecDtoFromJSON(json['schema']),
     };
 }
 
@@ -85,7 +81,7 @@ export function StreamUIRequestDtoToJSON(value?: StreamUIRequestDto | null): any
         
         'id': value['id'],
         'text': value['text'],
-        'type': value['type'],
+        'schema': ExtensionArgumentObjectSpecDtoToJSON(value['schema']),
     };
 }
 

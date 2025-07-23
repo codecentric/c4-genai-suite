@@ -50,7 +50,7 @@ export interface ExtensionArgumentBase {
   documentationUrl?: string;
 }
 
-export const EXTENSION_STRING_ARGUMENT_FORMATS = ['input', 'textarea', 'password', 'select', 'date', 'c4-ui'] as const;
+export const EXTENSION_STRING_ARGUMENT_FORMATS = ['input', 'textarea', 'password', 'select', 'date', 'email', 'c4-ui'] as const;
 
 export type ExtensionStringArgumentFormat = (typeof EXTENSION_STRING_ARGUMENT_FORMATS)[number];
 
@@ -58,6 +58,8 @@ export interface ExtensionStringArgument extends ExtensionArgumentBase {
   type: 'string';
 
   format?: ExtensionStringArgumentFormat;
+
+  examples?: string[];
 
   enum?: string[];
 

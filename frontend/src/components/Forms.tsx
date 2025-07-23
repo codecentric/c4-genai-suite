@@ -1,7 +1,13 @@
 /* eslint-disable react-refresh/only-export-components */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ActionIcon, MultiSelect as MantineMultiSelect, Select as MantineSingleSelect, TagsInput } from '@mantine/core';
+import {
+  ActionIcon,
+  Autocomplete,
+  MultiSelect as MantineMultiSelect,
+  Select as MantineSingleSelect,
+  TagsInput,
+} from '@mantine/core';
 import { IconRefresh } from '@tabler/icons-react';
 import { HTMLProps, PropsWithChildren, ReactNode, useEffect, useState } from 'react';
 import { Controller, ControllerFieldState, FormState, useController, useFieldArray, useFormContext } from 'react-hook-form';
@@ -322,7 +328,13 @@ export namespace Forms {
     );
   };
 
-  export const Select = ({ className, options, multiple, ...other }: OptionsFormEditorProps) => {
+  export const Select = ({
+    className,
+    options,
+    multiple,
+    autocomplete,
+    ...other
+  }: OptionsFormEditorProps & { autocomplete?: boolean }) => {
     const data = options.map((x) => ({ label: x.label, value: String(x.value) }));
     const numberOrNumberArray = options.some((x) => typeof x.value === 'number');
     const { control } = useFormContext();
@@ -343,6 +355,17 @@ export namespace Forms {
                 value={field.value || []}
                 onChange={(value) => field.onChange(value.map((v) => (numberOrNumberArray ? +v : v)))}
                 placeholder={texts.common.selectOptions}
+              />
+            ) : autocomplete ? (
+              <Autocomplete
+                {...field}
+                id={other.name}
+                className="grow"
+                data={data}
+                defaultValue={other.defaultValue != null ? String(other.defaultValue) : undefined}
+                value={field.value != null ? String(field.value) : undefined}
+                onChange={(value) => field.onChange(value != null && numberOrNumberArray ? +value : value)}
+                placeholder={texts.common.selectOption}
               />
             ) : (
               <MantineSingleSelect

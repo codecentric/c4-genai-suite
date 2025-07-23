@@ -40,7 +40,7 @@ export class AzureOpenAIModelExtension implements Extension<AzureOpenAIModelExte
           title: this.i18n.t('texts.extensions.common.apiVersion'),
           required: true,
           format: 'select',
-          enum: ['2024-02-01', '2023-05-15', '2022-12-01', '2024-12-01-preview'],
+          examples: ['2024-02-01', '2023-05-15', '2022-12-01', '2024-12-01-preview'],
         },
         temperature: {
           type: 'number',

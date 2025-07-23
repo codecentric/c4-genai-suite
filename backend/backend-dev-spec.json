@@ -326,7 +326,7 @@
         ],
         "requestBody": {
           "required": true,
-          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ConfirmDto" } } }
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ChatUICallbackResultDto" } } }
         },
         "responses": { "204": { "description": "" } },
         "summary": "",
@@ -1497,14 +1497,53 @@
         },
         "required": ["tool", "type"]
       },
+      "ExtensionArgumentObjectSpecDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "The type of the argument.",
+            "enum": ["string", "number", "boolean", "object", "array"]
+          },
+          "title": { "type": "string", "description": "The label of the argument." },
+          "description": { "type": "string", "description": "True, if required." },
+          "required": { "type": "boolean", "description": "True, if required." },
+          "showInList": { "type": "boolean", "description": "True to show this property in lists." },
+          "documentationUrl": { "type": "string", "description": "URL to the documentation." },
+          "properties": {
+            "type": "object",
+            "description": "The properties.",
+            "additionalProperties": {
+              "oneOf": [
+                { "$ref": "#/components/schemas/ExtensionArgumentStringSpecDto" },
+                { "$ref": "#/components/schemas/ExtensionArgumentNumberSpecDto" },
+                { "$ref": "#/components/schemas/ExtensionArgumentBooleanSpecDto" },
+                { "$ref": "#/components/schemas/ExtensionArgumentArraySpecDto" },
+                { "$ref": "#/components/schemas/ExtensionArgumentObjectSpecDto" }
+              ],
+              "discriminator": {
+                "propertyName": "type",
+                "mapping": {
+                  "string": "#/components/schemas/ExtensionArgumentStringSpecDto",
+                  "number": "#/components/schemas/ExtensionArgumentNumberSpecDto",
+                  "boolean": "#/components/schemas/ExtensionArgumentBooleanSpecDto",
+                  "object": "#/components/schemas/ExtensionArgumentObjectSpecDto",
+                  "array": "#/components/schemas/ExtensionArgumentArraySpecDto"
+                }
+              }
+            }
+          }
+        },
+        "required": ["type", "title", "properties"]
+      },
       "StreamUIRequestDto": {
         "type": "object",
         "properties": {
           "id": { "type": "string", "description": "The ID to confirm the request." },
           "text": { "type": "string", "description": "The text for the confirm dialog." },
-          "type": { "type": "string", "description": "The type of the request", "enum": ["boolean", "string"] }
+          "schema": { "description": "The schema.", "allOf": [{ "$ref": "#/components/schemas/ExtensionArgumentObjectSpecDto" }] }
         },
-        "required": ["id", "text", "type"]
+        "required": ["id", "text", "schema"]
       },
       "StreamUIEventDto": {
         "type": "object",
@@ -1718,10 +1757,13 @@
         },
         "required": ["rating"]
       },
-      "ConfirmDto": {
+      "ChatUICallbackResultDto": {
         "type": "object",
-        "properties": { "result": { "type": "object", "description": "The result." } },
-        "required": ["result"]
+        "properties": {
+          "action": { "type": "string", "description": "The action taken in the form.", "enum": ["accept", "reject", "cancel"] },
+          "data": { "type": "object", "description": "Additional data related to the action." }
+        },
+        "required": ["action"]
       },
       "ChatSuggestionDto": {
         "type": "object",
@@ -1747,45 +1789,6 @@
           "documentationUrl": { "type": "string", "description": "URL to the documentation." }
         },
         "required": ["type", "title"]
-      },
-      "ExtensionArgumentObjectSpecDto": {
-        "type": "object",
-        "properties": {
-          "type": {
-            "type": "string",
-            "description": "The type of the argument.",
-            "enum": ["string", "number", "boolean", "object", "array"]
-          },
-          "title": { "type": "string", "description": "The label of the argument." },
-          "description": { "type": "string", "description": "True, if required." },
-          "required": { "type": "boolean", "description": "True, if required." },
-          "showInList": { "type": "boolean", "description": "True to show this property in lists." },
-          "documentationUrl": { "type": "string", "description": "URL to the documentation." },
-          "properties": {
-            "type": "object",
-            "description": "The properties.",
-            "additionalProperties": {
-              "oneOf": [
-                { "$ref": "#/components/schemas/ExtensionArgumentStringSpecDto" },
-                { "$ref": "#/components/schemas/ExtensionArgumentNumberSpecDto" },
-                { "$ref": "#/components/schemas/ExtensionArgumentBooleanSpecDto" },
-                { "$ref": "#/components/schemas/ExtensionArgumentArraySpecDto" },
-                { "$ref": "#/components/schemas/ExtensionArgumentObjectSpecDto" }
-              ],
-              "discriminator": {
-                "propertyName": "type",
-                "mapping": {
-                  "string": "#/components/schemas/ExtensionArgumentStringSpecDto",
-                  "number": "#/components/schemas/ExtensionArgumentNumberSpecDto",
-                  "boolean": "#/components/schemas/ExtensionArgumentBooleanSpecDto",
-                  "object": "#/components/schemas/ExtensionArgumentObjectSpecDto",
-                  "array": "#/components/schemas/ExtensionArgumentArraySpecDto"
-                }
-              }
-            }
-          }
-        },
-        "required": ["type", "title", "properties"]
       },
       "ExtensionUserInfoDto": {
         "type": "object",
@@ -1906,8 +1909,9 @@
           "format": {
             "type": "string",
             "description": "The editor.",
-            "enum": ["input", "textarea", "password", "select", "date", "c4-ui"]
+            "enum": ["input", "textarea", "password", "select", "date", "email", "c4-ui"]
           },
+          "examples": { "description": "The examples.", "type": "array", "items": { "type": "string" } },
           "enum": { "description": "The allowed values.", "type": "array", "items": { "type": "string" } },
           "default": { "type": "string", "description": "The selected value." }
         },

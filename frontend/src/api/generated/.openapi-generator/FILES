@@ -15,11 +15,11 @@ models/BucketDto.ts
 models/BucketDtoFileSizeLimits.ts
 models/BucketsDto.ts
 models/ChatSuggestionDto.ts
+models/ChatUICallbackResultDto.ts
 models/ChunkDto.ts
 models/ConfigurationDto.ts
 models/ConfigurationUserValuesDto.ts
 models/ConfigurationsDto.ts
-models/ConfirmDto.ts
 models/ConversationDto.ts
 models/ConversationsDto.ts
 models/CreateConversationDto.ts

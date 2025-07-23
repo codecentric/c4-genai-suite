@@ -45,7 +45,7 @@ export function ExtensionForm(props: ExtensionFormProps) {
             }
           >
             {Object.entries(spec.arguments).map(([name, spec]) => (
-              <Argument key={name} buckets={buckets} name={name} argument={spec} />
+              <Argument namePrefix={'values.'} key={name} buckets={buckets} name={name} argument={spec} />
             ))}
           </Fieldset>
         </>
@@ -78,7 +78,7 @@ export function Argument({
   buckets,
   name,
   argument,
-  namePrefix = 'values.',
+  namePrefix = '',
   vertical,
   refreshable,
 }: {
@@ -169,8 +169,8 @@ export function Argument({
     );
   }
 
-  if (type === 'string' && argument._enum) {
-    const options = argument._enum.map((x) => ({ value: x, label: x }));
+  if (type === 'string' && (argument._enum?.length || argument.examples?.length)) {
+    const options = (argument._enum?.length ? argument._enum : (argument.examples ?? [])).map((x) => ({ value: x, label: x }));
 
     return (
       <Forms.Select
@@ -183,6 +183,7 @@ export function Argument({
         hints={hints()}
         vertical={vertical}
         defaultValue={argument._default}
+        autocomplete={!!argument.examples?.length}
       />
     );
   }
@@ -287,7 +288,7 @@ export function Argument({
   if (type === 'number') {
     const min = argument.minimum;
     const max = argument.maximum;
-    const step = argument.multipleOf ?? ((max || 100) - (min || 0)) / 100;
+    const step = argument.multipleOf;
 
     return (
       <Forms.Number

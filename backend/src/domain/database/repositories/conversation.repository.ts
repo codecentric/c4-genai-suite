@@ -2,7 +2,7 @@ import { Repository } from 'typeorm';
 import { getStartDate, GroupBy } from 'src/domain/chat/statistics';
 import { ConversationEntity } from '../entities';
 import { UsagesCount } from '../interfaces';
-import { dateTrunc, interval } from '../typeorm.helper';
+import { dateTrunc, interval, schema } from '../typeorm.helper';
 
 export class ConversationRepository extends Repository<ConversationEntity> {
   async getUsersCountByPeriod(since: Date | undefined, groupBy: GroupBy): Promise<UsagesCount[]> {
@@ -12,7 +12,7 @@ export class ConversationRepository extends Repository<ConversationEntity> {
 
     const start = since
       ? dateTrunc(groupBy, '($1)::date')
-      : dateTrunc(groupBy, `(SELECT MIN(${dateColumn}) FROM messages m WHERE ${condition})`);
+      : dateTrunc(groupBy, `(SELECT MIN(${dateColumn}) FROM ${schema}.messages m WHERE ${condition})`);
     const end = dateTrunc(groupBy, 'NOW()');
 
     const sql = `
@@ -25,8 +25,8 @@ export class ConversationRepository extends Repository<ConversationEntity> {
           SELECT
               ${dateTrunc(groupBy, dateColumn)} as "date",
               COUNT(distinct c."userId") AS total
-          FROM messages m
-          LEFT JOIN conversations c on c.id = m."conversationId"
+          FROM ${schema}.messages m
+          LEFT JOIN ${schema}.conversations c on c.id = m."conversationId"
           WHERE ${condition}
           GROUP BY ${dateTrunc(groupBy, dateColumn)}
       )

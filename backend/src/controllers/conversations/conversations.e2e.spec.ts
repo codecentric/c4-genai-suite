@@ -13,6 +13,7 @@ import {
   MessageEntity,
   UserEntity,
 } from '../../domain/database';
+import { schema } from '../../domain/database/typeorm.helper';
 import { buildClient } from '../../domain/files/use-cases/utils';
 import { initAppWithDataBaseAndValidUser } from '../../utils/testUtils';
 import { ConversationsController } from './conversations.controller';
@@ -88,7 +89,7 @@ async function cleanDatabase(dataSource: DataSource) {
 
   for (const entity of entities) {
     const repository = dataSource.getRepository(entity.name);
-    await repository.query(`TRUNCATE TABLE "${entity.tableName}" RESTART IDENTITY CASCADE`);
+    await repository.query(`TRUNCATE TABLE ${schema}."${entity.tableName}" RESTART IDENTITY CASCADE`);
   }
 }
 

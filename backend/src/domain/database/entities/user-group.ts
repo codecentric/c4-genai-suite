@@ -9,13 +9,14 @@ import {
   Repository,
   UpdateDateColumn,
 } from 'typeorm';
+import { schema } from '../typeorm.helper';
 import { ConfigurationEntity } from './configuration';
 import { FileEntity } from './file';
 import { UserEntity } from './user';
 
 export type UserGroupRepository = Repository<UserGroupEntity>;
 
-@Entity({ name: 'user-groups' })
+@Entity({ name: 'user-groups', schema })
 export class UserGroupEntity {
   @PrimaryColumn()
   id!: string;
