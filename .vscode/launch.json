@@ -63,6 +63,29 @@
       ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Dev: Run Everything in Dev Mode",
+      "program": "${workspaceFolder}/scripts/run-tests.js",
+      "args": [
+        "--devSetup"
+      ],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Dev Force: Run in Dev Mode (force using running services)",
+      "program": "${workspaceFolder}/scripts/run-tests.js",
+      "args": [
+        "--devSetup",
+        "--forceUsingRunningServices"
+      ],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
     }
   ]
 }
