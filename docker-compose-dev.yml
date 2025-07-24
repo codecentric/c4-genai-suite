@@ -109,6 +109,7 @@ services:
   mcp-fetch:
     hostname: mcp-fetch
     image: ghcr.io/codecentric/c4-genai-suite/dev-helper/mcp-tool-as-server:latest
+    container_name: c4-mcp-fetch-server
     environment:
       CONFIG: >
         {
