@@ -65,7 +65,7 @@ def get_pages_for_space(space_key: str) -> list[ConfluencePage]:
         pages.extend(ConfluencePage(
             r.get('id'),
             r.get('history').get('lastUpdated').get('when'),
-            r.get('_links').get('webui'),
+            f"{confluence_url}{r.get('_links').get('webui')}",
             r.get('body').get('storage').get('value')
         ) for r in result)
 
