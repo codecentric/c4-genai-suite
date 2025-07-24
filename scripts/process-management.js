@@ -36,6 +36,11 @@ const executeQuery = (command) => {
 };
 
 export const execute = (command, output = 'forward', onClose = null) => {
+  const debuggerLines = [
+    'Waiting for the debugger to disconnect...',
+    'Debugger attached.'
+  ];
+
   // Inside vscode, we need to use nvm, since new terminals do not load the nvm environment.
   const nvmPrefix =
     'export NVM_DIR="$HOME/.nvm"; ' +
@@ -57,8 +62,14 @@ export const execute = (command, output = 'forward', onClose = null) => {
   const child = spawn(shell, [flag, fullCommand]);
 
   if (output === 'forward') {
-    child.stdout.on('data', (data) => process.stdout.write(data));
-    child.stderr.on('data', (data) => process.stderr.write(data));
+    child.stdout.on('data', (data) => {
+      const text = data.toString();
+      if (!( insideVscode && debuggerLines.some((l)=>text.includes(l)))) process.stdout.write(data);
+    });
+    child.stderr.on('data', (data) => {
+      const text = data.toString();
+      if (!( insideVscode && debuggerLines.some((l)=>text.includes(l)))) process.stderr.write(data);
+    });
   }
 
   if (output === 'status') {
