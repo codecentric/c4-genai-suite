@@ -32,19 +32,29 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "All-E2Es: Run with Playwright Debug",
+      "name": "All-E2Es: Playwright Headed with Breakpoints",
       "program": "${workspaceFolder}/scripts/run-tests.js",
-      "args": ["--debug"],
+      "args": ["--headed"],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "env": {
-          "PWDEBUG": "1"
-      }
     },
     {
       "type": "node",
       "request": "launch",
-      "name": "Current-E2E: Debug Currently Open Test File",
+      "name": "Current-E2E: Playwright Headed with Breakpoints",
+      "program": "${workspaceFolder}/scripts/run-tests.js",
+      "args": [
+          "--headed",
+          "--file",
+          "${relativeFile}"
+      ],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Current-E2E-Inspector: Playwright Debug with Breakpoints",
       "program": "${workspaceFolder}/scripts/run-tests.js",
       "args": [
           "--debug",
@@ -53,9 +63,6 @@
       ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "env": {
-          "PWDEBUG": "1"
-      }
     }
   ]
 }

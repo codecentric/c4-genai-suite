@@ -36,6 +36,7 @@ const executeQuery = (command) => {
 };
 
 export const execute = (command, output = 'forward', onClose = null) => {
+  // Inside vscode, we need to use nvm, since new terminals do not load the nvm environment.
   const nvmPrefix =
     'export NVM_DIR="$HOME/.nvm"; ' +
     '[ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh"; ' +
@@ -56,8 +57,8 @@ export const execute = (command, output = 'forward', onClose = null) => {
   const child = spawn(shell, [flag, fullCommand]);
 
   if (output === 'forward') {
-    child.stdout.on('data', (data) => console.log(data.toString()));
-    child.stderr.on('data', (data) => console.error(data.toString()));
+    child.stdout.on('data', (data) => process.stdout.write(data));
+    child.stderr.on('data', (data) => process.stderr.write(data));
   }
 
   if (output === 'status') {
@@ -117,25 +118,27 @@ export async function dockerCleanups() {
         input: process.stdin,
         output: process.stdout,
       });
-      rl.question(
-        '\nWould you like to stop these containers now? [y/N]: ',
-        (answer) => {
-          if (answer.trim().toLowerCase() === 'y') {
-            try {
-              execSync(`docker stop ${containers.join(' ')}`, { stdio: 'inherit' });
-              console.log('\nContainers stopped. Please re-run the script.');
-            } catch (err) {
-              console.error('Failed to stop containers:', err);
-            }
-          } else {
-            console.log('No containers stopped. Exiting.');
-          }
-          rl.close();
-          process.exit(1);
+
+      // Await user input
+      const answer = await new Promise((resolve) => {
+        rl.question('\nWould you like to stop these containers now? [y/N]: ', resolve);
+      });
+      rl.close();
+
+      if (answer.trim().toLowerCase() === 'y') {
+        try {
+          execSync(`docker stop ${containers.join(' ')}`, { stdio: 'inherit' });
+          console.log('\nContainers stopped. Please re-run the script.');
+        } catch (err) {
+          console.error('Failed to stop containers:', err);
         }
-      );
+      } else {
+        console.log('No containers stopped. Exiting.');
+      }
+      return;
     }
   } catch (err) {
+    console.log('Error during Docker cleanup:', err);
     return;
   }
   return;
