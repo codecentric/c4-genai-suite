@@ -2,8 +2,10 @@ from atlassian import Confluence
 from dataclasses import dataclass
 import os
 
+confluence_url = os.environ.get("CONFLUENCE_URL")
+
 confluence = Confluence(
-    url=os.environ.get("CONFLUENCE_URL"),
+    url=confluence_url,
     token=os.environ.get("CONFLUENCE_TOKEN")
 )
 
@@ -12,6 +14,7 @@ confluence = Confluence(
 class ConfluencePage:
     id: int
     lastUpdated: str
+    url: str
     html_content: str
 
 
@@ -27,7 +30,12 @@ def get_page(page_id: int) -> ConfluencePage:
     """
     page = confluence.get_page_by_id(page_id, expand="body.storage,history.lastUpdated")
 
-    return ConfluencePage(page_id, "", page.get("body").get("storage").get("value"))
+    return ConfluencePage(
+        page_id,
+        page.get('history').get('lastUpdated').get('when'),
+        f"{confluence_url}{page.get('_links').get('webui')}",
+        page.get("body").get("storage").get("value")
+    )
 
 
 def get_pages_for_space(space_key: str) -> list[ConfluencePage]:
@@ -57,6 +65,7 @@ def get_pages_for_space(space_key: str) -> list[ConfluencePage]:
         pages.extend(ConfluencePage(
             r.get('id'),
             r.get('history').get('lastUpdated').get('when'),
+            r.get('_links').get('webui'),
             r.get('body').get('storage').get('value')
         ) for r in result)
 

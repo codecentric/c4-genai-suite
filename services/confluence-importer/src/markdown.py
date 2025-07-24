@@ -23,6 +23,7 @@ def html_to_markdown(page: ConfluencePage) -> str:
     temp_file.close()
 
     frontmatter = f"""---
+url: {page.url}
 lastUpdated: {page.lastUpdated}
 ---
 """
