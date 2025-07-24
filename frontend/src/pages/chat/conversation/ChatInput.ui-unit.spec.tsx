@@ -66,7 +66,6 @@ describe('ChatInput', () => {
         fileSize: 10,
         mimeType: 'image/png',
         uploadedAt: new Date(),
-        docId: 0,
       },
       {
         id: 1,
@@ -74,7 +73,6 @@ describe('ChatInput', () => {
         fileSize: 10,
         mimeType: 'image/png',
         uploadedAt: new Date(),
-        docId: 0,
       },
       {
         id: 2,
@@ -82,7 +80,6 @@ describe('ChatInput', () => {
         fileSize: 10,
         mimeType: 'text/plain',
         uploadedAt: new Date(),
-        docId: 0,
       },
     ]);
 
@@ -100,7 +97,6 @@ describe('ChatInput', () => {
         fileSize: 10,
         mimeType: 'image/png',
         uploadedAt: new Date(),
-        docId: 0,
       },
       {
         id: 1,
@@ -108,7 +104,6 @@ describe('ChatInput', () => {
         fileSize: 10,
         mimeType: 'image/png',
         uploadedAt: new Date(),
-        docId: 0,
       },
       ...Array.from({ length: 10 }, (_, index) => ({
         id: index + 2,
@@ -116,7 +111,6 @@ describe('ChatInput', () => {
         fileSize: 10,
         mimeType: 'text/plain',
         uploadedAt: new Date(),
-        docId: 0,
       })),
     ]);
     render(<ChatInput chatId={0} submitMessage={() => {}} />);

@@ -74,6 +74,6 @@ export class FileEntity {
   @Column()
   uploadStatus!: FileUploadStatus;
 
-  @Column({ type: 'int' })
-  docId!: number;
+  @Column({ type: 'int', name: 'docId' })
+  externalDocumentId!: number;
 }

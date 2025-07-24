@@ -42,12 +42,6 @@ export class FileDto {
   })
   uploadStatus!: FileUploadStatus;
 
-  @ApiProperty({
-    description: 'The doc ID of the file.',
-    required: true,
-  })
-  docId!: number;
-
   static fromDomain(this: void, source: UploadedFile) {
     const result = new FileDto();
     result.id = source.id;
@@ -56,7 +50,6 @@ export class FileDto {
     result.mimeType = source.mimeType;
     result.uploadedAt = source.uploadedAt;
     result.uploadStatus = source.uploadStatus;
-    result.docId = source.docId;
 
     return result;
   }

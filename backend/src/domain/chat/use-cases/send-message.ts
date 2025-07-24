@@ -29,7 +29,7 @@ export class SendMessage {
     public readonly conversationId: number,
     public readonly user: User,
     public readonly input: string,
-    public readonly files?: UploadedFile[],
+    public readonly files?: Pick<UploadedFile, 'id' | 'fileName'>[],
     public readonly editMessageId?: number,
   ) {}
 }

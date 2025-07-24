@@ -221,16 +221,54 @@ export class FilesController {
   @Role(BUILTIN_USER_GROUP_ADMIN)
   @UseGuards(RoleGuard)
   async postFile(@Param('id') bucketId: number, @Res() res: Response, @UploadedFile() file: Express.Multer.File) {
-    const command = new UploadFile(
-      undefined,
-      file.buffer,
-      file.mimetype,
-      file.originalname,
-      file.size,
-      bucketId,
-      undefined,
-      true,
-    );
+    const command = new UploadFile({
+      buffer: file.buffer,
+      mimeType: file.mimetype,
+      fileName: file.originalname,
+      fileSize: file.size,
+      bucketId: bucketId,
+      createEmbeddings: true,
+    });
+
+    await keepAlive(res, async () => {
+      const result: UploadFileResponse = await this.commandBus.execute(command);
+      return FileDto.fromDomain(result.file);
+    });
+  }
+
+  @Put(':id/files/:fileId')
+  @ApiOperation({ operationId: 'putFile', description: 'Updates a file.' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiOkResponse({ type: FileDto })
+  @Role(BUILTIN_USER_GROUP_ADMIN)
+  @UseGuards(RoleGuard)
+  async putFile(
+    @Param('id') bucketId: number,
+    @Param('fileId', ParseIntPipe) fileId: number,
+    @Res() res: Response,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    const command = new UploadFile({
+      fileIdToUpdate: fileId,
+      buffer: file.buffer,
+      mimeType: file.mimetype,
+      fileName: file.originalname,
+      fileSize: file.size,
+      bucketId: bucketId,
+      createEmbeddings: true,
+    });
 
     await keepAlive(res, async () => {
       const result: UploadFileResponse = await this.commandBus.execute(command);

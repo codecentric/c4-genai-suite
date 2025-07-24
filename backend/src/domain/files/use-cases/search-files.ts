@@ -16,7 +16,7 @@ export class SearchFiles {
     public readonly query: string,
     public readonly user: User,
     public readonly take = 10,
-    public readonly docIds: number[] | null = null,
+    public readonly externalDocumentIds: number[] | null = null,
     public readonly conversationId: number | null = null,
   ) {}
 }
@@ -38,7 +38,7 @@ export class SearchFilesHandler implements IQueryHandler<SearchFiles, SearchFile
   ) {}
 
   async execute(query: SearchFiles): Promise<SearchFilesResponse> {
-    const { bucketId, query: search, user, take, docIds } = query;
+    const { bucketId, query: search, user, take, externalDocumentIds } = query;
 
     const bucket = await this.buckets.findOneBy({ id: bucketId });
     if (!bucket) {
@@ -58,7 +58,7 @@ export class SearchFilesHandler implements IQueryHandler<SearchFiles, SearchFile
 
     const api = buildClient(bucket);
     try {
-      const result = await api.getFiles(search, take, ragBucket, bucket.indexName, docIds?.join(','));
+      const result = await api.getFiles(search, take, ragBucket, bucket.indexName, externalDocumentIds?.join(','));
       return new SearchFilesResponse(result.files, result.debug, result.sources);
     } catch (err) {
       if (err instanceof ResponseError && err.response.status === 422) {

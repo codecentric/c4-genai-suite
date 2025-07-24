@@ -836,6 +836,30 @@
       }
     },
     "/api/buckets/{id}/files/{fileId}": {
+      "put": {
+        "description": "Updates a file.",
+        "operationId": "putFile",
+        "parameters": [
+          { "name": "id", "required": true, "in": "path", "schema": { "type": "number" } },
+          { "name": "fileId", "required": true, "in": "path", "schema": { "type": "number" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": { "type": "object", "properties": { "file": { "type": "string", "format": "binary" } } }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/FileDto" } } }
+          }
+        },
+        "summary": "",
+        "tags": ["files"]
+      },
       "delete": {
         "description": "Deletes a file.",
         "operationId": "deleteFile",
@@ -1712,10 +1736,9 @@
             "type": "string",
             "description": "The status of the file upload to the RAG-Service",
             "enum": ["successful", "inProgress"]
-          },
-          "docId": { "type": "number", "description": "The doc ID of the file." }
+          }
         },
-        "required": ["id", "fileName", "fileSize", "mimeType", "uploadedAt", "docId"]
+        "required": ["id", "fileName", "fileSize", "mimeType", "uploadedAt"]
       },
       "SendMessageDto": {
         "type": "object",

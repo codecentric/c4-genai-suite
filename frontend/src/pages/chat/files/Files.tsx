@@ -69,7 +69,7 @@ export function Files({ conversationId, userBucket, configurationId }: FileProps
   const uploadMutations = useTypedMutationStates(upload, ['upload-user-file']);
   const deleteMutations = useTypedMutationStates(deleteFile, ['delete-user-file']);
 
-  const file2filedto = (f: File, i: number): FileDto => {
+  const fileToFileDto = (f: File, i: number): FileDto => {
     // transient, only during upload
     // we assign arbitrary ids which do not conflict with the actual ids from the backend
     return {
@@ -79,7 +79,6 @@ export function Files({ conversationId, userBucket, configurationId }: FileProps
       mimeType: f.type,
       uploadedAt: new Date(),
       uploadStatus: 'inProgress',
-      docId: -i,
     };
   };
 
@@ -87,7 +86,7 @@ export function Files({ conversationId, userBucket, configurationId }: FileProps
     ...(loadedFiles?.items.filter((f) => f.uploadStatus === 'inProgress') ?? []),
     ...uploadMutations
       .filter((mutation) => mutation.status === 'pending')
-      .map((mutation, i) => file2filedto(mutation.variables!, i))
+      .map((mutation, i) => fileToFileDto(mutation.variables!, i))
       // there is an edge case where we start with an "inProgress" file and poll the backend
       // if we upload a second file at the same time, it will appear twice. Once from the mutation
       // and once from polling. Since we doe not have a unique identifier for both, we work

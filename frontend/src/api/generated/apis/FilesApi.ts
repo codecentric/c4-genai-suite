@@ -97,6 +97,12 @@ export interface PutBucketRequest {
     upsertBucketDto: UpsertBucketDto;
 }
 
+export interface PutFileRequest {
+    id: number;
+    fileId: number;
+    file?: Blob;
+}
+
 export interface TestBucketRequest {
     testBucketDto: TestBucketDto;
 }
@@ -610,6 +616,69 @@ export class FilesApi extends runtime.BaseAPI {
      */
     async putBucket(id: number, upsertBucketDto: UpsertBucketDto, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BucketDto> {
         const response = await this.putBucketRaw({ id: id, upsertBucketDto: upsertBucketDto }, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Updates a file.
+     * 
+     */
+    async putFileRaw(requestParameters: PutFileRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<FileDto>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling putFile().'
+            );
+        }
+
+        if (requestParameters['fileId'] == null) {
+            throw new runtime.RequiredError(
+                'fileId',
+                'Required parameter "fileId" was null or undefined when calling putFile().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const consumes: runtime.Consume[] = [
+            { contentType: 'multipart/form-data' },
+        ];
+        // @ts-ignore: canConsumeForm may be unused
+        const canConsumeForm = runtime.canConsumeForm(consumes);
+
+        let formParams: { append(param: string, value: any): any };
+        let useForm = false;
+        // use FormData to transmit files using content-type "multipart/form-data"
+        useForm = canConsumeForm;
+        if (useForm) {
+            formParams = new FormData();
+        } else {
+            formParams = new URLSearchParams();
+        }
+
+        if (requestParameters['file'] != null) {
+            formParams.append('file', requestParameters['file'] as any);
+        }
+
+        const response = await this.request({
+            path: `/api/buckets/{id}/files/{fileId}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))).replace(`{${"fileId"}}`, encodeURIComponent(String(requestParameters['fileId']))),
+            method: 'PUT',
+            headers: headerParameters,
+            query: queryParameters,
+            body: formParams,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => FileDtoFromJSON(jsonValue));
+    }
+
+    /**
+     * Updates a file.
+     * 
+     */
+    async putFile(id: number, fileId: number, file?: Blob, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<FileDto> {
+        const response = await this.putFileRaw({ id: id, fileId: fileId, file: file }, initOverrides);
         return await response.value();
     }
 

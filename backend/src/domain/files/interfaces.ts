@@ -71,7 +71,7 @@ export interface UploadedFile {
   // The status of the file in relation to the RAG-Service
   uploadStatus: FileUploadStatus;
 
-  docId: number;
+  externalDocumentId: number;
 }
 
 export interface SearchResult {

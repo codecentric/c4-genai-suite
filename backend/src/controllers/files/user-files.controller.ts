@@ -129,17 +129,17 @@ export class UserFilesController {
     const bucket = result.extension?.values?.bucket as number;
     const createEmbeddings = (bucket ? (result.extension?.fixedValues?.createEmbeddings ?? true) : false) as boolean;
 
-    const command = new UploadFile(
-      req.user,
-      file.buffer,
-      file.mimetype,
-      file.originalname,
-      file.size,
-      bucket,
+    const command = new UploadFile({
+      user: req.user,
+      buffer: file.buffer,
+      mimeType: file.mimetype,
+      fileName: file.originalname,
+      fileSize: file.size,
+      bucketId: bucket,
       extensionId,
       createEmbeddings,
       conversationId,
-    );
+    });
 
     await keepAlive(res, async () => {
       const result: UploadFileResponse = await this.commandBus.execute(command);

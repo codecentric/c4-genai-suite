@@ -30,7 +30,7 @@ export class DeleteBucketHandler implements ICommandHandler<DeleteBucket, Delete
 
     const files = await bucket.files;
     for (const file of files) {
-      await api.deleteFile(file.docId.toString());
+      await api.deleteFile(file.externalDocumentId.toString());
     }
 
     await this.buckets.delete({ id });

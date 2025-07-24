@@ -55,8 +55,8 @@ const mockFilesAndSelectedFiles = (files: FileDto[], selectedIDs: number[]) => {
 
 describe('The Select/Deselect all files Buttons', () => {
   const mockedFiles = [
-    { id: 1, fileName: 'test1.txt', uploadedAt: new Date(), fileSize: 100, mimeType: 'text/plain', docId: 1 },
-    { id: 2, fileName: 'test2.txt', uploadedAt: new Date(), fileSize: 100, mimeType: 'text/plain', docId: 2 },
+    { id: 1, fileName: 'test1.txt', uploadedAt: new Date(), fileSize: 100, mimeType: 'text/plain', externalDocumentId: 1 },
+    { id: 2, fileName: 'test2.txt', uploadedAt: new Date(), fileSize: 100, mimeType: 'text/plain', externalDocumentId: 2 },
   ];
 
   const renderAndExpectButtons = () => {
@@ -118,7 +118,7 @@ describe('The user files sidebar', () => {
       fileSize: 100,
       mimeType: 'text/plain',
       uploadStatus: 'successful' as FileDtoUploadStatusEnum,
-      docId: 1,
+      externalDocumentId: 1,
     },
     {
       id: 2,
@@ -127,7 +127,7 @@ describe('The user files sidebar', () => {
       fileSize: 100,
       mimeType: 'text/plain',
       uploadStatus: 'successful' as FileDtoUploadStatusEnum,
-      docId: 2,
+      externalDocumentId: 2,
     },
   ];
 
@@ -139,7 +139,7 @@ describe('The user files sidebar', () => {
       fileSize: 100,
       mimeType: 'text/plain',
       uploadStatus: 'successful' as FileDtoUploadStatusEnum,
-      docId: 1,
+      externalDocumentId: 1,
     },
     {
       id: 2,
@@ -148,7 +148,7 @@ describe('The user files sidebar', () => {
       fileSize: 100,
       mimeType: 'text/plain',
       uploadStatus: 'inProgress' as FileDtoUploadStatusEnum,
-      docId: 2,
+      externalDocumentId: 2,
     },
   ];
 

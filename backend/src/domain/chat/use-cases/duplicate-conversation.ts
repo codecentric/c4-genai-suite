@@ -54,7 +54,7 @@ export class DuplicateConversationHandler implements ICommandHandler<DuplicateCo
           ...file,
           id: undefined,
           blobs: file.blobs.map((blob: BlobEntity) => ({ ...blob, id: uuid.v4() })),
-          docId: file.docId,
+          externalDocumentId: file.externalDocumentId,
         });
 
         return this.fileRepository.save(newFile);
