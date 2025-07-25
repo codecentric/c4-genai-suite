@@ -218,6 +218,7 @@ export async function addBucketToConfiguration(
   await page.getByRole('link', { name: 'Assistants' }).click();
   await page.getByRole('link', { name: configuration.name }).click();
   await page.getByRole('button', { name: 'Add Extension' }).click();
+  await page.getByLabel('Create Extension').getByRole('tab', { name: 'Tools' }).click();
   await page.getByRole('heading', { name: 'Search Files', exact: true }).click();
   await page.getByLabel('Description').fill(files.description);
   await selectOption(page, 'Bucket', files.bucketName);
@@ -229,6 +230,7 @@ export async function addUserArgsToConfiguration(page: Page, configuration: { na
   await page.getByRole('link', { name: 'Assistants' }).click();
   await page.getByRole('link').filter({ hasText: configuration.name }).click();
   await page.getByRole('button', { name: 'Add Extension' }).click();
+  await page.getByLabel('Create Extension').getByRole('tab', { name: 'Tools' }).click();
   await page
     .locator('*')
     .filter({ hasText: /^DEV: User ArgsShows the current user argstool$/ })
@@ -245,6 +247,7 @@ export async function addMCPToConfiguration(
   await page.getByRole('link', { name: 'Assistants' }).click();
   await page.getByRole('link').filter({ hasText: configuration.name }).click();
   await page.getByRole('button', { name: 'Add Extension' }).click();
+  await page.getByLabel('Create Extension').getByRole('tab', { name: 'Tools' }).click();
   await page
     .locator('*')
     .filter({ hasText: /^MCP ToolsMCP Server Integrationtool$/ })
@@ -270,6 +273,7 @@ export async function addMCPToConfiguration(
 export async function disableUserArgsInConfiguration(page: Page, configuration: { name: string }) {
   await page.getByRole('link', { name: 'Assistants' }).click();
   await page.getByRole('link').filter({ hasText: configuration.name }).click();
+  await page.getByTestId('sidebar-admin').getByRole('tab', { name: 'Tools' }).click();
   await page.getByRole('heading', { name: 'DEV: User Args', exact: true }).click();
   await page.getByRole('checkbox').uncheck();
 
@@ -284,6 +288,7 @@ export async function addWholeFileExtensionToConfiguration(
   await page.getByRole('link', { name: 'Assistants' }).click();
   await page.getByRole('link').filter({ hasText: configuration.name }).click();
   await page.getByRole('button', { name: 'Add Extension' }).click();
+  await page.getByLabel('Create Extension').getByRole('tab', { name: 'Tools' }).click();
   await page.getByRole('heading', { name: 'Complete Files', exact: true }).click();
   await selectOption(page, 'Bucket', wholeFilesConfig.bucketName);
 
@@ -293,6 +298,7 @@ export async function addWholeFileExtensionToConfiguration(
 export async function editWholeFileExtension(page: Page, configuration: { name: string }) {
   await page.getByRole('link', { name: 'Assistants' }).click();
   await page.getByRole('link').filter({ hasText: configuration.name }).click();
+  await page.getByTestId('sidebar-admin').getByRole('tab', { name: 'Tools' }).click();
   await page.getByRole('heading', { name: 'Complete Files', exact: true }).click();
 
   await save(page);
@@ -318,6 +324,7 @@ export async function addVisionFileExtensionToConfiguration(page: Page, configur
   await page.getByRole('link', { name: 'Assistants' }).click();
   await page.getByRole('link').filter({ hasText: name }).click();
   await page.getByRole('button', { name: 'Add Extension' }).click();
+  await page.getByLabel('Create Extension').getByRole('tab', { name: 'Tools' }).click();
   await page.getByRole('heading', { name: 'Files Vision', exact: true }).click();
 
   await save(page);
@@ -331,6 +338,7 @@ export async function addFilesInChatExtensionToConfiguration(
   await page.getByRole('link', { name: 'Assistants' }).click();
   await page.getByRole('link').filter({ hasText: configuration.name }).click();
   await page.getByRole('button', { name: 'Add Extension' }).click();
+  await page.getByLabel('Create Extension').getByRole('tab', { name: 'Tools' }).click();
   await page.getByRole('heading', { name: 'Search Files in Chat', exact: true }).click();
   await selectOption(page, 'Bucket', filesInChatConfig.bucketName);
   await page.getByRole('checkbox').first().check();
@@ -341,6 +349,7 @@ export async function addFilesInChatExtensionToConfiguration(
 export async function deactivateFileInChatExtensionToConfiguration(page: Page, configuration: { name: string }) {
   await page.getByRole('link', { name: 'Assistants' }).click();
   await page.getByRole('link').filter({ hasText: configuration.name }).click();
+  await page.getByTestId('sidebar-admin').getByRole('tab', { name: 'Tools' }).click();
   await page.getByRole('heading', { name: 'Search Files in Chat', exact: true }).click();
   await page
     .locator('div')
@@ -435,6 +444,8 @@ export async function addSystemPromptToConfiguration(
   await page.getByRole('link').filter({ hasText: configuration.name }).click();
 
   await page.getByRole('button', { name: 'Add Extension' }).click();
+
+  await page.getByLabel('Create Extension').getByRole('tab', { name: 'Other' }).click();
 
   await page
     .locator('*')

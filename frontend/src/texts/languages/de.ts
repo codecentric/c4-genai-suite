@@ -184,6 +184,8 @@ export const de: typeof en = {
       'Der Executor ist ein spezieller Dienst, der den gesamten Chat-Ablauf steuert und nur die Antwort bereitstellt. Für spezielle Fälle, in denen vollständige Kontrolle über den Chat benötigt wird.',
     executorHeaders: 'Executor-Header',
     headline: 'Erweiterungen',
+    noTools: 'Es sind aktuell keine Tools für diesen Assitenten konfiguriert',
+    noOthers: 'Es sind aktuell keine anderen Erweiterungen für diesen Assistenten konfiguriert',
     removeConfigurationConfirmText: 'Möchtest du diesen Assistenten wirklich löschen?',
     removeConfigurationConfirmTitle: 'Assistent löschen',
     removeConfigurationFailed: 'Löschen des Assistenten fehlgeschlagen',
@@ -207,7 +209,8 @@ export const de: typeof en = {
     userGroupsHints: 'Beschränke den Zugriff auf den Assistenten auf bestimmte Benutzergruppen.',
     warningIncompatibleFilesTools:
       'Die folgenden Tools sind nicht kompatibel: `{{tool}}` und `{{otherTool}}`. Bitte wählen Sie eine der beiden Tooltypen aus.',
-    warningNoModel: 'Du musst mindestens ein Modell konfigurieren oder aktivieren.',
+    warningNoModel:
+      'Du musst mindestens ein Modell konfigurieren oder aktivieren. Klicken Sie auf Erweiterung hinzufügen um ein Modell hinzuzufügen.',
     warningTooManyModels: 'Du hast mehr als ein Modell aktiviert. Das erste Modell wird standardmäßig für neue Chats ausgewählt.',
   },
   files: {

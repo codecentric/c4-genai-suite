@@ -181,6 +181,8 @@ export const en = {
       'The executor is a special service that handles the complete chat flow and only provides the answer. For special cases, where full control over the chat is needed.',
     executorHeaders: 'Executor Headers',
     headline: 'Extensions',
+    noTools: 'There are currently no tools configured for this assistant.',
+    noOthers: 'There are currently no other extensions configured for this assistant.',
     rebuildSchemaFailed: 'Refresh Schema failed',
     rebuildSchema: 'Refresh schema',
     removeConfigurationConfirmText: 'Do you really want to remove the assistant?',
@@ -204,7 +206,7 @@ export const en = {
     userGroupsHints: 'Restrict the access to the assistant to certain user groups.',
     warningIncompatibleFilesTools:
       'You have incompatible tools: `{{tool}}` and `{{otherTool}}`. Please choose one of the two types.',
-    warningNoModel: 'You have to configure or enable at least one model.',
+    warningNoModel: 'You have to configure or enable at least one model. Click on Add Extension to add a model.',
     warningTooManyModels: 'You have more than one model enabled, the first model will be chosen by default for new chats.',
   },
   files: {
