@@ -29,13 +29,16 @@ def clear_previous_ingests() -> None:
 
     print(f"Found {len(items)} files in bucket '{bucket_id}'")
 
-    for item in items:
-        if item.get("fileName").endswith(".md"):
+    for index, item in enumerate(items):
+        num_items = len(items)
+        file_name = item.get("fileName")
+
+        if file_name.startswith("confluence_page_") and file_name.endswith(".md"):
             requests.delete(
                 f'{c4_base_url}/api/buckets/{bucket_id}/files/{item.get("id")}',
                 headers={"x-api-key": os.environ.get("C4_TOKEN")}
             )
-            print(f"Deleted existing ingest {item.get('fileName')}")
+            print(f"Deleted existing ingest {item.get('fileName')}. File {index+1}/{num_items}.")
     print("Cleared previous ingests")
 
 
