@@ -1,6 +1,8 @@
 import os
 import requests
 
+from src.logger import logger
+
 c4_base_url = os.environ.get("C4_BASE_URL")
 bucket_id = '89'
 
@@ -14,7 +16,7 @@ def clear_previous_ingests() -> None:
     items: list[str] = []
 
     while True:
-        print(f"Fetching files list for bucket with '{bucket_id}' from page {page}")
+        logger.debug("Fetching partial list of files from c4 ", bucket_id=bucket_id, page=page)
         response = requests.get(f'{c4_base_url}/api/buckets/{bucket_id}/files',
                             headers={"x-api-key": os.environ.get("C4_TOKEN")})
 
@@ -27,7 +29,7 @@ def clear_previous_ingests() -> None:
         else:
             page += 1
 
-    print(f"Found {len(items)} files in bucket '{bucket_id}'")
+    logger.info("Full list of files in c4 fetched", bucket_id=bucket_id, num_files=total)
 
     for index, item in enumerate(items):
         num_items = len(items)
@@ -38,8 +40,8 @@ def clear_previous_ingests() -> None:
                 f'{c4_base_url}/api/buckets/{bucket_id}/files/{item.get("id")}',
                 headers={"x-api-key": os.environ.get("C4_TOKEN")}
             )
-            print(f"Deleted existing ingest {item.get('fileName')}. File {index+1}/{num_items}.")
-    print("Cleared previous ingests")
+            logger.info("Delete Confluence page in c4", bucket_id=bucket_id, file_name=file_name, progress=f"{index + 1}/{num_items}", status="success")
+    logger.info("All Confluence pages deleted from c4", bucket_id=bucket_id)
 
 
 def ingest_confluence_page(page_id: int, page_markdown: str) -> None:
@@ -55,8 +57,6 @@ def ingest_confluence_page(page_id: int, page_markdown: str) -> None:
                          headers={"x-api-key": os.environ.get("C4_TOKEN")})
 
     if response.status_code == 201:
-        print(f"Successfully ingested Confluence page with ID {page_id}")
+        logger.debug("Upload Confluence page to c4", bucket_id=bucket_id, page_id=page_id, status="success")
     else:
-        print(f"Failed to ingest Confluence page with ID {page_id}. Status code: {response.status_code}.")
-        print(response.text)
-        exit(1)
+        logger.error("Upload Confluence page to c4", bucket_id=bucket_id, page_id=page_id, status="error", c4_status_code=response.status_code, c4_error_response=response.text)

@@ -2,6 +2,8 @@ from atlassian import Confluence
 from dataclasses import dataclass
 import os
 
+from src.logger import logger
+
 confluence_url = os.environ.get("CONFLUENCE_URL")
 
 confluence = Confluence(
@@ -55,12 +57,12 @@ def get_pages_for_space(space_key: str) -> list[ConfluencePage]:
     pages = []
 
     while not crawling_done:
-        print(f"Fetching pages from offset {offset} with limit {batch_size}")
+        logger.debug("Fetch Pages for Confluence Space", space_key=space_key, offset=offset, limit=batch_size)
 
         # It seems that limit is broken in `atlassian-python-api`. It always defaults to 100? TODO figure out whats up.
         result = confluence.get_all_pages_from_space(space_key, start=offset, limit=batch_size, content_type="page",
                                                      expand="body.storage,history.lastUpdated", status="current")
-        print(f"Found {len(result)} pages in space '{space_key}'")
+        logger.info("All Pages for Confluence Space fetched", space_key=space_key, num_pages=len(result))
 
         pages.extend(ConfluencePage(
             r.get('id'),
