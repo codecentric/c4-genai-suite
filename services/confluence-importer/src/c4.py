@@ -47,16 +47,9 @@ def ingest_confluence_page(page_id: int, page_markdown: str) -> None:
         page_markdown: The HTML content of the Confluence page to ingest
         page_id: The ID of the Confluence page to ingest
     """
-
-    # TODO check if there is a way to do this in memory
-    temp_markdown_file = open(f'/tmp/{page_id}.md', 'w')
-    temp_markdown_file.write(page_markdown)
-    temp_markdown_file.close()
-
-    files = {'file': open(temp_markdown_file.name, 'rb')}
+    files = {'file': (f"confluence_page_{page_id}.md", page_markdown, "text/markdown")}
     response = requests.post('http://localhost:8080/api/buckets/89/files', files=files,
                          headers={"x-api-key": os.environ.get("C4_TOKEN")})
-    os.unlink(temp_markdown_file.name)
 
     if response.status_code == 201:
         print(f"Successfully ingested Confluence page with ID {page_id}")
