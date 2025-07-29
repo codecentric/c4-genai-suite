@@ -1,12 +1,15 @@
 import { Menu } from '@mantine/core';
-import { IconLogout, IconMessage, IconTrash, IconUserCog } from '@tabler/icons-react';
+import { IconLogout, IconMessage, IconSettings, IconTrash, IconUserCog } from '@tabler/icons-react';
 import { NavLink } from 'react-router-dom';
 import { ConfirmDialog } from 'src/components/ConfirmDialog';
+import { UserProfileModal } from 'src/components/UserProfileModal';
 import { useLogoutUrl, useProfile } from 'src/hooks';
 import { useStateOfSelectedChatId } from 'src/pages/chat/state/chat';
 import { isMobile } from 'src/pages/utils';
 import { texts } from 'src/texts';
 import { Avatar } from './Avatar';
+import { useState } from 'react';
+import { useAuthSettings } from 'src/hooks/useAuthSettings';
 
 interface ProfileButtonProps {
   onClearConversations?: () => void;
@@ -17,6 +20,9 @@ export const ProfileButton = ({ onClearConversations, section }: ProfileButtonPr
   const profile = useProfile();
   const logoutUrl = useLogoutUrl();
   const chatId = useStateOfSelectedChatId();
+  const [isUserModalOpen, setIsUserModalOpen] = useState(false);
+
+  const { data: authSettings } = useAuthSettings();
 
   return (
     <Menu width={250}>
@@ -39,6 +45,12 @@ export const ProfileButton = ({ onClearConversations, section }: ProfileButtonPr
         {section === 'admin' && (
           <Menu.Item leftSection={<IconMessage size={14} />} component={NavLink} to={`/chat/${chatId || ''}`}>
             {texts.common.chat}
+          </Menu.Item>
+        )}
+
+        {section === 'chat' && authSettings?.enablePasswordAuth && (
+          <Menu.Item leftSection={<IconSettings size={14} />} onClick={() => setIsUserModalOpen(true)}>
+            Settings
           </Menu.Item>
         )}
 
@@ -67,6 +79,8 @@ export const ProfileButton = ({ onClearConversations, section }: ProfileButtonPr
           Logout
         </Menu.Item>
       </Menu.Dropdown>
+
+      <UserProfileModal isOpen={isUserModalOpen} onClose={() => setIsUserModalOpen(false)} />
     </Menu>
   );
 };
