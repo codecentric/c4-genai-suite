@@ -1,7 +1,10 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AppClient, UpsertUserDto, UserDto } from 'src/api';
+import { useProfile } from 'src/hooks';
 
 export function useUpsertUser(api: AppClient, target: UserDto | null, onUpsert: (user: UserDto) => void, onClose: () => void) {
+  const currentProfile = useProfile();
+  const queryClient = useQueryClient();
   const { mutate, error, isPending } = useMutation({
     mutationFn: (request: UpsertUserDto) => {
       if (target) {
@@ -11,6 +14,11 @@ export function useUpsertUser(api: AppClient, target: UserDto | null, onUpsert: 
       }
     },
     onSuccess: (response) => {
+      if(target && target.id === currentProfile.id){
+        queryClient.invalidateQueries({
+          queryKey: ['profile'],
+        });
+      }
       onUpsert(response);
       onClose();
     },

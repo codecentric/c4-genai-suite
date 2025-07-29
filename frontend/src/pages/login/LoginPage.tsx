@@ -1,19 +1,15 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { FormProvider, useForm } from 'react-hook-form';
 import { AuthSettingsDto, useApi } from 'src/api';
 import { LoginDto } from 'src/api/generated';
 import { Forms, Logo } from 'src/components';
 import { Theme, useLoginUrl, useTheme, useTransientNavigate } from 'src/hooks';
 import { texts } from 'src/texts';
+import { useAuthSettings } from 'src/hooks/useAuthSettings';
 
 export function LoginPage() {
-  const api = useApi();
-
   const { theme } = useTheme();
-  const { data: authSettings, isError } = useQuery({
-    queryKey: ['settings'],
-    queryFn: () => api.auth.getAuthSettings(),
-  });
+  const { data: authSettings, isError } = useAuthSettings();
 
   return (
     <div className="text-primary flex h-screen overflow-hidden font-medium">
