@@ -18,7 +18,7 @@ services:
       AUTH_INITIAL_ADMIN_USERNAME: admin@example.com
       AUTH_INITIAL_ADMIN_PASSWORD: secret
       DB_URL: postgres://admin:secret@postgres:5432/cccc
-      NODE_ENV: production
+      NODE_ENV: dev
       SESSION_SECRET: random
     depends_on:
       postgres:

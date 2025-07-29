@@ -1,0 +1,27 @@
+[project]
+name = "confluencer-importer"
+version = "0.1.0"
+description = "Imports Confluence pages into c4 Buckets, enabling c4 Assistants to quickly and accurately answer questions using your organization's Confluence content."
+readme = "README.md"
+requires-python = ">=3.13.2"
+dependencies = [
+    "atlassian-python-api==4.0.4",
+    "markitdown==0.1.2",
+    "requests==2.32.4",
+    "structlog==25.4.0",
+    "pytest==8.4.1",
+    "pydantic-settings>=2.10.1",
+]
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "N", "A", "B"]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4.1",
+    "pytest-mock>=3.14.1",
+    "ruff>=0.12.5",
+]

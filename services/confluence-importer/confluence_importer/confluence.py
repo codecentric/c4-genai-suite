@@ -2,22 +2,19 @@ from typing import Generator
 
 from atlassian import Confluence
 from dataclasses import dataclass
-import os
 
-from src.logger import logger
+from confluence_importer.logger import logger
+from confluence_importer.config import config
 
-confluence_url = os.environ.get("CONFLUENCE_URL")
+confluence_url = config.confluence_url
 
-confluence_api = Confluence(
-    url=confluence_url,
-    token=os.environ.get("CONFLUENCE_TOKEN")
-)
+confluence_api = Confluence(url=confluence_url, token=config.confluence_token)
 
 
 @dataclass
 class ConfluencePage:
     id: int
-    lastUpdated: str
+    last_updated: str
     url: str
     html_content: str
 
@@ -25,10 +22,10 @@ class ConfluencePage:
 def get_page(page_id: int) -> ConfluencePage:
     """
     Retrieves the content of a Confluence page by its ID.
-    
+
     Args:
         page_id: The ID of the Confluence page to retrieve
-        
+
     Returns:
         A ConfluencePage dataclass containing the page information and content as HTML
     """
@@ -36,9 +33,9 @@ def get_page(page_id: int) -> ConfluencePage:
 
     return ConfluencePage(
         page_id,
-        page.get('history').get('lastUpdated').get('when'),
+        page.get("history").get("lastUpdated").get("when"),
         f"{confluence_url}{page.get('_links').get('webui')}",
-        page.get("body").get("storage").get("value")
+        page.get("body").get("storage").get("value"),
     )
 
 
@@ -60,17 +57,23 @@ def get_pages_for_space(space_key: str) -> Generator[ConfluencePage]:
         logger.debug("Fetch Pages for Confluence Space", space_key=space_key, offset=offset, limit=batch_size)
 
         # It seems that limit is broken in `atlassian-python-api`. It always defaults to 100? TODO figure out whats up.
-        result = confluence_api.get_all_pages_from_space_as_generator(space_key, start=offset, limit=batch_size, content_type="page",
-                                                         expand="body.storage,history.lastUpdated", status="current")
+        result = confluence_api.get_all_pages_from_space_as_generator(
+            space_key,
+            start=offset,
+            limit=batch_size,
+            content_type="page",
+            expand="body.storage,history.lastUpdated",
+            status="current",
+        )
 
         len_result = 0
         for r in result:
             len_result += 1
             yield ConfluencePage(
-                r.get('id'),
-                r.get('history').get('lastUpdated').get('when'),
+                r.get("id"),
+                r.get("history").get("lastUpdated").get("when"),
                 f"{confluence_url}{r.get('_links').get('webui')}",
-                r.get('body').get('storage').get('value')
+                r.get("body").get("storage").get("value"),
             )
 
         if len_result < batch_size:
