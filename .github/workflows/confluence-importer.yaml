@@ -1,0 +1,59 @@
+name: Confluence Importer
+permissions:
+  contents: read
+
+on:
+  pull_request:
+    paths:
+      - .github/workflows/confluence-importer.yaml
+      - services/confluence-importer/**
+  workflow_call:
+
+defaults:
+  run:
+    working-directory: services/confluence-importer
+
+jobs:
+  format-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+      - name: Install dependencies
+        run: uv sync --dev
+      - name: Check formatting with ruff
+        run: uv run ruff format --check .
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+      - name: Install dependencies
+        run: uv sync --dev
+      - name: Lint with ruff
+        run: uv run ruff check .
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+      - name: Install dependencies
+        run: uv sync --dev
+      - name: Move environment file
+        run: mv .env.example .env
+      - name: Run pytest
+        run: uv run pytest
