@@ -59,12 +59,6 @@ export class UpdateConversationHandler implements ICommandHandler<UpdateConversa
       if (!configuration.enabled) {
         throw new BadRequestException('Configuration is not enabled.');
       }
-
-      const totalMessages = await this.messages.countBy({ conversationId: id });
-
-      if (totalMessages > 0) {
-        throw new BadRequestException('Configuration ID cannot be changed after the conversation has been started.');
-      }
     }
 
     if (context) {
