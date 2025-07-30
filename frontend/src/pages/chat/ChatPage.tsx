@@ -182,6 +182,7 @@ export function ChatPage() {
             <Panel style={{ overflow: 'auto' }} id="right" order={2} {...panelSizes.right} className="bg-gray-100">
               {selectedDocument ? (
                 <SourcesChunkPreview onClose={() => setSelectedDocument(undefined)} document={selectedDocument} />
+                // TODO: show pdf
               ) : (
                 userBucket && (
                   <Files configurationId={selectedAssistantId} userBucket={userBucket} conversationId={selectedChatId} />
