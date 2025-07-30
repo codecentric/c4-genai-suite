@@ -71,7 +71,7 @@ export function ConversationPage(props: ConversationPageProps) {
         </>
       )}
       <div className="bg-white p-3">
-        <Configuration canEditConfiguration={isNewConversation} />
+        <Configuration canEditConfiguration={true} />
       </div>
       {isChatLoading ? (
         <div className="fade-in w-full bg-white" style={{ height: 'calc(100vh - 4rem)' }} />
