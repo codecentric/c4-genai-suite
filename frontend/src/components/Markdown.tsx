@@ -1,12 +1,16 @@
+import { useClipboard } from '@mantine/hooks';
+import { IconClipboard } from '@tabler/icons-react';
 import ReactMarkdown from 'react-markdown';
 import { Prism } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { toast } from 'react-toastify';
 import rehypeKatex from 'rehype-katex';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import 'katex/dist/katex.min.css'; // Import KaTeX CSS
 import { useTransientNavigate } from 'src/hooks';
 import { cn } from 'src/lib';
+import { texts } from 'src/texts';
 import { Icon } from './Icon';
 
 interface MarkdownProps {
@@ -88,10 +92,25 @@ function LinkRenderer({ href, children }: React.AnchorHTMLAttributes<HTMLAnchorE
 function Code(props: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>) {
   const { children, className, ref: _, ...other } = props;
   const match = /language-(\w+)/.exec(className || '');
+  const clipboard = useClipboard();
+
+  const handleCopy = () => {
+    if (typeof children === 'string') {
+      clipboard.copy(children);
+      toast(texts.common.copied, { type: 'info' });
+    }
+  };
+
   return match && typeof children === 'string' ? (
-    <Prism {...other} language={match[1]} style={vscDarkPlus} customStyle={{ backgroundColor: 'transparent', padding: 0 }}>
-      {children.replace(/\n$/, '')}
-    </Prism>
+    <div className="group relative">
+      <Prism {...other} language={match[1]} style={vscDarkPlus} customStyle={{ backgroundColor: 'transparent', padding: 0 }}>
+        {children.replace(/\n$/, '')}
+      </Prism>
+      <IconClipboard
+        onClick={handleCopy}
+        className="absolute top-2 right-2 cursor-pointer rounded bg-gray-800 p-1 text-white opacity-0 transition-all group-hover:opacity-100"
+      />
+    </div>
   ) : (
     <code {...other} className={cn(className, 'overflow-auto')}>
       {children}

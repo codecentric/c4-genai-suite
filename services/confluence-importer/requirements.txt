@@ -1,0 +1,5 @@
+atlassian-python-api==4.0.4
+markitdown==0.1.2
+requests==2.32.4
+structlog==25.4.0
+pytest==8.4.1

@@ -56,12 +56,6 @@ export interface FileDto {
      * @memberof FileDto
      */
     uploadStatus?: FileDtoUploadStatusEnum;
-    /**
-     * The doc ID of the file.
-     * @type {number}
-     * @memberof FileDto
-     */
-    docId: number;
 }
 
 
@@ -84,7 +78,6 @@ export function instanceOfFileDto(value: object): value is FileDto {
     if (!('fileSize' in value) || value['fileSize'] === undefined) return false;
     if (!('mimeType' in value) || value['mimeType'] === undefined) return false;
     if (!('uploadedAt' in value) || value['uploadedAt'] === undefined) return false;
-    if (!('docId' in value) || value['docId'] === undefined) return false;
     return true;
 }
 
@@ -104,7 +97,6 @@ export function FileDtoFromJSONTyped(json: any, ignoreDiscriminator: boolean): F
         'mimeType': json['mimeType'],
         'uploadedAt': (new Date(json['uploadedAt'])),
         'uploadStatus': json['uploadStatus'] == null ? undefined : json['uploadStatus'],
-        'docId': json['docId'],
     };
 }
 
@@ -120,7 +112,6 @@ export function FileDtoToJSON(value?: FileDto | null): any {
         'mimeType': value['mimeType'],
         'uploadedAt': ((value['uploadedAt']).toISOString()),
         'uploadStatus': value['uploadStatus'],
-        'docId': value['docId'],
     };
 }
 

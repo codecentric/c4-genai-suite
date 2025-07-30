@@ -17,6 +17,9 @@ export interface User {
   // Indicates if the user has a password configured.
   hasPassword?: boolean;
 
+  // Indicates if the user has an api configured.
+  hasApiKey?: boolean;
+
   // The API Key.
   apiKey?: string;
 }

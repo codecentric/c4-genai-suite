@@ -5,6 +5,7 @@
         reverse_proxy localhost {
             header_up Host {host}
             header_up X-Real-IP {remote}
+            header_up X-Forwarded-Proto https
 
             # Important for SSE - disable response buffering
             flush_interval -1

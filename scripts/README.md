@@ -21,6 +21,8 @@ It orchestrates the multiple services needed(PostgreSQL, frontend, backend, REIS
 | `--ui`                        | Launches Playwright UI                                                      |
 | `--debug`                     | Enables debug mode for Playwright                                           |
 
+Call Example: `node scripts/run-tests.js --file tests/administration/userGroups.spec.ts --debug`
+
 ## Service Overview
 
 | Service      | Port                        | Notes                            |
@@ -33,7 +35,7 @@ It orchestrates the multiple services needed(PostgreSQL, frontend, backend, REIS
 
 ## Log Output
 
-All output files are written to the `./output` directory.
+All output files are written to the `./output` directory. All log files are reset with a new run of the dev/test script.
 
 | Log File                  | Description                    |
 | ------------------------- | ------------------------------ |
@@ -44,10 +46,13 @@ All output files are written to the `./output` directory.
 | `mcp-tool.log`            | MCP tool service log           |
 | `playwright-install.log`  | Playwright installation output |
 
+Tip: use `tail -f ./output/*.log` to watch all logs live.
+
 ## Tips
 
-| Tip                                                                 | Context                                 |
-| ------------------------------------------------------------------- | --------------------------------------- |
-| Run `nvm install && npm install` before this script                 | Ensures proper Node.js and dependencies |
-| Use `--forceUsingRunningServices` if services are already running   | Avoids port conflicts                   |
-| Press `CTRL+C` when using `--noAutoKill` to terminate all processes | Manual shutdown mode                    |
+| Tip                                                                                                    | Context                                 |
+| ------------------------------------------------------------------------------------------------------ | --------------------------------------- |
+| Run `nvm install && npm install` before this script                                                    | Ensures proper Node.js and dependencies |
+| Use `--forceUsingRunningServices` if services are already running                                      | Avoids port conflicts                   |
+| Press `CTRL+C` when using `--noAutoKill` to terminate all processes                                    | Manual shutdown mode                    |
+| In VS-Code press `CTRL+SHIFT+D` to run all/the current E2E via the playwright extension (by Microsoft) | Enables debugging with Breakpoints      |

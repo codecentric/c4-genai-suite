@@ -73,8 +73,8 @@ function UpsertUserDialog(props: UpsertUserDialogProps) {
   }, [userGroups]);
 
   const form = useForm<UpsertUserDto>({ resolver: RESOLVER, defaultValues });
-  const watchUserGroup = form.watch('userGroupId') === 'admin';
-  const watchApiKey = form.watch('apiKey');
+  const userIsAdmin = form.watch('userGroupId') === 'admin';
+  const hasApiKey = form.watch('apiKey') || (!isCreating && props.target.hasApiKey);
 
   return (
     <Portal>
@@ -90,12 +90,12 @@ function UpsertUserDialog(props: UpsertUserDialogProps) {
                     {texts.common.cancel}
                   </Button>
 
-                  {!watchUserGroup && watchApiKey ? (
+                  {!userIsAdmin && hasApiKey ? (
                     <ConfirmDialog
                       title={texts.users.update}
                       text={texts.users.warningNotAdminWithKey}
                       onPerform={form.handleSubmit((newUserInformation) => {
-                        const updatedUser = { ...newUserInformation, apiKey: '' };
+                        const updatedUser = { ...newUserInformation, apiKey: null };
                         userUpsert.mutate(updatedUser);
                       })}
                     >
@@ -131,13 +131,13 @@ function UpsertUserDialog(props: UpsertUserDialogProps) {
 
               <Forms.Password name="passwordConfirm" label={texts.common.passwordConfirm} />
 
-              <Forms.Row name="apiKey" label={texts.common.apiKey} hints={!watchUserGroup && texts.users.apiKeyHint}>
+              <Forms.Row name="apiKey" label={texts.common.apiKey} hints={!userIsAdmin && texts.users.apiKeyHint}>
                 <div className="flex gap-2">
                   <div className="grow">
-                    <Forms.Text vertical name="apiKey" disabled={!watchUserGroup} />
+                    <Forms.Text vertical name="apiKey" disabled={true} />
                   </div>
 
-                  <GenerateApiKeyButton disabled={!watchUserGroup} />
+                  <GenerateApiKeyButton disabled={!userIsAdmin} />
                 </div>
               </Forms.Row>
               {!isCreating && userDelete && (

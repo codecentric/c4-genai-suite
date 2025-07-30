@@ -91,7 +91,7 @@ export interface ChatContext {
   readonly editMessageId?: number;
 
   // The input files
-  readonly files?: UploadedFile[];
+  readonly files?: Pick<UploadedFile, 'id' | 'fileName'>[];
 
   // The result message.
   readonly result: Subject<StreamEvent>;

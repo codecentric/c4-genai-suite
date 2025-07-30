@@ -145,10 +145,17 @@ class InternalTool extends StructuredTool {
         }),
       );
 
-      const docIds = files.files.map((file) => file.docId);
+      const externalDocumentIds = files.files.map((file) => file.externalDocumentId);
 
       const result: SearchFilesResponse = await this.queryBus.execute(
-        new SearchFiles(this.bucket.id, arg.query, this.context.user, this.take, docIds, this.context.conversationId),
+        new SearchFiles(
+          this.bucket.id,
+          arg.query,
+          this.context.user,
+          this.take,
+          externalDocumentIds,
+          this.context.conversationId,
+        ),
       );
       const sources = this.showSources ?? false;
 

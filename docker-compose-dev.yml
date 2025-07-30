@@ -35,6 +35,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    ports:
+      - "3334:3000"
     healthcheck:
       test: wget --no-verbose --spider --tries=1 http://localhost:3000/api/health || exit 1
       interval: 1s
@@ -109,6 +111,7 @@ services:
   mcp-fetch:
     hostname: mcp-fetch
     image: ghcr.io/codecentric/c4-genai-suite/dev-helper/mcp-tool-as-server:latest
+    container_name: c4-mcp-fetch-server
     environment:
       CONFIG: >
         {

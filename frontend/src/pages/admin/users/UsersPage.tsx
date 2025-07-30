@@ -86,7 +86,7 @@ export function UsersPage() {
                     <td className="overflow-hidden font-semibold">{user.name}</td>
                     <td className="truncate overflow-hidden">{user.email}</td>
                     <td className="overflow-hidden">{userGroups.find((x) => x.id === user.userGroupId)?.name}</td>
-                    <td className="overflow-hidden">{formatBoolean(!!user.apiKey)}</td>
+                    <td className="overflow-hidden">{formatBoolean(user.hasApiKey)}</td>
                     <td className="overflow-hidden">{formatBoolean(user.hasPassword)}</td>
                   </tr>
                 ))}

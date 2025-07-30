@@ -1,9 +1,10 @@
+import { createHash } from 'crypto';
 import { NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { UserEntity, UserRepository } from 'src/domain/database';
-import { assignDefined } from 'src/lib';
+import { assignDefined, isNull } from 'src/lib';
 import { User } from '../interfaces';
 import { buildUser } from './utils';
 
@@ -41,8 +42,14 @@ export class UpdateUserHandler implements ICommandHandler<UpdateUser, UpdateUser
       entity.passwordHash = await bcrypt.hash(password, 10);
     }
 
+    if (apiKey) {
+      entity.apiKey = createHash('sha256').update(apiKey).digest('hex');
+    } else if (isNull(apiKey)) {
+      entity.apiKey = undefined;
+    }
+
     // Assign the object manually to avoid updating unexpected values.
-    assignDefined(entity, { apiKey, email, name, userGroupId });
+    assignDefined(entity, { email, name, userGroupId });
 
     // Use the save method otherwise we would not get previous values.
     const updated = await this.users.save(entity);

@@ -857,6 +857,30 @@
       }
     },
     "/api/buckets/{id}/files/{fileId}": {
+      "put": {
+        "description": "Updates a file.",
+        "operationId": "putFile",
+        "parameters": [
+          { "name": "id", "required": true, "in": "path", "schema": { "type": "number" } },
+          { "name": "fileId", "required": true, "in": "path", "schema": { "type": "number" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": { "type": "object", "properties": { "file": { "type": "string", "format": "binary" } } }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/FileDto" } } }
+          }
+        },
+        "summary": "",
+        "tags": ["files"]
+      },
       "delete": {
         "description": "Deletes a file.",
         "operationId": "deleteFile",
@@ -1733,10 +1757,9 @@
             "type": "string",
             "description": "The status of the file upload to the RAG-Service",
             "enum": ["successful", "inProgress"]
-          },
-          "docId": { "type": "number", "description": "The doc ID of the file." }
+          }
         },
-        "required": ["id", "fileName", "fileSize", "mimeType", "uploadedAt", "docId"]
+        "required": ["id", "fileName", "fileSize", "mimeType", "uploadedAt"]
       },
       "SendMessageDto": {
         "type": "object",
@@ -2375,9 +2398,10 @@
           "picture": { "type": "string", "description": " The URL to an external picture." },
           "apiKey": { "type": "string", "description": "The API Key." },
           "userGroupId": { "type": "string", "description": "The user group ID." },
-          "hasPassword": { "type": "boolean", "description": "Indicates if the user has a password configured." }
+          "hasPassword": { "type": "boolean", "description": "Indicates if the user has a password configured." },
+          "hasApiKey": { "type": "boolean", "description": "Indicates if the user has an api key configured." }
         },
-        "required": ["id", "name", "email", "userGroupId", "hasPassword"]
+        "required": ["id", "name", "email", "userGroupId", "hasPassword", "hasApiKey"]
       },
       "UsersDto": {
         "type": "object",
@@ -2394,7 +2418,7 @@
           "email": { "type": "string", "description": "The email address." },
           "password": { "type": "string", "description": "The optional password." },
           "userGroupId": { "type": "string", "description": "The user group ID." },
-          "apiKey": { "type": "string", "description": "The API Key." }
+          "apiKey": { "type": "string", "description": "The API Key.", "nullable": true }
         },
         "required": ["name", "email", "userGroupId"]
       }

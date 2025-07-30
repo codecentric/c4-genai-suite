@@ -13,7 +13,7 @@ describe('UpdateUserDialog', () => {
     email: 'testuser@example.com',
     userGroupId: 'admin',
     hasPassword: false,
-    apiKey: '123',
+    hasApiKey: true,
   };
 
   const mockUserGroups: UserGroupDto[] = [
@@ -82,31 +82,11 @@ describe('UpdateUserDialog', () => {
     expect(defaultProps.onDelete).not.toHaveBeenCalled();
     expect(defaultProps.onUpdate).not.toHaveBeenCalled();
   });
-  it('should enable api key field just for user group admin', async () => {
-    render(<UpdateUserDialog {...defaultProps} />);
 
-    const user = userEvent.setup();
-    const userGroup = screen.getByLabelText(required(texts.common.userGroup));
-    await user.click(userGroup);
-    const defaultOption = screen.getByRole('option', { name: /Default/i });
-    await user.click(defaultOption);
-
-    let apiKeyInput = screen.getByRole('textbox', { name: texts.common.apiKey });
-    expect(apiKeyInput).toBeDisabled();
-
-    await user.click(userGroup);
-    const adminOption = screen.getByRole('option', { name: /Admin/i });
-    await user.click(adminOption);
-    apiKeyInput = screen.getByRole('textbox', { name: texts.common.apiKey });
-    expect(apiKeyInput).toBeEnabled();
-  });
   it('should show the confirm dialog when user group change from admin to default and there is a api key', async () => {
     render(<UpdateUserDialog {...defaultProps} />);
 
     const user = userEvent.setup();
-
-    const apiKeyInputField = screen.getByRole('textbox', { name: texts.common.apiKey });
-    expect(apiKeyInputField).toBeEnabled();
 
     const userGroup = screen.getByLabelText(required(texts.common.userGroup));
     await user.click(userGroup);

@@ -10,7 +10,7 @@ license = "Apache-2.0"
 python = "<4.0,>=3.12.0"
 pydantic = "2.11.7"
 pydantic-settings = "^2.10.1"
-langchain-core = "0.3.69"
+langchain-core = "0.3.72"
 langchain-community = "0.3.27"
 langchain-openai = "0.3.28"
 langchain-postgres = "0.0.15"
@@ -18,16 +18,16 @@ psycopg = {extras = ["binary"], version = "^3.2.9"}
 fastapi = {extras = ["standard"], version = "0.116.1"}
 azure-search-documents = "11.5.3"
 azure-identity = "1.23.1"
-unstructured = {extras = ["docx", "md", "pptx", "xlsx"], version = "0.18.9"}
+unstructured = {extras = ["docx", "md", "pptx", "xlsx"], version = "0.18.11"}
 pdfminer-six = "^20250506"
 ffmpeg-python = "^0.2.0"
 aiofiles = "^24.1.0"
 prometheus-fastapi-instrumentator = "^7.0.0"
 fastmcp = "^2.10.6"
-langchain-ollama = "^0.3.5"
+langchain-ollama = "^0.3.6"
 
 [tool.poetry.group.dev.dependencies]
-ruff = "0.12.4"
+ruff = "0.12.5"
 mypy = "1.17.0"
 pre-commit = "4.2.0"
 pytest = "8.4.1"

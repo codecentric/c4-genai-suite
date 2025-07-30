@@ -50,10 +50,10 @@ export class DeleteFileHandler implements ICommandHandler<DeleteFile, DeleteFile
 
     const api = entity.bucket ? buildClient(entity.bucket) : undefined;
     try {
-      const count = await this.files.count({ where: { docId: entity.docId } });
+      const count = await this.files.count({ where: { externalDocumentId: entity.externalDocumentId } });
 
       if (count === 1) {
-        await api?.deleteFile(entity.docId.toString(), entity.bucket?.indexName);
+        await api?.deleteFile(entity.externalDocumentId.toString(), entity.bucket?.indexName);
       }
 
       await this.files.remove(entity);
