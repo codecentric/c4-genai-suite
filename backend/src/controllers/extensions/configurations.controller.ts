@@ -82,6 +82,8 @@ export class ConfigurationsController {
     required: true,
     type: Number,
   })
+  @Role(BUILTIN_USER_GROUP_ADMIN)
+  @UseGuards(RoleGuard)
   async getConfiguration(@Param('id') id: number) {
     const result: GetConfigurationResponse = await this.queryBus.execute(new GetConfiguration(id));
 
