@@ -36,6 +36,8 @@ const Source: React.FC<{
           )}
         </div>
         {source.document?.link && (
+          // TODO: get `link` from source and show pdf "selectPdf", similar to above select document
+          //  only if source.document.mimetype is "application/pdf"
           <a
             href={source.document.link}
             target="_blank"
