@@ -73,10 +73,11 @@ def fetch_bucket_files_list():
         response = requests.get(f"{c4_base_url}/api/buckets/{bucket_id}/files", headers={"x-api-key": config.c4_token})
 
         total = response.json().get("total")
+        items_in_page = response.json().get("items")
 
-        items.extend(response.json().get("items"))
+        items.extend(items_in_page)
 
-        if page * batch_size >= total:
+        if page * batch_size >= total or len(items_in_page) == 0:
             break
         else:
             page += 1
