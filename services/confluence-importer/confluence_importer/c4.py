@@ -11,6 +11,10 @@ def clear_previous_ingests() -> None:
     """
     Clears all previously ingested files from the C4 bucket.
     """
+    logger.info("Starting deletion of all Confluence pages from c4", bucket_id=bucket_id)
+
+    deletion_counter = {"success": 0, "error": 0}
+
     files = fetch_bucket_files_list()
 
     for index, item in enumerate(files):
@@ -23,6 +27,7 @@ def clear_previous_ingests() -> None:
             try:
                 delete_confluence_page(item.get("id"))
             except Exception as e:
+                deletion_counter["error"] += 1
                 logger.error(
                     "Error deleting Confluence page from c4",
                     bucket_id=bucket_id,
@@ -32,6 +37,7 @@ def clear_previous_ingests() -> None:
                     error=str(e),
                 )
             else:
+                deletion_counter["success"] += 1
                 logger.info(
                     "Delete Confluence page in c4",
                     bucket_id=bucket_id,
@@ -40,7 +46,16 @@ def clear_previous_ingests() -> None:
                     status="success",
                 )
 
-    logger.info("All Confluence pages deleted from c4", bucket_id=bucket_id)
+    if deletion_counter["error"] > 0:
+        logger.error(
+            "Deletion of Confluence pages from c4 completed with errors! See log for more information.",
+            bucket_id=bucket_id,
+            deletion_counter=deletion_counter,
+        )
+    else:
+        logger.info(
+            "Deletion of Confluence pages from c4 completed.", bucket_id=bucket_id, deletion_counter=deletion_counter
+        )
 
 
 def delete_confluence_page(file_id):
