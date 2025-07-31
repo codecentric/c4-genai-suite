@@ -17,7 +17,9 @@ def clear_previous_ingests() -> None:
         num_items = len(files)
         file_name = item.get("fileName")
 
-        if file_name.startswith("confluence_page_") and file_name.endswith(".md"):
+        is_confluence_page_file = file_name.startswith("confluence_page_") and file_name.endswith(".md")
+
+        if is_confluence_page_file:
             requests.delete(
                 f"{c4_base_url}/api/buckets/{bucket_id}/files/{item.get('id')}", headers={"x-api-key": config.c4_token}
             )
