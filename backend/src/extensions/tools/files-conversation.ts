@@ -161,8 +161,6 @@ class InternalTool extends StructuredTool {
 
       if (sources && result.sources) {
         this.context.history?.addSources(this.extensionExternalId, result.sources);
-      } else if (result.debug) {
-        this.context.result.next({ type: 'debug', content: result.debug });
       }
 
       return JSON.stringify(result.files, undefined, 2);

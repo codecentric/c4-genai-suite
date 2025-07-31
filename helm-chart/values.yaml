@@ -95,7 +95,7 @@ backend:
     ## @param backend.image.repository The image repository including host, port, repo
     repository: "ghcr.io/codecentric/c4-genai-suite/backend"
     ## @param backend.image.tag [string] The image tag
-    tag: "v8.4.6"
+    tag: "v8.4.7"
   ## @param backend.extraEnvVars An extra list of environment variables to add to the deployment.
   extraEnvVars: []
   ## @param backend.extraVolumes An extra list of volumes to add to the deployment.
@@ -165,7 +165,7 @@ frontend:
     ## @param frontend.image.repository The image repository including host, port, repo
     repository: "ghcr.io/codecentric/c4-genai-suite/frontend"
     ## @param frontend.image.tag [string] The image tag
-    tag: "v8.4.6"
+    tag: "v8.4.7"
   ## @param frontend.replicaCount The number of replicas to create
   replicaCount: 1
   ## @param frontend.updateStrategy.type Frontend deployment strategy type
@@ -234,7 +234,7 @@ reis:
     ## @param reis.image.repository The image repository including host, port, repo
     repository: "ghcr.io/codecentric/c4-genai-suite/reis"
     ## @param reis.image.tag [string] The image tag
-    tag: "v8.4.6"
+    tag: "v8.4.7"
   metrics:
     ## @param reis.metrics.enabled Specifies whether a service for REIS metrics should be created
     enabled: false
