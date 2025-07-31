@@ -50,13 +50,14 @@ def get_pages_for_space(space_key: str) -> Generator[ConfluencePage]:
         A list of ConfluencePage dataclasses containing the page information and content as HTML
     """
     crawling_done = False
-    batch_size = 100
+    batch_size = 100  # Don't change. See comment regarding `get_all_pages_from_space_as_generator()` below.
     offset = 0
 
     while not crawling_done:
         logger.debug("Fetch Pages for Confluence Space", space_key=space_key, offset=offset, limit=batch_size)
 
-        # It seems that limit is broken in `atlassian-python-api`. It always defaults to 100? TODO figure out whats up.
+        # It seems that the `limit` parameter is broken and is always 100.
+        # This is fine as long as we keep our `batch_size` at 100.
         result = confluence_api.get_all_pages_from_space_as_generator(
             space_key,
             start=offset,
