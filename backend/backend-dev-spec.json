@@ -232,6 +232,40 @@
         "tags": ["conversation"]
       }
     },
+    "/api/conversations/{id}/messages/{messageId}/documents/{documentUri}": {
+      "get": {
+        "description": "Get the original document specified by the documentUri from an extension",
+        "operationId": "getDocument",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "The ID of the conversation.",
+            "schema": { "type": "number" }
+          },
+          {
+            "name": "messageId",
+            "required": true,
+            "in": "path",
+            "description": "The ID of the ai message.",
+            "schema": { "type": "number" }
+          },
+          {
+            "name": "documentUri",
+            "required": true,
+            "in": "path",
+            "description": "The URI identifying the document.",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/File" } } } }
+        },
+        "summary": "",
+        "tags": ["conversation"]
+      }
+    },
     "/api/conversations/{id}/messages/{messageId}/sse": {
       "put": {
         "description": "Updates an existing message message of the converation and handles it.",
@@ -1746,6 +1780,7 @@
         },
         "required": ["items"]
       },
+      "File": { "type": "object", "properties": {} },
       "FileDto": {
         "type": "object",
         "properties": {

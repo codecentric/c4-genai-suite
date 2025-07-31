@@ -181,6 +181,68 @@ export class ConversationsController {
     return result.documentContent;
   }
 
+  @Get(':id/messages/:messageId/documents/:documentUri')
+  @ApiOperation({
+    operationId: 'getDocument',
+    description: 'Get the original document specified by the documentUri from an extension',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'The ID of the conversation.',
+    required: true,
+    type: Number,
+  })
+  @ApiParam({
+    name: 'messageId',
+    description: 'The ID of the ai message.',
+    required: true,
+    type: Number,
+  })
+  @ApiParam({
+    name: 'documentUri',
+    description: 'The URI identifying the document.',
+    required: true,
+    type: String,
+  })
+  @ApiOkResponse({
+    schema: {
+      type: 'string',
+      format: 'binary',
+    },
+  })
+  // @ApiProduces('application/pdf')
+  async getDocument(
+    @Req() req: Request,
+    @Res() response: Response,
+    @Param('id', ParseIntPipe) conversationId: number,
+    @Param('messageId', ParseIntPipe) messageId: number,
+    @Param('documentUri') documentUri: string,
+  ) {
+    const result: GetDocumentResponse = await this.queryBus.execute(
+      new GetDocument(req.user, conversationId, messageId, documentUri),
+    );
+
+    // console.log("getDocument result:", result.document);
+    // response.send(result.document);
+    // return result.document;
+    // TODO: the file content will just not appear in the response :(
+    // response.contentType(result.document?.type ?? "application/pdf");
+    // response.send(result.document?.bytes());
+
+    const document = result.document;
+    if (!document) {
+      response.status(404).send('Document not found');
+      return;
+    }
+    const contentType = document.type ?? "application/pdf";
+    const bytes = await document.bytes();
+
+    response.setHeader('Content-Type', contentType);
+    response.setHeader('Content-Disposition', `attachment; filename="document.pdf"`);
+
+    response.send(bytes);
+  }
+
   private async streamResponse(
     @Req() req: Request,
     @Res() response: Response,
@@ -328,40 +390,5 @@ export class ConversationsController {
   @ApiNoContentResponse()
   confirm(@Param('id') id: string, @Body() result: ChatUICallbackResultDto) {
     this.callbacks.complete(id, result);
-  }
-
-  @Get(':id/messages/:messageId/documents/:documentUri')
-  @ApiOperation({
-    operationId: 'getDocument',
-    description: 'Get the original document specified by the documentUri from an extension',
-  })
-  @ApiParam({
-    name: 'id',
-    description: 'The ID of the conversation.',
-    required: true,
-    type: String,
-  })
-  @ApiParam({
-    name: 'messageId',
-    description: 'The ID of the message.',
-    required: true,
-    type: String,
-  })
-  @ApiParam({
-    name: 'documentUri',
-    description: 'The URI identifying the document.',
-    required: true,
-    type: String,
-  })
-  async getDocument(
-    @Req() req: Request,
-    @Param('id', ParseIntPipe) conversationId: number,
-    @Param('messageId', ParseIntPipe) messageId: number,
-    @Param('documentUri') documentUri: string,
-  ) {
-    const result: GetDocumentResponse = await this.queryBus.execute(
-      new GetDocument(req.user, conversationId, messageId, documentUri),
-    );
-    return result.document;
   }
 }

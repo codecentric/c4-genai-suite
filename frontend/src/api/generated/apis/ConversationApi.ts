@@ -61,6 +61,12 @@ export interface GetConversationRequest {
     id: number;
 }
 
+export interface GetDocumentRequest {
+    id: number;
+    messageId: number;
+    documentUri: string;
+}
+
 export interface GetDocumentChunksRequest {
     id: number;
     messageId: number;
@@ -300,6 +306,55 @@ export class ConversationApi extends runtime.BaseAPI {
      */
     async getConversations(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ConversationsDto> {
         const response = await this.getConversationsRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Get the original document specified by the documentUri from an extension
+     * 
+     */
+    async getDocumentRaw(requestParameters: GetDocumentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling getDocument().'
+            );
+        }
+
+        if (requestParameters['messageId'] == null) {
+            throw new runtime.RequiredError(
+                'messageId',
+                'Required parameter "messageId" was null or undefined when calling getDocument().'
+            );
+        }
+
+        if (requestParameters['documentUri'] == null) {
+            throw new runtime.RequiredError(
+                'documentUri',
+                'Required parameter "documentUri" was null or undefined when calling getDocument().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/conversations/{id}/messages/{messageId}/documents/{documentUri}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))).replace(`{${"messageId"}}`, encodeURIComponent(String(requestParameters['messageId']))).replace(`{${"documentUri"}}`, encodeURIComponent(String(requestParameters['documentUri']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse<any>(response);
+    }
+
+    /**
+     * Get the original document specified by the documentUri from an extension
+     * 
+     */
+    async getDocument(id: number, messageId: number, documentUri: string, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
+        const response = await this.getDocumentRaw({ id: id, messageId: messageId, documentUri: documentUri }, initOverrides);
         return await response.value();
     }
 

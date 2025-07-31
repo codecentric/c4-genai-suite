@@ -365,10 +365,27 @@ export class MCPToolsExtension implements Extension<Configuration> {
     const res = await client.request(req, ReadResourceResultSchema);
 
     // TODO: extract the content from the response
-    console.log(res);
+    // console.log(res);
+    // console.log(res.contents[0].blob);
+    console.log(res.contents[0].uri);
+    console.log(res.contents[0].mimeType);
+    const content = res.contents[0];
 
-    // Return a dummy file object for testing
-    return Promise.resolve(new File([], 'a', { type: 'a' }));
+    const base64String = content.blob as string;
+    const binaryString = atob(base64String);
+
+    // console.log(binaryString);
+
+    // Convert binary string to Uint8Array
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+
+    const file = new File([bytes], content.uri, { type: content.mimeType });
+    console.log(file);
+
+    return Promise.resolve(file);
   }
 
   async test(configuration: Configuration) {

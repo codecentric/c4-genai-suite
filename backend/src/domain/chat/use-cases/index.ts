@@ -13,3 +13,4 @@ export * from './get-messages-count';
 export * from './get-users-count';
 export * from './duplicate-conversation';
 export * from './get-document-content';
+export * from './get-document';

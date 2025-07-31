@@ -11,6 +11,16 @@ export const useDocumentContent = (conversationId: number, messageId: number, do
   });
 };
 
+export const useDocument = (conversationId: number, messageId: number, documentUri: string) => {
+  const { conversations } = useApi();
+
+  return useQuery({
+    queryFn: () => conversations.getDocument(conversationId, messageId, documentUri),
+    queryKey: ['files', 'document', { messageId }, { documentUri }],
+    enabled: !!documentUri,
+  });
+};
+
 export const useConversationFiles = (conversationId: number) => {
   const api = useApi();
   const { userFiles, ...userFilesFunctions } = useUserFilesStore();
