@@ -20,9 +20,7 @@ def clear_previous_ingests() -> None:
         is_confluence_page_file = file_name.startswith("confluence_page_") and file_name.endswith(".md")
 
         if is_confluence_page_file:
-            requests.delete(
-                f"{c4_base_url}/api/buckets/{bucket_id}/files/{item.get('id')}", headers={"x-api-key": config.c4_token}
-            )
+            delete_confluence_page(item.get("id"))
             logger.info(
                 "Delete Confluence page in c4",
                 bucket_id=bucket_id,
@@ -31,6 +29,12 @@ def clear_previous_ingests() -> None:
                 status="success",
             )
     logger.info("All Confluence pages deleted from c4", bucket_id=bucket_id)
+
+
+def delete_confluence_page(file_id):
+    requests.delete(
+        f"{c4_base_url}/api/buckets/{bucket_id}/files/{file_id}", headers={"x-api-key": config.c4_token}
+    )
 
 
 def fetch_bucket_files_list():
