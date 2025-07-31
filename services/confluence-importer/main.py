@@ -25,8 +25,11 @@ def process_confluence_spaces(page_import_counter):
             except Exception as e:
                 page_import_counter["error"] += 1
                 logger.error(
-                    "Error importing Confluence page", error=str(e), space_key=space_key, page_id=page.id,
-                    page_count=f"{index}"
+                    "Error importing Confluence page",
+                    error=str(e),
+                    space_key=space_key,
+                    page_id=page.id,
+                    page_count=f"{index}",
                 )
 
         logger.info("Import of Confluence Space completed", space_key=space_key)
@@ -55,8 +58,10 @@ def process_individual_pages(page_import_counter):
 
 def log_final_results(page_import_counter):
     if page_import_counter["error"] > 0:
-        logger.error("Synchronization Confluence to c4 completed with errors! See log for more information.",
-                     page_import_counter=page_import_counter)
+        logger.error(
+            "Synchronization Confluence to c4 completed with errors! See log for more information.",
+            page_import_counter=page_import_counter,
+        )
     else:
         logger.info("Synchronization Confluence to c4 completed.", page_import_counter)
 
