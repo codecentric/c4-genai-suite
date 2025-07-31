@@ -11,7 +11,7 @@ FROM python:3.13-slim
 
 WORKDIR /app
 
-COPY --from=builder --chown=app:app /app/.venv /app/.venv
+COPY --from=builder /app/.venv /app/.venv
 COPY confluence_importer/ confluence_importer/
 
 COPY main.py .
