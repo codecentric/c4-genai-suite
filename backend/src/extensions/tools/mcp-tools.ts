@@ -9,6 +9,8 @@ import {
   ElicitRequestSchema,
   ListToolsResultSchema,
   McpError,
+  ReadResourceRequest,
+  ReadResourceResultSchema,
 } from '@modelcontextprotocol/sdk/types.js';
 import { JsonSchemaObject, jsonSchemaToZod } from '@n8n/json-schema-to-zod';
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
@@ -353,6 +355,22 @@ export class MCPToolsExtension implements Extension<Configuration> {
     return spec;
   }
 
+  async getDocument(configuration: Configuration, documentUri: string) {
+    // TODO
+    const { client } = (await this.getTools(configuration)) ?? [];
+    const req: ReadResourceRequest = {
+      method: 'resources/read',
+      params: { uri: documentUri },
+    };
+    const res = await client.request(req, ReadResourceResultSchema);
+
+    // TODO: extract the content from the response
+    console.log(res);
+
+    // Return a dummy file object for testing
+    return Promise.resolve(new File([], 'a', { type: 'a' }));
+  }
+
   async test(configuration: Configuration) {
     return this.getTools(configuration);
   }
@@ -461,6 +479,8 @@ export class MCPToolsExtension implements Extension<Configuration> {
                     params: { name, arguments: { ...llmArgs, ...adminArgs, ...userArgs } },
                   };
                   const res = await client.request(req, CallToolResultSchema);
+                  console.log({ name, arguments: { ...llmArgs, ...adminArgs, ...userArgs } });
+                  console.log(res);
                   const { sources, content } = transformMCPToolResponse(res);
                   if (sources.length) {
                     context.history?.addSources(extension.externalId, sources);

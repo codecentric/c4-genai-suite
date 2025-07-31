@@ -42,6 +42,7 @@ import {
   UpdateConversation,
   UpdateConversationResponse,
 } from 'src/domain/chat';
+import { GetDocument, GetDocumentResponse } from 'src/domain/chat/use-cases/get-document';
 import {
   ChatUICallbackResultDto,
   ConversationDto,
@@ -327,5 +328,40 @@ export class ConversationsController {
   @ApiNoContentResponse()
   confirm(@Param('id') id: string, @Body() result: ChatUICallbackResultDto) {
     this.callbacks.complete(id, result);
+  }
+
+  @Get(':id/messages/:messageId/documents/:documentUri')
+  @ApiOperation({
+    operationId: 'getDocument',
+    description: 'Get the original document specified by the documentUri from an extension',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'The ID of the conversation.',
+    required: true,
+    type: String,
+  })
+  @ApiParam({
+    name: 'messageId',
+    description: 'The ID of the message.',
+    required: true,
+    type: String,
+  })
+  @ApiParam({
+    name: 'documentUri',
+    description: 'The URI identifying the document.',
+    required: true,
+    type: String,
+  })
+  async getDocument(
+    @Req() req: Request,
+    @Param('id', ParseIntPipe) conversationId: number,
+    @Param('messageId', ParseIntPipe) messageId: number,
+    @Param('documentUri') documentUri: string,
+  ) {
+    const result: GetDocumentResponse = await this.queryBus.execute(
+      new GetDocument(req.user, conversationId, messageId, documentUri),
+    );
+    return result.document;
   }
 }

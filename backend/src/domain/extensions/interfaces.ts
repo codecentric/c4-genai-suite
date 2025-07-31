@@ -232,6 +232,10 @@ export class ConfiguredExtension<T extends ExtensionConfiguration = ExtensionCon
     return this.extension.getChunks?.(this.entity.values, documentUri, chunkUris);
   }
 
+  async getDocument(documentUri: string): Promise<File | undefined> {
+    return this.extension.getDocument?.(this.entity.values, documentUri);
+  }
+
   getMiddlewares(
     user: User,
     userArgumentValues?: ExtensionUserArgumentValues,
@@ -278,6 +282,7 @@ export interface Extension<
   buildSpec?(extension: ExtensionEntity<TConfig>, throwOnError: boolean, forceRebuild: boolean): Promise<ExtensionSpec>;
 
   getChunks?(configuration: TConfig, documentUri: string, chunkUris: string[]): Promise<string[]>;
+  getDocument?(configuration: TConfig, documentUri: string): Promise<File>;
 
   fixedValues?: Partial<TConfig>;
 
