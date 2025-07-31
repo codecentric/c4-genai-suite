@@ -11,6 +11,9 @@ page_ids = config.confluence_page_ids_to_import
 
 def main():
     logger.info("Starting synchronization Confluence to c4")
+
+    page_import_counter = {"error": 0, "success": 0}
+
     clear_previous_ingests()
 
     logger.info("Starting import of Confluence Spaces", num_spaces=len(space_keys))
@@ -19,9 +22,17 @@ def main():
         pages = confluence.get_pages_for_space(space_key)
 
         for index, page in enumerate(pages, start=1):
-            page_markdown = html_to_markdown(page)
-            import_confluence_page(page.id, page_markdown)
-            logger.info("Import Confluence page", space_key=space_key, page_id=page.id, page_count=f"{index}")
+            try:
+                page_markdown = html_to_markdown(page)
+                import_confluence_page(page.id, page_markdown)
+            except Exception as e:
+                page_import_counter["error"] += 1
+                logger.error(
+                    "Error importing Confluence page", error=str(e), space_key=space_key, page_id=page.id, page_count=f"{index}"
+                )
+            else:
+                page_import_counter["success"] += 1
+                logger.info("Import Confluence page", space_key=space_key, page_id=page.id, page_count=f"{index}")
 
         logger.info("Import of Confluence Space completed", space_key=space_key)
     logger.info("Import of all Confluence Spaces completed")
@@ -29,15 +40,25 @@ def main():
     num_pages = len(page_ids)
     logger.info("Starting import of individual Confluence pages", num_pages=num_pages)
     for index, page_id in enumerate(page_ids):
-        page = confluence.get_page(page_id)
-        page_markdown = html_to_markdown(page)
-        import_confluence_page(page_id, page_markdown)
-        print(f"Ingested individual Confluence page {index + 1}/{num_pages}.")
-        logger.info("Importing Confluence page", page_id=page_id, progress=f"{index + 1}/{num_pages}")
+        try:
+            page = confluence.get_page(page_id)
+            page_markdown = html_to_markdown(page)
+            import_confluence_page(page_id, page_markdown)
+        except Exception as e:
+            page_import_counter["error"] += 1
+            logger.error(
+                "Error importing Confluence page", error=str(e), page_id=page_id, progress=f"{index + 1}/{num_pages}"
+            )
+        else:
+            page_import_counter["success"] += 1
+            logger.info("Import Confluence page", page_id=page_id, progress=f"{index + 1}/{num_pages}")
 
     logger.info("Import of individual Confluence pages completed")
 
-    logger.info("Synchronization Confluence to c4 completed")
+    if page_import_counter["error"] > 0:
+        logger.error("Synchronization Confluence to c4 completed with errors! See log for more information.", page_import_counter=page_import_counter)
+    else:
+        logger.info("Synchronization Confluence to c4 completed.", page_import_counter)
 
 
 main()
