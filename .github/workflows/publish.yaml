@@ -83,6 +83,7 @@ jobs:
           - frontend
           - backend
           - reis
+          - confluence-importer
     needs:
       - upstream-workflows
       - verify-version-strings
