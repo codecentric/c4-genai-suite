@@ -1,5 +1,5 @@
-import { useApi } from 'src/api';
 import { useQuery } from '@tanstack/react-query';
+import { useApi } from 'src/api';
 
 export const useAuthSettings = () => {
   const api = useApi();

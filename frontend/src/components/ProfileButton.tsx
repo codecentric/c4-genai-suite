@@ -1,15 +1,15 @@
 import { Menu } from '@mantine/core';
 import { IconLogout, IconMessage, IconSettings, IconTrash, IconUserCog } from '@tabler/icons-react';
+import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { ConfirmDialog } from 'src/components/ConfirmDialog';
 import { UserProfileModal } from 'src/components/UserProfileModal';
 import { useLogoutUrl, useProfile } from 'src/hooks';
+import { useAuthSettings } from 'src/hooks/useAuthSettings';
 import { useStateOfSelectedChatId } from 'src/pages/chat/state/chat';
 import { isMobile } from 'src/pages/utils';
 import { texts } from 'src/texts';
 import { Avatar } from './Avatar';
-import { useState } from 'react';
-import { useAuthSettings } from 'src/hooks/useAuthSettings';
 
 interface ProfileButtonProps {
   onClearConversations?: () => void;
@@ -50,7 +50,7 @@ export const ProfileButton = ({ onClearConversations, section }: ProfileButtonPr
 
         {section === 'chat' && authSettings?.enablePasswordAuth && (
           <Menu.Item leftSection={<IconSettings size={14} />} onClick={() => setIsUserModalOpen(true)}>
-            Settings
+            {texts.common.settings}
           </Menu.Item>
         )}
 

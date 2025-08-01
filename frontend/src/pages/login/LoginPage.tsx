@@ -4,8 +4,8 @@ import { AuthSettingsDto, useApi } from 'src/api';
 import { LoginDto } from 'src/api/generated';
 import { Forms, Logo } from 'src/components';
 import { Theme, useLoginUrl, useTheme, useTransientNavigate } from 'src/hooks';
-import { texts } from 'src/texts';
 import { useAuthSettings } from 'src/hooks/useAuthSettings';
+import { texts } from 'src/texts';
 
 export function LoginPage() {
   const { theme } = useTheme();
