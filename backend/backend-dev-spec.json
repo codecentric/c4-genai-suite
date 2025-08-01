@@ -2459,6 +2459,7 @@
           "name": { "type": "string", "description": "The display name." },
           "email": { "type": "string", "description": "The email address." },
           "password": { "type": "string", "description": "The optional password." },
+          "currentPassword": { "type": "string", "description": "The current password when updating password." },
           "userGroupId": { "type": "string", "description": "The user group ID." },
           "apiKey": { "type": "string", "description": "The API Key.", "nullable": true }
         },

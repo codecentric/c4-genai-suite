@@ -30,6 +30,14 @@ export class UpsertUserDto {
   password?: string;
 
   @ApiProperty({
+    description: 'The current password when updating password.',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  currentPassword?: string;
+
+  @ApiProperty({
     description: 'The user group ID.',
     required: true,
   })

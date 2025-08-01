@@ -39,6 +39,12 @@ export interface UpsertUserDto {
      */
     password?: string;
     /**
+     * The current password when updating password.
+     * @type {string}
+     * @memberof UpsertUserDto
+     */
+    currentPassword?: string;
+    /**
      * The user group ID.
      * @type {string}
      * @memberof UpsertUserDto
@@ -75,6 +81,7 @@ export function UpsertUserDtoFromJSONTyped(json: any, ignoreDiscriminator: boole
         'name': json['name'],
         'email': json['email'],
         'password': json['password'] == null ? undefined : json['password'],
+        'currentPassword': json['currentPassword'] == null ? undefined : json['currentPassword'],
         'userGroupId': json['userGroupId'],
         'apiKey': json['apiKey'] == null ? undefined : json['apiKey'],
     };
@@ -89,6 +96,7 @@ export function UpsertUserDtoToJSON(value?: UpsertUserDto | null): any {
         'name': value['name'],
         'email': value['email'],
         'password': value['password'],
+        'currentPassword': value['currentPassword'],
         'userGroupId': value['userGroupId'],
         'apiKey': value['apiKey'],
     };
