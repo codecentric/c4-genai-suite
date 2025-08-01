@@ -1,3 +1,5 @@
+"""Configuration module for the Confluence importer application."""
+
 from typing import Annotated
 
 from pydantic import Field
@@ -5,6 +7,11 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Config(BaseSettings):
+    """Configuration settings for the Confluence importer application.
+
+    Loads configuration from environment variables or .env file.
+    """
+
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore", env_ignore_empty=True)
 
     confluence_space_keys_to_import: list[str]

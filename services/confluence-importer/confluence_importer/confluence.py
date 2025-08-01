@@ -1,3 +1,5 @@
+"""Module for interacting with the Confluence API to retrieve content."""
+
 from typing import Generator
 
 from atlassian import Confluence
@@ -13,6 +15,8 @@ confluence_api = Confluence(url=confluence_url, token=config.confluence_token)
 
 @dataclass
 class ConfluencePage:
+    """Data class representing a Confluence page with its content and metadata."""
+
     id: int
     last_updated: str
     url: str
@@ -20,8 +24,7 @@ class ConfluencePage:
 
 
 def get_page(page_id: int) -> ConfluencePage:
-    """
-    Retrieves the content of a Confluence page by its ID.
+    """Retrieves the content of a Confluence page by its ID.
 
     Args:
         page_id: The ID of the Confluence page to retrieve
@@ -40,8 +43,7 @@ def get_page(page_id: int) -> ConfluencePage:
 
 
 def get_pages_for_space(space_key: str) -> Generator[ConfluencePage]:
-    """
-    Retrieves all pages from a specified Confluence space.
+    """Retrieves all pages from a specified Confluence space.
 
     Args:
         space_key: The key identifier of the Confluence space to retrieve pages from

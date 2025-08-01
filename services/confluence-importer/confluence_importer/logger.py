@@ -1,3 +1,5 @@
+"""Logging configuration module for the application."""
+
 import structlog
 
 structlog.configure(

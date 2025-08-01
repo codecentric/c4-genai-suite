@@ -1,3 +1,5 @@
+"""Main module for the Confluence to C4 synchronization process."""
+
 from confluence_importer import confluence
 from confluence_importer.c4 import clear_previous_ingests, import_confluence_page
 from confluence_importer.markdown import html_to_markdown
@@ -10,6 +12,13 @@ page_ids = config.confluence_page_ids_to_import
 
 
 def process_confluence_spaces(page_import_counter):
+    """Processes all Confluence spaces specified in the configuration.
+
+    Fetches all pages from each space and imports them into C4.
+
+    Args:
+        page_import_counter: Dictionary to track successful and failed imports
+    """
     logger.info("Starting import of Confluence Spaces", num_spaces=len(space_keys))
 
     for space_key in space_keys:
@@ -37,6 +46,13 @@ def process_confluence_spaces(page_import_counter):
 
 
 def process_individual_pages(page_import_counter):
+    """Processes individual Confluence pages specified in the configuration.
+
+    Fetches each page by ID and imports it into C4.
+
+    Args:
+        page_import_counter: Dictionary to track successful and failed imports
+    """
     num_pages = len(page_ids)
     logger.info("Starting import of individual Confluence pages", num_pages=num_pages)
 
@@ -57,6 +73,13 @@ def process_individual_pages(page_import_counter):
 
 
 def log_final_results(page_import_counter):
+    """Logs the final results of the import process.
+
+    Outputs either a success message or an error message based on the import counter.
+
+    Args:
+        page_import_counter: Dictionary containing counts of successful and failed imports
+    """
     if page_import_counter["error"] > 0:
         logger.error(
             "Synchronization Confluence to c4 completed with errors! See log for more information.",
@@ -67,6 +90,14 @@ def log_final_results(page_import_counter):
 
 
 def main():
+    """Main entry point for the Confluence to C4 synchronization process.
+
+    Orchestrates the entire import process:
+    1. Clears previous ingests from C4
+    2. Processes all configured Confluence spaces
+    3. Processes individual Confluence pages
+    4. Logs the final results
+    """
     logger.info("Starting synchronization Confluence to c4")
 
     clear_previous_ingests()

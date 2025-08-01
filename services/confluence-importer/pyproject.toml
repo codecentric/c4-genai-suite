@@ -17,11 +17,14 @@ dependencies = [
 line-length = 120
 
 [tool.ruff.lint]
-select = ["E", "W", "F", "N", "A", "B"]
+select = ["D", "E", "W", "F", "N", "A", "B"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
 
 [dependency-groups]
 dev = [
     "pytest>=8.4.1",
     "pytest-mock>=3.14.1",
-    "ruff>=0.12.5",
+    "ruff>=0.12.7",
 ]
