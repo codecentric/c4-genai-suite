@@ -1,3 +1,5 @@
+"""Tests for the C4 API interaction functionality."""
+
 from pytest_mock import MockerFixture
 
 from confluence_importer.c4 import (
@@ -9,7 +11,14 @@ from confluence_importer.c4 import (
 
 
 class TestC4:
+    """Tests for the c4 module functionality."""
+
     def test_delete_confluence_page(self, mocker: MockerFixture):
+        """Test that delete_confluence_page correctly calls the C4 API.
+
+        Args:
+            mocker: Pytest fixture for mocking
+        """
         # arrange
         mock_requests = mocker.patch("confluence_importer.c4.requests")
         mocker.patch("confluence_importer.c4.c4_base_url", "http://test-url")
@@ -26,6 +35,11 @@ class TestC4:
         )
 
     def test_fetch_bucket_files_list_single_page(self, mocker: MockerFixture):
+        """Test that fetch_bucket_files_list correctly handles a single page of results.
+
+        Args:
+            mocker: Pytest fixture for mocking
+        """
         # arrange
         mock_requests = mocker.patch("confluence_importer.c4.requests")
         mock_logger = mocker.patch("confluence_importer.c4.logger")
@@ -56,6 +70,11 @@ class TestC4:
         mock_logger.info.assert_called_once()
 
     def test_fetch_bucket_files_list_multiple_pages(self, mocker: MockerFixture):
+        """Test that fetch_bucket_files_list correctly handles multiple pages of results.
+
+        Args:
+            mocker: Pytest fixture for mocking
+        """
         # arrange
         mock_requests = mocker.patch("confluence_importer.c4.requests")
         mocker.patch("confluence_importer.c4.logger")
@@ -89,6 +108,11 @@ class TestC4:
         assert result[1]["id"] == "file2"
 
     def test_import_confluence_page_success(self, mocker: MockerFixture):
+        """Test that import_confluence_page correctly handles successful API responses.
+
+        Args:
+            mocker: Pytest fixture for mocking
+        """
         # arrange
         mock_requests = mocker.patch("confluence_importer.c4.requests")
         mock_logger = mocker.patch("confluence_importer.c4.logger")
@@ -117,6 +141,11 @@ class TestC4:
         mock_logger.error.assert_not_called()
 
     def test_import_confluence_page_error(self, mocker: MockerFixture):
+        """Test that import_confluence_page correctly handles error API responses.
+
+        Args:
+            mocker: Pytest fixture for mocking
+        """
         # arrange
         mock_requests = mocker.patch("confluence_importer.c4.requests")
         mock_logger = mocker.patch("confluence_importer.c4.logger")
@@ -145,6 +174,11 @@ class TestC4:
         mock_logger.error.assert_called_once()
 
     def test_clear_previous_ingests(self, mocker: MockerFixture):
+        """Test that clear_previous_ingests correctly deletes Confluence pages from C4.
+
+        Args:
+            mocker: Pytest fixture for mocking
+        """
         # arrange
         mock_fetch_bucket_files = mocker.patch(
             "confluence_importer.c4.fetch_bucket_files_list",
@@ -169,6 +203,11 @@ class TestC4:
         mock_logger.info.assert_called()
 
     def test_clear_previous_ingests_with_error(self, mocker: MockerFixture):
+        """Test that clear_previous_ingests correctly handles errors during deletion.
+
+        Args:
+            mocker: Pytest fixture for mocking
+        """
         # arrange
         mock_fetch_bucket_files = mocker.patch(
             "confluence_importer.c4.fetch_bucket_files_list",

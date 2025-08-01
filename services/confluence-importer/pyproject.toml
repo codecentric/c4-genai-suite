@@ -17,7 +17,10 @@ dependencies = [
 line-length = 120
 
 [tool.ruff.lint]
-select = ["E", "W", "F", "N", "A", "B"]
+select = ["D", "E", "W", "F", "N", "A", "B"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
 
 [dependency-groups]
 dev = [

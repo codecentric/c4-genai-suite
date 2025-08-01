@@ -1,10 +1,19 @@
+"""Tests for the Confluence API interaction functionality."""
+
 from pytest_mock import MockerFixture
 
 from confluence_importer.confluence import get_page, get_pages_for_space, ConfluencePage, confluence_url
 
 
 class TestConfluence:
+    """Tests for the Confluence module functionality."""
+
     def test_get_page(self, mocker: MockerFixture):
+        """Test that get_page correctly retrieves and parses a Confluence page.
+
+        Args:
+            mocker: Pytest fixture for mocking
+        """
         # arrange
         page_id = 123456
         mock_page_data = {
@@ -30,6 +39,11 @@ class TestConfluence:
         assert result.html_content == "<h1>Test Page</h1>"
 
     def test_get_pages_for_space(self, mocker: MockerFixture):
+        """Test that get_pages_for_space correctly retrieves and parses pages from a Confluence space.
+
+        Args:
+            mocker: Pytest fixture for mocking
+        """
         # arrange
         space_key = "TEST"
         mock_pages = [
@@ -83,6 +97,11 @@ class TestConfluence:
         assert results[1].html_content == "<h1>Test Page 2</h1>"
 
     def test_get_pages_for_space_pagination(self, mocker: MockerFixture):
+        """Test that get_pages_for_space correctly handles pagination of results.
+
+        Args:
+            mocker: Pytest fixture for mocking
+        """
         # arrange
         space_key = "TEST"
 

@@ -1,3 +1,5 @@
+"""Module for interacting with the C4 API to manage Confluence content."""
+
 import requests
 
 from confluence_importer.logger import logger
@@ -8,9 +10,7 @@ bucket_id = config.c4_bucket_id
 
 
 def clear_previous_ingests() -> None:
-    """
-    Clears all previously ingested files from the C4 bucket.
-    """
+    """Clears all previously ingested files from the C4 bucket."""
     logger.info("Starting deletion of all Confluence pages from c4", bucket_id=bucket_id)
 
     deletion_counter = {"success": 0, "error": 0}
@@ -59,10 +59,20 @@ def clear_previous_ingests() -> None:
 
 
 def delete_confluence_page(file_id):
+    """Deletes a file from the C4 bucket by its ID.
+
+    Args:
+        file_id: The ID of the file to delete from the C4 bucket
+    """
     requests.delete(f"{c4_base_url}/api/buckets/{bucket_id}/files/{file_id}", headers={"x-api-key": config.c4_token})
 
 
 def fetch_bucket_files_list():
+    """Fetches the list of all files in the C4 bucket.
+
+    Returns:
+        A list of dictionaries containing file information from the C4 bucket
+    """
     page = 1
     batch_size = 50
 
@@ -88,8 +98,7 @@ def fetch_bucket_files_list():
 
 
 def import_confluence_page(page_id: int, page_markdown: str) -> None:
-    """
-    Ingests a Confluence page into the C4 bucket.
+    """Ingests a Confluence page into the C4 bucket.
 
     Args:
         page_markdown: The HTML content of the Confluence page to ingest

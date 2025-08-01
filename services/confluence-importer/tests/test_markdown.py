@@ -1,3 +1,5 @@
+"""Tests for the HTML to Markdown conversion functionality."""
+
 import pytest
 from pytest_mock import MockerFixture
 
@@ -17,12 +19,27 @@ def sample_confluence_page():
 
 
 class MockDocumentConverterResult:
+    """Mock class for MarkItDown conversion result."""
+
     def __init__(self, text_content):
+        """Initialize the mock converter result.
+
+        Args:
+            text_content: The text content to be returned by the mock
+        """
         self.text_content = text_content
 
 
 class TestHtmlToMarkdown:
+    """Tests for the HTML to Markdown conversion functionality."""
+
     def test_conversion(self, sample_confluence_page, mocker: MockerFixture):
+        """Test that html_to_markdown correctly converts HTML to Markdown with frontmatter.
+
+        Args:
+            sample_confluence_page: Fixture providing a sample ConfluencePage
+            mocker: Pytest fixture for mocking
+        """
         # arrange
         mock_convert = mocker.patch(
             "confluence_importer.markdown.md.convert", return_value=MockDocumentConverterResult("# Test Page")
