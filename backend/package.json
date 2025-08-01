@@ -64,6 +64,7 @@
     "cookie-parser": "^1.4.7",
     "date-fns": "^4.1.0",
     "dotenv": "^16.6.1",
+    "duck-duck-scrape": "^2.2.7",
     "express-session": "^1.18.2",
     "json-diff-ts": "^4.6.3",
     "langchain": "^0.3.29",
