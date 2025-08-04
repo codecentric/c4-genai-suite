@@ -114,7 +114,7 @@ input[type='number'] {
 }
 
 .nav-menu li {
-  @apply px-4 py-2 hover:font-semibold hover:text-black;
+  @apply px-4 py-2 hover:font-semibold hover:text-black hover:bg-gray-100;
 }
 
 .nav-menu li a.active {
@@ -127,10 +127,6 @@ input[type='number'] {
 
 .form-row:last-child {
   @apply mb-0;
-}
-
-.nav-menu li:hover {
-  @apply font-normal;
 }
 
 .nav-menu-bordered li {

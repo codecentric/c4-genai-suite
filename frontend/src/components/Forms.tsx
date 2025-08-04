@@ -573,7 +573,7 @@ const InputRange = ({ className, name, ...other }: FormEditorProps<number> & HTM
           })}
         />
       </div>
-      <div className="w-12 text-right">{field.value}</div>
+      <div className="w-12 text-right">{field.value ?? other.defaultValue}</div>
     </div>
   );
 };

@@ -38,7 +38,7 @@ jobs:
           node-version: 24.x
           cache: 'npm'
           cache-dependency-path: backend/package-lock.json
-      - run: npm install
+      - run: npm ci
       - run: npm run generate-${{ matrix.service }}
       - run: git diff --quiet # exits with exitcode != 0 if changes are detected
 
@@ -51,7 +51,7 @@ jobs:
           node-version: 24.x
           cache: 'npm'
           cache-dependency-path: backend/package-lock.json
-      - run: npm install
+      - run: npm ci
       - run: npm run generate-openapi-dev
       - run: git add -N .
       - run: git diff .

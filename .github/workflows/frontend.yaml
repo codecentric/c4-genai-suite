@@ -35,7 +35,7 @@ jobs:
           node-version: 24.x
           cache: 'npm'
           cache-dependency-path: frontend/package-lock.json
-      - run: npm install
+      - run: npm ci
       - run: npm run generate-api
       - run: git add -N .
       - run: git diff .
