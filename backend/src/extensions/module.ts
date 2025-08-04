@@ -29,6 +29,7 @@ import { BingWebSearchExtension } from './tools/bing-web-search';
 import { CalculatorExtension } from './tools/calculator';
 import { ConfirmExtension } from './tools/confirm';
 import { DallEExtension } from './tools/dall-e';
+import { DuckduckgoWebSearchExtension } from './tools/duckduckgo-web-search';
 import { FilesExtension } from './tools/files';
 import { FilesConversationExtension } from './tools/files-conversation';
 import { FilesVisionExtension } from './tools/files-vision';
@@ -115,6 +116,7 @@ export class ExtensionLibraryModule {
         ContextExtension,
         CustomPromptExtension,
         DallEExtension,
+        DuckduckgoWebSearchExtension,
         FilesConversationExtension,
         FilesExtension,
         FilesVisionExtension,

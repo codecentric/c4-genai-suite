@@ -111,6 +111,11 @@
       "description": "Führt eine Websuche mit Bing durch",
       "apiKeyHint": "Der Bing Search Subscription Key"
     },
+    "duckduckgo": {
+      "title": "Duckduckgo Web Search",
+      "description": "Führt eine Websuche mit Duckduckgo durch",
+      "maxResults": "Anzahl der Suchergebnisse"
+    },
     "confirm": {
       "title": "DEV: Confirm",
       "description": "Fragt nach Bestätigung"
