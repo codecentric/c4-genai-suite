@@ -42,5 +42,10 @@
     "tree-kill": "1.2.2",
     "vitest": "3.2.1",
     "wait-on": "8.0.3"
+  },
+  "dependencies": {
+    "@azure/ai-agents": "^1.1.0",
+    "@azure/core-util": "^1.13.0",
+    "@azure/identity": "^4.10.2"
   }
 }
