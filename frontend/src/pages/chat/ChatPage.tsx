@@ -1,4 +1,4 @@
-import { Button } from '@mantine/core';
+import { Button, Tabs } from '@mantine/core';
 import { IconEdit } from '@tabler/icons-react';
 import { useEffect, useRef, useState } from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
@@ -16,8 +16,9 @@ import { DocumentSource, SourcesChunkPreview } from './SourcesChunkPreview';
 import { ConversationPage } from './conversation/ConversationPage';
 import { Files } from './files/Files';
 import { useStateOfSelectedAssistantId, useStateOfSelectedChatId } from './state/chat';
-import { useListOfChatsInit, useMutateNewChat, useStateMutateRemoveAllChats, useStateOfChatEmptiness } from './state/listOfChats';
+import { useChatsListInit, useMutateNewChat, useStateMutateRemoveAllChats, useStateOfChatEmptiness } from './state/listOfChats';
 import { useUserBucket } from './useUserBucket';
+import { PdfViewer } from 'src/components/PdfViewer';
 
 const CustomResizeHandle = () => (
   <PanelResizeHandle className="group ml-[-2px] flex w-2 items-center bg-gray-100 p-[2px] transition-all hover:bg-gray-200">
@@ -50,9 +51,10 @@ const getPanelSizes = (isRightPanelOpen: boolean) => {
 };
 export function ChatPage() {
   const { theme } = useTheme();
+
   const isMobileView = isMobile();
   useListOfAssistantsInit();
-  useListOfChatsInit();
+  useChatsListInit();
 
   const [selectedDocument, setSelectedDocument] = useState<DocumentSource | undefined>();
   const selectedAssistantId = useStateOfSelectedAssistantId();
@@ -181,11 +183,29 @@ export function ChatPage() {
             {!isMobileView && <CustomResizeHandle />}
             <Panel style={{ overflow: 'auto' }} id="right" order={2} {...panelSizes.right} className="bg-gray-100">
               {selectedDocument ? (
-                <SourcesChunkPreview onClose={() => setSelectedDocument(undefined)} document={selectedDocument} />
-                // TODO: show pdf
+                <Tabs defaultValue="sources-chunk-preview">
+                  <Tabs.List>
+                    <Tabs.Tab value="sources-chunk-preview">{texts.chat.sources.content}</Tabs.Tab>
+                    <Tabs.Tab value="source-document-viewer">{texts.chat.sources.viewer}</Tabs.Tab>
+                  </Tabs.List>
+
+                  <Tabs.Panel value="sources-chunk-preview">
+                    <SourcesChunkPreview onClose={() => setSelectedDocument(undefined)} document={selectedDocument} />
+                  </Tabs.Panel>
+                  <Tabs.Panel value="source-document-viewer">
+                    <PdfViewer />
+                  </Tabs.Panel>
+                </Tabs>
               ) : (
+                // TODO: show pdf
                 userBucket && (
-                  <Files configurationId={selectedAssistantId} userBucket={userBucket} conversationId={selectedChatId} />
+                  <Tabs defaultValue="drag-n-drop-area">
+                    <Tabs.Tab value="drag-n-drop-area">{texts.common.files}</Tabs.Tab>
+
+                    <Tabs.Panel value="drag-n-drop-area">
+                      <Files configurationId={selectedAssistantId} userBucket={userBucket} conversationId={selectedChatId} />
+                    </Tabs.Panel>
+                  </Tabs>
                 )
               )}
             </Panel>

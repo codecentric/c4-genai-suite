@@ -119,6 +119,7 @@ export const de: typeof en = {
     sources: {
       content: 'Quelleninhalt',
       sources: 'Quellen',
+      viewer: 'Quell-Viewer',
       metadata: {
         metadata: 'Metadaten',
         fileName: 'Dateiname',

@@ -117,6 +117,7 @@ export const en = {
     sources: {
       content: 'Source Content',
       sources: 'Sources',
+      viewer: 'Source Viewer',
       metadata: {
         metadata: 'Metadata',
         fileName: 'File name',

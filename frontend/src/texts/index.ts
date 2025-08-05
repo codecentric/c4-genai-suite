@@ -146,8 +146,9 @@ function load() {
       sourceAI: translate('chat.sourceAI'),
       sourceHuman: translate('chat.sourceHuman'),
       sources: {
-        sources: translate('chat.sources.sources'),
         content: translate('chat.sources.content'),
+        sources: translate('chat.sources.sources'),
+        viewer: translate('chat.sources.viewer'),
         metadata: {
           metadata: translate('chat.sources.metadata.metadata'),
           fileName: translate('chat.sources.metadata.fileName'),

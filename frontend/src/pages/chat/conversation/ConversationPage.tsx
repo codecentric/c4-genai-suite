@@ -4,7 +4,7 @@ import { RefObject, useMemo } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useParams } from 'react-router-dom';
 import { FileDto } from 'src/api';
-import { PdfUploader } from 'src/components/PdfUploader';
+import { PdfViewer } from 'src/components/PdfViewer';
 import { useEventCallback, useTheme } from 'src/hooks';
 import { useScrollToBottom } from 'src/hooks/useScrollToBottom';
 import { cn } from 'src/lib';
@@ -94,9 +94,9 @@ export function ConversationPage(props: ConversationPageProps) {
                 (showScrollToBottomButton || showRateThisConversation) && 'white-shadow',
               )}
             >
-              <div className={`flx-col items-center- flex shrink-0 justify-start px-4`}>
+              {/* <div className={`flx-col items-center- flex shrink-0 justify-start px-4`}>
                 <PdfUploader />
-              </div>
+              </div> */}
               <ChatInput
                 textareaRef={textareaRef}
                 chatId={chat.id}

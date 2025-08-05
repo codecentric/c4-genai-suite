@@ -29,10 +29,10 @@ const Source: React.FC<{
                 e.stopPropagation();
               }}
             >
-              {source.title}
+              {source.metadata?.title ? source.metadata?.title : source.title}
             </Anchor>
           ) : (
-            <span>{source.title}</span>
+            <span>{source.metadata?.title ? source.metadata?.title : source.title}</span>
           )}
         </div>
         {source.document?.link && (
