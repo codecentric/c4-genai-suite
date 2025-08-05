@@ -40,6 +40,12 @@ export interface MessageDto {
      */
     id: number;
     /**
+     * The ID of the used configuration.
+     * @type {number}
+     * @memberof MessageDto
+     */
+    configurationId: number;
+    /**
      * The content.
      * @type {Array<MessageContentDto>}
      * @memberof MessageDto
@@ -112,6 +118,7 @@ export type MessageDtoRatingEnum = typeof MessageDtoRatingEnum[keyof typeof Mess
  */
 export function instanceOfMessageDto(value: object): value is MessageDto {
     if (!('id' in value) || value['id'] === undefined) return false;
+    if (!('configurationId' in value) || value['configurationId'] === undefined) return false;
     if (!('content' in value) || value['content'] === undefined) return false;
     if (!('type' in value) || value['type'] === undefined) return false;
     return true;
@@ -128,6 +135,7 @@ export function MessageDtoFromJSONTyped(json: any, ignoreDiscriminator: boolean)
     return {
         
         'id': json['id'],
+        'configurationId': json['configurationId'],
         'content': ((json['content'] as Array<any>).map(MessageContentDtoFromJSON)),
         'type': json['type'],
         'rating': json['rating'] == null ? undefined : json['rating'],
@@ -145,6 +153,7 @@ export function MessageDtoToJSON(value?: MessageDto | null): any {
     return {
         
         'id': value['id'],
+        'configurationId': value['configurationId'],
         'content': ((value['content'] as Array<any>).map(MessageContentDtoToJSON)),
         'type': value['type'],
         'rating': value['rating'],

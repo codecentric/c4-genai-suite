@@ -1703,6 +1703,7 @@
         "type": "object",
         "properties": {
           "id": { "type": "number", "description": "The ID of the message." },
+          "configurationId": { "type": "number", "description": "The ID of the used configuration." },
           "content": {
             "type": "array",
             "description": "The content.",
@@ -1736,7 +1737,7 @@
           },
           "logging": { "description": "The logging information.", "type": "array", "items": { "type": "string" } }
         },
-        "required": ["id", "content", "type"]
+        "required": ["id", "configurationId", "content", "type"]
       },
       "MessagesDto": {
         "type": "object",

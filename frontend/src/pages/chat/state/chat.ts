@@ -71,12 +71,20 @@ export const useChatStream = (chatId: number) => {
       chatStore.setMessages(chatStore.messages.filter((message) => message.id > 0 && message.id < editMessageId));
     }
 
+    const configurationId = chatStore.chat.configurationId;
+
     chatStore.addMessage({
       type: 'human',
       content: [{ type: 'text', text: input }],
+      configurationId,
       id: editMessageId ?? getMessagePlaceholderId('human'),
     });
-    chatStore.addMessage({ type: 'ai', content: [{ type: 'text', text: '' }], id: getMessagePlaceholderId('ai') });
+    chatStore.addMessage({
+      type: 'ai',
+      configurationId,
+      content: [{ type: 'text', text: '' }],
+      id: getMessagePlaceholderId('ai'),
+    });
     chatStore.setIsAiWriting(true);
 
     chatStore.getStream(chatId, input, files, api, editMessageId).subscribe({

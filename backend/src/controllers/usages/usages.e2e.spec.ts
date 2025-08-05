@@ -162,14 +162,14 @@ async function seedTestData(dataSource: DataSource) {
   for (const userEntity of userEntities) {
     const conversationEntity = await createConversationEntity(userEntity.id, configurationEntity.id, conversationRepository);
 
-    await createMessageEntity(conversationEntity.id, now, messagesRepository);
+    await createMessageEntity(conversationEntity.id, configurationEntity.id, now, messagesRepository);
     await createUsageEntity(now, userEntity, usageRepository);
   }
 
   // two users send a message last month
   for (let i = 0; i < userEntities.length - 1; i++) {
     const conversationEntity = await createConversationEntity(userEntities[i].id, configurationEntity.id, conversationRepository);
-    await createMessageEntity(conversationEntity.id, startOfMonth(subMonths(now, 1)), messagesRepository);
+    await createMessageEntity(conversationEntity.id, configurationEntity.id, startOfMonth(subMonths(now, 1)), messagesRepository);
   }
 
   const configurations = await configurationRepository.find();
@@ -224,11 +224,13 @@ async function createConversationEntity(
 
 async function createMessageEntity(
   conversationId: number,
+  configurationId: number,
   creationDate: Date,
   messageRepository: Repository<MessageEntity>,
 ): Promise<MessageEntity> {
   const messageEntity = new MessageEntity();
   messageEntity.conversationId = conversationId;
+  messageEntity.configurationId = configurationId;
   messageEntity.createdAt = creationDate;
   messageEntity.type = 'text';
   messageEntity.type = 'human';

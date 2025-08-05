@@ -107,7 +107,7 @@ async function seedTestData(dataSource: DataSource) {
   const conversation = await createConversationEntity(conversationRepository, configurationEntity, userEntity);
   const bucketEntity = await createBucket(bucketRepository);
   await createFiles(fileRepository, conversation.id, bucketEntity);
-  await createMessages(messageRepository, conversation.id);
+  await createMessages(messageRepository, conversation.id, configurationEntity.id);
 
   return conversation;
 }
@@ -142,10 +142,15 @@ function createConversationEntity(
   return conversationRepository.save(conversationEntity);
 }
 
-function createMessages(messageRepository: Repository<MessageEntity>, conversationId: number): Promise<MessageEntity[]> {
+function createMessages(
+  messageRepository: Repository<MessageEntity>,
+  conversationId: number,
+  configurationId: number,
+): Promise<MessageEntity[]> {
   const messages = [];
   const message1 = new MessageEntity();
   message1.conversationId = conversationId;
+  message1.configurationId = configurationId;
   message1.createdAt = new Date();
   message1.type = 'human';
   message1.data = `{"content":"hi","additional_kwargs":{},"response_metadata":{}}`;
@@ -153,6 +158,7 @@ function createMessages(messageRepository: Repository<MessageEntity>, conversati
 
   const message2 = new MessageEntity();
   message2.conversationId = conversationId;
+  message2.configurationId = configurationId;
   message2.createdAt = new Date();
   message2.type = 'ai';
   message2.data = `{"content":"Hello! How can I assist you today?","tool_calls":[],"invalid_tool_calls":[],"additional_kwargs":{},"response_metadata":{}}`;

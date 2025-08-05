@@ -264,6 +264,7 @@ function createMessageEntity(repository: Repository<MessageEntity>) {
   const entity = new MessageEntity();
   entity.id = 1;
   entity.conversationId = 1;
+  entity.configurationId = 1;
   entity.data = { content: 'empty' };
   entity.type = 'ai';
   entity.sources = [

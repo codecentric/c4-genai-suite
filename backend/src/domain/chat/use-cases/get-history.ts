@@ -43,7 +43,7 @@ export class GetHistoryHandler implements IQueryHandler<GetHistory, GetHistoryRe
 
     const entities = await this.messages.getMessageThread(conversationId);
 
-    const result = entities.map((m: { id: number; type: string; data: MessageEntityData }) => ({
+    const result = entities.map((m: { id: number; configurationId: number; type: string; data: MessageEntityData }) => ({
       ...m,
       type: m.type as MessageType,
       content: normalizedMessageContent(m.data.content),

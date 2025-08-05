@@ -26,9 +26,9 @@ export class GetHistoryMiddleware implements ChatMiddleware {
   order?: number = GetHistoryMiddleware.ORDER;
 
   async invoke(context: ChatContext, getContext: GetContext, next: ChatNextDelegate): Promise<any> {
-    const { conversationId } = context;
+    const { conversationId, configuration } = context;
 
-    const history = new InternalChatHistory(conversationId, context, this.messages);
+    const history = new InternalChatHistory(conversationId, configuration.id, context, this.messages);
 
     await history.addMessage(
       new HumanMessage({
@@ -55,6 +55,7 @@ class InternalChatHistory extends BaseListChatMessageHistory implements Messages
 
   constructor(
     private readonly conversationId: number,
+    private readonly configurationId: number,
     private readonly context: ChatContext,
     private readonly messages: MessageRepository,
   ) {
@@ -123,6 +124,7 @@ class InternalChatHistory extends BaseListChatMessageHistory implements Messages
         const entity = await this.messages.save({
           ...data[0],
           parentId: this.currentParentId,
+          configurationId: this.configurationId,
         });
         this.currentParentId = entity.id;
         // Notifo the UI about the message ID, because it is needed to rate messages.
@@ -147,7 +149,11 @@ class InternalChatHistory extends BaseListChatMessageHistory implements Messages
         this.stored = mapStoredMessagesToChatMessages(
           await this.messages.getMessageThread(this.conversationId, this.currentParentId),
         );
-        const entity = await this.messages.save({ parentId: this.currentParentId, ...data[0] });
+        const entity = await this.messages.save({
+          parentId: this.currentParentId,
+          configurationId: this.configurationId,
+          ...data[0],
+        });
         this.currentParentId = entity.id;
         this.context.result.next({ type: 'saved', messageId: entity.id, messageType: 'human' });
       }

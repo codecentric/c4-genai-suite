@@ -56,6 +56,12 @@ export class MessageDto {
   id!: number;
 
   @ApiProperty({
+    description: 'The ID of the used configuration.',
+    required: true,
+  })
+  configurationId!: number;
+
+  @ApiProperty({
     description: 'The content.',
     required: true,
     type: 'array',
@@ -116,6 +122,7 @@ export class MessageDto {
     result.tools = source.tools;
     result.type = source.type;
     result.logging = source.logging;
+    result.configurationId = source.configurationId;
 
     return result;
   }

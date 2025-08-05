@@ -9,7 +9,7 @@ type ChatHistoryProps = {
   editMessage: (input: string, files?: FileDto[], editMessageId?: number) => void;
 };
 
-export function ChatHistory({ agentName, llmLogo, selectDocument, editMessage }: ChatHistoryProps) {
+export function ChatHistory({ agentName, selectDocument, editMessage }: ChatHistoryProps) {
   const messages = useStateOfMessages();
   const allMessagesButLastTwo = messages.slice(0, -2);
   const lastTwoMessages = messages.slice(-2);
@@ -26,7 +26,6 @@ export function ChatHistory({ agentName, llmLogo, selectDocument, editMessage }:
             isLast={i === messages.length - 1}
             isBeforeLast={i === messages.length - 2}
             message={message}
-            llmLogo={llmLogo}
             selectDocument={(documentUri) => selectDocument(chatId, message.id, documentUri)}
             editMessage={editMessage}
           />
@@ -40,7 +39,6 @@ export function ChatHistory({ agentName, llmLogo, selectDocument, editMessage }:
             isLast={i === 1}
             isBeforeLast={i === 0}
             message={message}
-            llmLogo={llmLogo}
             selectDocument={(documentUri) => selectDocument(chatId, message.id, documentUri)}
             editMessage={editMessage}
           />

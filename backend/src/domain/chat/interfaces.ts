@@ -175,6 +175,8 @@ export interface Message {
   rating?: MessageRating;
 
   logging?: string[];
+
+  configurationId: number;
 }
 
 export type NormalizedMessageContentText = {

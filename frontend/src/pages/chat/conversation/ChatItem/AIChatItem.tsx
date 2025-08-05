@@ -3,6 +3,7 @@ import { useClipboard, useDebouncedValue } from '@mantine/hooks';
 import { toast } from 'react-toastify';
 import { Alert, Markdown } from 'src/components';
 import { useProfile } from 'src/hooks';
+import { useStateOfAssistants } from 'src/pages/chat/state/listOfAssistants';
 import { texts } from 'src/texts';
 import { useStateOfIsAiWriting } from '../../state/chat';
 import { ChatItemDebug } from '../ChatItemDebug';
@@ -14,7 +15,7 @@ import { AiAvatar } from './AiAvatar';
 import { ChatItemProps } from './ChatItemProps';
 import { ChatItemUserInput } from './ChatItemUserInput';
 
-export const AIChatItem = ({ agentName, message, isLast, llmLogo, selectDocument }: ChatItemProps) => {
+export const AIChatItem = ({ agentName, message, isLast, selectDocument }: ChatItemProps) => {
   // MessageDTO ist generated from the backend models.
   // It may be refactored to become a simple string
   // instead of an array with one entry (in the futute ;) ).
@@ -22,19 +23,28 @@ export const AIChatItem = ({ agentName, message, isLast, llmLogo, selectDocument
   const user = useProfile();
   const isWriting = useStateOfIsAiWriting();
   const clipboard = useClipboard();
+  const assistants = useStateOfAssistants();
 
   const copyTextToClipboard = () => {
     clipboard.copy(textContent);
     toast(texts.common.copied, { type: 'info' });
   };
 
+  const messageAssistant = assistants.find((x) => x.id === message.configurationId);
+  const assistantLLmLogo = messageAssistant?.extensions?.find((x) => x.type === 'llm')?.logo;
+
   const [debouncedIsWriting] = useDebouncedValue(isWriting, 500);
   const newReply = isWriting || debouncedIsWriting;
   return (
     <div className={'scroll-y-m-4 group box-border max-w-full'} data-testid="chat-item">
       <div className="flex items-center gap-2">
-        <AiAvatar llmLogo={llmLogo} />
+        <AiAvatar llmLogo={assistantLLmLogo} />
         <strong>{agentName}</strong>
+        {messageAssistant && (
+          <>
+            |<strong>{messageAssistant.name}</strong>
+          </>
+        )}
       </div>
       {message.error && <Alert text={message.error} className="mt-1" />}
       <ChatItemTools tools={message.toolsInUse || {}} />

@@ -1,6 +1,16 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { Source } from 'src/domain/chat';
 import { schema } from '../typeorm.helper';
+import { ConfigurationEntity } from './configuration';
 import { ConversationEntity } from './conversation';
 
 export type ExtensionSource = Source & { extensionExternalId: string };
@@ -24,6 +34,13 @@ export class MessageEntity {
 
   @Column('simple-json', { nullable: true })
   tools?: any;
+
+  @Column()
+  configurationId!: number;
+
+  @ManyToOne(() => ConfigurationEntity)
+  @JoinColumn({ name: 'configurationId' })
+  configuration!: ConfigurationEntity;
 
   @Column('simple-json', { nullable: true })
   debug?: any;
