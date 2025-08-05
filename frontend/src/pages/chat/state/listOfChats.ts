@@ -39,12 +39,12 @@ export const useListOfChatsInit = () => {
 
 export const useStateMutateDuplicateChat = () => {
   const api = useApi();
-  const refetchListOfChats = useListOfChatsStore((s) => s.refetch);
+  const refetchChatsList = useListOfChatsStore((s) => s.refetch);
 
   return useMutation({
     mutationFn: (id: number) => api.conversations.duplicateConversation(id),
     onSuccess: () => {
-      refetchListOfChats();
+      refetchChatsList();
       toast.success(texts.chat.duplicateConversationSuccess);
     },
     onError: async () => {

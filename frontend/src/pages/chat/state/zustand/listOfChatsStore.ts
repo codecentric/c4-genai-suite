@@ -1,8 +1,11 @@
 import { create } from 'zustand';
 import { ConversationDto } from 'src/api';
 
-type ListOfChatsState = {
+type chatsListState = {
   chats: ConversationDto[];
+};
+
+type chatsListActions = {
   setChats: (chats: ConversationDto[]) => void;
   upsertChat: (chat: ConversationDto) => void;
   removeChat: (id: number) => void;
@@ -10,7 +13,7 @@ type ListOfChatsState = {
   setRefetchFn: (refetchFn: VoidFunction) => void;
 };
 
-export const useListOfChatsStore = create<ListOfChatsState>()((set) => ({
+export const useListOfChatsStore = create<chatsListState & chatsListActions>()((set) => ({
   chats: [],
   setChats: (chats) => set({ chats }),
   upsertChat: (chat) =>
@@ -21,7 +24,10 @@ export const useListOfChatsStore = create<ListOfChatsState>()((set) => ({
         chats: chats.map((existingChat) => (existingChat.id === chat.id ? chat : existingChat)),
       };
     }),
-  removeChat: (id) => set((state) => ({ chats: state.chats.filter((x) => x.id !== id) })),
+  removeChat: (id) =>
+    set((state) => ({
+      chats: state.chats.filter((x) => x.id !== id),
+    })),
   refetch: () => {},
   setRefetchFn: (refetch) => set({ refetch }),
 }));

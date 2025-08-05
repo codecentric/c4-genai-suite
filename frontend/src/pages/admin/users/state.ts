@@ -1,10 +1,12 @@
 import { create } from 'zustand';
 import { UserDto } from 'src/api';
 
-interface UsersState {
+type UsersState = {
   // The users.
   users: UserDto[];
+};
 
+type UsersActions = {
   // Adds or sets an user.
   setUser: (user: UserDto) => void;
 
@@ -13,9 +15,9 @@ interface UsersState {
 
   // Sets all users.
   setUsers: (users: UserDto[]) => void;
-}
+};
 
-const useUsersStore_ = create<UsersState>()((set) => ({
+const useUsersStore_ = create<UsersState & UsersActions>()((set) => ({
   users: [],
   setUser: (user: UserDto) => {
     return set((state) => {
