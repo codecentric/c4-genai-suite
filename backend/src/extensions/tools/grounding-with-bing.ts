@@ -171,30 +171,34 @@ class InternalTool extends StructuredTool {
     // Get the first message
     for await (const message of messagesIterator) {
       for (const agentMessage of message.content) {
-        if (isOutputOfType(agentMessage, 'text')) {
-          const textContent = agentMessage as MessageTextContent;
-          result += textContent.text.value;
-
-          const annotations = textContent.text.annotations;
-          const sources: Source[] = [];
-          for (const annotation of annotations) {
-            const cite = annotation as MessageTextUrlCitationAnnotation;
-            const source: Source = {
-              title: cite.urlCitation.title ?? 'Search result',
-              chunk: {
-                content: textContent.text.value,
-                score: 0,
-              },
-              document: {
-                uri: cite.urlCitation.url,
-                mimeType: 'text/html',
-                link: cite.urlCitation.url,
-              },
-            };
-            sources.push(source);
-          }
-          this.context.history?.addSources(this.extensionExternalId, sources);
+        if (!isOutputOfType(agentMessage, 'text')) {
+          continue;
         }
+        const textContent = agentMessage as MessageTextContent;
+        result += textContent.text.value;
+
+        const annotations = textContent.text.annotations;
+        const sources: Source[] = [];
+        for (const annotation of annotations) {
+          if (!isOutputOfType(annotation, 'urlCitation')) {
+            continue;
+          }
+          const cite = annotation as MessageTextUrlCitationAnnotation;
+          const source: Source = {
+            title: cite.urlCitation.title ?? 'Search result',
+            chunk: {
+              content: textContent.text.value,
+              score: 0,
+            },
+            document: {
+              uri: cite.urlCitation.url,
+              mimeType: 'text/html',
+              link: cite.urlCitation.url,
+            },
+          };
+          sources.push(source);
+        }
+        this.context.history?.addSources(this.extensionExternalId, sources);
       }
     }
 
