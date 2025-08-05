@@ -132,7 +132,6 @@ class InternalTool extends StructuredTool {
     const credential = new ClientSecretCredential(this.tenantId, this.clientId, this.clientSecret);
     const client = new AgentsClient(this.projectEndpoint, credential);
 
-    // Create an Agent
     let agent;
     try {
       const bingTool = ToolUtility.createBingGroundingTool([{ connectionId: this.connectionId }]);
@@ -162,13 +161,9 @@ class InternalTool extends StructuredTool {
       result = 'Query failed: ${run.lastError?.message}';
     }
 
-    // Delete the assistant when done
     await client.deleteAgent(agent.id);
 
-    // Fetch and log all messages
     const messagesIterator = client.messages.list(thread.id);
-
-    // Get the first message
     for await (const message of messagesIterator) {
       for (const agentMessage of message.content) {
         if (!isOutputOfType(agentMessage, 'text')) {
