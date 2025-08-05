@@ -6,7 +6,7 @@ import {
   ToolUtility,
 } from '@azure/ai-agents';
 import { delay } from '@azure/core-util';
-import { DefaultAzureCredential } from '@azure/identity';
+import { ClientSecretCredential } from '@azure/identity';
 import { StructuredTool } from '@langchain/core/tools';
 import { Logger } from '@nestjs/common';
 import { z } from 'zod';
@@ -27,13 +27,6 @@ export class GroundingWithBingSearchExtension implements Extension<GroundingWith
       description: this.i18n.t('texts.extensions.bing.description'),
       type: 'tool',
       arguments: {
-        apiKey: {
-          type: 'string',
-          title: this.i18n.t('texts.extensions.common.apiKey'),
-          required: true,
-          format: 'password',
-          description: this.i18n.t('texts.extensions.grounding-with-bing.apiKeyHint'),
-        },
         projectEndpoint: {
           type: 'string',
           title: this.i18n.t('texts.extensions.grounding-with-bing.projectEndpoint'),
@@ -45,6 +38,32 @@ export class GroundingWithBingSearchExtension implements Extension<GroundingWith
           title: this.i18n.t('texts.extensions.grounding-with-bing.connectionId'),
           required: true,
           description: this.i18n.t('texts.extensions.grounding-with-bing.connectionIdHint'),
+        },
+        tenantId: {
+          type: 'string',
+          title: this.i18n.t('texts.extensions.grounding-with-bing.tenantId'),
+          required: true,
+          description: this.i18n.t('texts.extensions.grounding-with-bing.tenantIdHint'),
+        },
+        clientId: {
+          type: 'string',
+          title: this.i18n.t('texts.extensions.grounding-with-bing.clientId'),
+          required: true,
+          description: this.i18n.t('texts.extensions.grounding-with-bing.clientIdHint'),
+        },
+        clientSecret: {
+          type: 'string',
+          title: this.i18n.t('texts.extensions.grounding-with-bing.clientSecret'),
+          required: true,
+          format: 'password',
+          description: this.i18n.t('texts.extensions.grounding-with-bing.clientSecretHint'),
+        },
+        model: {
+          type: 'string',
+          title: this.i18n.t('texts.extensions.common.model'),
+          required: true,
+          default: 'gpt-4.1-mini',
+          description: this.i18n.t('texts.extensions.grounding-with-bing.model'),
         },
       },
     };
@@ -70,8 +89,11 @@ class InternalTool extends StructuredTool {
   readonly description: string;
   readonly displayName = 'Grounding with Bing Search';
   readonly projectEndpoint: string;
-  readonly apiKey: string;
   readonly connectionId: string;
+  readonly tenantId: string;
+  readonly clientId: string;
+  readonly clientSecret: string;
+  readonly model: string;
   private readonly logger = new Logger(InternalTool.name);
 
   get lc_id() {
@@ -92,54 +114,41 @@ class InternalTool extends StructuredTool {
     this.name = extensionExternalId;
 
     this.projectEndpoint = configuration.projectEndpoint;
-    this.apiKey = configuration.apiKey;
     this.connectionId = configuration.connectionId;
+    this.tenantId = configuration.tenantId;
+    this.clientId = configuration.clientId;
+    this.clientSecret = configuration.clientSecret;
+    this.model = configuration.model;
 
     this.description = 'Uses Grounding with Bing to get information from a web search.';
   }
 
   protected async _call(arg: z.infer<typeof this.schema>): Promise<string> {
     const { query } = arg;
-    console.log(`Ground with query: ${query}`);
 
     // see also:
     // https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/tools/bing-code-samples?pivots=javascript
 
-    // TODO: Unfortunately, the Azure SDK does not support auth via an API token. (AzureKeyCredential(this.apiKey))
-    //  So we need to implement auth via Entra somehow.
-    const cred = new DefaultAzureCredential();
-    const client = new AgentsClient(this.projectEndpoint, cred);
-
-    // TODO remove debug logging
-    console.log(`Made Client`);
-    console.log(`endpoint: ${this.projectEndpoint}`);
-    console.log(`connectionId: ${this.connectionId}`);
-    console.log(cred);
-    // console.log(client);
+    const credential = new ClientSecretCredential(this.tenantId, this.clientId, this.clientSecret);
+    const client = new AgentsClient(this.projectEndpoint, credential);
 
     // Create an Agent
     let agent;
     try {
       const bingTool = ToolUtility.createBingGroundingTool([{ connectionId: this.connectionId }]);
-      agent = await client.createAgent('gpt-4.1-mini', {
+      agent = await client.createAgent(this.model, {
         name: 'agent-for-bing',
         instructions: 'You are a helpful agent',
         tools: [bingTool.definition],
       });
-      console.log(`Made Agent`);
     } catch (error) {
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       this.logger.error(`Error creating agent: ${error}`);
       return Promise.resolve('Error');
     }
 
-    // Create thread for communication
     const thread = await client.threads.create();
-    console.log(`Made Thread`);
-
-    // Create message to thread
     await client.messages.create(thread.id, 'user', query);
-    console.log(`Made Message`);
 
     // Create and process agent run in thread with tools
     let run = await client.runs.create(thread.id, agent.id);
@@ -149,46 +158,43 @@ class InternalTool extends StructuredTool {
       run = await client.runs.get(thread.id, run.id);
     }
     if (run.status === 'failed') {
-      console.log(`Run failed: ${run.lastError?.message}`);
+      this.logger.error(`Run failed: ${run.lastError?.message}`);
       result = 'Query failed: ${run.lastError?.message}';
     }
-    console.log(`Run finished with status: ${run.status}`);
 
     // Delete the assistant when done
     await client.deleteAgent(agent.id);
 
     // Fetch and log all messages
     const messagesIterator = client.messages.list(thread.id);
-    console.log(`Messages:`);
 
     // Get the first message
-    const firstMessage = await messagesIterator.next();
-    if (!firstMessage.done && firstMessage.value) {
-      const agentMessage = firstMessage.value.content[0];
-      if (isOutputOfType(agentMessage, 'text')) {
-        const textContent = agentMessage as MessageTextContent;
-        result += textContent.text.value;
+    for await (const message of messagesIterator) {
+      for (const agentMessage of message.content) {
+        if (isOutputOfType(agentMessage, 'text')) {
+          const textContent = agentMessage as MessageTextContent;
+          result += textContent.text.value;
 
-        const annotations = textContent.text.annotations;
-        const sources: Source[] = [];
-        for (const annotation of annotations) {
-          console.log('URL Citation Annotation:', annotation);
-          const cite = annotation as MessageTextUrlCitationAnnotation;
-          const source: Source = {
-            title: cite.urlCitation.title ?? 'Search result',
-            chunk: {
-              content: textContent.text.value,
-              score: 0,
-            },
-            document: {
-              uri: cite.urlCitation.url,
-              mimeType: 'text/html',
-              link: cite.urlCitation.url,
-            },
-          };
-          sources.push(source);
+          const annotations = textContent.text.annotations;
+          const sources: Source[] = [];
+          for (const annotation of annotations) {
+            const cite = annotation as MessageTextUrlCitationAnnotation;
+            const source: Source = {
+              title: cite.urlCitation.title ?? 'Search result',
+              chunk: {
+                content: textContent.text.value,
+                score: 0,
+              },
+              document: {
+                uri: cite.urlCitation.url,
+                mimeType: 'text/html',
+                link: cite.urlCitation.url,
+              },
+            };
+            sources.push(source);
+          }
+          this.context.history?.addSources(this.extensionExternalId, sources);
         }
-        this.context.history?.addSources(this.extensionExternalId, sources);
       }
     }
 
@@ -200,4 +206,8 @@ type GroundingWithBingSearchExtensionConfiguration = ExtensionConfiguration & {
   projectEndpoint: string;
   apiKey: string;
   connectionId: string;
+  tenantId: string;
+  clientId: string;
+  clientSecret: string;
+  model: string;
 };
