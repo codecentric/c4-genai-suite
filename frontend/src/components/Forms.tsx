@@ -203,9 +203,9 @@ export namespace Forms {
     );
   };
 
-  export const Text = ({ className, placeholder, ...other }: FormEditorProps<string> & HTMLProps<HTMLInputElement>) => {
+  export const Text = ({ className, placeholder, vertical, ...other }: FormEditorProps<string> & HTMLProps<HTMLInputElement>) => {
     return (
-      <Forms.Row className={className} {...other}>
+      <Forms.Row className={className} vertical {...other}>
         <InputText type="text" placeholder={placeholder} {...other} />
       </Forms.Row>
     );
@@ -227,9 +227,14 @@ export namespace Forms {
     );
   };
 
-  export const Textarea = ({ className, placeholder, ...other }: FormEditorProps<string> & HTMLProps<HTMLInputElement>) => {
+  export const Textarea = ({
+    className,
+    placeholder,
+    vertical,
+    ...other
+  }: FormEditorProps<string> & HTMLProps<HTMLInputElement>) => {
     return (
-      <Forms.Row className={className} {...other}>
+      <Forms.Row className={className} vertical {...other}>
         <InputTextarea placeholder={placeholder} {...other} />
       </Forms.Row>
     );
@@ -266,9 +271,9 @@ export namespace Forms {
     );
   };
 
-  export const Password = ({ className, placeholder, ...other }: FormEditorProps<string>) => {
+  export const Password = ({ className, placeholder, vertical, ...other }: FormEditorProps<string>) => {
     return (
-      <Forms.Row className={className} {...other}>
+      <Forms.Row className={className} vertical {...other}>
         <InputText type="password" placeholder={placeholder} {...other} />
       </Forms.Row>
     );
@@ -557,7 +562,7 @@ const InputTextarea = ({ className, name, ...other }: FormEditorProps<string>) =
   );
 };
 
-const InputRange = ({ className, name, ...other }: FormEditorProps<number> & HTMLProps<HTMLInputElement>) => {
+const InputRange = ({ className, name, vertical, ...other }: FormEditorProps<number> & HTMLProps<HTMLInputElement>) => {
   const { field, fieldState, formState } = useController({ name });
 
   return (
