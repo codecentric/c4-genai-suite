@@ -38,6 +38,9 @@
     "migration:revert": "npm run typeorm -- -d src/config/typeorm-migration.config.ts migration:revert"
   },
   "dependencies": {
+    "@azure/ai-agents": "^1.1.0",
+    "@azure/core-util": "^1.13.0",
+    "@azure/identity": "^4.11.0",
     "@langchain/aws": "0.1.11",
     "@langchain/community": "^0.3.48",
     "@langchain/core": "^0.3.62",
