@@ -161,7 +161,7 @@
       "projectEndpoint": "Projekt-Endpunkt",
       "projectEndpointHint": "Endpunkt des Azure AI Foundry Projekts, z.B. https://myfoundry.services.ai.azure.com/api/projects/myFoundry",
       "connectionId": "Connection ID",
-      "connectionIdHint": "Connection Id des Groundig Tools, z.B. /subscriptions/<subscription_id>/resourceGroups/<resource_group_name>/providers/Microsoft.CognitiveServices/accounts/<ai_service_name>/projects/<project_name>/connections/<connection_name>",
+      "connectionIdHint": "Connection ID des Groundig Tools im Format /subscriptions/<subscription_id>/resourceGroups/<resource_group_name>/providers/Microsoft.CognitiveServices/accounts/<ai_service_name>/projects/<project_name>/connections/<connection_name>",
       "tenantId": "Tenant ID",
       "tenantIdHint": "Azure Tenant ID (uuid)",
       "clientId": "Client ID",
