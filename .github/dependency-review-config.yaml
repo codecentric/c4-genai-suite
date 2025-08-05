@@ -13,5 +13,6 @@ allow_licenses:
   - 'LGPL-2.1-or-later'
   - 'LGPL-2.1-only'
   - 'Unlicense'
+  - 'CC0-1.0'
 allow-dependencies-licenses:
   - 'pkg:pypi/structlog' # This package is a false-positive because of a Contributor License Agreement, which is not a software license.
