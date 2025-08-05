@@ -1,4 +1,4 @@
-FROM node:24.4.1-alpine3.22 AS build
+FROM node:24.5.0-alpine3.22 AS build
 ARG VERSION
 WORKDIR /src
 
