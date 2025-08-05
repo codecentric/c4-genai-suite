@@ -26,6 +26,7 @@ import { Always42Extension } from './tools/always-42';
 import { AzureAISearchExtension } from './tools/azure-ai-search';
 import { AzureDallEExtension } from './tools/azure-dall-e';
 import { BingWebSearchExtension } from './tools/bing-web-search';
+import { BraveWebSearchExtension } from './tools/brave-web-search';
 import { CalculatorExtension } from './tools/calculator';
 import { ConfirmExtension } from './tools/confirm';
 import { DallEExtension } from './tools/dall-e';
@@ -111,6 +112,7 @@ export class ExtensionLibraryModule {
         AzureOpenAIReasoningModelExtension,
         BedrockModelExtension,
         BingWebSearchExtension,
+        BraveWebSearchExtension,
         CalculatorExtension,
         ConfirmExtension,
         ContextExtension,

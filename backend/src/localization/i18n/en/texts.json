@@ -111,6 +111,11 @@
       "description": "Performs a web search using Bing",
       "apiKeyHint": "The Bing Search Subscription Key"
     },
+    "brave": {
+      "title": "Brave Web Search",
+      "description": "Performs a web search using Brave",
+      "apiKeyHint": "The Brave Search API Key"
+    },
     "duckduckgo": {
       "title": "Duckduckgo Web Search",
       "description": "Performs a web search using Duckduckgo",
