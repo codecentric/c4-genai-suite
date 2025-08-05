@@ -31,8 +31,6 @@ ingress:
 backend:
   ## @param backend.enabled Specifies whether c4 should be deployed
   enabled: true
-  ## @param backend.port The backend port
-  port: 3000
   ## @param backend.baseUrl [string] Base URL should match `https://{{ingress.host}}`. Required for OpenID Connect or assistants using Dall-E image generation.
   baseUrl: ""
   ssl:
@@ -159,8 +157,6 @@ backend:
 frontend:
   ## @param frontend.enabled Specifies whether the frontend should be deployed
   enabled: true
-  ## @param frontend.port The frontend port
-  port: 80
   image:
     ## @param frontend.image.repository The image repository including host, port, repo
     repository: "ghcr.io/codecentric/c4-genai-suite/frontend"

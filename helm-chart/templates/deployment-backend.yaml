@@ -42,7 +42,7 @@ spec:
           image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag }}"
           securityContext: {{ .Values.backend.containerSecurityContext | toYaml | nindent 12 }}
           ports:
-            - containerPort: {{ .Values.backend.port }}
+            - containerPort: 3000
               name: web
               protocol: TCP
             - containerPort: {{ .Values.backend.metrics.port }}

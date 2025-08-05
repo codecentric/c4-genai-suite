@@ -1,4 +1,4 @@
-:{$PORT} {
+:3080 {
 	encode
 
 	handle /api/* {

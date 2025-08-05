@@ -4,7 +4,7 @@ services:
     volumes:
       - ./dev/Caddyfile:/etc/caddy/Caddyfile
     ports:
-      - "3333:80"
+      - "3333:3080"
     depends_on:
       c4-backend:
         condition: service_started

@@ -30,7 +30,7 @@ jobs:
     env:
       AZURE_OPEN_AI_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
       TEST_DIR: ./${{ inputs.testdir }}
-      URL: http://localhost
+      URL: http://localhost:3080
       REIS_ENDPOINT: http://reis:3201
       MCP_SERVER_ENDPOINT: http://mcp-fetch:8000/sse
     steps:
@@ -58,7 +58,7 @@ jobs:
             -d \
             --network test-network \
             --name backend \
-            -e BASE_URL="http://localhost" \
+            -e BASE_URL="http://localhost:3080" \
             -e DB_URL="postgres://admin:secret@pgvector:5432/cccc" \
             -e C4_DB_RETRY_DELAY="6000" \
             -e NODE_ENV="development" \
@@ -116,7 +116,8 @@ jobs:
         run: |
           docker run \
             -d \
-            -p 80:80 \
+            -p 3080:3080 \
+            -e FRONTEND_PORT=3080 -e PORT=3080 -e BACKEND_PORT=3000  \
             --network test-network \
             ghcr.io/codecentric/c4-genai-suite/dev-helper/caddy-gateway-proxy:latest
       - uses: actions/setup-node@v4
