@@ -24,7 +24,18 @@ convention = "google"
 
 [dependency-groups]
 dev = [
+    "mypy>=1.17.1",
+    "pip>=25.2",
     "pytest>=8.4.1",
     "pytest-mock>=3.14.1",
     "ruff>=0.12.7",
 ]
+
+[tool.mypy]
+strict = true
+install_types = true
+non_interactive = true
+ignore_missing_imports = true
+exclude = [
+    ".cache",
+    ]

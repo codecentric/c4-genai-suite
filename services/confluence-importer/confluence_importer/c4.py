@@ -19,13 +19,13 @@ def clear_previous_ingests() -> None:
 
     for index, item in enumerate(files):
         num_items = len(files)
-        file_name = item.get("fileName")
+        file_name = item["fileName"]
 
         is_confluence_page_file = file_name.startswith("confluence_page_") and file_name.endswith(".md")
 
         if is_confluence_page_file:
             try:
-                delete_confluence_page(item.get("id"))
+                delete_confluence_page(item["id"])
             except Exception as e:
                 deletion_counter["error"] += 1
                 logger.error(
@@ -58,7 +58,7 @@ def clear_previous_ingests() -> None:
         )
 
 
-def delete_confluence_page(file_id):
+def delete_confluence_page(file_id) -> None:
     """Deletes a file from the C4 bucket by its ID.
 
     Args:
@@ -67,7 +67,7 @@ def delete_confluence_page(file_id):
     requests.delete(f"{c4_base_url}/api/buckets/{bucket_id}/files/{file_id}", headers={"x-api-key": config.c4_token})
 
 
-def fetch_bucket_files_list():
+def fetch_bucket_files_list() -> list[dict]:
     """Fetches the list of all files in the C4 bucket.
 
     Returns:
@@ -76,7 +76,7 @@ def fetch_bucket_files_list():
     page = 1
     batch_size = 50
 
-    items: list[str] = []
+    items: list[dict] = []
 
     while True:
         logger.debug("Fetching partial list of files from c4 ", bucket_id=bucket_id, page=page)
@@ -95,7 +95,6 @@ def fetch_bucket_files_list():
     logger.info("Full list of files in c4 fetched", bucket_id=bucket_id, num_files=total)
 
     return items
-
 
 def import_confluence_page(page_id: int, page_markdown: str) -> None:
     """Ingests a Confluence page into the C4 bucket.

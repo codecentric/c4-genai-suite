@@ -11,7 +11,7 @@ space_keys = config.confluence_space_keys_to_import
 page_ids = config.confluence_page_ids_to_import
 
 
-def process_confluence_spaces(page_import_counter):
+def process_confluence_spaces(page_import_counter) -> None:
     """Processes all Confluence spaces specified in the configuration.
 
     Fetches all pages from each space and imports them into C4.
@@ -45,7 +45,7 @@ def process_confluence_spaces(page_import_counter):
     logger.info("Import of all Confluence Spaces completed")
 
 
-def process_individual_pages(page_import_counter):
+def process_individual_pages(page_import_counter) -> None:
     """Processes individual Confluence pages specified in the configuration.
 
     Fetches each page by ID and imports it into C4.
@@ -72,7 +72,7 @@ def process_individual_pages(page_import_counter):
     logger.info("Import of individual Confluence pages completed")
 
 
-def log_final_results(page_import_counter):
+def log_final_results(page_import_counter) -> None:
     """Logs the final results of the import process.
 
     Outputs either a success message or an error message based on the import counter.
@@ -89,7 +89,7 @@ def log_final_results(page_import_counter):
         logger.info("Synchronization Confluence to c4 completed.", page_import_counter)
 
 
-def main():
+def main() -> None:
     """Main entry point for the Confluence to C4 synchronization process.
 
     Orchestrates the entire import process:

@@ -13,7 +13,7 @@ from confluence_importer.c4 import (
 class TestC4:
     """Tests for the c4 module functionality."""
 
-    def test_delete_confluence_page(self, mocker: MockerFixture):
+    def test_delete_confluence_page(self, mocker: MockerFixture) -> None:
         """Test that delete_confluence_page correctly calls the C4 API.
 
         Args:
