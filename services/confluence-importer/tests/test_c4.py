@@ -202,6 +202,29 @@ class TestC4:
         mock_delete_confluence_page.assert_any_call("file3")
         mock_logger.info.assert_called()
 
+    def test_clear_previous_ingests_with_empty_list(self, mocker: MockerFixture):
+        """Test that clear_previous_ingests works correctly with empty bucket files list.
+
+        Args:
+            mocker: Pytest fixture for mocking
+        """
+        # arrange
+        mock_fetch_bucket_files = mocker.patch(
+            "confluence_importer.c4.fetch_bucket_files_list",
+            return_value=[]
+        )
+        mock_delete_confluence_page = mocker.patch("confluence_importer.c4.delete_confluence_page")
+        mock_logger = mocker.patch("confluence_importer.c4.logger")
+        mocker.patch("confluence_importer.c4.bucket_id", "test-bucket")
+
+        # act
+        clear_previous_ingests()
+
+        # assert
+        mock_fetch_bucket_files.assert_called_once()
+        mock_delete_confluence_page.assert_not_called()
+        mock_logger.info.assert_called()
+
     def test_clear_previous_ingests_with_error(self, mocker: MockerFixture):
         """Test that clear_previous_ingests correctly handles errors during deletion.
 
