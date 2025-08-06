@@ -41,6 +41,8 @@ jobs:
         run: uv sync --dev
       - name: Lint with ruff
         run: uv run ruff check .
+      - name: Lint with mypy
+        run: uv run mypy .
 
   test:
     runs-on: ubuntu-latest
