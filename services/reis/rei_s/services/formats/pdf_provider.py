@@ -2,11 +2,13 @@ from io import BytesIO
 from typing import Any, BinaryIO
 
 from langchain_core.documents import Document
-from langchain_community.document_loaders.parsers.pdf import PDFMinerParser
+from langchain_community.document_loaders.parsers.pdf import PDFMinerParser, PyPDFParser
 from langchain_community.document_loaders.generic import GenericLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 import pdfminer
+import pypdf
 
+from rei_s import logger
 from rei_s.services.formats.abstract_format_provider import AbstractFormatProvider
 from rei_s.services.formats.utils import BytesLoader, validate_chunk_overlap, validate_chunk_size
 from rei_s.types.source_file import SourceFile
@@ -58,10 +60,22 @@ class PdfProvider(AbstractFormatProvider):
             blob_parser=TolerantPDFMinerParser(extract_images=False, mode="page"),
         )
 
-        documents = loader.load()
+        try:
+            documents = loader.load()
+            parser_info = f"PDFMiner {pdfminer.__version__}"
+        except Exception as e:
+            # Fallback to PyPDF if PDFMiner fails
+            # sometimes PyPDF is more tolerant to malformed PDFs
+            logger.warning(f"PDFMiner failed to load PDF {file.id}, falling back to PyPDF. Error: `{e}`")
+            loader = GenericLoader(
+                blob_loader=BytesLoader(BytesIO(file.buffer)),
+                blob_parser=PyPDFParser(extract_images=False, mode="page"),
+            )
+            documents = loader.load()
+            parser_info = f"PyPDF {pypdf.__version__}"
 
         for doc in documents:
-            doc.metadata["pdf_parser"] = f"PDFMiner {pdfminer.__version__}"
+            doc.metadata["pdf_parser"] = parser_info
             if "page" in doc.metadata:
                 # this loader starts to count at 0
                 # since convention for pdfs (and books, ...) is to start at 1, we need to increase it here

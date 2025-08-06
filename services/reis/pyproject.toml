@@ -20,6 +20,7 @@ azure-search-documents = "11.5.3"
 azure-identity = "1.23.1"
 unstructured = {extras = ["docx", "md", "pptx", "xlsx"], version = "0.18.11"}
 pdfminer-six = "^20250506"
+pypdf = "^5.9.0"
 ffmpeg-python = "^0.2.0"
 aiofiles = "^24.1.0"
 prometheus-fastapi-instrumentator = "^7.0.0"
