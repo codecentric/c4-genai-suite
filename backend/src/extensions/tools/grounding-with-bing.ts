@@ -62,7 +62,7 @@ export class GroundingWithBingSearchExtension implements Extension<GroundingWith
           type: 'string',
           title: this.i18n.t('texts.extensions.grounding-with-bing.model'),
           required: true,
-          default: 'gpt-4.1-mini',
+          examples: ['gpt-4.1-mini'],
           description: this.i18n.t('texts.extensions.grounding-with-bing.modelHint'),
         },
       },
