@@ -70,6 +70,7 @@ def delete_confluence_page(file_id: int) -> None:
 
 class C4BucketFileItem(TypedDict):
     """TypedDict representing a file item in the C4 bucket."""
+
     id: int
     fileName: str
 
@@ -102,6 +103,7 @@ def fetch_bucket_files_list() -> list[C4BucketFileItem]:
     logger.info("Full list of files in c4 fetched", bucket_id=bucket_id, num_files=total)
 
     return items
+
 
 def import_confluence_page(page_id: int, page_markdown: str) -> None:
     """Ingests a Confluence page into the C4 bucket.

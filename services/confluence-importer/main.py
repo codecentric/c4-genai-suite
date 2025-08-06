@@ -13,8 +13,9 @@ page_ids = config.confluence_page_ids_to_import
 
 
 @dataclass
-class PageImportCounter():
+class PageImportCounter:
     """Data class to track the number of successful and failed imports."""
+
     error: int = 0
     success: int = 0
 

@@ -209,10 +209,7 @@ class TestC4:
             mocker: Pytest fixture for mocking
         """
         # arrange
-        mock_fetch_bucket_files = mocker.patch(
-            "confluence_importer.c4.fetch_bucket_files_list",
-            return_value=[]
-        )
+        mock_fetch_bucket_files = mocker.patch("confluence_importer.c4.fetch_bucket_files_list", return_value=[])
         mock_delete_confluence_page = mocker.patch("confluence_importer.c4.delete_confluence_page")
         mock_logger = mocker.patch("confluence_importer.c4.logger")
         mocker.patch("confluence_importer.c4.bucket_id", "test-bucket")

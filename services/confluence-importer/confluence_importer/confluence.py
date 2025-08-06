@@ -22,6 +22,7 @@ class ConfluencePage:
     url: str
     html_content: str
 
+
 def get_page(page_id: int) -> ConfluencePage:
     """Retrieves the content of a Confluence page by its ID.
 

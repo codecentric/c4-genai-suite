@@ -23,4 +23,4 @@ class Config(BaseSettings):
     c4_token: str
 
 
-config = Config() # type: ignore[call-arg]
+config = Config()  # type: ignore[call-arg]
