@@ -1,5 +1,6 @@
 """Main module for the Confluence to C4 synchronization process."""
 
+from dataclasses import dataclass
 from confluence_importer import confluence
 from confluence_importer.c4 import clear_previous_ingests, import_confluence_page
 from confluence_importer.markdown import html_to_markdown
@@ -11,7 +12,14 @@ space_keys = config.confluence_space_keys_to_import
 page_ids = config.confluence_page_ids_to_import
 
 
-def process_confluence_spaces(page_import_counter) -> None:
+@dataclass
+class PageImportCounter():
+    """Data class to track the number of successful and failed imports."""
+    error: int = 0
+    success: int = 0
+
+
+def process_confluence_spaces(page_import_counter: PageImportCounter) -> None:
     """Processes all Confluence spaces specified in the configuration.
 
     Fetches all pages from each space and imports them into C4.
@@ -29,10 +37,10 @@ def process_confluence_spaces(page_import_counter) -> None:
             try:
                 page_markdown = html_to_markdown(page)
                 import_confluence_page(page.id, page_markdown)
-                page_import_counter["success"] += 1
+                page_import_counter.success += 1
                 logger.info("Import Confluence page", space_key=space_key, page_id=page.id, page_count=f"{index}")
             except Exception as e:
-                page_import_counter["error"] += 1
+                page_import_counter.error += 1
                 logger.error(
                     "Error importing Confluence page",
                     error=str(e),
@@ -45,7 +53,7 @@ def process_confluence_spaces(page_import_counter) -> None:
     logger.info("Import of all Confluence Spaces completed")
 
 
-def process_individual_pages(page_import_counter) -> None:
+def process_individual_pages(page_import_counter: PageImportCounter) -> None:
     """Processes individual Confluence pages specified in the configuration.
 
     Fetches each page by ID and imports it into C4.
@@ -61,10 +69,10 @@ def process_individual_pages(page_import_counter) -> None:
             page = confluence.get_page(page_id)
             page_markdown = html_to_markdown(page)
             import_confluence_page(page_id, page_markdown)
-            page_import_counter["success"] += 1
+            page_import_counter.success += 1
             logger.info("Import Confluence page", page_id=page_id, progress=f"{index + 1}/{num_pages}")
         except Exception as e:
-            page_import_counter["error"] += 1
+            page_import_counter.error += 1
             logger.error(
                 "Error importing Confluence page", error=str(e), page_id=page_id, progress=f"{index + 1}/{num_pages}"
             )
@@ -72,7 +80,7 @@ def process_individual_pages(page_import_counter) -> None:
     logger.info("Import of individual Confluence pages completed")
 
 
-def log_final_results(page_import_counter) -> None:
+def log_final_results(page_import_counter: PageImportCounter) -> None:
     """Logs the final results of the import process.
 
     Outputs either a success message or an error message based on the import counter.
@@ -80,7 +88,7 @@ def log_final_results(page_import_counter) -> None:
     Args:
         page_import_counter: Dictionary containing counts of successful and failed imports
     """
-    if page_import_counter["error"] > 0:
+    if page_import_counter.error > 0:
         logger.error(
             "Synchronization Confluence to c4 completed with errors! See log for more information.",
             page_import_counter=page_import_counter,
@@ -102,7 +110,8 @@ def main() -> None:
 
     clear_previous_ingests()
 
-    page_import_counter = {"error": 0, "success": 0}
+    page_import_counter = PageImportCounter()
+
     process_confluence_spaces(page_import_counter)
     process_individual_pages(page_import_counter)
     log_final_results(page_import_counter)

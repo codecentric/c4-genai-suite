@@ -8,7 +8,7 @@ from confluence_importer.markdown import html_to_markdown
 
 
 @pytest.fixture
-def sample_confluence_page():
+def sample_confluence_page() -> ConfluencePage:
     """Fixture that returns a sample ConfluencePage object for testing."""
     return ConfluencePage(
         id=12345,
@@ -21,7 +21,7 @@ def sample_confluence_page():
 class MockDocumentConverterResult:
     """Mock class for MarkItDown conversion result."""
 
-    def __init__(self, text_content):
+    def __init__(self, text_content: str) -> None:
         """Initialize the mock converter result.
 
         Args:
@@ -33,7 +33,7 @@ class MockDocumentConverterResult:
 class TestHtmlToMarkdown:
     """Tests for the HTML to Markdown conversion functionality."""
 
-    def test_conversion(self, sample_confluence_page, mocker: MockerFixture):
+    def test_conversion(self, sample_confluence_page: ConfluencePage, mocker: MockerFixture) -> None:
         """Test that html_to_markdown correctly converts HTML to Markdown with frontmatter.
 
         Args:

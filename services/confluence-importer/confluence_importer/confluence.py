@@ -10,7 +10,7 @@ from confluence_importer.config import config
 
 confluence_url = config.confluence_url
 
-confluence_api = Confluence(url=confluence_url, token=config.confluence_token)
+confluence_api = Confluence(url=confluence_url, token=config.confluence_token)  # type: ignore[no-untyped-call]
 
 
 @dataclass
@@ -22,7 +22,6 @@ class ConfluencePage:
     url: str
     html_content: str
 
-
 def get_page(page_id: int) -> ConfluencePage:
     """Retrieves the content of a Confluence page by its ID.
 
@@ -32,7 +31,7 @@ def get_page(page_id: int) -> ConfluencePage:
     Returns:
         A ConfluencePage dataclass containing the page information and content as HTML
     """
-    page = confluence_api.get_page_by_id(page_id, expand="body.storage,history.lastUpdated")
+    page = confluence_api.get_page_by_id(page_id, expand="body.storage,history.lastUpdated")  # type: ignore[no-untyped-call]
 
     return ConfluencePage(
         page_id,
@@ -67,7 +66,7 @@ def get_pages_for_space(space_key: str) -> Generator[ConfluencePage]:
             content_type="page",
             expand="body.storage,history.lastUpdated",
             status="current",
-        )
+        )  # type: ignore[no-untyped-call]
 
         len_result = 0
         for r in result:

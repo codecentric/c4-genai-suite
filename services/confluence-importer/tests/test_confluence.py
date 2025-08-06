@@ -8,7 +8,7 @@ from confluence_importer.confluence import get_page, get_pages_for_space, Conflu
 class TestConfluence:
     """Tests for the Confluence module functionality."""
 
-    def test_get_page(self, mocker: MockerFixture):
+    def test_get_page(self, mocker: MockerFixture) -> None:
         """Test that get_page correctly retrieves and parses a Confluence page.
 
         Args:
@@ -38,7 +38,7 @@ class TestConfluence:
         assert result.url == f"{confluence_url}/rest/api/content/123456"
         assert result.html_content == "<h1>Test Page</h1>"
 
-    def test_get_pages_for_space(self, mocker: MockerFixture):
+    def test_get_pages_for_space(self, mocker: MockerFixture) -> None:
         """Test that get_pages_for_space correctly retrieves and parses pages from a Confluence space.
 
         Args:
@@ -48,13 +48,13 @@ class TestConfluence:
         space_key = "TEST"
         mock_pages = [
             {
-                "id": "123456",
+                "id": 123456,
                 "history": {"lastUpdated": {"when": "2025-07-29T13:56:00.000Z"}},
                 "_links": {"webui": "/rest/api/content/123456"},
                 "body": {"storage": {"value": "<h1>Test Page 1</h1>"}},
             },
             {
-                "id": "789012",
+                "id": 789012,
                 "history": {"lastUpdated": {"when": "2025-07-30T10:15:00.000Z"}},
                 "_links": {"webui": "/rest/api/content/789012"},
                 "body": {"storage": {"value": "<h1>Test Page 2</h1>"}},
@@ -85,18 +85,18 @@ class TestConfluence:
         assert len(results) == 2
 
         assert isinstance(results[0], ConfluencePage)
-        assert results[0].id == "123456"
+        assert results[0].id == 123456
         assert results[0].last_updated == "2025-07-29T13:56:00.000Z"
         assert results[0].url == f"{confluence_url}/rest/api/content/123456"
         assert results[0].html_content == "<h1>Test Page 1</h1>"
 
         assert isinstance(results[1], ConfluencePage)
-        assert results[1].id == "789012"
+        assert results[1].id == 789012
         assert results[1].last_updated == "2025-07-30T10:15:00.000Z"
         assert results[1].url == f"{confluence_url}/rest/api/content/789012"
         assert results[1].html_content == "<h1>Test Page 2</h1>"
 
-    def test_get_pages_for_space_pagination(self, mocker: MockerFixture):
+    def test_get_pages_for_space_pagination(self, mocker: MockerFixture) -> None:
         """Test that get_pages_for_space correctly handles pagination of results.
 
         Args:
@@ -107,7 +107,7 @@ class TestConfluence:
 
         first_batch = [
             {
-                "id": f"{i}",
+                "id": i,
                 "history": {"lastUpdated": {"when": "2025-07-29T13:56:00.000Z"}},
                 "_links": {"webui": f"/rest/api/content/{i}"},
                 "body": {"storage": {"value": f"<h1>Page {i}</h1>"}},
@@ -117,7 +117,7 @@ class TestConfluence:
 
         second_batch = [
             {
-                "id": f"{i + 100}",
+                "id": i + 100,
                 "history": {"lastUpdated": {"when": "2025-07-30T10:15:00.000Z"}},
                 "_links": {"webui": f"/rest/api/content/{i + 100}"},
                 "body": {"storage": {"value": f"<h1>Page {i + 100}</h1>"}},
@@ -157,7 +157,7 @@ class TestConfluence:
         }
 
         assert len(results) == 150
-        assert results[0].id == "0"
-        assert results[99].id == "99"
-        assert results[100].id == "100"
-        assert results[149].id == "149"
+        assert results[0].id == 0
+        assert results[99].id == 99
+        assert results[100].id == 100
+        assert results[149].id == 149

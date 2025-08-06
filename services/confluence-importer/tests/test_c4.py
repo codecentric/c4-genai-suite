@@ -24,17 +24,17 @@ class TestC4:
         mocker.patch("confluence_importer.c4.c4_base_url", "http://test-url")
         mocker.patch("confluence_importer.c4.bucket_id", "test-bucket")
         mocker.patch("confluence_importer.c4.config.c4_token", "test-token")
-        file_id = "test-file-id"
+        file_id = 23
 
         # act
         delete_confluence_page(file_id)
 
         # assert
         mock_requests.delete.assert_called_once_with(
-            "http://test-url/api/buckets/test-bucket/files/test-file-id", headers={"x-api-key": "test-token"}
+            "http://test-url/api/buckets/test-bucket/files/23", headers={"x-api-key": "test-token"}
         )
 
-    def test_fetch_bucket_files_list_single_page(self, mocker: MockerFixture):
+    def test_fetch_bucket_files_list_single_page(self, mocker: MockerFixture) -> None:
         """Test that fetch_bucket_files_list correctly handles a single page of results.
 
         Args:
@@ -51,8 +51,8 @@ class TestC4:
         mock_response.json.return_value = {
             "total": 2,
             "items": [
-                {"id": "file1", "fileName": "confluence_page_1.md"},
-                {"id": "file2", "fileName": "confluence_page_2.md"},
+                {"id": 1, "fileName": "confluence_page_1.md"},
+                {"id": 2, "fileName": "confluence_page_2.md"},
             ],
         }
         mock_requests.get.return_value = mock_response
@@ -65,11 +65,11 @@ class TestC4:
             "http://test-url/api/buckets/test-bucket/files", headers={"x-api-key": "test-token"}
         )
         assert len(result) == 2
-        assert result[0]["id"] == "file1"
-        assert result[1]["id"] == "file2"
+        assert result[0]["id"] == 1
+        assert result[1]["id"] == 2
         mock_logger.info.assert_called_once()
 
-    def test_fetch_bucket_files_list_multiple_pages(self, mocker: MockerFixture):
+    def test_fetch_bucket_files_list_multiple_pages(self, mocker: MockerFixture) -> None:
         """Test that fetch_bucket_files_list correctly handles multiple pages of results.
 
         Args:
@@ -86,13 +86,13 @@ class TestC4:
         first_response.json.return_value = {
             "total": 3,
             "items": [
-                {"id": "file1", "fileName": "confluence_page_1.md"},
-                {"id": "file2", "fileName": "confluence_page_2.md"},
+                {"id": 1, "fileName": "confluence_page_1.md"},
+                {"id": 2, "fileName": "confluence_page_2.md"},
             ],
         }
 
         second_response = mocker.MagicMock()
-        second_response.json.return_value = {"total": 3, "items": [{"id": "file3", "fileName": "confluence_page_3.md"}]}
+        second_response.json.return_value = {"total": 3, "items": [{"id": 3, "fileName": "confluence_page_3.md"}]}
 
         mock_requests.get.return_value = first_response
 
@@ -104,10 +104,10 @@ class TestC4:
             "http://test-url/api/buckets/test-bucket/files", headers={"x-api-key": "test-token"}
         )
         assert len(result) == 2
-        assert result[0]["id"] == "file1"
-        assert result[1]["id"] == "file2"
+        assert result[0]["id"] == 1
+        assert result[1]["id"] == 2
 
-    def test_import_confluence_page_success(self, mocker: MockerFixture):
+    def test_import_confluence_page_success(self, mocker: MockerFixture) -> None:
         """Test that import_confluence_page correctly handles successful API responses.
 
         Args:
@@ -140,7 +140,7 @@ class TestC4:
         mock_logger.debug.assert_called_once()
         mock_logger.error.assert_not_called()
 
-    def test_import_confluence_page_error(self, mocker: MockerFixture):
+    def test_import_confluence_page_error(self, mocker: MockerFixture) -> None:
         """Test that import_confluence_page correctly handles error API responses.
 
         Args:
@@ -173,7 +173,7 @@ class TestC4:
         mock_logger.debug.assert_not_called()
         mock_logger.error.assert_called_once()
 
-    def test_clear_previous_ingests(self, mocker: MockerFixture):
+    def test_clear_previous_ingests(self, mocker: MockerFixture) -> None:
         """Test that clear_previous_ingests correctly deletes Confluence pages from C4.
 
         Args:
@@ -183,9 +183,9 @@ class TestC4:
         mock_fetch_bucket_files = mocker.patch(
             "confluence_importer.c4.fetch_bucket_files_list",
             return_value=[
-                {"id": "file1", "fileName": "confluence_page_1.md"},
-                {"id": "file2", "fileName": "other_file.txt"},
-                {"id": "file3", "fileName": "confluence_page_2.md"},
+                {"id": 1, "fileName": "confluence_page_1.md"},
+                {"id": 2, "fileName": "other_file.txt"},
+                {"id": 3, "fileName": "confluence_page_2.md"},
             ],
         )
         mock_delete_confluence_page = mocker.patch("confluence_importer.c4.delete_confluence_page")
@@ -198,11 +198,11 @@ class TestC4:
         # assert
         mock_fetch_bucket_files.assert_called_once()
         assert mock_delete_confluence_page.call_count == 2
-        mock_delete_confluence_page.assert_any_call("file1")
-        mock_delete_confluence_page.assert_any_call("file3")
+        mock_delete_confluence_page.assert_any_call(1)
+        mock_delete_confluence_page.assert_any_call(3)
         mock_logger.info.assert_called()
 
-    def test_clear_previous_ingests_with_empty_list(self, mocker: MockerFixture):
+    def test_clear_previous_ingests_with_empty_list(self, mocker: MockerFixture) -> None:
         """Test that clear_previous_ingests works correctly with empty bucket files list.
 
         Args:
@@ -225,7 +225,7 @@ class TestC4:
         mock_delete_confluence_page.assert_not_called()
         mock_logger.info.assert_called()
 
-    def test_clear_previous_ingests_with_error(self, mocker: MockerFixture):
+    def test_clear_previous_ingests_with_error(self, mocker: MockerFixture) -> None:
         """Test that clear_previous_ingests correctly handles errors during deletion.
 
         Args:
@@ -235,13 +235,13 @@ class TestC4:
         mock_fetch_bucket_files = mocker.patch(
             "confluence_importer.c4.fetch_bucket_files_list",
             return_value=[
-                {"id": "file1", "fileName": "confluence_page_1.md"},
-                {"id": "file2", "fileName": "confluence_page_2.md"},
+                {"id": 1, "fileName": "confluence_page_1.md"},
+                {"id": 2, "fileName": "confluence_page_2.md"},
             ],
         )
 
-        def delete_side_effect(file_id):
-            if file_id == "file2":
+        def delete_side_effect(file_id: int) -> None:
+            if file_id == 2:
                 raise Exception("Delete failed")
 
         mock_delete_confluence_page = mocker.patch(

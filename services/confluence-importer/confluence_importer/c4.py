@@ -1,5 +1,6 @@
 """Module for interacting with the C4 API to manage Confluence content."""
 
+from typing import TypedDict
 import requests
 
 from confluence_importer.logger import logger
@@ -58,7 +59,7 @@ def clear_previous_ingests() -> None:
         )
 
 
-def delete_confluence_page(file_id) -> None:
+def delete_confluence_page(file_id: int) -> None:
     """Deletes a file from the C4 bucket by its ID.
 
     Args:
@@ -67,7 +68,13 @@ def delete_confluence_page(file_id) -> None:
     requests.delete(f"{c4_base_url}/api/buckets/{bucket_id}/files/{file_id}", headers={"x-api-key": config.c4_token})
 
 
-def fetch_bucket_files_list() -> list[dict]:
+class C4BucketFileItem(TypedDict):
+    """TypedDict representing a file item in the C4 bucket."""
+    id: int
+    fileName: str
+
+
+def fetch_bucket_files_list() -> list[C4BucketFileItem]:
     """Fetches the list of all files in the C4 bucket.
 
     Returns:
@@ -76,7 +83,7 @@ def fetch_bucket_files_list() -> list[dict]:
     page = 1
     batch_size = 50
 
-    items: list[dict] = []
+    items: list[C4BucketFileItem] = []
 
     while True:
         logger.debug("Fetching partial list of files from c4 ", bucket_id=bucket_id, page=page)
