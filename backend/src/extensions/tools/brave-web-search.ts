@@ -1,4 +1,6 @@
 import { BraveSearch } from '@langchain/community/tools/brave_search';
+import { StructuredTool } from '@langchain/core/tools';
+import { z } from 'zod';
 import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from 'src/domain/chat';
 import { Extension, ExtensionConfiguration, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions';
 import { User } from 'src/domain/users';
@@ -30,12 +32,44 @@ export class BraveWebSearchExtension implements Extension<BraveWebSearchExtensio
   getMiddlewares(_user: User, extension: ExtensionEntity<BraveWebSearchExtensionConfiguration>): Promise<ChatMiddleware[]> {
     const middleware = {
       invoke: async (context: ChatContext, getContext: GetContext, next: ChatNextDelegate): Promise<any> => {
-        context.tools.push(new BraveSearch({ apiKey: extension.values.apiKey }));
+        context.tools.push(new InternalTool(extension.values, extension.externalId));
         return next(context);
       },
     };
 
     return Promise.resolve([middleware]);
+  }
+}
+
+class InternalTool extends StructuredTool {
+  readonly name: string;
+  readonly description: string;
+  readonly displayName = 'Brave Search';
+  readonly apiKey: string;
+  readonly braveSearch: BraveSearch;
+
+  get lc_id() {
+    return [...this.lc_namespace, this.name];
+  }
+
+  readonly schema = z.object({
+    query: z.string().describe('The search query.'),
+  });
+
+  constructor(configuration: BraveWebSearchExtensionConfiguration, extensionExternalId: string) {
+    super();
+
+    this.name = extensionExternalId;
+    this.apiKey = configuration.apiKey;
+    this.description = 'Performs a web search using Brave Search.';
+
+    this.braveSearch = new BraveSearch({
+      apiKey: this.apiKey,
+    });
+  }
+
+  protected async _call(arg: z.infer<typeof this.schema>): Promise<string> {
+    return (await this.braveSearch.invoke(arg.query)) as string;
   }
 }
 
