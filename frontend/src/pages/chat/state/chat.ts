@@ -267,3 +267,23 @@ export const useStateOfIsAiWriting = () => {
   const chatData = chatDataMap.get(currentChatId);
   return chatData?.isAiWriting || false;
 };
+
+export const useStateOfSelectedDocument = () => {
+  const selectedDocument = useChatStore((state) => state.selectedDocument);
+  const setSelectedDocument = useChatStore((state) => state.setSelectedDocument);
+
+  return {
+    selectedDocument,
+    setSelectedDocument,
+  };
+};
+
+export const useStateOfSelectedSource = () => {
+  const selectedSource = useChatStore((state) => state.selectedSource);
+  const setSelectedSource = useChatStore((state) => state.setSelectedSource);
+
+  return {
+    selectedSource,
+    setSelectedSource,
+  };
+};

@@ -1,20 +1,24 @@
 import { FileDto } from 'src/api';
-import { useStateOfMessages, useStateOfSelectedChatId } from '../state/chat';
+import { useSidebarState } from 'src/hooks/stored';
+import { useStateOfMessages, useStateOfSelectedChatId, useStateOfSelectedDocument } from '../state/chat';
 import { ChatItem } from './ChatItem/ChatItem';
 
 type ChatHistoryProps = {
   agentName: string;
   llmLogo?: string;
-  selectDocument: (chatId: number, messageId: number, documentUri: string) => void;
   editMessage: (input: string, files?: FileDto[], editMessageId?: number) => void;
 };
 
-export function ChatHistory({ agentName, selectDocument, editMessage }: ChatHistoryProps) {
+export function ChatHistory({ agentName, llmLogo, editMessage }: ChatHistoryProps) {
   const messages = useStateOfMessages();
   const allMessagesButLastTwo = messages.slice(0, -2);
   const lastTwoMessages = messages.slice(-2);
   const chatId = useStateOfSelectedChatId();
   const autoScrollContainerForLastMessageExchange = 'grid min-h-full min-w-full max-w-full grid-rows-[max-content_1fr]';
+
+  const [_, setSidebarRight] = useSidebarState('sidebar-right');
+
+  const { setSelectedDocument } = useStateOfSelectedDocument();
 
   return (
     <>
@@ -26,7 +30,11 @@ export function ChatHistory({ agentName, selectDocument, editMessage }: ChatHist
             isLast={i === messages.length - 1}
             isBeforeLast={i === messages.length - 2}
             message={message}
-            selectDocument={(documentUri) => selectDocument(chatId, message.id, documentUri)}
+            llmLogo={llmLogo}
+            selectDocument={(documentUri) => {
+              setSelectedDocument({ conversationId: chatId, messageId: message.id, documentUri });
+              setSidebarRight(true);
+            }}
             editMessage={editMessage}
           />
         ))}
@@ -39,7 +47,11 @@ export function ChatHistory({ agentName, selectDocument, editMessage }: ChatHist
             isLast={i === 1}
             isBeforeLast={i === 0}
             message={message}
-            selectDocument={(documentUri) => selectDocument(chatId, message.id, documentUri)}
+            llmLogo={llmLogo}
+            selectDocument={(documentUri) => {
+              setSelectedDocument({ conversationId: chatId, messageId: message.id, documentUri });
+              setSidebarRight(true);
+            }}
             editMessage={editMessage}
           />
         ))}

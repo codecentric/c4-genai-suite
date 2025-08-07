@@ -1,6 +1,7 @@
 import { Observable, Subscription } from 'rxjs';
 import { create } from 'zustand';
-import { AppClient, ConversationDto, FileDto, MessageDto, StreamEventDto } from 'src/api';
+import { AppClient, ConversationDto, FileDto, MessageDto, SourceDto, StreamEventDto } from 'src/api';
+import { DocumentSource } from '../../SourcesChunkPreview';
 import { ChatMessage } from '../types';
 
 type ChatData = {
@@ -15,6 +16,11 @@ type ChatData = {
 type ChatState = {
   currentChatId: number;
   chatDataMap: Map<number, ChatData>;
+
+  // Remove these comments if the purpose of selectedDocument and selectedSource being here seems self-explanatory
+  // A selected Documents from a List of Sources provided by the LLM o RAG Assitant is a piece of information related to the concept/entity of a Chat
+  selectedDocument: DocumentSource | undefined;
+  selectedSource: SourceDto | undefined;
 };
 
 type ChatActions = {
@@ -25,14 +31,16 @@ type ChatActions = {
     messageId: number,
     messageUpdate: Partial<ChatMessage> | ((oldMessage: ChatMessage) => Partial<ChatMessage>),
   ) => void;
-  appendToStreamingMessage: (chatId: number, text: string) => void;
+
   setChat: (chatId: number, chat: ConversationDto) => void;
+  initializeChatIfNeeded: (chatId: number) => void;
+  switchToChat: (chatId: number) => void;
+
   setIsAiWriting: (chatId: number, isAiWriting: boolean) => void;
   setStreamingMessageId: (chatId: number, messageId?: number) => void;
+  appendToStreamingMessage: (chatId: number, text: string) => void;
   setActiveStreamSubscription: (chatId: number, subscription?: Subscription) => void;
   cancelActiveStream: (chatId: number) => void;
-  switchToChat: (chatId: number) => void;
-  initializeChatIfNeeded: (chatId: number) => void;
   getStream: (
     chatId: number,
     input: string,
@@ -40,6 +48,9 @@ type ChatActions = {
     api: AppClient,
     editMessageId: number | undefined,
   ) => Observable<StreamEventDto>;
+
+  setSelectedDocument: (document: DocumentSource | undefined) => void;
+  setSelectedSource: (source: SourceDto | undefined) => void;
 };
 
 const createEmptyChatData = (chatId: number): ChatData => ({
@@ -55,6 +66,9 @@ export const useChatStore = create<ChatState & ChatActions>()((set, get) => {
   return {
     currentChatId: 0,
     chatDataMap: new Map(),
+
+    selectedDocument: undefined,
+    selectedSource: undefined,
 
     initializeChatIfNeeded: (chatId) => {
       set((state) => {
@@ -200,5 +214,12 @@ export const useChatStore = create<ChatState & ChatActions>()((set, get) => {
         });
         return { chatDataMap: newMap };
       }),
+
+    setSelectedDocument: (selectedDocument) => {
+      set({ selectedDocument });
+    },
+    setSelectedSource: (selectedSource) => {
+      set({ selectedSource });
+    },
   };
 });
