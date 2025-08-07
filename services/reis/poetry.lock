@@ -1794,14 +1794,14 @@ tenacity = ">=8.1.0,<8.4.0 || >8.4.0,<10"
 
 [[package]]
 name = "langchain-core"
-version = "0.3.72"
+version = "0.3.73"
 description = "Building applications with LLMs through composability"
 optional = false
 python-versions = ">=3.9"
 groups = ["main"]
 files = [
-    {file = "langchain_core-0.3.72-py3-none-any.whl", hash = "sha256:9fa15d390600eb6b6544397a7aa84be9564939b6adf7a2b091179ea30405b240"},
-    {file = "langchain_core-0.3.72.tar.gz", hash = "sha256:4de3828909b3d7910c313242ab07b241294650f5cb6eac17738dd3638b1cd7de"},
+    {file = "langchain_core-0.3.73-py3-none-any.whl", hash = "sha256:90c64e13d5a213b0642eab29831b011a3592e57f20f34cac8c0bf9a6e4f563bc"},
+    {file = "langchain_core-0.3.73.tar.gz", hash = "sha256:8de06dbfed5a2e39dbefb48c61f32b011a0ee50a77b51728cc151930789bbc17"},
 ]
 
 [package.dependencies]
@@ -6046,4 +6046,4 @@ cffi = ["cffi (>=1.11)"]
 [metadata]
 lock-version = "2.1"
 python-versions = "<4.0,>=3.12.0"
-content-hash = "327bc24b7690f90e955f2b39c5994d7d704a16d24b3461495c60d426bb25986f"
+content-hash = "5ee78131537c14b19098c06174d6f65a7d5531a7462704b0feb149dede96fd53"
