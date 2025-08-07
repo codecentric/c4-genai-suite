@@ -4,9 +4,9 @@ import { toast } from 'react-toastify';
 import { ConversationDto, useApi } from 'src/api';
 import { useTransientContext, useTransientNavigate } from 'src/hooks';
 import { buildError } from 'src/lib';
+import { useStateOfChat } from 'src/pages/chat/state/chat';
 import { useStateOfAssistants } from 'src/pages/chat/state/listOfAssistants';
 import { texts } from 'src/texts';
-import { useChatStore } from './zustand/chatStore';
 import { useListOfChatsStore } from './zustand/listOfChatsStore';
 
 /**
@@ -67,9 +67,8 @@ export const useStateMutateRenameChat = () => {
 
 export const useStateMutateRemoveChat = () => {
   const api = useApi();
-  const chatId = useChatStore((s) => s.currentChatId);
-  const chatDataMap = useChatStore((s) => s.chatDataMap);
-  const assistantId = chatDataMap.get(chatId)?.chat.configurationId || -1;
+
+  const chat = useStateOfChat();
   const removeChat = useListOfChatsStore((s) => s.removeChat);
   const createNewChat = useMutateNewChat();
 
@@ -77,8 +76,8 @@ export const useStateMutateRemoveChat = () => {
     mutationFn: (id: number) => api.conversations.deleteConversation(id),
     onSuccess: (_, deletedId) => {
       removeChat(deletedId);
-      if (deletedId === chatId) {
-        createNewChat.mutate(assistantId);
+      if (deletedId === chat.id) {
+        createNewChat.mutate(chat.configurationId);
       }
     },
     onError: async () => {
@@ -89,9 +88,7 @@ export const useStateMutateRemoveChat = () => {
 
 export const useStateMutateRemoveAllChats = () => {
   const api = useApi();
-  const currentChatId = useChatStore((s) => s.currentChatId);
-  const chatDataMap = useChatStore((s) => s.chatDataMap);
-  const assistantId = chatDataMap.get(currentChatId)?.chat.configurationId || -1;
+  const assistantId = useStateOfChat().configurationId;
   const setChats = useListOfChatsStore((s) => s.setChats);
   const createNewChat = useMutateNewChat();
 

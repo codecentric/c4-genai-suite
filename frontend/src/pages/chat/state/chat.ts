@@ -146,13 +146,10 @@ export const useChatStream = (chatId: number) => {
           case 'error':
             return chatStore.updateMessage(chatId, actualAiMessageId, { error: msg.message });
           case 'completed':
-            // Use the actual message ID (which might have been updated by 'saved' event)
             return chatStore.updateMessage(chatId, actualAiMessageId, { tokenCount: msg.metadata.tokenCount });
           case 'saved':
-            // Update our tracking of the actual message ID
             if (msg.messageType === 'ai') {
               actualAiMessageId = msg.messageId;
-              // Update the streaming message ID to the new real ID
               chatStore.setStreamingMessageId(chatId, msg.messageId);
             }
             return chatStore.updateMessage(chatId, getMessagePlaceholderId(msg.messageType), { id: msg.messageId });
@@ -172,7 +169,6 @@ export const useChatStream = (chatId: number) => {
         listOfChatsStore.refetch();
         chatStore.setIsAiWriting(chatId, false);
         chatStore.setStreamingMessageId(chatId, undefined);
-        // Clear the subscription reference when complete
         const currentChatData = chatStore.chatDataMap.get(chatId);
         if (currentChatData?.activeStreamSubscription === subscription) {
           chatStore.setActiveStreamSubscription(chatId, undefined);
@@ -180,7 +176,6 @@ export const useChatStream = (chatId: number) => {
       },
     });
 
-    // Store the subscription so it can be cancelled later if needed
     chatStore.setActiveStreamSubscription(chatId, subscription);
   };
 
@@ -211,7 +206,7 @@ export const useConfirmAiAction = (requestId: string) => {
       return api.conversations.confirm(requestId, result);
     },
     onSuccess: () => {
-      chatStore.updateMessage(currentChatId, getMessagePlaceholderId('ai'), { ui: undefined }); // Use updateMessage with AI message ID
+      chatStore.updateMessage(currentChatId, getMessagePlaceholderId('ai'), { ui: undefined });
     },
   });
 };
@@ -242,7 +237,6 @@ export const useStateMutateMessageRating = (messageId: number) => {
   });
 };
 
-// Updated selectors to work with the new structure
 export const useStateOfChat = () => {
   const currentChatId = useChatStore((s) => s.currentChatId);
   const chatDataMap = useChatStore((s) => s.chatDataMap);

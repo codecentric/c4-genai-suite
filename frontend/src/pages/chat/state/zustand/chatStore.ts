@@ -9,15 +9,13 @@ type ChatData = {
   isAiWriting: boolean;
   activeStreamSubscription?: Subscription;
   streamingMessageId?: number;
-  hasLoadedFromServer?: boolean; // Track if we've loaded initial data
+  hasLoadedFromServer?: boolean;
 };
 
 type ChatState = {
   currentChatId: number;
   chatDataMap: Map<number, ChatData>;
 
-  // Actions
-  getCurrentChatData: () => ChatData | undefined;
   setMessages: (chatId: number, messages: ChatMessage[], preserveIfNewer?: boolean) => void;
   addMessage: (chatId: number, message: ChatMessage) => void;
   updateMessage: (
@@ -25,18 +23,12 @@ type ChatState = {
     messageId: number,
     messageUpdate: Partial<ChatMessage> | ((oldMessage: ChatMessage) => Partial<ChatMessage>),
   ) => void;
-  updateLastMessage: (
-    chatId: number,
-    messageUpdate: Partial<ChatMessage> | ((oldMessage: ChatMessage) => Partial<ChatMessage>),
-  ) => void;
-  appendLastMessage: (chatId: number, text: string) => void;
   appendToStreamingMessage: (chatId: number, text: string) => void;
   setChat: (chatId: number, chat: ConversationDto) => void;
   setIsAiWriting: (chatId: number, isAiWriting: boolean) => void;
   setStreamingMessageId: (chatId: number, messageId?: number) => void;
   setActiveStreamSubscription: (chatId: number, subscription?: Subscription) => void;
   cancelActiveStream: (chatId: number) => void;
-  cancelAllActiveStreams: () => void;
   switchToChat: (chatId: number) => void;
   initializeChatIfNeeded: (chatId: number) => void;
   getStream: (
@@ -46,7 +38,6 @@ type ChatState = {
     api: AppClient,
     editMessageId: number | undefined,
   ) => Observable<StreamEventDto>;
-  hasActiveStream: (chatId: number) => boolean;
 };
 
 const createEmptyChatData = (chatId: number): ChatData => ({
@@ -62,11 +53,6 @@ export const useChatStore = create<ChatState>()((set, get) => {
   return {
     currentChatId: 0,
     chatDataMap: new Map(),
-
-    getCurrentChatData: () => {
-      const { currentChatId, chatDataMap } = get();
-      return chatDataMap.get(currentChatId);
-    },
 
     initializeChatIfNeeded: (chatId) => {
       set((state) => {
@@ -87,12 +73,6 @@ export const useChatStore = create<ChatState>()((set, get) => {
 
     getStream: (chatId, query, files, api, editMessageId) => {
       return api.stream.streamPrompt(chatId, { query, files }, editMessageId);
-    },
-
-    hasActiveStream: (chatId) => {
-      const state = get();
-      const chatData = state.chatDataMap.get(chatId);
-      return !!(chatData?.activeStreamSubscription && !chatData.activeStreamSubscription.closed);
     },
 
     setStreamingMessageId: (chatId, messageId) =>
@@ -118,55 +98,11 @@ export const useChatStore = create<ChatState>()((set, get) => {
         const message = messages[messageIndex];
         if (message && message.content[0] && message.content[0].type === 'text') {
           const newText = message.content[0].text + text;
-          const newMsg: MessageDto = {
+          messages[messageIndex] = {
             ...message,
             content: [{ type: 'text', text: newText }],
           };
-          messages[messageIndex] = newMsg;
         }
-
-        const newMap = new Map(state.chatDataMap);
-        newMap.set(chatId, { ...chatData, messages });
-        return { chatDataMap: newMap };
-      }),
-
-    appendLastMessage: (chatId, text) =>
-      set((state) => {
-        const chatData = state.chatDataMap.get(chatId);
-        if (!chatData) return state;
-
-        const messages = [...chatData.messages];
-        const lastMsg = messages.pop();
-
-        if (lastMsg && lastMsg.content[0]) {
-          const contentItem = lastMsg.content[0];
-          if (contentItem.type === 'text') {
-            const newText = contentItem.text + text;
-            const newMsg: MessageDto = { ...lastMsg, content: [{ type: 'text', text: newText }] };
-            messages.push(newMsg);
-          } else {
-            messages.push(lastMsg);
-          }
-        }
-
-        const newMap = new Map(state.chatDataMap);
-        newMap.set(chatId, { ...chatData, messages });
-        return { chatDataMap: newMap };
-      }),
-
-    updateLastMessage: (chatId, messageUpdate) =>
-      set((state) => {
-        const chatData = state.chatDataMap.get(chatId);
-        if (!chatData) return state;
-
-        const messages = [...chatData.messages];
-        const lastMsg = messages.pop();
-
-        if (!lastMsg) return state;
-
-        const messageUpdates = typeof messageUpdate === 'function' ? messageUpdate(lastMsg) : messageUpdate;
-        const newMsg: MessageDto = { ...lastMsg, ...messageUpdates };
-        messages.push(newMsg);
 
         const newMap = new Map(state.chatDataMap);
         newMap.set(chatId, { ...chatData, messages });
@@ -205,7 +141,6 @@ export const useChatStore = create<ChatState>()((set, get) => {
       set((state) => {
         const chatData = state.chatDataMap.get(chatId) || createEmptyChatData(chatId);
 
-        // If preserveIfNewer is true and we already have messages (from streaming), don't overwrite
         if (preserveIfNewer && chatData.messages.length > 0 && chatData.hasLoadedFromServer) {
           return state;
         }
@@ -214,7 +149,7 @@ export const useChatStore = create<ChatState>()((set, get) => {
         newMap.set(chatId, {
           ...chatData,
           messages,
-          isAiWriting: chatData.isAiWriting, // Preserve streaming state
+          isAiWriting: chatData.isAiWriting,
           hasLoadedFromServer: true,
         });
         return { chatDataMap: newMap };
@@ -261,25 +196,6 @@ export const useChatStore = create<ChatState>()((set, get) => {
           isAiWriting: false,
           streamingMessageId: undefined,
         });
-        return { chatDataMap: newMap };
-      }),
-
-    cancelAllActiveStreams: () =>
-      set((state) => {
-        const newMap = new Map(state.chatDataMap);
-
-        state.chatDataMap.forEach((chatData, chatId) => {
-          if (chatData.activeStreamSubscription) {
-            chatData.activeStreamSubscription.unsubscribe();
-            newMap.set(chatId, {
-              ...chatData,
-              activeStreamSubscription: undefined,
-              isAiWriting: false,
-              streamingMessageId: undefined,
-            });
-          }
-        });
-
         return { chatDataMap: newMap };
       }),
   };

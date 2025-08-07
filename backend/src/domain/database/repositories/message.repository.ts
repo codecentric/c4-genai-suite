@@ -9,11 +9,11 @@ export interface MessagesCount {
 }
 
 export class MessageRepository extends Repository<MessageEntity> {
-  async getMessageThread(conversationId: number, messageId?: number) {
+  async getMessageThread(conversationId: number, messageId?: number, fetchLatestConversation = true) {
     const messages = await this.findBy({ conversationId });
     const map = new Map<number, MessageEntity>(messages.map((message) => [message.id, message]));
 
-    if (!messageId) {
+    if (!messageId && fetchLatestConversation) {
       // if no message is given we just assume it is the latest one in the conversation
       const message = await this.findOne({
         where: {

@@ -147,8 +147,9 @@ class InternalChatHistory extends BaseListChatMessageHistory implements Messages
         }
 
         this.stored = mapStoredMessagesToChatMessages(
-          await this.messages.getMessageThread(this.conversationId, this.currentParentId),
+          await this.messages.getMessageThread(this.conversationId, this.currentParentId, false),
         );
+
         const entity = await this.messages.save({
           parentId: this.currentParentId,
           configurationId: this.configurationId,
