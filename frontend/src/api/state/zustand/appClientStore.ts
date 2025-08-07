@@ -1,5 +1,6 @@
 import Cookies from 'universal-cookie';
 import { create } from 'zustand';
+
 import { Configuration, Middleware } from 'src/api/generated';
 import { useTransientNavigate } from 'src/hooks';
 import { i18next } from 'src/texts/i18n';
@@ -7,7 +8,7 @@ import { AppClient } from '../apiAppClient';
 
 type TransientNavigateFn = ReturnType<typeof useTransientNavigate>;
 
-type AppClientStore = {
+type AppClientActions = {
   getAppClient: (navigate: TransientNavigateFn) => AppClient;
 };
 
@@ -36,7 +37,7 @@ const createAppClientMiddleware: (navigate: TransientNavigateFn) => Middleware =
  * @description An appClient provider that can be reused without reinitializing
  * the appClient. The singleton functionality of Zustand enables us to do so.
  */
-export const useAppClientStore = create<AppClientStore>(() => {
+export const useAppClientStore = create<AppClientActions>(() => {
   let appClient: AppClient | undefined;
 
   const initializeAppClient = (navigate: TransientNavigateFn): AppClient => {

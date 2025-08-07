@@ -15,7 +15,9 @@ type ChatData = {
 type ChatState = {
   currentChatId: number;
   chatDataMap: Map<number, ChatData>;
+};
 
+type ChatActions = {
   setMessages: (chatId: number, messages: ChatMessage[], preserveIfNewer?: boolean) => void;
   addMessage: (chatId: number, message: ChatMessage) => void;
   updateMessage: (
@@ -49,7 +51,7 @@ const createEmptyChatData = (chatId: number): ChatData => ({
   hasLoadedFromServer: false,
 });
 
-export const useChatStore = create<ChatState>()((set, get) => {
+export const useChatStore = create<ChatState & ChatActions>()((set, get) => {
   return {
     currentChatId: 0,
     chatDataMap: new Map(),

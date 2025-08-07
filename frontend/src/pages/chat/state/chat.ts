@@ -14,7 +14,7 @@ import {
 } from 'src/api';
 import { texts } from 'src/texts';
 import { useChatStore } from './zustand/chatStore';
-import { useListOfChatsStore } from './zustand/chatsListStore';
+import { useListOfChatsStore } from './zustand/listOfChatsStore';
 
 const getMessagePlaceholderId = (messageType: StreamMessageSavedDtoMessageTypeEnum) => {
   return messageType === 'ai' ? -1 : 0;

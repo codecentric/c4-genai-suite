@@ -7,7 +7,9 @@ interface ExtensionsState {
 
   // The extensions.
   extensions: ExtensionDto[];
+}
 
+type ExtensionsActions = {
   // Adds or sets an extension.
   setExtension: (extension: ExtensionDto) => void;
 
@@ -16,12 +18,14 @@ interface ExtensionsState {
 
   // Remove an extension.
   removeExtension: (id: number) => void;
-}
+};
 
-interface ConfigurationState {
+type ConfigurationState = {
   // The configurations.
   configurations: ConfigurationDto[];
+};
 
+type ConfigurationActions = {
   // Adds or sets a configuration.
   setConfiguration: (configuration: ConfigurationDto) => void;
 
@@ -30,9 +34,9 @@ interface ConfigurationState {
 
   // Remove a configuration.
   removeConfiguration: (id: number) => void;
-}
+};
 
-const useExtensionsStore_ = create<ExtensionsState>()((set) => ({
+const useExtensionsStore_ = create<ExtensionsState & ExtensionsActions>()((set) => ({
   specs: [],
   extensions: [],
   setExtension: (extension: ExtensionDto) => {
@@ -85,7 +89,7 @@ const useExtensionsStore_ = create<ExtensionsState>()((set) => ({
  **/
 export const useExtensionsStore = useExtensionsStore_;
 
-const useConfigurationStore_ = create<ConfigurationState>()((set) => ({
+const useConfigurationStore_ = create<ConfigurationState & ConfigurationActions>()((set) => ({
   configurations: [],
   setConfiguration: (configuration: ConfigurationDto) => {
     return set((state) => {
