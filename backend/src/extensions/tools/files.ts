@@ -90,7 +90,7 @@ export class FilesExtension<T extends FilesExtensionConfiguration = FilesExtensi
     return Object.fromEntries(Object.keys(userArguments).map((key) => [key, getDefault(userArguments[key])]));
   }
 
-  getMiddlewares(user: User, extension: ExtensionEntity<T>, userArgs?: UserArgs): Promise<ChatMiddleware[]> {
+  getMiddlewares(user: User, extension: ExtensionEntity<T>): Promise<ChatMiddleware[]> {
     const middleware = {
       invoke: async (context: ChatContext, getContext: GetContext, next: ChatNextDelegate): Promise<any> => {
         const { bucket, description, take } = extension.values;
@@ -119,7 +119,7 @@ export class FilesExtension<T extends FilesExtensionConfiguration = FilesExtensi
 
         if (bucketEntity.type === 'user') {
           const files = await this.files.findBy({ bucketId: bucket, userId: user.id });
-          const fileIdFilter: number[] = userArgs?.fileIdFilter?.split(',').map(Number) ?? [];
+          const fileIdFilter: number[] = context.files?.map((x) => x.id) ?? [];
           const filesSelected = files.filter((f) => fileIdFilter.includes(f.id));
 
           toolDescription += '* Users can upload files to their user library using the drop zone in the right side bar.\n';
@@ -139,20 +139,24 @@ export class FilesExtension<T extends FilesExtensionConfiguration = FilesExtensi
           if ((enrichedDescription + fileList).length < 1024) {
             enrichedDescription += `\n\n${fileList}`;
           }
+
+          context.tools.push(
+            new InternalTool(
+              enrichedDescription,
+              this.queryBus,
+              context,
+              bucketEntity,
+              take,
+              extension.externalId,
+              filesSelected.map((x) => x.id),
+            ),
+          );
+        } else {
+          context.tools.push(
+            new InternalTool(enrichedDescription, this.queryBus, context, bucketEntity, take, extension.externalId, null),
+          );
         }
 
-        const userArgsWithDefaults = userArgs ?? this.getDefaultArgs();
-        context.tools.push(
-          new InternalTool(
-            enrichedDescription,
-            this.queryBus,
-            context,
-            bucketEntity,
-            take,
-            extension.externalId,
-            userArgsWithDefaults,
-          ),
-        );
         return next(context);
       },
     };
@@ -187,7 +191,7 @@ class InternalTool extends StructuredTool {
     private readonly bucket: Bucket,
     private readonly take: number,
     private readonly extensionExternalId: string,
-    private readonly userArgs: UserArgs,
+    private readonly fileFilter: number[] | null,
   ) {
     super();
 
@@ -196,19 +200,9 @@ class InternalTool extends StructuredTool {
 
   protected async _call(arg: z.infer<typeof this.schema>): Promise<string> {
     try {
-      const userFileFilter = typeof this.userArgs.fileIdFilter === 'string' ? this.userArgs.fileIdFilter : '';
-      const fileFilter = this.bucket.type === 'user' ? userFileFilter : null;
-
       // TODO: adjust file filter format
       const result: SearchFilesResponse = await this.queryBus.execute(
-        new SearchFiles(
-          this.bucket.id,
-          arg.query,
-          this.context.user,
-          this.take,
-          fileFilter?.split(',').map(Number) ?? null,
-          this.context.conversationId,
-        ),
+        new SearchFiles(this.bucket.id, arg.query, this.context.user, this.take, this.fileFilter, this.context.conversationId),
       );
 
       if (result.sources) {

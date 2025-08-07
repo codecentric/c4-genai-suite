@@ -23,7 +23,7 @@ export function Files({ conversationId, userBucket, configurationId }: FileProps
   const api = useApi();
 
   const allowedFileNameExtensions = userBucket.fileNameExtensions ?? [];
-  const fileIdSelector = useFileIdSelector(conversationId, userBucket.extensionId);
+  const fileIdSelector = useFileIdSelector(conversationId);
 
   const [page, setPage] = useState(0);
 
@@ -43,7 +43,7 @@ export function Files({ conversationId, userBucket, configurationId }: FileProps
   const upload = useMutation({
     mutationKey: ['upload-user-file'],
     mutationFn: (file: File) => api.files.postUserFile(userBucket.extensionId, undefined, file),
-    onSuccess: (file) => fileIdSelector.selectId(file.id),
+    onSuccess: (file) => fileIdSelector.selectId(file),
     onError: async (error, file) => {
       const isImage = file.type.startsWith('image/');
       if (!isImage) {
@@ -133,9 +133,7 @@ export function Files({ conversationId, userBucket, configurationId }: FileProps
             color="gray"
             disabled={fileIdSelector.selectedIDs.length === loadedFiles.items.length}
             onClick={() => {
-              loadedFiles.items.forEach(
-                (file) => !fileIdSelector.selectedIDs.includes(file.id) && fileIdSelector.selectId(file.id),
-              );
+              loadedFiles.items.forEach((file) => !fileIdSelector.selectedIDs.includes(file.id) && fileIdSelector.selectId(file));
             }}
           >
             {texts.files.selectAll}
@@ -147,9 +145,7 @@ export function Files({ conversationId, userBucket, configurationId }: FileProps
             color="gray"
             disabled={fileIdSelector.selectedIDs.length === 0}
             onClick={() =>
-              loadedFiles.items.forEach(
-                (file) => fileIdSelector.selectedIDs.includes(file.id) && fileIdSelector.deselectId(file.id),
-              )
+              loadedFiles.items.forEach((file) => fileIdSelector.selectedIDs.includes(file.id) && fileIdSelector.deselectId(file))
             }
           >
             {texts.files.deselectAll}

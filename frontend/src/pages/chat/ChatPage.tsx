@@ -6,6 +6,7 @@ import { Route, Routes } from 'react-router-dom';
 import { CollapseButton, ProfileButton } from 'src/components';
 import { NavigationBar } from 'src/components/NavigationBar';
 import { useSidebarState, useTheme } from 'src/hooks';
+import { useConversationFiles } from 'src/hooks/api/files';
 import { useListOfAssistantsInit } from 'src/pages/chat/state/listOfAssistants';
 import { texts } from 'src/texts';
 import { isMobile } from '../utils';
@@ -65,6 +66,12 @@ export function ChatPage() {
   const [sidebarRight, setSidebarRight] = useSidebarState('sidebar-right');
   const rightPanelVisible = !!(sidebarRight && selectedChatId && (userBucket || selectedDocument));
   const panelSizes = getPanelSizes(rightPanelVisible);
+
+  const { clear: clearBucketFiles } = useConversationFiles(selectedChatId);
+  useEffect(() => {
+    clearBucketFiles();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userBucket]);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 

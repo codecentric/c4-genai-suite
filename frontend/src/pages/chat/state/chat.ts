@@ -24,6 +24,14 @@ export const useChatStream = (chatId: number) => {
   const api = useApi();
   const navigate = useNavigate();
   const chatStore = useChatStore();
+
+  useEffect(() => {
+    if (chatStore.currentChatId !== chatId) {
+      chatStore.switchToChat(chatId);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chatId]);
+
   const listOfChatsStore = useListOfChatsStore();
 
   const {
@@ -40,9 +48,9 @@ export const useChatStream = (chatId: number) => {
     },
     refetchOnWindowFocus: false,
     retry: (failureCount, error: ResponseError) =>
-      // if we receive 404 or 403 from the server, then don't retry. Otherwise retry 3 times (default behavior).
       error?.response?.status !== 404 && error?.response?.status !== 403 && failureCount < 3,
   });
+
   useEffect(() => {
     if (error) {
       if (error.response.status === 403) {
@@ -60,80 +68,120 @@ export const useChatStream = (chatId: number) => {
 
   useEffect(() => {
     if (loadedChatAndMessages) {
-      chatStore.setMessages(loadedChatAndMessages.messages.items);
-      chatStore.setChat(loadedChatAndMessages.chat);
+      // Use preserveIfNewer to avoid overwriting streaming messages
+      chatStore.setMessages(chatId, loadedChatAndMessages.messages.items, true);
+      chatStore.setChat(chatId, loadedChatAndMessages.chat);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loadedChatAndMessages, chatStore.setChat]);
+  }, [loadedChatAndMessages, chatId]);
 
-  const sendMessage = (chatId: number, input: string, files?: FileDto[], editMessageId?: number) => {
+  const sendMessage = (input: string, files?: FileDto[], editMessageId?: number) => {
+    // Only cancel existing stream for this specific chat if we're starting a new message
+    chatStore.cancelActiveStream(chatId);
+
     if (editMessageId) {
-      chatStore.setMessages(chatStore.messages.filter((message) => message.id > 0 && message.id < editMessageId));
+      const currentMessages = chatStore.chatDataMap.get(chatId)?.messages || [];
+      const filteredMessages = currentMessages.filter((message) => message.id > 0 && message.id < editMessageId);
+      chatStore.setMessages(chatId, filteredMessages);
     }
 
-    const configurationId = chatStore.chat.configurationId;
+    const configurationId = chatStore.chatDataMap.get(chatId)?.chat.configurationId;
 
-    chatStore.addMessage({
+    chatStore.addMessage(chatId, {
       type: 'human',
       content: [{ type: 'text', text: input }],
-      configurationId,
+      configurationId: configurationId ?? 0,
       id: editMessageId ?? getMessagePlaceholderId('human'),
     });
-    chatStore.addMessage({
-      type: 'ai',
-      configurationId,
-      content: [{ type: 'text', text: '' }],
-      id: getMessagePlaceholderId('ai'),
-    });
-    chatStore.setIsAiWriting(true);
 
-    chatStore.getStream(chatId, input, files, api, editMessageId).subscribe({
+    const aiMessageId = getMessagePlaceholderId('ai');
+    chatStore.addMessage(chatId, {
+      type: 'ai',
+      content: [{ type: 'text', text: '' }],
+      configurationId: configurationId ?? 0,
+      id: aiMessageId,
+    });
+
+    // Set which message is being streamed to
+    chatStore.setStreamingMessageId(chatId, aiMessageId);
+    chatStore.setIsAiWriting(chatId, true);
+
+    // Keep track of the actual message ID after it's saved
+    let actualAiMessageId = aiMessageId;
+
+    const subscription = chatStore.getStream(chatId, input, files, api, editMessageId).subscribe({
       next: (msg) => {
-        if (msg.type === 'error' || msg.type === 'completed') chatStore.setIsAiWriting(false);
+        if (msg.type === 'error' || msg.type === 'completed') {
+          chatStore.setIsAiWriting(chatId, false);
+          chatStore.setStreamingMessageId(chatId, undefined);
+        }
 
         switch (msg.type) {
           case 'chunk': {
             const chunk = msg.content[0];
-            if (chunk.type === 'text') chatStore.appendLastMessage(chunk.text);
-            if (chunk.type === 'image_url') chatStore.appendLastMessage(`![image](${chunk.image.url})`);
+            if (chunk.type === 'text') chatStore.appendToStreamingMessage(chatId, chunk.text);
+            if (chunk.type === 'image_url') chatStore.appendToStreamingMessage(chatId, `![image](${chunk.image.url})`);
             return;
           }
           case 'tool_start':
-            return chatStore.updateLastMessage((oldMessage) => ({
+            return chatStore.updateMessage(chatId, actualAiMessageId, (oldMessage) => ({
               toolsInUse: { ...oldMessage.toolsInUse, [msg.tool.name]: 'Started' },
             }));
           case 'tool_end':
-            return chatStore.updateLastMessage((oldMessage) => ({
+            return chatStore.updateMessage(chatId, actualAiMessageId, (oldMessage) => ({
               toolsInUse: { ...oldMessage.toolsInUse, [msg.tool.name]: 'Completed' },
             }));
           case 'debug':
-            return chatStore.updateLastMessage((oldMessage) => ({ debug: [...(oldMessage.debug || []), msg.content] }));
+            return chatStore.updateMessage(chatId, actualAiMessageId, (oldMessage) => ({
+              debug: [...(oldMessage.debug || []), msg.content],
+            }));
           case 'sources':
-            return chatStore.updateLastMessage((oldMessage) => ({ sources: [...(oldMessage.sources || []), ...msg.content] }));
+            return chatStore.updateMessage(chatId, actualAiMessageId, (oldMessage) => ({
+              sources: [...(oldMessage.sources || []), ...msg.content],
+            }));
           case 'logging':
-            return chatStore.updateLastMessage((oldMessage) => ({ logging: [...(oldMessage.logging || []), msg.content] }));
+            return chatStore.updateMessage(chatId, actualAiMessageId, (oldMessage) => ({
+              logging: [...(oldMessage.logging || []), msg.content],
+            }));
           case 'error':
-            return chatStore.updateLastMessage({ error: msg.message });
+            return chatStore.updateMessage(chatId, actualAiMessageId, { error: msg.message });
           case 'completed':
-            return chatStore.updateLastMessage({ tokenCount: msg.metadata.tokenCount });
+            // Use the actual message ID (which might have been updated by 'saved' event)
+            return chatStore.updateMessage(chatId, actualAiMessageId, { tokenCount: msg.metadata.tokenCount });
           case 'saved':
-            return chatStore.updateMessage(getMessagePlaceholderId(msg.messageType), { id: msg.messageId });
+            // Update our tracking of the actual message ID
+            if (msg.messageType === 'ai') {
+              actualAiMessageId = msg.messageId;
+              // Update the streaming message ID to the new real ID
+              chatStore.setStreamingMessageId(chatId, msg.messageId);
+            }
+            return chatStore.updateMessage(chatId, getMessagePlaceholderId(msg.messageType), { id: msg.messageId });
           case 'ui':
-            return chatStore.updateLastMessage({ ui: msg.request });
+            return chatStore.updateMessage(chatId, actualAiMessageId, { ui: msg.request });
           case 'summary':
             listOfChatsStore.refetch();
         }
       },
       error: (error: string | Error) => {
         const message = error instanceof Error ? error.message : error;
-        chatStore.updateLastMessage({ error: message });
-        chatStore.setIsAiWriting(false);
+        chatStore.updateMessage(chatId, actualAiMessageId, { error: message });
+        chatStore.setIsAiWriting(chatId, false);
+        chatStore.setStreamingMessageId(chatId, undefined);
       },
       complete: () => {
         listOfChatsStore.refetch();
-        chatStore.setIsAiWriting(false);
+        chatStore.setIsAiWriting(chatId, false);
+        chatStore.setStreamingMessageId(chatId, undefined);
+        // Clear the subscription reference when complete
+        const currentChatData = chatStore.chatDataMap.get(chatId);
+        if (currentChatData?.activeStreamSubscription === subscription) {
+          chatStore.setActiveStreamSubscription(chatId, undefined);
+        }
       },
     });
+
+    // Store the subscription so it can be cancelled later if needed
+    chatStore.setActiveStreamSubscription(chatId, subscription);
   };
 
   return { sendMessage, isChatLoading };
@@ -141,26 +189,29 @@ export const useChatStream = (chatId: number) => {
 
 export const useStateMutateChat = (chatId: number) => {
   const api = useApi();
-  const setChat = useChatStore((s) => s.setChat);
+  const chatStore = useChatStore();
 
   return useMutation({
     mutationFn: (conversionUpdate: UpdateConversationDto) => {
       return api.conversations.patchConversation(chatId, conversionUpdate);
     },
-    onSuccess: setChat,
+    onSuccess: (updatedChat) => {
+      chatStore.setChat(chatId, updatedChat);
+    },
   });
 };
 
 export const useConfirmAiAction = (requestId: string) => {
   const api = useApi();
-  const updateLastMessage = useChatStore((s) => s.updateLastMessage);
+  const chatStore = useChatStore();
+  const currentChatId = chatStore.currentChatId;
 
   return useMutation({
     mutationFn: (result: ChatUICallbackResultDto) => {
       return api.conversations.confirm(requestId, result);
     },
     onSuccess: () => {
-      updateLastMessage({ ui: undefined });
+      chatStore.updateMessage(currentChatId, getMessagePlaceholderId('ai'), { ui: undefined }); // Use updateMessage with AI message ID
     },
   });
 };
@@ -176,8 +227,8 @@ export const useStateMutateChatRating = (chatId: number) => {
 
 export const useStateMutateMessageRating = (messageId: number) => {
   const api = useApi();
-  const chatId = useChatStore((s) => s.chat.id);
-  const updateMessage = useChatStore((s) => s.updateMessage);
+  const chatStore = useChatStore();
+  const chatId = chatStore.currentChatId;
 
   return useMutation({
     mutationFn: async (rating: MessageDtoRatingEnum) => {
@@ -186,13 +237,38 @@ export const useStateMutateMessageRating = (messageId: number) => {
       }
     },
     onSuccess: (_, rating) => {
-      updateMessage(messageId, { rating });
+      chatStore.updateMessage(chatId, messageId, { rating });
     },
   });
 };
 
-export const useStateOfChat = () => useChatStore((s) => s.chat);
-export const useStateOfSelectedChatId = () => useChatStore((s) => s.chat.id);
-export const useStateOfSelectedAssistantId = () => useChatStore((s) => s.chat.configurationId);
-export const useStateOfMessages = () => useChatStore((s) => s.messages);
-export const useStateOfIsAiWriting = () => useChatStore((s) => s.isAiWriting);
+// Updated selectors to work with the new structure
+export const useStateOfChat = () => {
+  const currentChatId = useChatStore((s) => s.currentChatId);
+  const chatDataMap = useChatStore((s) => s.chatDataMap);
+  const chatData = chatDataMap.get(currentChatId);
+  return chatData?.chat || { id: 0, configurationId: -1, createdAt: new Date() };
+};
+
+export const useStateOfSelectedChatId = () => useChatStore((s) => s.currentChatId);
+
+export const useStateOfSelectedAssistantId = () => {
+  const currentChatId = useChatStore((s) => s.currentChatId);
+  const chatDataMap = useChatStore((s) => s.chatDataMap);
+  const chatData = chatDataMap.get(currentChatId);
+  return chatData?.chat.configurationId || -1;
+};
+
+export const useStateOfMessages = () => {
+  const currentChatId = useChatStore((s) => s.currentChatId);
+  const chatDataMap = useChatStore((s) => s.chatDataMap);
+  const chatData = chatDataMap.get(currentChatId);
+  return chatData?.messages || [];
+};
+
+export const useStateOfIsAiWriting = () => {
+  const currentChatId = useChatStore((s) => s.currentChatId);
+  const chatDataMap = useChatStore((s) => s.chatDataMap);
+  const chatData = chatDataMap.get(currentChatId);
+  return chatData?.isAiWriting || false;
+};

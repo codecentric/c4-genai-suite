@@ -24,7 +24,7 @@ export const FileCard = memo((props: FileCardProps) => {
   const { selectedIDs, toggleIdSelection, deselectId } = fileIdSelector;
 
   const removeFile = (file: FileDto) => {
-    deselectId(file.id);
+    deselectId(file);
     onDelete(file);
   };
 
@@ -37,7 +37,7 @@ export const FileCard = memo((props: FileCardProps) => {
         </div>
 
         <div className="mt-1 flex gap-2 truncate" title={file.fileName}>
-          <input type="checkbox" checked={selectedIDs.includes(file.id)} onChange={() => toggleIdSelection(file.id)} />
+          <input type="checkbox" checked={selectedIDs.includes(file.id)} onChange={() => toggleIdSelection(file)} />
           {file.fileName}
         </div>
         <span className="text-sm">{formatDate(file.uploadedAt, 'Pp')}</span>

@@ -67,8 +67,9 @@ export const useStateMutateRenameChat = () => {
 
 export const useStateMutateRemoveChat = () => {
   const api = useApi();
-  const chatId = useChatStore((s) => s.chat.id);
-  const assistantId = useChatStore((s) => s.chat.configurationId);
+  const chatId = useChatStore((s) => s.currentChatId);
+  const chatDataMap = useChatStore((s) => s.chatDataMap);
+  const assistantId = chatDataMap.get(chatId)?.chat.configurationId || -1;
   const removeChat = useListOfChatsStore((s) => s.removeChat);
   const createNewChat = useMutateNewChat();
 
@@ -88,7 +89,9 @@ export const useStateMutateRemoveChat = () => {
 
 export const useStateMutateRemoveAllChats = () => {
   const api = useApi();
-  const assistantId = useChatStore((s) => s.chat.configurationId);
+  const currentChatId = useChatStore((s) => s.currentChatId);
+  const chatDataMap = useChatStore((s) => s.chatDataMap);
+  const assistantId = chatDataMap.get(currentChatId)?.chat.configurationId || -1;
   const setChats = useListOfChatsStore((s) => s.setChats);
   const createNewChat = useMutateNewChat();
 

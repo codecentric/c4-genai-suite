@@ -12,6 +12,7 @@ import { buildError } from 'src/lib';
 import { FileItem } from 'src/pages/chat/conversation/FileItem';
 import { FilterModal } from 'src/pages/chat/conversation/FilterModal';
 import { Language, SpeechRecognitionButton } from 'src/pages/chat/conversation/SpeechRecognitionButton';
+import { VirtualFile } from 'src/pages/chat/state/zustand/userFilesStore';
 import { texts } from 'src/texts';
 import { useChatDropzone } from '../useChatDropzone';
 import { Suggestions } from './Suggestions';
@@ -48,6 +49,7 @@ export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEm
     uploadMutations,
     upload,
     userBucket,
+    removeLocalFile,
   } = useChatDropzone();
 
   const speechRecognitionLanguages: Language[] = [
@@ -127,10 +129,10 @@ export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEm
   };
 
   const deleteFile = useMutation({
-    mutationFn: async (file: FileDto) => {
+    mutationFn: async (file: VirtualFile) => {
       return api.files.deleteUserFile(file.id);
     },
-    onSuccess: () => {
+    onSuccess: (_) => {
       toast.success(texts.files.deleted);
     },
     onError: async (error) => {
@@ -202,7 +204,7 @@ export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEm
 
         <div className="flex flex-wrap gap-2">
           {chatFiles.map((file) => (
-            <FileItem key={file.id} file={file} onRemove={() => deleteFile.mutate(file)} />
+            <FileItem key={file.id} file={file} onRemove={() => (file.local ? removeLocalFile(file) : deleteFile.mutate(file))} />
           ))}
           {uploadingFiles.map((file) => (
             <FileItem key={file.name} file={{ fileName: file.name }} loading={true} />

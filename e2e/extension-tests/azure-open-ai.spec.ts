@@ -96,7 +96,7 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
 
     await test.step('should not show previous reply in viewport after sending question', async () => {
       await sendMessage(page, configuration, {
-        message: 'Write a one-column table with the lower case letters from a to z in the rows.',
+        message: 'Write a two-column table with the lower case letters from a to z followed by a random short word in the rows.',
       });
       await page.waitForTimeout(1000);
       const element = page.getByText(/^What is the capital of Germany.+Friendly AI/);
@@ -104,14 +104,16 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
     });
 
     await test.step('should show current question in viewport after sending question', async () => {
-      const element = page.getByText('Write a one-column table with the lower case letters from a to z in the rows.');
-      await expectElementInYRange(element, 112, 180);
+      const element = page.getByText(
+        'Write a two-column table with the lower case letters from a to z followed by a random short word in the rows.',
+      );
+      await expectElementInYRange(element, 112, 200);
     });
 
     await test.step('should not scroll down when reply is to long for viewport', async () => {
-      await expectElementInYRange(page.locator('td', { hasText: 'a' }), 162, 400);
-      await expectElementInYRange(page.locator('td', { hasText: 'm' }), 500, 2000);
-      await expectElementInYRange(page.locator('td', { hasText: 'z' }), 700, 2000);
+      await expectElementInYRange(page.getByRole('cell', { name: 'a', exact: true }), 162, 500);
+      await expectElementInYRange(page.getByRole('cell', { name: 'm', exact: true }), 500, 2000);
+      await expectElementInYRange(page.getByRole('cell', { name: 'z', exact: true }), 700, 2000);
     });
 
     await test.step('should show auto-scroll button when reply is to long for viewport', async () => {
@@ -139,9 +141,9 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
 
     await test.step('should stop showing auto-scroll button, if new chat is opened, while button was visible', async () => {
       await sendMessage(page, configuration, {
-        message: 'Write a one-column table with the upper case letters from A to Z in the rows.',
+        message: 'Write a two-column table with the upper case letters from A to Z followed by a random short word in the rows.',
       });
-      await page.waitForTimeout(3500);
+      await page.waitForTimeout(5000);
       const autoScrollButton = page.locator('[data-testid="scrollToBottomButton"]');
       expect(await autoScrollButton.evaluate((el) => getComputedStyle(el).opacity)).toBe('1');
       await newChat(page);
@@ -216,8 +218,8 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
 
     await test.step('should upload a new file and this should be selected', async () => {
       await uploadFileWhileInChat(page, 'e2e-test.txt');
-      const keywordFile = page.getByText('keyword_ä_ö_ß.MD');
-      const secondFile = page.getByText('e2e-test.txt');
+      const keywordFile = page.getByText('keyword_ä_ö_ß.MD').first();
+      const secondFile = page.getByText('e2e-test.txt').first();
 
       await expect(keywordFile).toBeVisible();
       await expect(secondFile).toBeVisible();

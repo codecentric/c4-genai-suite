@@ -26,7 +26,7 @@ export const useChatDropzone = () => {
     onSettled: () => refetch(),
   });
   const uploadMutations = useTypedMutationStates(upload, ['upload-files-in-chat']);
-  const { data: chatFiles = [], refetch } = useConversationFiles(chatId);
+  const { data: chatFiles = [], refetch, remove: removeLocalFile } = useConversationFiles(chatId);
   const uploadingFiles = uploadMutations
     .filter((m) => m.status === 'pending')
     .map((m) => m.variables?.file)
@@ -117,5 +117,6 @@ export const useChatDropzone = () => {
     userBucket,
     uploadingFiles,
     fullFileSlots,
+    removeLocalFile,
   };
 };

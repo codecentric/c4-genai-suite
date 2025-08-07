@@ -58,7 +58,12 @@ export class DuplicateConfigurationHandler implements ICommandHandler<DuplicateC
     if (extensions?.length) {
       entity.extensions = extensions.map((extension: ExtensionEntity) => {
         const extensionEntity = this.extensions.create();
-        assignDefined(extensionEntity, { name: extension.name, enabled: extension.enabled, values: extension.values });
+        assignDefined(extensionEntity, {
+          name: extension.name,
+          enabled: extension.enabled,
+          values: extension.values,
+          configurableArguments: extension.configurableArguments,
+        });
         return extensionEntity;
       });
     }

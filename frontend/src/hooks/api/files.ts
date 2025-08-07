@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useApi } from 'src/api';
+import { useUserFilesStore, VirtualFile } from 'src/pages/chat/state/zustand/userFilesStore';
 
 export const useDocumentContent = (conversationId: number, messageId: number, documentUri: string) => {
   const { conversations } = useApi();
@@ -12,10 +13,17 @@ export const useDocumentContent = (conversationId: number, messageId: number, do
 
 export const useConversationFiles = (conversationId: number) => {
   const api = useApi();
+  const { userFiles, ...userFilesFunctions } = useUserFilesStore();
 
-  return useQuery({
+  const { data: conversationFiles, refetch } = useQuery({
     queryKey: ['files', 'conversation-files', { conversationId }],
     queryFn: () => api.files.getUserFiles(undefined, undefined, undefined, conversationId),
     select: (data) => data.items,
   });
+
+  return {
+    data: [...userFiles, ...(conversationFiles || [])] as VirtualFile[],
+    ...userFilesFunctions,
+    refetch,
+  };
 };

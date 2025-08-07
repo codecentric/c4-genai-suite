@@ -45,7 +45,7 @@ export function ConversationPage(props: ConversationPageProps) {
   }, [assistant?.agentName, theme.agentName]);
 
   const submitMessage = useEventCallback((input: string, uploadedFiles?: FileDto[], editMessageId?: number) => {
-    sendMessage(chatId, input, uploadedFiles, editMessageId);
+    sendMessage(input, uploadedFiles, editMessageId);
     setTimeout(() => scrollToBottom(), 500);
     return false;
   });
