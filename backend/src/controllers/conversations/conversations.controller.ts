@@ -15,7 +15,15 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { ApiExtraModels, ApiNoContentResponse, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import {
+  ApiExtraModels,
+  ApiNoContentResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiParam,
+  ApiProduces,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Request, Response } from 'express';
 import { Observable } from 'rxjs';
 import { LocalAuthGuard } from 'src/domain/auth';
@@ -210,7 +218,7 @@ export class ConversationsController {
       format: 'binary',
     },
   })
-  // @ApiProduces('application/pdf')
+  @ApiProduces('application/octet-stream')
   async getDocument(
     @Req() req: Request,
     @Res() response: Response,
@@ -234,7 +242,7 @@ export class ConversationsController {
       response.status(404).send('Document not found');
       return;
     }
-    const contentType = document.type ?? "application/pdf";
+    const contentType = document.type ?? 'application/pdf';
     const bytes = await document.bytes();
 
     response.setHeader('Content-Type', contentType);
