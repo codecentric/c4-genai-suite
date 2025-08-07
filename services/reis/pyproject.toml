@@ -24,7 +24,7 @@ pypdf = "^5.9.0"
 ffmpeg-python = "^0.2.0"
 aiofiles = "^24.1.0"
 prometheus-fastapi-instrumentator = "^7.0.0"
-fastmcp = "^2.11.1"
+fastmcp = "^2.11.2"
 langchain-ollama = "^0.3.6"
 
 [tool.poetry.group.dev.dependencies]
