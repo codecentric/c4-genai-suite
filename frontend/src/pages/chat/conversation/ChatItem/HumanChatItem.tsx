@@ -9,7 +9,7 @@ import { useConversationFiles } from 'src/hooks/api/files';
 import { cn } from 'src/lib';
 import { texts } from 'src/texts';
 import { useStateOfSelectedChatId } from '../../state/chat';
-import { ChatItemProps } from './ChatItemProps';
+import { ChatItemProps } from './ChatItem';
 
 export const HumanChatItem = ({ message, editMessage }: ChatItemProps) => {
   // MessageDTO ist generated from the backend models.

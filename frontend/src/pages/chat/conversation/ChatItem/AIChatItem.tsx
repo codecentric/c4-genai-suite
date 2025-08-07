@@ -12,7 +12,7 @@ import ChatItemSources from '../ChatItemSources';
 import { ChatItemTools } from '../ChatItemTools';
 import { AIChatItemActions } from './AIChatItemActions';
 import { AiAvatar } from './AiAvatar';
-import { ChatItemProps } from './ChatItemProps';
+import { ChatItemProps } from './ChatItem';
 import { ChatItemUserInput } from './ChatItemUserInput';
 
 export const AIChatItem = ({ agentName, message, isLast, selectDocument }: ChatItemProps) => {
@@ -35,6 +35,7 @@ export const AIChatItem = ({ agentName, message, isLast, selectDocument }: ChatI
 
   const [debouncedIsWriting] = useDebouncedValue(isWriting, 500);
   const newReply = isWriting || debouncedIsWriting;
+
   return (
     <div className={'scroll-y-m-4 group box-border max-w-full'} data-testid="chat-item">
       <div className="flex items-center gap-2">
