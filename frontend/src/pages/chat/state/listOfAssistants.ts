@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useMemo } from 'react';
+
 import { useApi } from 'src/api';
 import { useStateOfChat } from 'src/pages/chat/state/chat';
 import { useListOfAssistantsStore } from './zustand/assistantStore';

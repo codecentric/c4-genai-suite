@@ -4,12 +4,13 @@ import {
   IconArrowBarToRight,
   IconArrowLeft,
   IconArrowRight,
+  IconEye,
+  IconEyeClosed,
   IconZoomIn,
   IconZoomOut,
   IconZoomReset,
 } from '@tabler/icons-react';
-
-import type { File } from 'react-pdf/dist/shared/types.js';
+import { Dispatch, SetStateAction } from 'react';
 
 interface IconConfigurationProps {
   style?: CSSProperties | undefined;
@@ -17,12 +18,14 @@ interface IconConfigurationProps {
 }
 
 interface PdfControlBarProps {
-  file: File;
   pageNumber: number;
   numPages: number | null;
-  setPageNumber: (pageNumber: any) => void;
+  setPageNumber: Dispatch<SetStateAction<number>>;
   scale: number;
-  setScale: (scale: any) => void;
+  setScale: Dispatch<SetStateAction<number>>;
+  showViewer?: boolean;
+  setShowViewer?: (value: React.SetStateAction<boolean>) => void;
+  isLoadingPage?: boolean;
 }
 
 interface PdfZoomLevelProps {
@@ -30,11 +33,20 @@ interface PdfZoomLevelProps {
   maxZoomLvl: number;
 }
 
-const PdfControlBar = ({ file, pageNumber, numPages, setPageNumber, scale, setScale }: PdfControlBarProps) => {
+const PdfControlBar = ({
+  pageNumber,
+  numPages,
+  setPageNumber,
+  scale,
+  setScale,
+  showViewer = true,
+  setShowViewer,
+}: PdfControlBarProps) => {
   const iconConfigurationParams: IconConfigurationProps = {
-    style: { width: '70%', height: '70%' },
+    style: { width: '75%', height: '75%' },
     stroke: 1.5,
   };
+  const inputStylingRules = 'mx-2 h-9 w-15  p-0 pl-1';
 
   const zoomConfigurationParams: PdfZoomLevelProps = {
     minZoomLvl: 0.6,
@@ -94,49 +106,66 @@ const PdfControlBar = ({ file, pageNumber, numPages, setPageNumber, scale, setSc
     <div className="control-panel m-3 flex items-baseline justify-between p-3">
       <div className="flex items-baseline justify-between">
         <Group className="pdf-ctrl-bar" gap="s">
+          <Group className="show-viewer">
+            <ActionIcon
+              onClick={() => {
+                if (setShowViewer) {
+                  setShowViewer((prevVal) => !prevVal);
+                }
+              }}
+              aria-label="Hide PDF Viewer"
+              disabled={!numPages}
+            >
+              {showViewer && <IconEye {...iconConfigurationParams} />}
+              {!showViewer && <IconEyeClosed {...iconConfigurationParams} />}
+            </ActionIcon>
+          </Group>
+          <Divider orientation="vertical" />
           <Group className="doc-navigation" gap="xs">
-            <Group className="doc-navigation-btns">
+            <div className="doc-navigation-btns">
               <ActionIcon onClick={goToFirstPage} aria-label="go to first page" variant="filled" disabled={isFirstPage}>
                 <IconArrowBarToLeft {...iconConfigurationParams} />
               </ActionIcon>
               <ActionIcon onClick={goToPreviousPage} aria-label="go to previous page" variant="filled" disabled={isFirstPage}>
                 <IconArrowLeft {...iconConfigurationParams} />
               </ActionIcon>
-            </Group>
+            </div>
             <NumberInput
-              className="mx-2 p-0 pl-1"
+              className={inputStylingRules}
               value={pageNumber}
               min={1}
               max={numPages ?? 1}
-              onChange={setPageNumber}
+              onChange={(value) => setPageNumber((_prev) => +value)}
               clampBehavior="strict"
               hideControls
+              disabled={!numPages}
             />
             {`/ ${numPages}`}
-            <Group className="doc-navigation-btns" gap="xs">
+            <div className="doc-navigation-btns">
               <ActionIcon onClick={goToNextPage} aria-label="go to next page" variant="filled" disabled={isLastPage}>
                 <IconArrowRight {...iconConfigurationParams} />
               </ActionIcon>
               <ActionIcon onClick={goToLastPage} aria-label="go to last page" variant="filled" disabled={isLastPage}>
                 <IconArrowBarToRight {...iconConfigurationParams} />
               </ActionIcon>
-            </Group>
+            </div>
           </Group>
-
-          <Group className="zoom-level-ctrl" gap="xs">
+          <Divider orientation="vertical" />
+          <Group className="zoom-level-ctrl flex justify-center" gap="xs">
             <ActionIcon onClick={zoomOut} variant="filled" aria-label="zoom out" disabled={isMinZoom}>
               <IconZoomOut {...iconConfigurationParams} />
             </ActionIcon>
             <NumberInput
-              className="mx-2 p-0 pl-1"
+              className={inputStylingRules}
               value={scale}
               min={zoomConfigurationParams.minZoomLvl}
               max={zoomConfigurationParams.maxZoomLvl}
               decimalScale={1}
               fixedDecimalScale
-              onChange={setScale}
+              onChange={(value) => setScale((_prev) => +value)}
               clampBehavior="strict"
               hideControls
+              disabled={!numPages}
             />
             <ActionIcon onClick={zoomIn} variant="filled" aria-label="zoom in" disabled={isMaxZoom}>
               <IconZoomIn {...iconConfigurationParams} />

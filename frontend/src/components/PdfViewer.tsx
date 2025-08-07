@@ -1,112 +1,129 @@
-import { Button, Card } from '@mantine/core';
-import React, { useState } from 'react';
+/* eslint-disable  @typescript-eslint/no-non-null-asserted-optional-chain */
 
-import { Document, Page } from 'react-pdf';
-import { pdfjs } from 'react-pdf';
+import { ActionIcon, Button, Card, Group, Loader } from '@mantine/core';
+import { IconX } from '@tabler/icons-react';
+import { ReactNode, useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Document, Page, pdfjs } from 'react-pdf';
 
-import 'react-pdf/dist/Page/TextLayer.css';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
+import 'react-pdf/dist/Page/TextLayer.css';
+
+import { toast } from 'react-toastify';
+import { SourceDto } from 'src/api/generated/models/SourceDto';
+import { useDocument } from 'src/hooks/api/files';
+import { DocumentSource } from 'src/pages/chat/SourcesChunkPreview';
+import { Alert } from './Alert';
 import PdfControlBar from './PdfControlBar';
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString();
 
 interface PdfViewerProps {
-  file?: File;
+  selectedDocument?: DocumentSource;
+  selectedSource?: SourceDto;
+  onClose: () => void;
 }
 
-export function PdfViewer({ file }: PdfViewerProps) {
-  const [pdfFile, setPdfFile] = useState<File | null>(null);
+const VIEWPORT_STYLING_RULES = {
+  minWidth: '25%',
+};
+
+export function PdfViewer({ selectedDocument, selectedSource: _selectedSource, onClose }: PdfViewerProps) {
+  const { t } = useTranslation();
+
   const [pdfFileUrl, setPdfFileUrl] = useState<string | null>(null);
 
   const [scale, setScale] = useState<number>(1.0);
   const [numPages, setNumPages] = useState<number | null>(null);
   const [pageNumber, setPageNumber] = useState<number>(1);
-  const [_isLoading, setIsLoading] = useState<boolean>(true);
-  const [displayPdfViewer, setDisplayPdfViewer] = useState<boolean>(false);
+  const [displayPdfViewer, setDisplayPdfViewer] = useState<boolean>(true);
 
-  const handlePdfFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files) {
-      console.log('A PDF File has been selected');
-      setPdfFile(event.target.files[0]);
-    }
-  };
+  const { data, isFetched, isError, isPending, refetch } = useDocument(
+    // This is the reason to disable @typescript-eslint/no-non-null-asserted-optional-chain
+    selectedDocument?.conversationId!,
+    selectedDocument?.messageId!,
+    selectedDocument?.documentUri!,
+  );
 
-  const handlePdfUpload = () => {
-    if (pdfFile) {
+  const handleSelectedPdfDocument = useCallback(() => {
+    if (data && isFetched && !isError) {
       try {
-        if (pdfFile.type === 'application/pdf') {
-          const fileUrl = URL.createObjectURL(pdfFile);
-          setPdfFileUrl(fileUrl);
-          setDisplayPdfViewer((prevVal) => !prevVal);
+        const documentData = data;
+        if (documentData.type && documentData.type === 'application/pdf') {
+          const documentUrl = URL.createObjectURL(documentData);
+          setPdfFileUrl(documentUrl);
         } else {
-          alert('Please upload a valid PDF file.');
+          toast('Something went wrong while loading the PDF source document. Please try again.');
         }
-
-        const formData = new FormData();
-        formData.append('pdfFile', pdfFile);
       } catch (error) {
         console.error(error);
       }
     }
-  };
+  }, [data, isFetched, isError]);
 
   function onDocumentLoadSuccess({ numPages }: { numPages: number }) {
     setNumPages(numPages);
-    setIsLoading(false);
   }
 
   //  w-full max-w-[min(800px,_100%)] grow overflow-auto
 
-  return (
+  useEffect(() => {
+    handleSelectedPdfDocument();
+  }, [data, handleSelectedPdfDocument]);
+
+  const container = (children: ReactNode) => (
     <Card withBorder mt="sm" mr="xs" ml="6">
-      <Card.Section className="input-group" withBorder inheritPadding py="xs">
-        <label htmlFor="file_upload">Choose a PDF File to upload. </label>
-        <input id="file_upload" type="file" accept="application/pdf" style={{ opacity: 0 }} onChange={handlePdfFileChange} />
-        <div className="file-metadata">
-          {pdfFile && (
-            <section>
-              File details:
-              <ul>
-                <li>Name: {pdfFile.name}</li>
-                <li>Type: {pdfFile.type}</li>
-                <li>Size: {pdfFile.size}</li>
-              </ul>
-            </section>
-          )}
-          {pdfFile && (
-            <Button onClick={handlePdfUpload} className="submit">
-              Display PDF file: {pdfFile.name}
-            </Button>
-          )}
-          {pdfFileUrl && (
-            <Button
-              onClick={() => {
-                setDisplayPdfViewer((prevVal) => !prevVal);
-              }}
-            >
-              Hide PDF Viewer
-            </Button>
+      <Card.Section withBorder inheritPadding py="xs">
+        <Group justify="flex-end">
+          <ActionIcon onClick={onClose} variant="subtle" color="gray" aria-label="close">
+            <IconX title="close" />
+          </ActionIcon>
+        </Group>
+      </Card.Section>
+      {children}
+    </Card>
+  );
+
+  if (isError) {
+    return container(
+      <Alert text={t('common.errorLoading')} className="mt-4">
+        <Button color="red" size="compact-xs" variant="light" mt="sm" onClick={() => refetch()}>
+          {t('common.tryAgain')}
+        </Button>
+      </Alert>,
+    );
+  }
+
+  if (isPending) {
+    return container(<Loader className="mx-auto my-32" />);
+  }
+
+  return container(
+    <>
+      <Card.Section className="input-group" inheritPadding>
+        <div className="viewer-ctrls">
+          {data && (
+            <PdfControlBar
+              numPages={numPages}
+              pageNumber={pageNumber}
+              scale={scale}
+              setPageNumber={setPageNumber}
+              setScale={setScale}
+              showViewer={displayPdfViewer}
+              setShowViewer={setDisplayPdfViewer}
+            />
           )}
         </div>
       </Card.Section>
       {pdfFileUrl && displayPdfViewer && (
-        <div className="pdf-viewer">
-          <PdfControlBar
-            file={pdfFileUrl}
-            numPages={numPages}
-            pageNumber={pageNumber}
-            scale={scale}
-            setPageNumber={setPageNumber}
-            setScale={setScale}
-          />
-          <div className="pdf-viewport" style={{ outline: 'solid 1px red', overflow: 'auto', width: '650px', height: '886px' }}>
-            {/* Arbitrary width value -- For Test purposes ONLY */}
+        <Card.Section className="pdf-viewer pt-0 pr-4 pb-4 pl-4">
+          <div className="pdf-viewport h-ful w-full overflow-auto border-1" style={VIEWPORT_STYLING_RULES}>
             <Document file={pdfFileUrl} onLoadSuccess={onDocumentLoadSuccess} onLoadError={console.error}>
               <Page pageNumber={pageNumber} scale={scale} />
             </Document>
           </div>
-        </div>
+        </Card.Section>
       )}
-    </Card>
+    </>,
   );
 }
