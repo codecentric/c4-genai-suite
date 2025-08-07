@@ -14,6 +14,7 @@ models/BucketAvailabilityDto.ts
 models/BucketDto.ts
 models/BucketDtoFileSizeLimits.ts
 models/BucketsDto.ts
+models/ChangePasswordDto.ts
 models/ChatSuggestionDto.ts
 models/ChatUICallbackResultDto.ts
 models/ChunkDto.ts

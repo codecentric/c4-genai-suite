@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import * as Yup from 'yup';
-import { UpsertUserDto, useApi } from 'src/api';
+import { ChangePasswordDto, useApi } from 'src/api';
 import { Forms, Modal } from 'src/components';
 import { useProfile } from 'src/hooks';
 import { texts } from 'src/texts';
@@ -40,23 +40,17 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
 
   const updatePassword = useMutation({
     mutationFn: async (request: { currentPassword?: string; password?: string }) => {
-      const fullUserData = await api.users.getUser(profile.id);
-
-      const updateData: UpsertUserDto = {
-        name: fullUserData.name,
-        email: fullUserData.email,
-        userGroupId: fullUserData.userGroupId,
-        password: request.password,
-        apiKey: fullUserData.apiKey,
-        currentPassword: request.currentPassword,
+      const payload: ChangePasswordDto = {
+        password: request.password!,
+        currentPassword: request.currentPassword!,
       };
-      return api.users.putUser(profile.id, updateData);
+      return api.users.putMyPassword(payload);
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({
         queryKey: ['profile'],
       });
-      passwordForm.reset({ password: '', passwordConfirm: '' });
+      passwordForm.reset({ currentPassword: '', password: '', passwordConfirm: '' });
       toast.success(texts.chat.settings.passwordUpdatedSuccessfully);
     },
     onError: () => {
@@ -72,7 +66,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
 
   useEffect(() => {
     if (!isOpen) {
-      passwordForm.reset({ password: '', passwordConfirm: '' });
+      passwordForm.reset({ currentPassword: '', password: '', passwordConfirm: '' });
       updatePassword.reset();
     }
   }, [isOpen]);
