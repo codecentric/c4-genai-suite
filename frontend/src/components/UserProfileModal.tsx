@@ -2,11 +2,11 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { Button, Tabs } from '@mantine/core';
 import { IconLock, IconUser } from '@tabler/icons-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import * as Yup from 'yup';
-import { UpsertUserDto, useApi } from 'src/api';
+import { ChangePasswordDto, useApi } from 'src/api';
 import { Forms, Modal } from 'src/components';
 import { useProfile } from 'src/hooks';
 import { texts } from 'src/texts';
@@ -40,23 +40,17 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
 
   const updatePassword = useMutation({
     mutationFn: async (request: { currentPassword?: string; password?: string }) => {
-      const fullUserData = await api.users.getUser(profile.id);
-
-      const updateData: UpsertUserDto = {
-        name: fullUserData.name,
-        email: fullUserData.email,
-        userGroupId: fullUserData.userGroupId,
-        password: request.password,
-        apiKey: fullUserData.apiKey,
-        currentPassword: request.currentPassword,
+      const payload: ChangePasswordDto = {
+        password: request.password!,
+        currentPassword: request.currentPassword!,
       };
-      return api.users.putUser(profile.id, updateData);
+      return api.users.putMyPassword(payload);
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({
         queryKey: ['profile'],
       });
-      passwordForm.reset({ password: '', passwordConfirm: '' });
+      passwordForm.reset({ currentPassword: '', password: '', passwordConfirm: '' });
       toast.success(texts.chat.settings.passwordUpdatedSuccessfully);
     },
     onError: () => {
@@ -70,16 +64,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
     }
   };
 
-  useEffect(() => {
-    if (!isOpen) {
-      passwordForm.reset({ password: '', passwordConfirm: '' });
-      updatePassword.reset();
-    }
-  }, [isOpen]);
-
-  if (!isOpen) {
-    return null;
-  }
+  if (!isOpen) return null;
 
   const PersonalInfoSection = () => (
     <div>
@@ -127,7 +112,15 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
   );
 
   return (
-    <Modal size="xl" header={<div className="flex items-center gap-4">{texts.chat.settings.header}</div>} onClose={onClose}>
+    <Modal
+      size="xl"
+      header={<div className="flex items-center gap-4">{texts.chat.settings.header}</div>}
+      onClose={() => {
+        passwordForm.reset({ currentPassword: '', password: '', passwordConfirm: '' });
+        updatePassword.reset();
+        onClose();
+      }}
+    >
       <div className="flex h-96">
         <div className="w-1/3 border-r border-gray-200 pr-4">
           <Tabs

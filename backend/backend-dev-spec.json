@@ -1374,6 +1374,20 @@
         "summary": "",
         "tags": ["users"]
       }
+    },
+    "/api/users/me/password": {
+      "put": {
+        "description": "Updates the user password.",
+        "operationId": "putMyPassword",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ChangePasswordDto" } } }
+        },
+        "responses": { "204": { "description": "" } },
+        "summary": "",
+        "tags": ["users"]
+      }
     }
   },
   "info": { "title": "c4 GenAI Suite", "description": "c4 GenAI Suite", "version": "1.0", "contact": {} },
@@ -2459,11 +2473,18 @@
           "name": { "type": "string", "description": "The display name." },
           "email": { "type": "string", "description": "The email address." },
           "password": { "type": "string", "description": "The optional password." },
-          "currentPassword": { "type": "string", "description": "The current password when updating password." },
           "userGroupId": { "type": "string", "description": "The user group ID." },
           "apiKey": { "type": "string", "description": "The API Key.", "nullable": true }
         },
         "required": ["name", "email", "userGroupId"]
+      },
+      "ChangePasswordDto": {
+        "type": "object",
+        "properties": {
+          "password": { "type": "string", "description": "The new password." },
+          "currentPassword": { "type": "string", "description": "The current existing password." }
+        },
+        "required": ["password", "currentPassword"]
       }
     }
   }

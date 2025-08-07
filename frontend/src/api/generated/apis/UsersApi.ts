@@ -16,6 +16,7 @@
 
 import * as runtime from '../runtime';
 import type {
+  ChangePasswordDto,
   UpsertUserDto,
   UpsertUserGroupDto,
   UserDto,
@@ -24,6 +25,8 @@ import type {
   UsersDto,
 } from '../models/index';
 import {
+    ChangePasswordDtoFromJSON,
+    ChangePasswordDtoToJSON,
     UpsertUserDtoFromJSON,
     UpsertUserDtoToJSON,
     UpsertUserGroupDtoFromJSON,
@@ -62,6 +65,10 @@ export interface PostUserRequest {
 
 export interface PostUserGroupRequest {
     upsertUserGroupDto: UpsertUserGroupDto;
+}
+
+export interface PutMyPasswordRequest {
+    changePasswordDto: ChangePasswordDto;
 }
 
 export interface PutUserRequest {
@@ -324,6 +331,43 @@ export class UsersApi extends runtime.BaseAPI {
     async postUserGroup(upsertUserGroupDto: UpsertUserGroupDto, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserGroupDto> {
         const response = await this.postUserGroupRaw({ upsertUserGroupDto: upsertUserGroupDto }, initOverrides);
         return await response.value();
+    }
+
+    /**
+     * Updates the user password.
+     * 
+     */
+    async putMyPasswordRaw(requestParameters: PutMyPasswordRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters['changePasswordDto'] == null) {
+            throw new runtime.RequiredError(
+                'changePasswordDto',
+                'Required parameter "changePasswordDto" was null or undefined when calling putMyPassword().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/api/users/me/password`,
+            method: 'PUT',
+            headers: headerParameters,
+            query: queryParameters,
+            body: ChangePasswordDtoToJSON(requestParameters['changePasswordDto']),
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Updates the user password.
+     * 
+     */
+    async putMyPassword(changePasswordDto: ChangePasswordDto, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.putMyPasswordRaw({ changePasswordDto: changePasswordDto }, initOverrides);
     }
 
     /**

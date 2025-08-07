@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDefined, IsOptional, IsString, Length } from 'class-validator';
+import { IsDefined, IsNotEmpty, IsOptional, IsString, Length } from 'class-validator';
 import { User, UserGroup } from 'src/domain/users';
 
 export class UpsertUserDto {
@@ -30,14 +30,6 @@ export class UpsertUserDto {
   password?: string;
 
   @ApiProperty({
-    description: 'The current password when updating password.',
-    required: false,
-  })
-  @IsOptional()
-  @IsString()
-  currentPassword?: string;
-
-  @ApiProperty({
     description: 'The user group ID.',
     required: true,
   })
@@ -53,6 +45,26 @@ export class UpsertUserDto {
   @IsOptional()
   @IsString()
   apiKey?: string;
+}
+
+export class ChangePasswordDto {
+  @ApiProperty({
+    description: 'The new password.',
+    required: true,
+  })
+  @IsDefined()
+  @IsString()
+  @IsNotEmpty()
+  password!: string;
+
+  @ApiProperty({
+    description: 'The current existing password.',
+    required: true,
+  })
+  @IsDefined()
+  @IsString()
+  @IsNotEmpty()
+  currentPassword!: string;
 }
 
 export class UserDto {
