@@ -313,7 +313,7 @@ export class ConversationApi extends runtime.BaseAPI {
      * Get the original document specified by the documentUri from an extension
      * 
      */
-    async getDocumentRaw(requestParameters: GetDocumentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
+    async getDocumentRaw(requestParameters: GetDocumentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Blob>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -346,14 +346,14 @@ export class ConversationApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse<any>(response);
+        return new runtime.BlobApiResponse(response);
     }
 
     /**
      * Get the original document specified by the documentUri from an extension
      * 
      */
-    async getDocument(id: number, messageId: number, documentUri: string, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
+    async getDocument(id: number, messageId: number, documentUri: string, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Blob> {
         const response = await this.getDocumentRaw({ id: id, messageId: messageId, documentUri: documentUri }, initOverrides);
         return await response.value();
     }
