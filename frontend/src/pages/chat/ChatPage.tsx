@@ -69,6 +69,9 @@ export function ChatPage() {
   const { selectedSource, setSelectedSource } = useStateOfSelectedSource();
 
   const isSourcePdfFile = selectedSource?.document?.mimeType === 'application/pdf';
+  // FIX ME: currently only the s5q-document:// uris can return pdf blobs.
+  //  We need to add a field to the DocumentDto, whether the blob is available or not.
+  const isSourceAvailable = selectedSource?.document?.uri.startsWith('s5q-document://');
 
   const selectedAssistantId = useStateOfSelectedAssistantId();
   const { userBucket } = useUserBucket(selectedAssistantId);
@@ -192,13 +195,15 @@ export function ChatPage() {
                 <Tabs defaultValue="sources-chunk-preview">
                   <Tabs.List>
                     <Tabs.Tab value="sources-chunk-preview">{texts.chat.sources.content}</Tabs.Tab>
-                    <Tabs.Tab value="source-document-viewer">{texts.chat.sources.viewer}</Tabs.Tab>
+                    <Tabs.Tab value="source-document-viewer" hidden={!(isSourcePdfFile && isSourceAvailable)}>
+                      {texts.chat.sources.viewer}
+                    </Tabs.Tab>
                   </Tabs.List>
 
                   <Tabs.Panel value="sources-chunk-preview">
                     <SourcesChunkPreview onClose={() => setSelectedDocument(undefined)} document={selectedDocument} />
                   </Tabs.Panel>
-                  {isSourcePdfFile && (
+                  {isSourcePdfFile && isSourceAvailable && (
                     <Tabs.Panel value="source-document-viewer">
                       <PdfViewer
                         selectedDocument={selectedDocument}
@@ -210,13 +215,7 @@ export function ChatPage() {
                 </Tabs>
               ) : (
                 userBucket && (
-                  <Tabs defaultValue="drag-n-drop-area">
-                    <Tabs.Tab value="drag-n-drop-area">{texts.common.files}</Tabs.Tab>
-
-                    <Tabs.Panel value="drag-n-drop-area">
-                      <Files configurationId={selectedAssistantId} userBucket={userBucket} conversationId={selectedChatId} />
-                    </Tabs.Panel>
-                  </Tabs>
+                  <Files configurationId={selectedAssistantId} userBucket={userBucket} conversationId={selectedChatId} />
                 )
               )}
             </Panel>
