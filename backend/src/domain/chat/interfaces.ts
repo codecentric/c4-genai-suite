@@ -326,6 +326,7 @@ export type Document = {
   mimeType: string;
   size?: number | null;
   link?: string | null;
+  downloadAvailable?: boolean;
 };
 
 export type Source = {

@@ -53,6 +53,7 @@ export const convertC4JsonToSource = (type: C4JsonType): Source => {
       mimeType: type.data.metadata.mime_type,
       link: type.data.metadata.link,
       size: type.data.metadata.size,
+      downloadAvailable: true,
     },
     metadata: metadata.attributes ?? {},
   };

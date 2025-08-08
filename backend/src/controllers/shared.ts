@@ -2,7 +2,7 @@ import { BadRequestException, Injectable, PipeTransform } from '@nestjs/common';
 import { ApiProperty, getSchemaPath } from '@nestjs/swagger';
 import { SchemaObject } from '@nestjs/swagger/dist/interfaces/open-api-spec.interface';
 import { Type } from 'class-transformer';
-import { IsArray, IsDefined, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { IsArray, IsBoolean, IsDefined, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
 
 export class ImageUrlDto {
   @ApiProperty({
@@ -155,6 +155,15 @@ export class DocumentDto {
   @IsString()
   @IsOptional()
   link?: string | null;
+
+  @ApiProperty({
+    description: 'Can the document be downloaded via the `getDocument` endpoint.',
+    required: false,
+    type: 'boolean',
+  })
+  @IsBoolean()
+  @IsOptional()
+  downloadAvailable?: boolean;
 }
 
 export class SourceDto {

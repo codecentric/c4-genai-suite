@@ -50,6 +50,12 @@ export interface DocumentDto {
      * @memberof DocumentDto
      */
     link?: string;
+    /**
+     * Can the document be downloaded via the `getDocument` endpoint.
+     * @type {boolean}
+     * @memberof DocumentDto
+     */
+    downloadAvailable?: boolean;
 }
 
 /**
@@ -76,6 +82,7 @@ export function DocumentDtoFromJSONTyped(json: any, ignoreDiscriminator: boolean
         'mimeType': json['mimeType'],
         'size': json['size'] == null ? undefined : json['size'],
         'link': json['link'] == null ? undefined : json['link'],
+        'downloadAvailable': json['downloadAvailable'] == null ? undefined : json['downloadAvailable'],
     };
 }
 
@@ -90,6 +97,7 @@ export function DocumentDtoToJSON(value?: DocumentDto | null): any {
         'mimeType': value['mimeType'],
         'size': value['size'],
         'link': value['link'],
+        'downloadAvailable': value['downloadAvailable'],
     };
 }
 

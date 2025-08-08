@@ -69,9 +69,7 @@ export function ChatPage() {
   const { selectedSource, setSelectedSource } = useStateOfSelectedSource();
 
   const isSourcePdfFile = selectedSource?.document?.mimeType === 'application/pdf';
-  // FIX ME: currently only the s5q-document:// uris can return pdf blobs.
-  //  We need to add a field to the DocumentDto, whether the blob is available or not.
-  const isSourceAvailable = selectedSource?.document?.uri.startsWith('s5q-document://');
+  const isSourceAvailable = selectedSource?.document?.downloadAvailable ?? false;
 
   const selectedAssistantId = useStateOfSelectedAssistantId();
   const { userBucket } = useUserBucket(selectedAssistantId);

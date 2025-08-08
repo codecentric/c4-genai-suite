@@ -1461,7 +1461,11 @@
           "name": { "type": "string", "description": "Name of the document" },
           "mimeType": { "type": "string", "description": "MIME type of the document", "example": "application/pdf" },
           "size": { "type": "number", "description": "Size of the document in bytes" },
-          "link": { "type": "string", "description": "Link to the document, if available" }
+          "link": { "type": "string", "description": "Link to the document, if available" },
+          "downloadAvailable": {
+            "type": "boolean",
+            "description": "Can the document be downloaded via the `getDocument` endpoint."
+          }
         },
         "required": ["uri", "mimeType"]
       },
