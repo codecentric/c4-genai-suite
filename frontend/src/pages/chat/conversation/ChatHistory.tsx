@@ -5,11 +5,10 @@ import { ChatItem } from './ChatItem/ChatItem';
 
 type ChatHistoryProps = {
   agentName: string;
-  llmLogo?: string;
   editMessage: (input: string, files?: FileDto[], editMessageId?: number) => void;
 };
 
-export function ChatHistory({ agentName, llmLogo, editMessage }: ChatHistoryProps) {
+export function ChatHistory({ agentName, editMessage }: ChatHistoryProps) {
   const messages = useStateOfMessages();
   const allMessagesButLastTwo = messages.slice(0, -2);
   const lastTwoMessages = messages.slice(-2);
@@ -30,7 +29,6 @@ export function ChatHistory({ agentName, llmLogo, editMessage }: ChatHistoryProp
             isLast={i === messages.length - 1}
             isBeforeLast={i === messages.length - 2}
             message={message}
-            llmLogo={llmLogo}
             selectDocument={(documentUri) => {
               setSelectedDocument({ conversationId: chatId, messageId: message.id, documentUri });
               setSidebarRight(true);
@@ -47,7 +45,6 @@ export function ChatHistory({ agentName, llmLogo, editMessage }: ChatHistoryProp
             isLast={i === 1}
             isBeforeLast={i === 0}
             message={message}
-            llmLogo={llmLogo}
             selectDocument={(documentUri) => {
               setSelectedDocument({ conversationId: chatId, messageId: message.id, documentUri });
               setSidebarRight(true);
