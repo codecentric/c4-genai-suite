@@ -47,7 +47,7 @@ jobs:
             -e POSTGRES_PASSWORD="secret" \
             -e POSTGRES_DB="cccc" \
             pgvector/pgvector:pg16
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v5
         with:
           name: backend
           path: /tmp/
@@ -66,7 +66,7 @@ jobs:
             -e AUTH_INITIAL_ADMIN_USERNAME="admin@example.com" \
             -e AUTH_INITIAL_ADMIN_PASSWORD="secret" \
             backend:commit-${{ github.sha }}
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v5
         with:
           name: reis
           path: /tmp/
@@ -100,7 +100,7 @@ jobs:
             --name mcp-fetch \
             -e CONFIG='{"mcpServers":{"mcp-fetch":{"command":"uvx","args":["mcp-server-fetch"],"port":8000}}}' \
             ghcr.io/codecentric/c4-genai-suite/dev-helper/mcp-tool-as-server:latest
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v5
         with:
           name: frontend
           path: /tmp/
