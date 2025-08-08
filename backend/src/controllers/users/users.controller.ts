@@ -9,10 +9,12 @@ import {
   Post,
   Put,
   Query,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { ApiNoContentResponse, ApiOkResponse, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { Request } from 'express';
 import { LocalAuthGuard, Role, RoleGuard } from 'src/domain/auth';
 import { BUILTIN_USER_GROUP_ADMIN } from 'src/domain/database';
 import {
@@ -26,7 +28,7 @@ import {
   UpdateUser,
   UpdateUserResponse,
 } from 'src/domain/users';
-import { UpsertUserDto, UserDto, UsersDto } from './dtos';
+import { ChangePasswordDto, UpsertUserDto, UserDto, UsersDto } from './dtos';
 
 @Controller('users')
 @ApiTags('users')
@@ -118,6 +120,15 @@ export class UsersController {
     const result: UpdateUserResponse = await this.commandBus.execute(command);
 
     return UserDto.fromDomain(result.user);
+  }
+
+  @Put('me/password')
+  @ApiOperation({ operationId: 'putMyPassword', description: 'Updates the user password.' })
+  @ApiNoContentResponse()
+  async putMyPassword(@Req() req: Request, @Body() body: ChangePasswordDto) {
+    await this.commandBus.execute(
+      new UpdateUser(req.user.id, { password: body.password, currentPassword: body.currentPassword }),
+    );
   }
 
   @Delete(':id')

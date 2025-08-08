@@ -1,5 +1,5 @@
 import { createHash } from 'crypto';
-import { NotFoundException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
@@ -8,7 +8,7 @@ import { assignDefined, isNull } from 'src/lib';
 import { User } from '../interfaces';
 import { buildUser } from './utils';
 
-type Values = Partial<Pick<User, 'apiKey' | 'name' | 'email' | 'userGroupId'> & { password: string }>;
+type Values = Partial<Pick<User, 'apiKey' | 'name' | 'email' | 'userGroupId'> & { password: string; currentPassword?: string }>;
 
 export class UpdateUser {
   constructor(
@@ -30,7 +30,7 @@ export class UpdateUserHandler implements ICommandHandler<UpdateUser, UpdateUser
 
   async execute(request: UpdateUser): Promise<UpdateUserResponse> {
     const { id, values } = request;
-    const { apiKey, email, name, password, userGroupId } = values;
+    const { apiKey, email, name, password, userGroupId, currentPassword } = values;
 
     const entity = await this.users.findOneBy({ id });
 
@@ -39,6 +39,13 @@ export class UpdateUserHandler implements ICommandHandler<UpdateUser, UpdateUser
     }
 
     if (password) {
+      if (currentPassword) {
+        const isValid = await bcrypt.compare(currentPassword, entity.passwordHash!);
+        if (!isValid) {
+          throw new BadRequestException('The current password does not match');
+        }
+      }
+
       entity.passwordHash = await bcrypt.hash(password, 10);
     }
 

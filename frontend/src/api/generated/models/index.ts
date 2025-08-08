@@ -7,6 +7,7 @@ export * from './BucketAvailabilityDto';
 export * from './BucketDto';
 export * from './BucketDtoFileSizeLimits';
 export * from './BucketsDto';
+export * from './ChangePasswordDto';
 export * from './ChatSuggestionDto';
 export * from './ChatUICallbackResultDto';
 export * from './ChunkDto';

@@ -645,3 +645,13 @@ export async function expectElementInYRange(element: Locator, min: number, max: 
   expect(highestPointY).toBeGreaterThan(min);
   expect(lowestPointY).toBeLessThan(max);
 }
+
+export async function changePassword(page: Page, currentPassword: string, newPassword: string) {
+  await page.getByRole('textbox', { name: 'Current Password', exact: true }).waitFor();
+  await page.getByRole('textbox', { name: 'Current Password', exact: true }).fill(currentPassword);
+  await page.getByRole('textbox', { name: 'Password', exact: true }).click();
+  await page.getByRole('textbox', { name: 'Password', exact: true }).fill(newPassword);
+  await page.getByRole('textbox', { name: 'Confirm Password', exact: true }).click();
+  await page.getByRole('textbox', { name: 'Confirm Password', exact: true }).fill(newPassword);
+  await page.getByRole('button', { name: 'Update Password' }).click({ timeout: 3000 });
+}
