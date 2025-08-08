@@ -5,9 +5,9 @@ services:
     image: pgvector/pgvector:pg16
     container_name: c4-dev-postgres
     ports:
-      - 5433:5433
+      - 5432:5432
     environment:
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=secret
       - POSTGRES_DB=cccc
-      - PGPORT=5433
+      - PGPORT=5432

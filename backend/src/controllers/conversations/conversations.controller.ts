@@ -230,23 +230,16 @@ export class ConversationsController {
       new GetDocument(req.user, conversationId, messageId, documentUri),
     );
 
-    // console.log("getDocument result:", result.document);
-    // response.send(result.document);
-    // return result.document;
-    // TODO: the file content will just not appear in the response :(
-    // response.contentType(result.document?.type ?? "application/pdf");
-    // response.send(result.document?.bytes());
-
     const document = result.document;
     if (!document) {
       response.status(404).send('Document not found');
       return;
     }
-    const contentType = document.type ?? 'application/pdf';
+    const contentType = document.type ?? 'application/octet-stream';
     const bytes = await document.bytes();
 
     response.setHeader('Content-Type', contentType);
-    response.setHeader('Content-Disposition', `attachment; filename="document.pdf"`);
+    response.setHeader('Content-Disposition', `attachment; filename="${document.name ?? 'document'}"`);
 
     response.send(bytes);
   }

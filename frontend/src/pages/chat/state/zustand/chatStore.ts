@@ -17,8 +17,7 @@ type ChatState = {
   currentChatId: number;
   chatDataMap: Map<number, ChatData>;
 
-  // Remove these comments if the purpose of selectedDocument and selectedSource being here seems self-explanatory
-  // A selected Documents from a List of Sources provided by the LLM o RAG Assitant is a piece of information related to the concept/entity of a Chat
+  // sources selected to be shown in the viewer
   selectedDocument: DocumentSource | undefined;
   selectedSource: SourceDto | undefined;
 };

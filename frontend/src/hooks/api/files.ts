@@ -16,7 +16,7 @@ export const useDocument = (conversationId: number, messageId: number, documentU
 
   return useQuery({
     queryFn: () => conversations.getDocument(conversationId, messageId, documentUri),
-    queryKey: ['files', 'document', { messageId }, { documentUri }],
+    queryKey: ['files', 'document', { conversationId }, { messageId }, { documentUri }],
     enabled: !!documentUri,
   });
 };

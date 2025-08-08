@@ -93,9 +93,6 @@ export function ConversationPage(props: ConversationPageProps) {
                 (showScrollToBottomButton || showRateThisConversation) && 'white-shadow',
               )}
             >
-              {/* <div className={`flx-col items-center- flex shrink-0 justify-start px-4`}>
-                <PdfUploader />
-              </div> */}
               <ChatInput
                 textareaRef={textareaRef}
                 chatId={chat.id}

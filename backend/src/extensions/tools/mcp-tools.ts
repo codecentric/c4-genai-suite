@@ -356,34 +356,22 @@ export class MCPToolsExtension implements Extension<Configuration> {
   }
 
   async getDocument(configuration: Configuration, documentUri: string) {
-    // TODO
     const { client } = (await this.getTools(configuration)) ?? [];
     const req: ReadResourceRequest = {
       method: 'resources/read',
       params: { uri: documentUri },
     };
     const res = await client.request(req, ReadResourceResultSchema);
-
-    // TODO: extract the content from the response
-    // console.log(res);
-    // console.log(res.contents[0].blob);
-    console.log(res.contents[0].uri);
-    console.log(res.contents[0].mimeType);
     const content = res.contents[0];
 
     const base64String = content.blob as string;
     const binaryString = atob(base64String);
-
-    // console.log(binaryString);
-
-    // Convert binary string to Uint8Array
     const bytes = new Uint8Array(binaryString.length);
     for (let i = 0; i < binaryString.length; i++) {
       bytes[i] = binaryString.charCodeAt(i);
     }
 
     const file = new File([bytes], content.uri, { type: content.mimeType });
-    console.log(file);
 
     return Promise.resolve(file);
   }
@@ -496,8 +484,6 @@ export class MCPToolsExtension implements Extension<Configuration> {
                     params: { name, arguments: { ...llmArgs, ...adminArgs, ...userArgs } },
                   };
                   const res = await client.request(req, CallToolResultSchema);
-                  console.log({ name, arguments: { ...llmArgs, ...adminArgs, ...userArgs } });
-                  console.log(res);
                   const { sources, content } = transformMCPToolResponse(res);
                   if (sources.length) {
                     context.history?.addSources(extension.externalId, sources);

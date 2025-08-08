@@ -6,9 +6,6 @@ import { ReactNode, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Document, Page, pdfjs } from 'react-pdf';
 
-import 'react-pdf/dist/Page/AnnotationLayer.css';
-import 'react-pdf/dist/Page/TextLayer.css';
-
 import { toast } from 'react-toastify';
 import { SourceDto } from 'src/api/generated/models/SourceDto';
 import { useDocument } from 'src/hooks/api/files';
@@ -64,8 +61,6 @@ export function PdfViewer({ selectedDocument, selectedSource: _selectedSource, o
   function onDocumentLoadSuccess({ numPages }: { numPages: number }) {
     setNumPages(numPages);
   }
-
-  //  w-full max-w-[min(800px,_100%)] grow overflow-auto
 
   useEffect(() => {
     handleSelectedPdfDocument();

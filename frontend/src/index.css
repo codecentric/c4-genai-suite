@@ -1,5 +1,9 @@
 @import 'tailwindcss';
 
+/* Necessary for annotations and the textlayer for pdfs */
+@import 'react-pdf/dist/Page/AnnotationLayer.css';
+@import 'react-pdf/dist/Page/TextLayer.css';
+
 @plugin "daisyui" {
   themes:
     light --default,
