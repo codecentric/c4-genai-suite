@@ -1,5 +1,4 @@
-import { ChatOllama } from '@langchain/ollama';
-import { createToolCallingAgent } from 'langchain/agents';
+import { ChatOpenAI } from '@langchain/openai';
 import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from 'src/domain/chat';
 import { Extension, ExtensionConfiguration, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions';
 import { User } from 'src/domain/users';
@@ -42,7 +41,6 @@ export class OllamaModelExtension implements Extension<OllamaModelExtensionConfi
         context.llms[this.spec.name] = await context.cache.get(this.spec.name, extension.values, () => {
           return this.createModel(extension.values);
         });
-        context.agentFactory = createToolCallingAgent;
 
         return next(context);
       },
@@ -54,9 +52,12 @@ export class OllamaModelExtension implements Extension<OllamaModelExtensionConfi
   private createModel(configuration: OllamaModelExtensionConfiguration) {
     const { endpoint, modelName } = configuration;
 
-    return new ChatOllama({
-      baseUrl: endpoint,
+    return new ChatOpenAI({
       model: modelName,
+      openAIApiKey: 'ollama',
+      configuration: {
+        baseURL: `${endpoint}/v1`,
+      },
     });
   }
 }
