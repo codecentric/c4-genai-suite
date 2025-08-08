@@ -15,7 +15,7 @@ const ChatItemSources: React.FC<{ sources: SourceDto[]; selectDocument: (documen
   if (!uniqueSources || uniqueSources.length === 0) return null;
 
   return (
-    <div className="mt-2 mb-2 rounded-2xl border-2 p-4" data-testid="sources-section">
+    <div className="mt-2 mb-2 rounded-2xl border-2 p-4 break-all" data-testid="sources-section">
       <h2 className="mb-4 text-xl font-bold">{texts.chat.sources.sources}</h2>
       <ul>
         {uniqueSources.map((source, index) => (
