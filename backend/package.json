@@ -113,7 +113,7 @@
     "@types/passport-microsoft": "2.1.0",
     "@types/pg": "8.15.4",
     "@types/supertest": "6.0.3",
-    "@typescript-eslint/eslint-plugin": "8.33.1",
+    "@typescript-eslint/eslint-plugin": "8.39.1",
     "@typescript-eslint/parser": "8.35.1",
     "eslint": "9.32.0",
     "eslint-config-prettier": "10.1.5",
