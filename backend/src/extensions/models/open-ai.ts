@@ -60,6 +60,12 @@ export class OpenAIModelExtension implements Extension<OpenAIModelExtensionConfi
           format: 'slider',
           description: this.i18n.t('texts.extensions.common.frequencyPenaltyHint'),
         },
+        effort: {
+          type: 'string',
+          title: this.i18n.t('texts.extensions.common.effort'),
+          required: false,
+          enum: ['', 'low', 'medium', 'high'],
+        },
       },
     };
   }
@@ -110,7 +116,7 @@ export class OpenAIModelExtension implements Extension<OpenAIModelExtensionConfi
   }
 
   private createModel(configuration: OpenAIModelExtensionConfiguration, callbacks?: CallbackHandlerMethods[], streaming = false) {
-    const { apiKey, modelName, frequencyPenalty, presencePenalty, temperature } = configuration;
+    const { apiKey, modelName, frequencyPenalty, presencePenalty, temperature, effort } = configuration;
 
     return new ChatOpenAI({
       callbacks,
@@ -120,6 +126,7 @@ export class OpenAIModelExtension implements Extension<OpenAIModelExtensionConfi
       presencePenalty,
       streaming,
       temperature,
+      reasoning: effort ? { effort } : undefined,
     });
   }
 }
@@ -131,6 +138,7 @@ type OpenAIModelExtensionConfiguration = ExtensionConfiguration & {
   seed: number;
   presencePenalty: number;
   frequencyPenalty: number;
+  effort?: 'low' | 'medium' | 'high';
 };
 
 type OpenAITokenEstimation = {

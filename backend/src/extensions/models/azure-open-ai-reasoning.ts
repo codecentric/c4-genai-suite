@@ -41,6 +41,12 @@ export class AzureOpenAIReasoningModelExtension implements Extension<AzureOpenAI
           format: 'select',
           examples: ['2024-12-01-preview'],
         },
+        effort: {
+          type: 'string',
+          title: this.i18n.t('texts.extensions.common.effort'),
+          required: false,
+          enum: ['', 'low', 'medium', 'high'],
+        },
       },
     };
   }
@@ -77,18 +83,17 @@ export class AzureOpenAIReasoningModelExtension implements Extension<AzureOpenAI
     callbacks?: CallbackHandlerMethods[],
     streaming = false,
   ) {
-    const { apiKey, apiVersion, deploymentName, instanceName } = configuration;
+    const { apiKey, apiVersion, deploymentName, instanceName, effort } = configuration;
 
-    const llm = new AzureChatOpenAI({
+    return new AzureChatOpenAI({
       azureOpenAIApiDeploymentName: deploymentName,
       azureOpenAIApiInstanceName: instanceName,
       azureOpenAIApiKey: apiKey,
       azureOpenAIApiVersion: apiVersion,
       callbacks,
       streaming,
+      reasoning: effort ? { effort } : undefined,
     });
-
-    return llm;
   }
 }
 
@@ -97,4 +102,5 @@ type AzureOpenAIReasoningModelExtensionConfiguration = ExtensionConfiguration & 
   deploymentName: string;
   instanceName: string;
   apiVersion: string;
+  effort?: 'low' | 'medium' | 'high';
 };

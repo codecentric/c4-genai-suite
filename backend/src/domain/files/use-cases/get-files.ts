@@ -20,7 +20,6 @@ export class GetFiles {
       pageSize?: number;
       query?: string;
       conversationId?: number;
-      extensionId?: number;
       files?: number[];
       withContent?: boolean;
     },
@@ -44,17 +43,7 @@ export class GetFilesHandler implements IQueryHandler<GetFiles, GetFilesResponse
   ) {}
 
   async execute(query: GetFiles): Promise<GetFilesResponse> {
-    const {
-      page,
-      pageSize,
-      extensionId,
-      query: searchQuery,
-      bucketIdOrType,
-      user,
-      conversationId,
-      files,
-      withContent,
-    } = query.data;
+    const { page, pageSize, query: searchQuery, bucketIdOrType, user, conversationId, files, withContent } = query.data;
 
     const where: FindOptionsWhere<FileEntity> = {};
     const bucketWhere: FindOptionsWhere<BucketEntity> = {};
@@ -81,10 +70,6 @@ export class GetFilesHandler implements IQueryHandler<GetFiles, GetFilesResponse
     if (conversationId) {
       where.conversationId = conversationId;
       where.userId = user.id;
-    }
-
-    if (extensionId) {
-      where.extensionId = extensionId;
     }
 
     if (searchQuery && searchQuery != '') {

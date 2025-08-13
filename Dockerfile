@@ -19,7 +19,7 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=80
 
-RUN apk add --no-cache caddy=2.10.0-r0 tini=0.19.0-r3
+RUN apk update && apk add --no-cache caddy=2.10.0-r1 tini=0.19.0-r3
 COPY Caddyfile /etc/caddy/Caddyfile
 
 COPY --from=backend_build /src/backend/dist /app/backend/dist

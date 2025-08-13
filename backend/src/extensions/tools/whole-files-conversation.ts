@@ -90,7 +90,6 @@ export class WholeFilesExtension implements Extension<WholeFilesExtensionConfigu
             page: 0,
             pageSize: context.files?.length ?? extension.values.maxFiles,
             conversationId: context.conversationId,
-            extensionId: extension.id,
             files: context.files ? context.files.map((x) => x.id) : undefined,
             withContent: true,
           }),

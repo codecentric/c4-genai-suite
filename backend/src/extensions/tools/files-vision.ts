@@ -125,7 +125,6 @@ export class FilesVisionExtension implements Extension<FilesVisionExtensionConfi
                   page: 0,
                   pageSize: context.files?.length ?? 1,
                   conversationId: context.conversationId,
-                  extensionId: extension.id,
                   files: imageFiles,
                   withContent: true,
                 }),
