@@ -45,7 +45,8 @@
     },
     "azure": {
       "title": "Azure OpenAI",
-      "description": "OpenAI LLM-Integration"
+      "description": "OpenAI LLM-Integration",
+      "topPHint": "Eine Alternative zum Sampling mit Temperature ist das sogenannte Nucleus Sampling, bei dem das Modell nur die Ergebnisse der Tokens mit Top_p probability mass berücksichtigt. Ein Wert von 0,1 bedeutet also, dass nur die Tokens in Betracht gezogen werden, die zusammen die obersten 10 % der probability mass ausmachen. Wir empfehlen in der Regel, entweder diesen Wert oder Temperature anzupassen – jedoch nicht beide gleichzeitig."
     },
     "azure-o": {
       "title": "Azure OpenAI Reasoning",
