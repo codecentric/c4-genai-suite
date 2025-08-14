@@ -1,4 +1,4 @@
-import { ActionIcon, Select, SelectProps, Text } from '@mantine/core';
+import { ActionIcon, Select } from '@mantine/core';
 import { IconSettings } from '@tabler/icons-react';
 import { useState } from 'react';
 import { ConfigurationUserValuesModal } from 'src/pages/chat/conversation/ConfigurationUserValuesModal';
@@ -22,15 +22,6 @@ export const Configuration = ({ canEditConfiguration }: ConfigurationProps) => {
   const updateLastSelectedAssistant = useUpdateLastSelectedAssistant();
 
   const [showModal, setShowModal] = useState(false);
-
-  const renderSelectOption: SelectProps['renderOption'] = ({ option }) => (
-    <div>
-      <Text>{option.label}</Text>
-      <Text size="xs" c="dimmed">
-        {assistants.find((c) => c.id + '' === option.value)?.description}
-      </Text>
-    </div>
-  );
 
   const close = () => setShowModal(false);
 
@@ -56,7 +47,6 @@ export const Configuration = ({ canEditConfiguration }: ConfigurationProps) => {
             handleAssistantChange(option);
           },
         }}
-        renderOption={renderSelectOption}
         onChange={handleAssistantChange}
         value={assistant?.id + ''}
         data={assistants.map((c) => ({ value: c.id + '', label: c.name }))}

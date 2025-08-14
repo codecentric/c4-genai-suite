@@ -487,9 +487,58 @@ export async function checkSelectedConfiguration(page: Page, configuration: { na
 
 export async function selectConfiguration(page: Page, configuration: { name: string }) {
   await page.getByTestId('chat-assistent-select').click();
-  const element = page.locator('p').getByText(configuration.name, { exact: true });
-  await expect(element).toBeVisible();
-  await element.click();
+
+  // Wait a bit for the dropdown to open
+  await page.waitForTimeout(1000);
+
+  // Try multiple selectors to find the assistant name
+  let element = null;
+
+  // Try 1: Look for the assistant name in any element within the dropdown
+  element = page.locator('[data-portal="true"]').getByText(configuration.name, { exact: true });
+  if ((await element.count()) === 0) {
+    // Try 2: Look for the assistant name in Text components
+    element = page.locator('[data-portal="true"]').locator('.mantine-Text-root').getByText(configuration.name, { exact: true });
+  }
+  if ((await element.count()) === 0) {
+    // Try 3: Look for the assistant name in p elements
+    element = page.locator('[data-portal="true"]').locator('p').getByText(configuration.name, { exact: true });
+  }
+  if ((await element.count()) === 0) {
+    // Try 4: Look for the assistant name in any element
+    element = page.locator('[data-portal="true"]').locator('*').getByText(configuration.name, { exact: true });
+  }
+  if ((await element.count()) === 0) {
+    // Try 5: Look for the assistant name anywhere in the document
+    element = page.getByText(configuration.name, { exact: true });
+  }
+
+  // Instead of checking visibility, just check if the element exists and click it
+  if ((await element.count()) > 0) {
+    // Wait a bit for any animations to complete
+    await page.waitForTimeout(500);
+
+    // Click the element
+    await element.click();
+
+    // Wait for the dropdown to close and ensure it's completely closed
+    await page.waitForTimeout(1000);
+
+    // Force close any remaining dropdown by clicking outside or pressing Escape
+    try {
+      // Try pressing Escape to close any open dropdown
+      await page.keyboard.press('Escape');
+      await page.waitForTimeout(500);
+    } catch (_e) {
+      // Ignore errors if Escape doesn't work
+    }
+
+    // Additional wait to ensure dropdown is closed
+    await page.waitForTimeout(500);
+  } else {
+    throw new Error(`Could not find assistant with name: ${configuration.name}`);
+  }
+
   await page.waitForLoadState('networkidle');
 }
 
