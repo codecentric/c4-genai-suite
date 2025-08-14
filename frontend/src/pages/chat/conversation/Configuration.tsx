@@ -22,7 +22,6 @@ export const Configuration = ({ canEditConfiguration }: ConfigurationProps) => {
   const updateLastSelectedAssistant = useUpdateLastSelectedAssistant();
 
   const [showModal, setShowModal] = useState(false);
-  const [searchValue, setSearchValue] = useState('');
 
   const renderSelectOption: SelectProps['renderOption'] = ({ option }) => (
     <div>
@@ -53,6 +52,9 @@ export const Configuration = ({ canEditConfiguration }: ConfigurationProps) => {
           shadow: 'md',
           position: 'bottom-start',
           middlewares: { flip: false, shift: false },
+          onOptionSubmit: (option) => {
+            handleAssistantChange(option);
+          },
         }}
         renderOption={renderSelectOption}
         onChange={handleAssistantChange}
@@ -67,8 +69,6 @@ export const Configuration = ({ canEditConfiguration }: ConfigurationProps) => {
           offsetScrollbars: true,
         }}
         searchable
-        searchValue={searchValue}
-        onSearchChange={setSearchValue}
         placeholder="Search assistants..."
         maxDropdownHeight={400}
         styles={{
