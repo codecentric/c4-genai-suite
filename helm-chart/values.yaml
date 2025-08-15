@@ -1,3 +1,8 @@
+## @section Global parameters
+global:
+  ## @param global.imagePullSecrets Global registry secret names as strings in an array
+  imagePullSecrets: []
+
 ## @section General
 ## @param fullnameOverride Overrides the name of the resources
 fullnameOverride: ""
@@ -94,6 +99,8 @@ backend:
     repository: "ghcr.io/codecentric/c4-genai-suite/backend"
     ## @param backend.image.tag [string] The image tag
     tag: "v8.5.1"
+    ## @param backend.image.pullSecrets Registry secret names as strings in an array
+    pullSecrets: []
   ## @param backend.extraEnvVars An extra list of environment variables to add to the deployment.
   extraEnvVars: []
   ## @param backend.extraVolumes An extra list of volumes to add to the deployment.
@@ -162,6 +169,8 @@ frontend:
     repository: "ghcr.io/codecentric/c4-genai-suite/frontend"
     ## @param frontend.image.tag [string] The image tag
     tag: "v8.5.1"
+    ## @param frontend.image.pullSecrets Registry secret names as strings in an array
+    pullSecrets: []
   ## @param frontend.replicaCount The number of replicas to create
   replicaCount: 1
   ## @param frontend.updateStrategy.type Frontend deployment strategy type
@@ -231,6 +240,8 @@ reis:
     repository: "ghcr.io/codecentric/c4-genai-suite/reis"
     ## @param reis.image.tag [string] The image tag
     tag: "v8.5.1"
+    ## @param reis.image.pullSecrets Registry secret names as strings in an array
+    pullSecrets: []
   metrics:
     ## @param reis.metrics.enabled Specifies whether a service for REIS metrics should be created
     enabled: false

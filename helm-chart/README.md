@@ -57,6 +57,12 @@ reis:
 
 ## Parameters
 
+### Global parameters
+
+| Name                      | Description                                         | Value |
+| ------------------------- | --------------------------------------------------- | ----- |
+| `global.imagePullSecrets` | Global registry secret names as strings in an array | `[]`  |
+
 ### General
 
 | Name                        | Description                                                                   | Value   |
@@ -111,6 +117,7 @@ reis:
 | `backend.postgresql.ssl.clientKeySecretKey`           | Key in the Secret that holds the client key for the external PostgreSQL database. Make sure that the connection string contains `sslkey=/etc/ssl/certs/<clientKeySecretKey>`.                                           | `client.key`                                 |
 | `backend.image.repository`                            | The image repository including host, port, repo                                                                                                                                                                         | `ghcr.io/codecentric/c4-genai-suite/backend` |
 | `backend.image.tag`                                   | The image tag                                                                                                                                                                                                           | `""`                                         |
+| `backend.image.pullSecrets`                           | Registry secret names as strings in an array                                                                                                                                                                            | `[]`                                         |
 | `backend.extraEnvVars`                                | An extra list of environment variables to add to the deployment.                                                                                                                                                        | `[]`                                         |
 | `backend.extraVolumes`                                | An extra list of volumes to add to the deployment.                                                                                                                                                                      | `[]`                                         |
 | `backend.extraVolumeMounts`                           | An extra list of volume mounts to add to the deployment.                                                                                                                                                                | `[]`                                         |
@@ -142,6 +149,7 @@ reis:
 | `frontend.enabled`                              | Specifies whether the frontend should be deployed                                                                       | `true`                                        |
 | `frontend.image.repository`                     | The image repository including host, port, repo                                                                         | `ghcr.io/codecentric/c4-genai-suite/frontend` |
 | `frontend.image.tag`                            | The image tag                                                                                                           | `""`                                          |
+| `frontend.image.pullSecrets`                    | Registry secret names as strings in an array                                                                            | `[]`                                          |
 | `frontend.replicaCount`                         | The number of replicas to create                                                                                        | `1`                                           |
 | `frontend.updateStrategy.type`                  | Frontend deployment strategy type                                                                                       | `RollingUpdate`                               |
 | `frontend.resources`                            | Set container requests and limits for different resources like CPU or memory                                            | `{}`                                          |
@@ -170,6 +178,7 @@ reis:
 | `reis.host`                                                   | The REIS container host to bind to                                                                                      | `0.0.0.0`                                 |
 | `reis.image.repository`                                       | The image repository including host, port, repo                                                                         | `ghcr.io/codecentric/c4-genai-suite/reis` |
 | `reis.image.tag`                                              | The image tag                                                                                                           | `""`                                      |
+| `reis.image.pullSecrets`                                      | Registry secret names as strings in an array                                                                            | `[]`                                      |
 | `reis.metrics.enabled`                                        | Specifies whether a service for REIS metrics should be created                                                          | `false`                                   |
 | `reis.metrics.port`                                           | The REIS metrics port                                                                                                   | `9200`                                    |
 | `reis.metrics.prometheusRule.enabled`                         | Specifies whether a PrometheusRule for REIS should be created                                                           | `false`                                   |

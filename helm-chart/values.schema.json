@@ -2,6 +2,17 @@
     "title": "Chart Values",
     "type": "object",
     "properties": {
+        "global": {
+            "type": "object",
+            "properties": {
+                "imagePullSecrets": {
+                    "type": "array",
+                    "description": "Global registry secret names as strings in an array",
+                    "default": [],
+                    "items": {}
+                }
+            }
+        },
         "fullnameOverride": {
             "type": "string",
             "description": "Overrides the name of the resources",
@@ -242,6 +253,12 @@
                             "type": "string",
                             "description": "The image tag",
                             "default": "\"\""
+                        },
+                        "pullSecrets": {
+                            "type": "array",
+                            "description": "Registry secret names as strings in an array",
+                            "default": [],
+                            "items": {}
                         }
                     }
                 },
@@ -405,6 +422,12 @@
                             "type": "string",
                             "description": "The image tag",
                             "default": "\"\""
+                        },
+                        "pullSecrets": {
+                            "type": "array",
+                            "description": "Registry secret names as strings in an array",
+                            "default": [],
+                            "items": {}
                         }
                     }
                 },
@@ -548,6 +571,12 @@
                             "type": "string",
                             "description": "The image tag",
                             "default": "\"\""
+                        },
+                        "pullSecrets": {
+                            "type": "array",
+                            "description": "Registry secret names as strings in an array",
+                            "default": [],
+                            "items": {}
                         }
                     }
                 },
