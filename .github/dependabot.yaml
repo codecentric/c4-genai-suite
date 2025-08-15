@@ -39,6 +39,11 @@ updates:
           - "langchain"
           - "langfuse-langchain"
           - "@langchain/*"
+      nestjs:
+        patterns:
+          - "nest-"
+          - "nestjs-"
+          - "@nestjs/*"
 
   - package-ecosystem: "pip"
     directories:
