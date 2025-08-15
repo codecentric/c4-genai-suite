@@ -17,7 +17,7 @@ jobs:
   check-generated-specs:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: pipx install poetry
       - uses: actions/setup-python@v5
         with:
@@ -36,7 +36,7 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: pipx install poetry
       - uses: actions/setup-python@v5
         with:
@@ -66,7 +66,7 @@ jobs:
         ports:
           - 5432:5432
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           lfs: true
       - uses: AnimMouse/setup-ffmpeg@v1
