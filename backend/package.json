@@ -89,7 +89,7 @@
     "typeorm": "^0.3.25",
     "undici": "^7.11.0",
     "winston": "^3.17.0",
-    "zod": "3.25.51"
+    "zod": "3.25.76"
   },
   "devDependencies": {
     "@eslint/compat": "1.2.9",
