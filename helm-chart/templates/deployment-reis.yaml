@@ -36,6 +36,7 @@ spec:
         {{- toYaml .Values.reis.podAnnotations | nindent 8 }}
         {{- end }}
     spec:
+      {{- include "c4genaisuite.imagePullSecrets" (dict "global" .Values.global "component" .Values.reis) | indent 6 }}
       securityContext: {{ .Values.reis.podSecurityContext | toYaml | nindent 8 }}
       containers:
         - name: {{ .Chart.Name }}-reis
