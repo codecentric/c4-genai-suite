@@ -33,6 +33,12 @@ updates:
       - "/frontend"
     schedule:
       interval: "daily"
+    groups:
+      langchain:
+        patterns:
+          - "langchain"
+          - "langfuse-langchain"
+          - "@langchain/*"
 
   - package-ecosystem: "pip"
     directories:
