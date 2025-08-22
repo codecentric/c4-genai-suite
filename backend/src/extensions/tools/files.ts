@@ -5,14 +5,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { z } from 'zod';
 import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from 'src/domain/chat';
 import { BucketEntity, BucketRepository, FileEntity, FileRepository } from 'src/domain/database';
-import { Extension, ExtensionArgument, ExtensionConfiguration, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions';
+import { Extension, ExtensionConfiguration, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions';
 import { Bucket, GetDocumentContent, GetDocumentContentResponse, SearchFiles, SearchFilesResponse } from 'src/domain/files';
 import { User } from 'src/domain/users';
 import { I18nService } from '../../localization/i18n.service';
-
-type UserArgs = {
-  fileIdFilter?: string;
-};
 
 @Extension()
 export class FilesExtension<T extends FilesExtensionConfiguration = FilesExtensionConfiguration>
@@ -74,20 +70,6 @@ export class FilesExtension<T extends FilesExtensionConfiguration = FilesExtensi
         },
       },
     };
-  }
-
-  private getDefaultArgs(): UserArgs {
-    const userArguments = this.spec.userArguments?.properties ?? {};
-    const getDefault = (argument: ExtensionArgument) => {
-      switch (argument.type) {
-        case 'string':
-        case 'array':
-        case 'number':
-          return argument.default;
-      }
-    };
-
-    return Object.fromEntries(Object.keys(userArguments).map((key) => [key, getDefault(userArguments[key])]));
   }
 
   getMiddlewares(user: User, extension: ExtensionEntity<T>): Promise<ChatMiddleware[]> {
@@ -200,7 +182,6 @@ class InternalTool extends StructuredTool {
 
   protected async _call(arg: z.infer<typeof this.schema>): Promise<string> {
     try {
-      // TODO: adjust file filter format
       const result: SearchFilesResponse = await this.queryBus.execute(
         new SearchFiles(this.bucket.id, arg.query, this.context.user, this.take, this.fileFilter, this.context.conversationId),
       );

@@ -219,7 +219,9 @@
       "maxFiles": "Max. Dateien",
       "maxFilesHint": "Maximale Anzahl von Dateien im Chat",
       "showSources": "Quellen anzeigen",
-      "showSourcesHint": "Zeigt die Quellen der Dateien an"
+      "showSourcesHint": "Zeigt die Quellen der Dateien an",
+      "vectorize": "Inhalte vektorisieren",
+      "vectorizeHint": "Ermöglicht eine Vektorsuche auf den Inhalten der Dateien"
     },
     "filesVision": {
       "title": "Bilder im Chat",

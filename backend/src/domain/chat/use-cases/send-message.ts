@@ -31,11 +31,15 @@ export class SendMessage {
     public readonly input: string,
     public readonly files?: Pick<UploadedFile, 'id' | 'fileName'>[],
     public readonly editMessageId?: number,
+    public readonly systemMessages?: string[],
   ) {}
 }
 
 export class SendMessageResponse {
-  constructor(public readonly stream: Observable<StreamEvent>) {}
+  constructor(
+    public readonly stream: Observable<StreamEvent>,
+    public readonly abort: AbortController,
+  ) {}
 }
 
 @QueryHandler(SendMessage)
@@ -53,7 +57,7 @@ export class SendMessageHandler implements IQueryHandler<SendMessage, SendMessag
   ) {}
 
   async execute(query: SendMessage): Promise<SendMessageResponse> {
-    const { conversationId, input, user, files, editMessageId } = query;
+    const { conversationId, input, user, files, editMessageId, systemMessages } = query;
 
     // Get the conversation here, because we need the extension configuration.
     const { conversation }: GetConversationResponse = await this.queryBus.execute(new GetConversation(conversationId, user));
@@ -71,9 +75,10 @@ export class SendMessageHandler implements IQueryHandler<SendMessage, SendMessag
       throw new NotFoundException(`Configuration with id '${conversation.configurationId}' not found`);
     }
 
+    const abort = new AbortController();
     const observable = new Observable<StreamEvent>((observer) => {
       const context: ChatContext = {
-        abort: new AbortController(),
+        abort,
         cache: this.cache,
         callbacks: [],
         context: conversation.context || {},
@@ -85,7 +90,7 @@ export class SendMessageHandler implements IQueryHandler<SendMessage, SendMessag
         llm: conversation.llm,
         llms: {},
         result: new ReplaySubject(),
-        systemMessages: [],
+        systemMessages: systemMessages ?? [],
         tools: [],
         ui: undefined!,
         user,
@@ -123,7 +128,7 @@ export class SendMessageHandler implements IQueryHandler<SendMessage, SendMessag
       };
     });
 
-    return new SendMessageResponse(observable);
+    return new SendMessageResponse(observable, abort);
   }
 
   private async buildPipeline(context: ChatContext, conversation: Conversation, getContext: GetContext) {

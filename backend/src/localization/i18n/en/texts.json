@@ -219,7 +219,9 @@
       "maxFiles": "Max. Files",
       "maxFilesHint": "Maximum number of files to upload in a conversation",
       "showSources": "Show sources",
-      "showSourcesHint": "Show sources of the files"
+      "showSourcesHint": "Show sources of the files",
+      "vectorize": "Vectorize content",
+      "vectorizeHint": "Enables a vector search on the contents of the files"
     },
     "filesVision": {
       "title": "Files Vision",

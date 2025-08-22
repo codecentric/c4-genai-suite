@@ -28,8 +28,14 @@ export interface UploadFileParams {
   fileName: string;
   fileSize: number;
   bucketId?: number;
-  extensionId?: number;
-  createEmbeddings: boolean;
+  /**
+   * embedType values
+   * - vector: the document will be added to the vector store (reis)
+   * - text: the text of document will be extracted and stored in db
+   * - vector_and_text: the document will be added to the vector store and the extracted text will be stored in db
+   * - none: the document will be stored as complete file (e.g. image file)
+   */
+  embedType: 'vector' | 'text' | 'vector_and_text' | 'none';
   conversationId?: number;
 }
 
@@ -56,9 +62,9 @@ export class UploadFileHandler implements ICommandHandler<UploadFile, UploadFile
   ) {}
 
   private async handleFileWithoutBucket(params: UploadFileParams) {
-    const { extensionId, createEmbeddings, buffer, mimeType, fileName, fileSize, user, conversationId } = params;
+    const { embedType, buffer, mimeType, fileName, fileSize, user, conversationId } = params;
 
-    if (createEmbeddings) {
+    if (embedType !== 'none') {
       throw new BadRequestException('not allowed to store non embedded files without bucket');
     }
 
@@ -68,7 +74,6 @@ export class UploadFileHandler implements ICommandHandler<UploadFile, UploadFile
       fileSize,
       mimeType,
       conversationId,
-      extensionId,
       uploadStatus: FileUploadStatus.Successful,
       userId: user?.id,
     });
@@ -98,7 +103,7 @@ export class UploadFileHandler implements ICommandHandler<UploadFile, UploadFile
       throw new BadRequestException('not allowed to store in general bucket');
     }
 
-    if (bucket.type === 'conversation' && (!conversationId || !user)) {
+    if (bucket.type === 'conversation' && !user) {
       throw new BadRequestException('not allowed to store in conversation bucket');
     }
 
@@ -173,7 +178,7 @@ export class UploadFileHandler implements ICommandHandler<UploadFile, UploadFile
   }
 
   async execute({ params }: UploadFile): Promise<UploadFileResponse> {
-    const { extensionId, buffer, mimeType, fileName, fileSize, user, conversationId, bucketId, createEmbeddings } = params;
+    const { buffer, mimeType, fileName, fileSize, user, conversationId, bucketId, embedType } = params;
 
     if (!bucketId) {
       return this.handleFileWithoutBucket(params);
@@ -188,11 +193,10 @@ export class UploadFileHandler implements ICommandHandler<UploadFile, UploadFile
       fileName,
       fileSize,
       mimeType,
-      bucket: createEmbeddings ? bucket : undefined,
+      bucket: embedType !== 'none' ? bucket : undefined,
       conversationId,
       uploadStatus: FileUploadStatus.InProgress,
       userId: user?.id,
-      extensionId,
     });
 
     const blob = new File([buffer], fileName, { type: mimeType });
@@ -204,7 +208,7 @@ export class UploadFileHandler implements ICommandHandler<UploadFile, UploadFile
       const created = await this.files.save(entity);
       result = buildFile(created);
 
-      if (createEmbeddings) {
+      if (embedType === 'vector' || embedType === 'vector_and_text') {
         const bucketPath = getBucketId(bucket, user, conversationId);
         await api.uploadFile(
           encodeURIComponent(fileName),
@@ -217,7 +221,9 @@ export class UploadFileHandler implements ICommandHandler<UploadFile, UploadFile
           },
         );
         await this.files.update({ id: entity.id }, { uploadStatus: FileUploadStatus.Successful });
-      } else {
+      }
+
+      if (embedType === 'vector_and_text' || embedType === 'text') {
         const fileContent = await api.processFile(encodeURIComponent(fileName), mimeType, 100000, {
           body: blob,
         });

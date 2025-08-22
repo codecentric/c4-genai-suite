@@ -20,7 +20,7 @@ export class NamedDynamicStructuredTool extends DynamicStructuredTool {
   }
 }
 
-type FilesVisionExtensionConfiguration = { fileNameExtensions: string[]; maxFiles: [] };
+export type FilesVisionExtensionConfiguration = { fileNameExtensions: string[]; maxFiles: [] };
 
 @Extension()
 export class FilesVisionExtension implements Extension<FilesVisionExtensionConfiguration> {
@@ -121,10 +121,9 @@ export class FilesVisionExtension implements Extension<FilesVisionExtensionConfi
               const matchingFiles: GetFilesResponse = await this.queryBus.execute(
                 new GetFiles({
                   user,
-                  bucketIdOrType: 'conversation',
+                  bucketIdOrType: 'all',
                   page: 0,
                   pageSize: context.files?.length ?? 1,
-                  conversationId: context.conversationId,
                   files: imageFiles,
                   withContent: true,
                 }),

@@ -1,11 +1,13 @@
 import { StructuredTool } from '@langchain/core/tools';
 import { Logger, NotFoundException } from '@nestjs/common';
 import { QueryBus } from '@nestjs/cqrs';
+import { In } from 'typeorm';
 import { z } from 'zod';
 import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from 'src/domain/chat';
 import { Extension, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions';
 import { User } from 'src/domain/users';
-import { Bucket, GetFiles, GetFilesResponse, SearchFiles, SearchFilesResponse } from '../../domain/files';
+import { FileEntity } from '../../domain/database';
+import { Bucket, SearchFiles, SearchFilesResponse } from '../../domain/files';
 import { FilesExtension, FilesExtensionConfiguration } from './files';
 
 @Extension()
@@ -56,7 +58,9 @@ export class FilesConversationExtension extends FilesExtension<FilesConversation
           throw new NotFoundException(`Bucket with id '${bucket}' was not found`);
         }
 
-        const files = await this.files.findBy({ bucketId: bucket, userId: user.id, conversationId: context.conversationId });
+        const files = context.files?.length
+          ? await this.files.findBy({ bucketId: bucket, id: In(context.files.map((x) => x.id)) })
+          : [];
 
         let description =
           'Use this tool to semantically search the contents of files uploaded by the user in this conversation.\n\n';
@@ -98,6 +102,7 @@ export class FilesConversationExtension extends FilesExtension<FilesConversation
             20,
             extension.externalId,
             showSources ?? false,
+            files,
           ),
         );
         return next(context);
@@ -128,6 +133,7 @@ class InternalTool extends StructuredTool {
     private readonly take: number,
     private readonly extensionExternalId: string,
     private readonly showSources: boolean,
+    private readonly files: FileEntity[],
   ) {
     super();
     this.name = extensionExternalId;
@@ -135,27 +141,10 @@ class InternalTool extends StructuredTool {
 
   protected async _call(arg: z.infer<typeof this.schema>): Promise<string> {
     try {
-      const files: GetFilesResponse = await this.queryBus.execute(
-        new GetFiles({
-          page: 0,
-          pageSize: 10000,
-          user: this.context.user,
-          bucketIdOrType: this.bucket.id,
-          conversationId: this.context.conversationId,
-        }),
-      );
-
-      const externalDocumentIds = files.files.map((file) => file.externalDocumentId);
+      const externalDocumentIds = this.files.map((file) => file.externalDocumentId);
 
       const result: SearchFilesResponse = await this.queryBus.execute(
-        new SearchFiles(
-          this.bucket.id,
-          arg.query,
-          this.context.user,
-          this.take,
-          externalDocumentIds,
-          this.context.conversationId,
-        ),
+        new SearchFiles(this.bucket.id, arg.query, this.context.user, this.take, externalDocumentIds),
       );
       const sources = this.showSources ?? false;
 
