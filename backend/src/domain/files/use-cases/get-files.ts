@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { FindManyOptions, FindOptionsWhere, In, Raw } from 'typeorm';
 import { BucketEntity, BucketRepository, BucketType, FileEntity, FileRepository } from 'src/domain/database';
 import { User } from 'src/domain/users';
+import { ConversationFileEntity, ConversationFileRepository } from '../../database/entities/conversation-file';
 import { UploadedFile } from '../interfaces';
 import { buildFile } from './utils';
 
@@ -15,7 +16,7 @@ export class GetFiles {
   constructor(
     public readonly data: {
       user: User;
-      bucketIdOrType: number | BucketType;
+      bucketIdOrType: number | BucketType | 'all';
       page: number;
       pageSize?: number;
       query?: string;
@@ -40,14 +41,20 @@ export class GetFilesHandler implements IQueryHandler<GetFiles, GetFilesResponse
     private readonly buckets: BucketRepository,
     @InjectRepository(FileEntity)
     private readonly files: FileRepository,
+    @InjectRepository(ConversationFileEntity)
+    private readonly conversionFiles: ConversationFileRepository,
   ) {}
 
   async execute(query: GetFiles): Promise<GetFilesResponse> {
     const { page, pageSize, query: searchQuery, bucketIdOrType, user, conversationId, files, withContent } = query.data;
 
+    const fileFilter = { ids: [...(files ?? [])], enabled: !!files?.length };
+
     const where: FindOptionsWhere<FileEntity> = {};
     const bucketWhere: FindOptionsWhere<BucketEntity> = {};
-    if (!conversationId) {
+
+    // read files from a specific bucket (user or general)
+    if (!conversationId && bucketIdOrType !== 'all') {
       if (isBucketType(bucketIdOrType)) {
         bucketWhere.type = bucketIdOrType;
       } else {
@@ -67,17 +74,26 @@ export class GetFilesHandler implements IQueryHandler<GetFiles, GetFilesResponse
       }
     }
 
+    // get files from a specific conversation
     if (conversationId) {
-      where.conversationId = conversationId;
+      const filesInConversation = await this.conversionFiles.findBy({ conversationId });
+      fileFilter.ids.push(...filesInConversation.map((x) => x.fileId));
+      fileFilter.enabled = true;
       where.userId = user.id;
     }
 
+    // get files specified by ids without restriction
+    if (bucketIdOrType == 'all' && files) {
+      fileFilter.enabled = true;
+      where.userId = user.id;
+    }
+
+    // apply filters
     if (searchQuery && searchQuery != '') {
       where.fileName = Raw((alias) => `LOWER(${alias}) Like '%${searchQuery}%'`);
     }
-
-    if (files && files.length > 0) {
-      where.id = In(files);
+    if (fileFilter.enabled) {
+      where.id = In(fileFilter.ids);
     }
 
     const options: FindManyOptions<FileEntity> = { where };

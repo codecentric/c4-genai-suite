@@ -11,7 +11,7 @@ import {
 import { schema } from '../typeorm.helper';
 import { BlobEntity } from './blob';
 import { BucketEntity } from './bucket';
-import { ConversationEntity } from './conversation';
+import { ConversationFileEntity } from './conversation-file';
 import { ExtensionEntity } from './extension';
 import { UserEntity } from './user';
 
@@ -65,15 +65,9 @@ export class FileEntity {
   @UpdateDateColumn({ type: 'timestamptz' })
   updatedAt!: Date;
 
-  @ManyToOne(() => ConversationEntity, { onDelete: 'CASCADE' })
-  conversation?: ConversationEntity;
-
-  @Column({ nullable: true })
-  conversationId?: number;
+  @OneToMany(() => ConversationFileEntity, (cf) => cf.file)
+  conversations!: ConversationFileEntity[];
 
   @Column()
   uploadStatus!: FileUploadStatus;
-
-  @Column({ type: 'int', name: 'docId' })
-  externalDocumentId!: number;
 }

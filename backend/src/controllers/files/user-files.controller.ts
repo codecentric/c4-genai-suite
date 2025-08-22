@@ -127,7 +127,9 @@ export class UserFilesController {
     }
 
     const bucket = result.extension?.values?.bucket as number;
-    const createEmbeddings = (bucket ? (result.extension?.fixedValues?.createEmbeddings ?? true) : false) as boolean;
+    const vectorize = (result.extension?.values?.vectorize as boolean) ?? true;
+
+    const embedType = bucket ? (vectorize ? 'vector_and_text' : 'text') : 'none';
 
     const command = new UploadFile({
       user: req.user,
@@ -136,8 +138,7 @@ export class UserFilesController {
       fileName: file.originalname,
       fileSize: file.size,
       bucketId: bucket,
-      extensionId,
-      createEmbeddings,
+      embedType,
       conversationId,
     });
 
@@ -155,9 +156,18 @@ export class UserFilesController {
     required: true,
     type: Number,
   })
+  @ApiQuery({
+    name: 'conversationId',
+    required: false,
+    type: 'number',
+  })
   @ApiNoContentResponse()
-  async deleteUserFile(@Req() req: Request, @Param('fileId') fileId: number) {
-    const command = new DeleteFile(req.user, +fileId);
+  async deleteUserFile(
+    @Req() req: Request,
+    @Param('fileId', ParseIntPipe) fileId: number,
+    @Query('conversationId', new ParseIntPipe({ optional: true })) conversationId?: number,
+  ) {
+    const command = new DeleteFile(req.user, fileId, conversationId);
 
     await this.commandBus.execute(command);
   }

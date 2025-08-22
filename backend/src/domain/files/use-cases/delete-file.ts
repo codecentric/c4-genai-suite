@@ -4,12 +4,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { FileEntity, FileRepository } from 'src/domain/database';
 import { User } from 'src/domain/users';
 import { isNumber } from 'src/lib';
+import { ConversationFileEntity, ConversationFileRepository } from '../../database/entities/conversation-file';
 import { buildClient } from './utils';
 
 export class DeleteFile {
   constructor(
     public readonly source: number | User,
     public readonly id: number,
+    public readonly conversationId?: number,
   ) {}
 }
 
@@ -22,10 +24,12 @@ export class DeleteFileHandler implements ICommandHandler<DeleteFile, DeleteFile
   constructor(
     @InjectRepository(FileEntity)
     private readonly files: FileRepository,
+    @InjectRepository(ConversationFileEntity)
+    private readonly conversationFiles: ConversationFileRepository,
   ) {}
 
   async execute(command: DeleteFile): Promise<DeleteFileResponse> {
-    const { id, source } = command;
+    const { id, source, conversationId } = command;
 
     const entity = await this.files.findOne({
       where: { id },
@@ -50,12 +54,19 @@ export class DeleteFileHandler implements ICommandHandler<DeleteFile, DeleteFile
 
     const api = entity.bucket ? buildClient(entity.bucket) : undefined;
     try {
-      const count = await this.files.count({ where: { externalDocumentId: entity.externalDocumentId } });
+      if (conversationId) {
+        await this.conversationFiles.delete({ fileId: entity.id, conversationId });
+        if (entity.bucket?.type !== 'conversation') {
+          return new DeleteFileResponse();
+        }
 
-      if (count === 1) {
-        await api?.deleteFile(entity.externalDocumentId.toString(), entity.bucket?.indexName);
+        const count = await this.conversationFiles.count({ where: { fileId: entity.id } });
+        if (count > 0) {
+          return new DeleteFileResponse();
+        }
       }
 
+      await api?.deleteFile(entity.id.toString(), entity.bucket?.indexName);
       await this.files.remove(entity);
     } catch (err) {
       this.logger.error('Failed to delete file from RAG server.', err);

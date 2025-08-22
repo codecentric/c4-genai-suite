@@ -1,7 +1,7 @@
 import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { schema } from '../typeorm.helper';
 import { ConfigurationEntity } from './configuration';
-import { FileEntity } from './file';
+import { ConversationFileEntity } from './conversation-file';
 import { MessageEntity } from './message';
 import { UserEntity } from './user';
 
@@ -55,6 +55,6 @@ export class ConversationEntity {
   @UpdateDateColumn({ type: 'timestamptz' })
   updatedAt!: Date;
 
-  @OneToMany(() => FileEntity, (file) => file.conversation, { cascade: true })
-  files?: FileEntity[];
+  @OneToMany(() => ConversationFileEntity, (cf) => cf.conversation)
+  files!: ConversationFileEntity[];
 }

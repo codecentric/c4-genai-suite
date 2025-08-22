@@ -1,14 +1,14 @@
 import { Agent, RequestInfo, RequestInit, fetch as undiciFetch } from 'undici';
 import { BlobCategory, BucketEntity, FileEntity } from 'src/domain/database';
 import { User } from 'src/domain/users';
-import { Bucket } from '../interfaces';
+import { Bucket, UploadedFile } from '../interfaces';
 import { Configuration, FilesApi, HTTPHeaders } from './generated';
 
 export function buildBucket(source: BucketEntity): Bucket {
   return source;
 }
 
-export function buildFile(source: FileEntity) {
+export function buildFile(source: FileEntity): UploadedFile {
   const { createdAt: uploadedAt, ...other } = source;
 
   return {

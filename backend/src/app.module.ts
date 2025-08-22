@@ -14,6 +14,7 @@ import { ExtensionsController } from './controllers/extensions/extensions.contro
 import { FilesController } from './controllers/files/files.controller';
 import { UserFilesController } from './controllers/files/user-files.controller';
 import { HealthController } from './controllers/health/health.controller';
+import { ApiResponsesController } from './controllers/responses/api.responses.controller';
 import { SettingsController } from './controllers/settings/settings.controller';
 import { UsagesController } from './controllers/usages/usages.controller';
 import { UserGroupsController } from './controllers/users/user-groups.controller';
@@ -80,6 +81,7 @@ import { PrometheusModule } from './metrics/prometheus.module';
     AuthController,
     BlobsController,
     HealthController,
+    ApiResponsesController,
     ConversationsController,
     ConfigurationsController,
     ExtensionsController,

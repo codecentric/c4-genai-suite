@@ -2,16 +2,8 @@ import { NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Like } from 'typeorm';
-import * as uuid from 'uuid';
-import {
-  BlobEntity,
-  ConversationEntity,
-  ConversationRepository,
-  FileEntity,
-  FileRepository,
-  MessageEntity,
-  MessageRepository,
-} from '../../database';
+import { ConversationEntity, ConversationRepository, MessageEntity, MessageRepository } from '../../database';
+import { ConversationFileEntity, ConversationFileRepository } from '../../database/entities/conversation-file';
 import { Conversation } from '../interfaces';
 
 export class DuplicateConversationResponse {
@@ -27,8 +19,8 @@ export class DuplicateConversationHandler implements ICommandHandler<DuplicateCo
   constructor(
     @InjectRepository(ConversationEntity)
     private readonly conversationRepository: ConversationRepository,
-    @InjectRepository(FileEntity)
-    private readonly fileRepository: FileRepository,
+    @InjectRepository(ConversationFileEntity)
+    private readonly conversationFileRepository: ConversationFileRepository,
     @InjectRepository(MessageEntity)
     private readonly messageRepository: MessageRepository,
   ) {}
@@ -38,7 +30,7 @@ export class DuplicateConversationHandler implements ICommandHandler<DuplicateCo
 
     const conversationEntity = await this.conversationRepository.findOne({
       where: { id },
-      relations: { messages: true, files: { blobs: true } },
+      relations: { messages: true, files: {} },
     });
 
     if (!conversationEntity) {
@@ -47,19 +39,6 @@ export class DuplicateConversationHandler implements ICommandHandler<DuplicateCo
 
     const sortedMessages = [...conversationEntity.messages].sort((a, b) => a.id - b.id);
     const sortedFiles = conversationEntity.files?.sort((a, b) => a.id - b.id) ?? [];
-
-    const newFiles = await Promise.all(
-      (sortedFiles || []).map(async (file) => {
-        const newFile = this.fileRepository.create({
-          ...file,
-          id: undefined,
-          blobs: file.blobs.map((blob: BlobEntity) => ({ ...blob, id: uuid.v4() })),
-          externalDocumentId: file.externalDocumentId,
-        });
-
-        return this.fileRepository.save(newFile);
-      }),
-    );
 
     // It is kind of expensive to get all conversations, which have conflicting names
     // but since duplication is a rare event, this should be fine
@@ -78,7 +57,7 @@ export class DuplicateConversationHandler implements ICommandHandler<DuplicateCo
       id: undefined,
       name: generateNameForDuplicate(conversationEntity.name, conflictingNames),
       isNameSetManually: true,
-      files: newFiles,
+      files: [],
       messages: [],
     });
 
@@ -93,6 +72,14 @@ export class DuplicateConversationHandler implements ICommandHandler<DuplicateCo
       });
       messageIdMap.set(id, newMessage.id);
     }
+
+    await this.conversationFileRepository.save(
+      sortedFiles.map((file) => ({
+        conversationId: saved.id,
+        fileId: file.fileId,
+        messageId: file.messageId ? messageIdMap.get(file.messageId) : undefined,
+      })),
+    );
 
     return new DuplicateConversationResponse(saved);
   }

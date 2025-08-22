@@ -14,6 +14,7 @@ import {
   UsageRepository,
   UserGroupEntity,
 } from 'src/domain/database';
+import { ConversationFileEntity } from '../database/entities/conversation-file';
 import { registerRepositoryForEntity } from '../database/typeorm.helper';
 import { ChatCacheImpl } from './cache';
 import { CHAT_MIDDLEWARES_TOKEN, ChatMiddleware } from './interfaces';
@@ -64,6 +65,7 @@ import {
       UserGroupEntity,
       BucketEntity,
       FileEntity,
+      ConversationFileEntity,
     ]),
   ],
   exports: [CallbackService],

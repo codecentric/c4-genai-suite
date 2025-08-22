@@ -227,7 +227,7 @@ export class FilesController {
       fileName: file.originalname,
       fileSize: file.size,
       bucketId: bucketId,
-      createEmbeddings: true,
+      embedType: 'vector',
     });
 
     await keepAlive(res, async () => {
@@ -267,7 +267,7 @@ export class FilesController {
       fileName: file.originalname,
       fileSize: file.size,
       bucketId: bucketId,
-      createEmbeddings: true,
+      embedType: 'vector',
     });
 
     await keepAlive(res, async () => {
