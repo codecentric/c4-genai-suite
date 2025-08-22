@@ -1,7 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { onErrorResumeNextWith } from 'rxjs';
+import { In } from 'typeorm';
 import { ExtensionSource, MessageEntity, MessageRepository } from 'src/domain/database';
+import { ConversationFileEntity, ConversationFileRepository } from '../../database/entities/conversation-file';
 import {
   AIMessage,
   BaseMessage,
@@ -21,6 +23,8 @@ export class GetHistoryMiddleware implements ChatMiddleware {
   constructor(
     @InjectRepository(MessageEntity)
     private readonly messages: MessageRepository,
+    @InjectRepository(ConversationFileEntity)
+    private readonly conversationFiles: ConversationFileRepository,
   ) {}
 
   order?: number = GetHistoryMiddleware.ORDER;
@@ -28,7 +32,7 @@ export class GetHistoryMiddleware implements ChatMiddleware {
   async invoke(context: ChatContext, getContext: GetContext, next: ChatNextDelegate): Promise<any> {
     const { conversationId, configuration } = context;
 
-    const history = new InternalChatHistory(conversationId, configuration.id, context, this.messages);
+    const history = new InternalChatHistory(conversationId, configuration.id, context, this.messages, this.conversationFiles);
 
     await history.addMessage(new HumanMessage(context.input), true, context.editMessageId);
 
@@ -45,13 +49,12 @@ class InternalChatHistory extends MessagesHistory {
   private stored?: BaseMessage[];
   private currentParentId?: number;
 
-  lc_namespace!: string[];
-
   constructor(
     private readonly conversationId: number,
     private readonly configurationId: number,
     private readonly context: ChatContext,
     private readonly messages: MessageRepository,
+    private readonly conversationFiles: ConversationFileRepository,
   ) {
     super();
 
@@ -94,6 +97,44 @@ class InternalChatHistory extends MessagesHistory {
           },
         })),
       });
+    }
+  }
+
+  private async attachNewFilesToConversation(conversationId: number, messageId: number, files: ChatContext['files']) {
+    if (!files?.length) {
+      return;
+    }
+
+    const fileIds = files.map((file) => file.id);
+    const existingFiles = await this.conversationFiles.find({
+      where: {
+        conversationId,
+        fileId: In(fileIds),
+      },
+    });
+
+    const existingFileIds = new Set(existingFiles.map((file) => file.fileId));
+    const filesToSave = files
+      .filter((file) => !existingFileIds.has(file.id))
+      .map((file) => ({
+        conversationId,
+        messageId,
+        fileId: file.id,
+      }));
+
+    const filesToUpdate = existingFiles
+      .filter((file) => file.messageId == null)
+      .map((file) => ({
+        ...file,
+        messageId,
+      }));
+
+    if (filesToUpdate.length > 0) {
+      await this.conversationFiles.save(filesToUpdate);
+    }
+
+    if (filesToSave.length > 0) {
+      await this.conversationFiles.save(filesToSave);
     }
   }
 
@@ -152,6 +193,7 @@ class InternalChatHistory extends MessagesHistory {
           ...data,
         });
         this.currentParentId = entity.id;
+        await this.attachNewFilesToConversation(entity.conversationId, entity.id, this.context.files);
         this.context.result.next({ type: 'saved', messageId: entity.id, messageType: 'human' });
       }
     } catch (err) {

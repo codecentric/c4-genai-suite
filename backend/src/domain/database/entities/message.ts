@@ -12,6 +12,7 @@ import { Source } from 'src/domain/chat';
 import { schema } from '../typeorm.helper';
 import { ConfigurationEntity } from './configuration';
 import { ConversationEntity } from './conversation';
+import { ConversationFileEntity } from './conversation-file';
 
 export type ExtensionSource = Source & { extensionExternalId: string };
 
@@ -65,6 +66,9 @@ export class MessageEntity {
 
   @Column()
   conversationId!: number;
+
+  @OneToMany(() => ConversationFileEntity, (cf) => cf.message)
+  files!: ConversationFileEntity[];
 
   @CreateDateColumn({ type: 'timestamptz' })
   createdAt!: Date;

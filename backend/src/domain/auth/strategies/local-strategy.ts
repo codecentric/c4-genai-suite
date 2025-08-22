@@ -11,7 +11,7 @@ import { isArray } from 'src/lib';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
-  private readonly headers = ['x-api-key', 'x-apikey', 'api-key', 'apikey'];
+  private readonly headers = ['x-api-key', 'x-apikey', 'api-key', 'apikey', 'authorization', 'Authorization'];
 
   constructor(
     @InjectRepository(UserEntity)
@@ -21,11 +21,10 @@ export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
   }
 
   async validate(request: Request): Promise<Partial<User> | null> {
-    const apiKey = this.findApiKey(request);
+    const key = this.findApiKey(request);
 
-    if (apiKey) {
-      const hashedApiKey = createHash('sha256').update(apiKey).digest('hex');
-      return await this.userRepository.findOneBy({ apiKey: hashedApiKey });
+    if (key) {
+      return this.userRepository.findOneBy({ apiKey: key });
     } else if (request.session.user) {
       return request.session.user;
     }
@@ -35,11 +34,11 @@ export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
 
   private findApiKey(request: Request) {
     for (const candidate of this.headers) {
-      const apiKeyHeader = request.headers[candidate];
-      const apiKeyValue = isArray(apiKeyHeader) ? apiKeyHeader[0] : apiKeyHeader;
+      const header = request.headers[candidate];
+      const value = isArray(header) ? header[0] : header;
 
-      if (isString(apiKeyValue) && apiKeyValue.trim().length > 0) {
-        return apiKeyValue;
+      if (isString(value) && value.trim().length > 0) {
+        return createHash('sha256').update(value.replace('Bearer ', '')).digest('hex');
       }
     }
 

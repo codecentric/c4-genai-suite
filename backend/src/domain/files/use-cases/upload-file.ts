@@ -16,6 +16,7 @@ import {
 import { User } from 'src/domain/users';
 import { assignDefined } from 'src/lib';
 import { I18nService } from '../../../localization/i18n.service';
+import { ConversationFileEntity, ConversationFileRepository } from '../../database/entities/conversation-file';
 import { UploadedFile } from '../interfaces';
 import { FilesApi, ResponseError } from './generated';
 import { buildClient, buildFile, getBucketId } from './utils';
@@ -28,8 +29,14 @@ export interface UploadFileParams {
   fileName: string;
   fileSize: number;
   bucketId?: number;
-  extensionId?: number;
-  createEmbeddings: boolean;
+  /**
+   * embedType values
+   * - vector: the document will be added to the vector store (reis)
+   * - text: the text of document will be extracted and stored in db
+   * - vector_and_text: the document will be added to the vector store and the extracted text will be stored in db
+   * - none: the document will be stored as complete file (e.g. image file)
+   */
+  embedType: 'vector' | 'text' | 'vector_and_text' | 'none';
   conversationId?: number;
 }
 
@@ -50,15 +57,17 @@ export class UploadFileHandler implements ICommandHandler<UploadFile, UploadFile
     private readonly buckets: BucketRepository,
     @InjectRepository(FileEntity)
     private readonly files: FileRepository,
+    @InjectRepository(ConversationFileEntity)
+    private readonly conversationFiles: ConversationFileRepository,
     @InjectRepository(BlobEntity)
     private readonly blob: BlobRepository,
     private readonly i18n: I18nService,
   ) {}
 
   private async handleFileWithoutBucket(params: UploadFileParams) {
-    const { extensionId, createEmbeddings, buffer, mimeType, fileName, fileSize, user, conversationId } = params;
+    const { embedType, buffer, mimeType, fileName, fileSize, user, conversationId } = params;
 
-    if (createEmbeddings) {
+    if (embedType !== 'none') {
       throw new BadRequestException('not allowed to store non embedded files without bucket');
     }
 
@@ -67,12 +76,17 @@ export class UploadFileHandler implements ICommandHandler<UploadFile, UploadFile
       fileName,
       fileSize,
       mimeType,
-      conversationId,
-      extensionId,
       uploadStatus: FileUploadStatus.Successful,
       userId: user?.id,
     });
     const created = await this.files.save(entity);
+
+    if (conversationId) {
+      await this.conversationFiles.save({
+        conversationId,
+        fileId: created.id,
+      });
+    }
 
     await this.blob.save({
       id: uuid.v4(),
@@ -98,7 +112,7 @@ export class UploadFileHandler implements ICommandHandler<UploadFile, UploadFile
       throw new BadRequestException('not allowed to store in general bucket');
     }
 
-    if (bucket.type === 'conversation' && (!conversationId || !user)) {
+    if (bucket.type === 'conversation' && !user) {
       throw new BadRequestException('not allowed to store in conversation bucket');
     }
 
@@ -165,7 +179,7 @@ export class UploadFileHandler implements ICommandHandler<UploadFile, UploadFile
         throw new NotFoundException(`File with id ${fileIdToUpdate} not found in bucket ${bucketId}`);
       }
 
-      await api.deleteFile(existingFile.externalDocumentId.toString());
+      await api.deleteFile(existingFile.id.toString());
       return existingFile;
     }
 
@@ -173,7 +187,7 @@ export class UploadFileHandler implements ICommandHandler<UploadFile, UploadFile
   }
 
   async execute({ params }: UploadFile): Promise<UploadFileResponse> {
-    const { extensionId, buffer, mimeType, fileName, fileSize, user, conversationId, bucketId, createEmbeddings } = params;
+    const { buffer, mimeType, fileName, fileSize, user, conversationId, bucketId, embedType } = params;
 
     if (!bucketId) {
       return this.handleFileWithoutBucket(params);
@@ -188,11 +202,11 @@ export class UploadFileHandler implements ICommandHandler<UploadFile, UploadFile
       fileName,
       fileSize,
       mimeType,
-      bucket: createEmbeddings ? bucket : undefined,
-      conversationId,
+      bucket: embedType !== 'none' ? bucket : undefined,
       uploadStatus: FileUploadStatus.InProgress,
       userId: user?.id,
-      extensionId,
+      createdAt: new Date(),
+      updatedAt: new Date(),
     });
 
     const blob = new File([buffer], fileName, { type: mimeType });
@@ -200,27 +214,22 @@ export class UploadFileHandler implements ICommandHandler<UploadFile, UploadFile
     let result: UploadedFile | undefined;
 
     try {
-      // Use the save method otherwise we would not get previous values.
       const created = await this.files.save(entity);
       result = buildFile(created);
-
-      if (createEmbeddings) {
+      // Use the save method otherwise we would not get previous values.
+      if (embedType === 'vector' || embedType === 'vector_and_text') {
         const bucketPath = getBucketId(bucket, user, conversationId);
-        await api.uploadFile(
-          encodeURIComponent(fileName),
-          mimeType,
-          bucketPath,
-          (result.externalDocumentId ?? result.id).toString(),
-          bucket.indexName,
-          {
-            body: blob,
-          },
-        );
+        await api.uploadFile(encodeURIComponent(fileName), mimeType, bucketPath, created.id.toString(), bucket.indexName, {
+          body: blob,
+        });
         await this.files.update({ id: entity.id }, { uploadStatus: FileUploadStatus.Successful });
-      } else {
+      }
+
+      if (embedType === 'vector_and_text' || embedType === 'text') {
         const fileContent = await api.processFile(encodeURIComponent(fileName), mimeType, 100000, {
           body: blob,
         });
+        await this.blob.delete({ fileId: entity.id });
         await this.blob.save({
           id: uuid.v4(),
           fileId: entity.id,
@@ -230,6 +239,13 @@ export class UploadFileHandler implements ICommandHandler<UploadFile, UploadFile
           category: BlobCategory.FILE_PROCESSED,
         });
         await this.files.update({ id: entity.id }, { uploadStatus: FileUploadStatus.Successful });
+      }
+
+      if (conversationId) {
+        await this.conversationFiles.save({
+          conversationId,
+          fileId: created.id,
+        });
       }
 
       return new UploadFileResponse(result);
