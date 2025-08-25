@@ -39,7 +39,7 @@ spec:
       securityContext: {{ .Values.backend.podSecurityContext | toYaml | nindent 8 }}
       containers:
         - name: {{ .Chart.Name }}
-          image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag }}"
+          image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag | default .Chart.AppVersion }}"
           securityContext: {{ .Values.backend.containerSecurityContext | toYaml | nindent 12 }}
           ports:
             - containerPort: 3000

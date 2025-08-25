@@ -37,7 +37,7 @@ spec:
       securityContext: {{ .Values.frontend.podSecurityContext | toYaml | nindent 8 }}
       containers:
         - name: {{ .Chart.Name }}-frontend
-          image: "{{ .Values.frontend.image.repository }}:{{ .Values.frontend.image.tag }}"
+          image: "{{ .Values.frontend.image.repository }}:{{ .Values.frontend.image.tag | default .Chart.AppVersion }}"
           securityContext: {{ .Values.frontend.containerSecurityContext | toYaml | nindent 12 }}
           ports:
             - containerPort: 3080

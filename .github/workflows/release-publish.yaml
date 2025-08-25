@@ -61,17 +61,6 @@ jobs:
             exit 1
           fi
 
-      - name: Verify that container image tags are correct
-        run: |
-          if [ $(yq '.backend.image.tag' helm-chart/values.yaml) != "v${{ steps.extract_ref.outputs.version }}" ] \
-          || [ $(yq '.frontend.image.tag' helm-chart/values.yaml) != "v${{ steps.extract_ref.outputs.version }}" ] \
-          || [ $(yq '.reis.image.tag' helm-chart/values.yaml) != "v${{ steps.extract_ref.outputs.version }}" ]
-          then
-            echo "Version mismatch detected"
-            exit 1
-          fi
-
-
   promote-images:
     name: Container Image Promotion
     runs-on: ubuntu-latest
