@@ -39,7 +39,7 @@ spec:
       securityContext: {{ .Values.reis.podSecurityContext | toYaml | nindent 8 }}
       containers:
         - name: {{ .Chart.Name }}-reis
-          image: "{{ .Values.reis.image.repository }}:{{ .Values.reis.image.tag | default .Chart.AppVersion }}"
+          image: "{{ .Values.reis.image.repository }}:{{ .Values.reis.image.tag | default .Chart.Version }}"
           securityContext: {{ .Values.reis.containerSecurityContext | toYaml | nindent 12 }}
           ports:
             - containerPort: 3201

@@ -21,7 +21,7 @@ helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 app.kubernetes.io/part-of: {{ include "c4genaisuite.name" . }}
-app.kubernetes.io/version: "{{ .Chart.AppVersion }}"
+app.kubernetes.io/version: "{{ .Chart.Version }}"
 {{- end }}
 
 {{- define "c4genaisuite.commonSelectors" -}}
