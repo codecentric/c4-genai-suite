@@ -1,0 +1,42 @@
+{
+  "packages": {
+    "backend": {
+      "component": "backend",
+      "release-type": "node"
+    },
+    "frontend": {
+      "component": "frontend",
+      "release-type": "node"
+    },
+    "helm-chart": {
+      "component": "helm-chart",
+      "release-type": "helm"
+    },
+    "services/confluence-importer": {
+      "component": "confluence-importer",
+      "release-type": "python"
+    },
+    "services/reis": {
+      "component": "reis",
+      "release-type": "python"
+    }
+  },
+  "plugins": [
+    {
+      "type": "linked-versions",
+      "groupName": "mono",
+      "components": [
+        "backend",
+        "frontend",
+        "helm-chart",
+        "confluence-importer",
+        "reis"
+      ],
+      "updateAllPackages": false
+    }
+  ],
+  "last-release-sha": "b661fdb7ed75f99884936816d6e4838fdd2c9090",
+  "include-component-in-tag": false,
+  "include-v-in-tag": true,
+  "separate-pull-requests": false
+}
