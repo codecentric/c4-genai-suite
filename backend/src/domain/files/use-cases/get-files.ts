@@ -15,7 +15,7 @@ export class GetFiles {
   constructor(
     public readonly data: {
       user: User;
-      bucketIdOrType: number | BucketType;
+      bucketIdOrType: number | BucketType | 'all';
       page: number;
       pageSize?: number;
       query?: string;
@@ -47,7 +47,7 @@ export class GetFilesHandler implements IQueryHandler<GetFiles, GetFilesResponse
 
     const where: FindOptionsWhere<FileEntity> = {};
     const bucketWhere: FindOptionsWhere<BucketEntity> = {};
-    if (!conversationId) {
+    if (!conversationId && bucketIdOrType !== 'all') {
       if (isBucketType(bucketIdOrType)) {
         bucketWhere.type = bucketIdOrType;
       } else {
@@ -67,7 +67,7 @@ export class GetFilesHandler implements IQueryHandler<GetFiles, GetFilesResponse
       }
     }
 
-    if (conversationId) {
+    if (conversationId || bucketIdOrType == 'all') {
       where.conversationId = conversationId;
       where.userId = user.id;
     }

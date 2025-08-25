@@ -17,10 +17,6 @@ export class WholeFilesExtension implements Extension<WholeFilesExtensionConfigu
     protected readonly i18n: I18nService,
   ) {}
 
-  get fixedValues() {
-    return { createEmbeddings: false };
-  }
-
   get spec(): ExtensionSpec {
     return {
       name: 'files-whole',
@@ -37,6 +33,12 @@ export class WholeFilesExtension implements Extension<WholeFilesExtensionConfigu
           required: true,
           format: 'bucket',
           showInList: true,
+        },
+        vectorize: {
+          type: 'boolean',
+          title: this.i18n.t('texts.extensions.filesInConversation.vectorize'),
+          required: false,
+          default: true,
         },
         maxFiles: {
           type: 'number',
@@ -89,7 +91,7 @@ export class WholeFilesExtension implements Extension<WholeFilesExtensionConfigu
             bucketIdOrType: 'conversation',
             page: 0,
             pageSize: context.files?.length ?? extension.values.maxFiles,
-            conversationId: context.conversationId,
+            conversationId: !context.files?.length ? context.conversationId : undefined,
             files: context.files ? context.files.map((x) => x.id) : undefined,
             withContent: true,
           }),
@@ -165,7 +167,7 @@ class InternalTool extends StructuredTool {
   }
 }
 
-type WholeFilesExtensionConfiguration = ExtensionConfiguration & {
+export type WholeFilesExtensionConfiguration = ExtensionConfiguration & {
   bucket: number;
   maxFiles: number;
 };
