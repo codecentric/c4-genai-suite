@@ -3,7 +3,7 @@ from mcp.server.fastmcp import FastMCP
 from typing import Any, Dict
 from pydantic import Field
 
-mcp = FastMCP(host="0.0.0.0", port="3202")
+mcp = FastMCP(host="0.0.0.0", port=3202)
 base_url = "http://localhost:3201"
 
 
