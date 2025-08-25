@@ -41,6 +41,44 @@ export class ApiResponsesController {
     private readonly commandBus: CommandBus,
   ) {}
 
+  private getLlm(extensions: GetExtensionsResponse['extensions'], model?: string) {
+    if (model != null) {
+      const llm = extensions.find(
+        (x) =>
+          (x.spec.type === 'llm' && x.values.deploymentName === model) ||
+          x.values.model === model ||
+          x.values.modelName === model,
+      );
+      return llm?.spec.name;
+    }
+  }
+
+  private setConfigurationValue<T extends string | number | undefined>(
+    extensions: GetExtensionsResponse['extensions'],
+    key: string,
+    value: T,
+    configuration: Record<number, Record<string, any>>,
+  ) {
+    if (value != null) {
+      extensions
+        .filter((x) => Object.keys(x.configurableArguments?.properties ?? {}).includes(key))
+        .forEach((x) => {
+          configuration[x.id] = configuration[x.id] ?? {};
+          configuration[x.id][key] = value;
+        });
+    }
+  }
+
+  private getConfiguration(
+    extensions: GetExtensionsResponse['extensions'],
+    data: { temperature?: number; instructions?: string },
+  ) {
+    const configuration: Record<string, Record<string, any>> = {};
+    this.setConfigurationValue(extensions, 'temperature', data.temperature, configuration);
+    this.setConfigurationValue(extensions, 'text', data.instructions, configuration);
+    return configuration;
+  }
+
   private findBucketForAssistant(extensions: GetExtensionsResponse['extensions'], fileName: string, purpose: FilePurpose) {
     if (purpose === 'user_data') {
       const filesUser = extensions.find((x) => x.name === 'files-42');
@@ -106,36 +144,6 @@ export class ApiResponsesController {
     });
 
     return result.concat(systemMessageTexts);
-  }
-
-  private extractFilename(fileUrl: string, headers: Headers): string {
-    const contentDisposition = headers.get('content-disposition');
-    if (contentDisposition) {
-      let filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/i);
-      if (filenameMatch && filenameMatch[1]) {
-        const filename = filenameMatch[1].replace(/['"]/g, '').trim();
-        if (filename) return filename;
-      }
-
-      filenameMatch = contentDisposition.match(/filename\*=([^']*)'([^']*)'(.+)/i);
-      if (filenameMatch && filenameMatch[3]) {
-        return decodeURIComponent(filenameMatch[3]);
-      }
-    }
-
-    try {
-      const url = new URL(fileUrl);
-      const pathname = url.pathname.split('?')[0]; // Remove query params
-      const filename = pathname.split('/').pop();
-
-      if (filename && filename.length > 0 && filename !== '/') {
-        return decodeURIComponent(filename);
-      }
-    } catch (error) {
-      this.logger.warn('Failed to parse URL for filename:', error);
-    }
-
-    return '';
   }
 
   private async uploadFilesByData(
@@ -251,16 +259,18 @@ export class ApiResponsesController {
     @Req() req: Request,
   ): Promise<ResponseDto> {
     const { extensions }: GetExtensionsResponse = await this.queryBus.execute(new GetExtensions(assistantId, true, true));
+    const llm = this.getLlm(extensions, request.model);
+    const configuration = this.getConfiguration(extensions, request);
     const userMessages = this.getUserPrompts(request);
     const systemMessages = this.getSystemMessages(request);
     const input = userMessages.join(' ');
     const files = await this.getFiles(request, req.user, extensions);
 
     const result: StartConversationResponse = await this.commandBus.execute(
-      new StartConversation(req.user, { configurationId: assistantId }),
+      new StartConversation(req.user, { configurationId: assistantId, llm }),
     );
     const response: SendMessageResponse = await this.queryBus.execute(
-      new SendMessage(result.conversation.id, req.user, input, files, undefined, systemMessages),
+      new SendMessage(result.conversation.id, req.user, input, files, undefined, systemMessages, configuration),
     );
 
     const output = await this.readStream(response.stream);

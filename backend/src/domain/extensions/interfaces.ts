@@ -236,19 +236,29 @@ export class ConfiguredExtension<T extends ExtensionConfiguration = ExtensionCon
     return this.extension.getDocument?.(this.entity.values, documentUri);
   }
 
+  private mergeExtensionUserValues(...extensionUserValues: (ExtensionUserArgumentValues | undefined)[]) {
+    const merged: ExtensionConfiguration = {};
+    extensionUserValues
+      .filter((values) => values != null)
+      .forEach((values) => {
+        Object.entries(values).forEach(([key, value]) => {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          merged[key] = value;
+        });
+      });
+
+    return merged as T;
+  }
+
   getMiddlewares(
     user: User,
     userArgumentValues?: ExtensionUserArgumentValues,
-    userConfiguredValues?: ExtensionUserArgumentValues,
+    ...argumentValues: ExtensionUserArgumentValues[]
   ): Promise<ChatMiddleware[]> {
     if (!this.extension.getMiddlewares) {
       return Promise.resolve([]);
     }
-
-    this.entity.values = {
-      ...(this.entity.values ?? {}),
-      ...(userConfiguredValues ?? {}),
-    };
+    this.entity.values = this.mergeExtensionUserValues(this.entity.values, ...argumentValues);
 
     return this.extension.getMiddlewares(user, this.entity, userArgumentValues);
   }
