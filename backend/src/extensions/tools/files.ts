@@ -56,6 +56,13 @@ export class FilesExtension<T extends FilesExtensionConfiguration = FilesExtensi
           required: false,
           default: 20,
         },
+        showSources: {
+          type: 'boolean',
+          title: this.i18n.t('texts.extensions.files.showSources'),
+          description: this.i18n.t('texts.extensions.files.showSourcesHint'),
+          required: false,
+          default: true,
+        },
       },
       userArguments: {
         type: 'object',
@@ -75,7 +82,7 @@ export class FilesExtension<T extends FilesExtensionConfiguration = FilesExtensi
   getMiddlewares(user: User, extension: ExtensionEntity<T>): Promise<ChatMiddleware[]> {
     const middleware = {
       invoke: async (context: ChatContext, getContext: GetContext, next: ChatNextDelegate): Promise<any> => {
-        const { bucket, description, take } = extension.values;
+        const { bucket, description, take, showSources } = extension.values;
 
         let toolDescription = 'Use this tool to semantically search files.\n\n';
         toolDescription += [
@@ -131,11 +138,21 @@ export class FilesExtension<T extends FilesExtensionConfiguration = FilesExtensi
               take,
               extension.externalId,
               filesSelected.map((x) => x.id),
+              showSources,
             ),
           );
         } else {
           context.tools.push(
-            new InternalTool(enrichedDescription, this.queryBus, context, bucketEntity, take, extension.externalId, null),
+            new InternalTool(
+              enrichedDescription,
+              this.queryBus,
+              context,
+              bucketEntity,
+              take,
+              extension.externalId,
+              null,
+              showSources,
+            ),
           );
         }
 
@@ -174,6 +191,7 @@ class InternalTool extends StructuredTool {
     private readonly take: number,
     private readonly extensionExternalId: string,
     private readonly fileFilter: number[] | null,
+    private readonly showSources: boolean,
   ) {
     super();
 
@@ -186,9 +204,9 @@ class InternalTool extends StructuredTool {
         new SearchFiles(this.bucket.id, arg.query, this.context.user, this.take, this.fileFilter, this.context.conversationId),
       );
 
-      if (result.sources) {
+      if (result.sources && this.showSources) {
         this.context.history?.addSources(this.extensionExternalId, result.sources);
-      } else if (result.debug) {
+      } else if (result.debug && this.showSources) {
         this.context.result.next({ type: 'debug', content: result.debug });
       }
 
@@ -206,4 +224,5 @@ export type FilesExtensionConfiguration = ExtensionConfiguration & {
   description: string;
   bucket: number;
   take: number;
+  showSources: boolean;
 };

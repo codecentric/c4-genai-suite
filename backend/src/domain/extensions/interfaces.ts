@@ -224,10 +224,6 @@ export class ConfiguredExtension<T extends ExtensionConfiguration = ExtensionCon
     return this.entity.configurableArguments;
   }
 
-  get fixedValues(): Partial<ExtensionConfiguration> {
-    return this.extension.fixedValues ?? {};
-  }
-
   async getChunks(documentUri: string, chunkUris: string[]): Promise<string[] | undefined> {
     return this.extension.getChunks?.(this.entity.values, documentUri, chunkUris);
   }
