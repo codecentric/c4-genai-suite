@@ -1,6 +1,6 @@
 [project]
 name = "confluencer-importer"
-version = "0.1.0"
+version = "8.6.0"
 description = "Imports Confluence pages into c4 Buckets, enabling c4 Assistants to quickly and accurately answer questions using your organization's Confluence content."
 readme = "README.md"
 requires-python = ">=3.13.2"
