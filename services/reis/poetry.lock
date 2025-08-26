@@ -1831,19 +1831,19 @@ ollama = ">=0.5.1,<1.0.0"
 
 [[package]]
 name = "langchain-openai"
-version = "0.3.28"
+version = "0.3.31"
 description = "An integration package connecting OpenAI and LangChain"
 optional = false
 python-versions = ">=3.9"
 groups = ["main"]
 files = [
-    {file = "langchain_openai-0.3.28-py3-none-any.whl", hash = "sha256:4cd6d80a5b2ae471a168017bc01b2e0f01548328d83532400a001623624ede67"},
-    {file = "langchain_openai-0.3.28.tar.gz", hash = "sha256:6c669548dbdea325c034ae5ef699710e2abd054c7354fdb3ef7bf909dc739d9e"},
+    {file = "langchain_openai-0.3.31-py3-none-any.whl", hash = "sha256:b5b2ae7d3f996f189d400d864e1884e6c368ab6b1a0c1305042761ab946c3a26"},
+    {file = "langchain_openai-0.3.31.tar.gz", hash = "sha256:3a039f81f2aa64e85fd18be14f72b8f79bbb1d58efd57327918289aed6eedd3d"},
 ]
 
 [package.dependencies]
-langchain-core = ">=0.3.68,<1.0.0"
-openai = ">=1.86.0,<2.0.0"
+langchain-core = ">=0.3.74,<1.0.0"
+openai = ">=1.99.9,<2.0.0"
 tiktoken = ">=0.7,<1"
 
 [[package]]
@@ -2712,14 +2712,14 @@ pydantic = ">=2.9"
 
 [[package]]
 name = "openai"
-version = "1.88.0"
+version = "1.101.0"
 description = "The official Python library for the openai API"
 optional = false
 python-versions = ">=3.8"
 groups = ["main"]
 files = [
-    {file = "openai-1.88.0-py3-none-any.whl", hash = "sha256:7edd7826b3b83f5846562a6f310f040c79576278bf8e3687b30ba05bb5dff978"},
-    {file = "openai-1.88.0.tar.gz", hash = "sha256:122d35e42998255cf1fc84560f6ee49a844e65c054cd05d3e42fda506b832bb1"},
+    {file = "openai-1.101.0-py3-none-any.whl", hash = "sha256:6539a446cce154f8d9fb42757acdfd3ed9357ab0d34fcac11096c461da87133b"},
+    {file = "openai-1.101.0.tar.gz", hash = "sha256:29f56df2236069686e64aca0e13c24a4ec310545afb25ef7da2ab1a18523f22d"},
 ]
 
 [package.dependencies]
@@ -2733,6 +2733,7 @@ tqdm = ">4"
 typing-extensions = ">=4.11,<5"
 
 [package.extras]
+aiohttp = ["aiohttp", "httpx-aiohttp (>=0.1.8)"]
 datalib = ["numpy (>=1)", "pandas (>=1.2.3)", "pandas-stubs (>=1.1.0.11)"]
 realtime = ["websockets (>=13,<16)"]
 voice-helpers = ["numpy (>=2.0.2)", "sounddevice (>=0.5.1)"]
@@ -6078,4 +6079,4 @@ cffi = ["cffi (>=1.11)"]
 [metadata]
 lock-version = "2.1"
 python-versions = "<4.0,>=3.12.0"
-content-hash = "719b926e95b170696d5a4852dbe66f842048827d69116bea8e0794c6b1dabc9d"
+content-hash = "4daca2cb12cff2cc69b737eaae7b8b8309f83976456a69e3743050a3f1778f5b"
