@@ -1,7 +1,0 @@
-{
-  "backend": "8.5.1",
-  "frontend": "8.5.1",
-  "helm-chart": "8.5.1",
-  "services/confluence-importer": "8.5.1",
-  "services/reis": "8.5.1"
-}

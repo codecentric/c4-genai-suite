@@ -7,7 +7,7 @@ permissions:
 on:
   push:
     tags:
-      - c4-genai-suite-v*
+      - v*
 
 jobs:
   backend:
@@ -40,6 +40,26 @@ jobs:
       - reis
     steps:
       - run: echo "all done"
+
+  verify-version-strings:
+    name: Verify version strings match tag
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Extract version from tag
+        id: extract_ref
+        run: echo "version=$(echo ${GITHUB_REF#refs/tags/v})" >> $GITHUB_OUTPUT
+
+      - name: Verify that chart version is correct
+        run: |
+          if [ $(yq '.version' helm-chart/Chart.yaml) != "${{ steps.extract_ref.outputs.version }}" ] \
+          || [ $(yq '.appVersion' helm-chart/Chart.yaml) != "${{ steps.extract_ref.outputs.version }}" ]
+          then
+            echo "Version mismatch detected"
+            exit 1
+          fi
 
   promote-images:
     name: Container Image Promotion
