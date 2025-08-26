@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "REI-S"
-version = "0.1.0"
+version = "8.6.0"
 description = ""
 authors = ["Patrick Reichmann <patrick.reichmann@codecentric.de>"]
 readme = "README.md"
