@@ -2,8 +2,9 @@ from langchain_openai import OpenAIEmbeddings, AzureOpenAIEmbeddings
 from langchain_community.embeddings import FakeEmbeddings
 from langchain_ollama import OllamaEmbeddings
 from langchain_core.embeddings import Embeddings
-
+from langchain_aws.embeddings.bedrock import BedrockEmbeddings
 from rei_s.config import Config
+from pydantic import SecretStr
 
 
 def get_embeddings(config: Config) -> Embeddings:
@@ -48,6 +49,22 @@ def get_embeddings(config: Config) -> Embeddings:
             azure_endpoint=config.embeddings_azure_openai_endpoint,
             api_version=config.embeddings_azure_openai_api_version,
             max_retries=max_retries,
+        )
+    elif config.embeddings_type.lower() == "bedrock":
+        if config.embeddings_bedrock_region_name is None:
+            raise ValueError("The env variable `EMBEDDINGS_BEDROCK_REGION_NAME` is missing.")
+        if config.embeddings_bedrock_model_id is None:
+            raise ValueError("The env variable `EMBEDDINGS_BEDROCK_MODEL_ID` is missing.")
+        if config.embeddings_bedrock_aws_access_key_id is None:
+            raise ValueError("The env variable `EMBEDDINGS_BEDROCK_AWS_ACCESS_KEY_ID` is missing.")
+        if config.embeddings_bedrock_aws_secret_access_key is None:
+            raise ValueError("The env variable `EMBEDDINGS_BEDROCK_AWS_SECRET_ACCESS_KEY` is missing.")
+
+        return BedrockEmbeddings(
+            model_id=config.embeddings_bedrock_model_id,
+            aws_access_key_id=SecretStr(config.embeddings_bedrock_aws_access_key_id),
+            aws_secret_access_key=SecretStr(config.embeddings_bedrock_aws_secret_access_key),
+            region_name=config.embeddings_bedrock_region_name,
         )
     elif config.embeddings_type.lower() == "random-test-embeddings":
         # use text-embedding-3-large size, which is at the time of writing the

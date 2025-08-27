@@ -43,13 +43,18 @@ class Config(BaseSettings, frozen=True):  # type: ignore
     batch_size: Annotated[int, Field(gt=0)] | None = None
     filesize_threshold: Annotated[int, Field(gt=0)] = 10**5
 
-    embeddings_type: Literal["azure-openai", "openai", "random-test-embeddings", "ollama"]
+    embeddings_type: Literal["azure-openai", "openai", "random-test-embeddings", "ollama", "bedrock"]
     # needed for Azure OpenAI
     embeddings_azure_openai_endpoint: str | None = None
     embeddings_azure_openai_api_key: SecretStr | None = None
     embeddings_azure_openai_api_version: str | None = None
     embeddings_azure_openai_model_name: str | None = None
     embeddings_azure_openai_deployment_name: str | None = None
+    # needed for Bedrock
+    embeddings_bedrock_model_id: str | None = None
+    embeddings_bedrock_aws_access_key_id: str | None = None
+    embeddings_bedrock_aws_secret_access_key: str | None = None
+    embeddings_bedrock_region_name: str | None = None
     # needed for OpenAI
     embeddings_openai_endpoint: str | None = None
     embeddings_openai_api_key: SecretStr | None = None
@@ -108,6 +113,15 @@ class Config(BaseSettings, frozen=True):  # type: ignore
                 "EMBEDDINGS_AZURE_OPENAI_MODEL_NAME": self.embeddings_azure_openai_model_name,
             }
             check_needed(needed_for_azure_open_ai, "EMBEDDINGS_TYPE", "azure-openai")
+
+        if self.embeddings_type == "bedrock":
+            needed_for_bedrock = {
+                "EMBEDDINGS_BEDROCK_MODEL_ID": self.embeddings_bedrock_model_id,
+                "EMBEDDINGS_BEDROCK_REGION_NAME": self.embeddings_bedrock_region_name,
+                "EMBEDDINGS_BEDROCK_AWS_ACCESS_KEY_ID": self.embeddings_bedrock_aws_access_key_id,
+                "EMBEDDINGS_BEDROCK_AWS_SECRET_ACCESS_KEY": self.embeddings_bedrock_aws_secret_access_key,
+            }
+            check_needed(needed_for_bedrock, "EMBEDDINGS_TYPE", "bedrock")
 
         if self.embeddings_type == "ollama":
             needed_for_azure_open_ai = {
