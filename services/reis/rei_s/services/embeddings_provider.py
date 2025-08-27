@@ -4,7 +4,6 @@ from langchain_ollama import OllamaEmbeddings
 from langchain_core.embeddings import Embeddings
 from langchain_aws.embeddings.bedrock import BedrockEmbeddings
 from rei_s.config import Config
-from pydantic import SecretStr
 
 
 def get_embeddings(config: Config) -> Embeddings:
@@ -62,8 +61,8 @@ def get_embeddings(config: Config) -> Embeddings:
 
         return BedrockEmbeddings(
             model_id=config.embeddings_bedrock_model_id,
-            aws_access_key_id=SecretStr(config.embeddings_bedrock_aws_access_key_id),
-            aws_secret_access_key=SecretStr(config.embeddings_bedrock_aws_secret_access_key),
+            aws_access_key_id=config.embeddings_bedrock_aws_access_key_id,
+            aws_secret_access_key=config.embeddings_bedrock_aws_secret_access_key,
             region_name=config.embeddings_bedrock_region_name,
         )
     elif config.embeddings_type.lower() == "random-test-embeddings":

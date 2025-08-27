@@ -52,8 +52,8 @@ class Config(BaseSettings, frozen=True):  # type: ignore
     embeddings_azure_openai_deployment_name: str | None = None
     # needed for Bedrock
     embeddings_bedrock_model_id: str | None = None
-    embeddings_bedrock_aws_access_key_id: str | None = None
-    embeddings_bedrock_aws_secret_access_key: str | None = None
+    embeddings_bedrock_aws_access_key_id: SecretStr | None = None
+    embeddings_bedrock_aws_secret_access_key: SecretStr | None = None
     embeddings_bedrock_region_name: str | None = None
     # needed for OpenAI
     embeddings_openai_endpoint: str | None = None
