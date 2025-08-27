@@ -39,7 +39,7 @@ test('Configuration Management', async ({ page }) => {
   await test.step('edit a configuration', async () => {
     await page.getByRole('link', { name: configName, exact: true }).click();
     await page.locator('li').filter({ hasText: configName }).getByTestId('more-actions').click();
-    await page.getByText('Duplicate').waitFor();
+    await page.getByRole('button', { name: 'Duplicate' }).waitFor();
     await page.getByRole('button', { name: 'Edit' }).click();
     await page.getByLabel('Name').fill(configNewName);
     await page.getByRole('button', { name: 'Save' }).click();
