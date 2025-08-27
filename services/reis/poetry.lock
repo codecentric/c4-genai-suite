@@ -1815,19 +1815,19 @@ typing-extensions = ">=4.7"
 
 [[package]]
 name = "langchain-ollama"
-version = "0.3.6"
+version = "0.3.7"
 description = "An integration package connecting Ollama and LangChain"
 optional = false
 python-versions = ">=3.9"
 groups = ["main"]
 files = [
-    {file = "langchain_ollama-0.3.6-py3-none-any.whl", hash = "sha256:b339bd3fcf913b8d606ad426ef39e7122695532507fcd85aa96271b3f33dc3df"},
-    {file = "langchain_ollama-0.3.6.tar.gz", hash = "sha256:4270c4b30b3f3d10850cb9a1183b8c77d616195e0d9717ac745ef7f7f6cc2b6e"},
+    {file = "langchain_ollama-0.3.7-py3-none-any.whl", hash = "sha256:845192a75a1671bd36bc8c54baae2e929c3b1b0e3c8c618438df20354b0231de"},
+    {file = "langchain_ollama-0.3.7.tar.gz", hash = "sha256:9deeca09a44fb8c5a46b1e43d670a7301f1d1e73196fa9191a89f9883217903b"},
 ]
 
 [package.dependencies]
-langchain-core = ">=0.3.70,<1.0.0"
-ollama = ">=0.5.1,<1.0.0"
+langchain-core = ">=0.3.74,<1.0.0"
+ollama = ">=0.5.3,<1.0.0"
 
 [[package]]
 name = "langchain-openai"
@@ -2696,14 +2696,14 @@ tests = ["pytest", "pytest-cov"]
 
 [[package]]
 name = "ollama"
-version = "0.5.1"
+version = "0.5.3"
 description = "The official Python client for Ollama."
 optional = false
 python-versions = ">=3.8"
 groups = ["main"]
 files = [
-    {file = "ollama-0.5.1-py3-none-any.whl", hash = "sha256:4c8839f35bc173c7057b1eb2cbe7f498c1a7e134eafc9192824c8aecb3617506"},
-    {file = "ollama-0.5.1.tar.gz", hash = "sha256:5a799e4dc4e7af638b11e3ae588ab17623ee019e496caaf4323efbaa8feeff93"},
+    {file = "ollama-0.5.3-py3-none-any.whl", hash = "sha256:a8303b413d99a9043dbf77ebf11ced672396b59bec27e6d5db67c88f01b279d2"},
+    {file = "ollama-0.5.3.tar.gz", hash = "sha256:40b6dff729df3b24e56d4042fd9d37e231cee8e528677e0d085413a1d6692394"},
 ]
 
 [package.dependencies]
@@ -6079,4 +6079,4 @@ cffi = ["cffi (>=1.11)"]
 [metadata]
 lock-version = "2.1"
 python-versions = "<4.0,>=3.12.0"
-content-hash = "de94e9a23df25ef49bc8d4a633ba6920ae782673025564244b50fb96ee51c801"
+content-hash = "e18c81ff2ff3b0b3e02eeccace50d6c3e4a1fd4bd0412ebcfa9c6d132bb1a3c7"
