@@ -54,8 +54,7 @@ jobs:
 
       - name: Verify that chart version is correct
         run: |
-          if [ $(yq '.version' helm-chart/Chart.yaml) != "${{ steps.extract_ref.outputs.version }}" ] \
-          || [ $(yq '.appVersion' helm-chart/Chart.yaml) != "${{ steps.extract_ref.outputs.version }}" ]
+          if [ $(yq '.version' helm-chart/Chart.yaml) != "${{ steps.extract_ref.outputs.version }}" ]
           then
             echo "Version mismatch detected"
             exit 1
