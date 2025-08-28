@@ -29,7 +29,7 @@ langchain-ollama = "^0.3.7"
 langchain-aws = "^0.2.31"
 
 [tool.poetry.group.dev.dependencies]
-ruff = "0.12.10"
+ruff = "0.12.11"
 mypy = "1.17.1"
 pre-commit = "4.3.0"
 pytest = "8.4.1"
