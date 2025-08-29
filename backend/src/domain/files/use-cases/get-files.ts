@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { FindManyOptions, FindOptionsWhere, In, Raw } from 'typeorm';
 import { BucketEntity, BucketRepository, BucketType, FileEntity, FileRepository } from 'src/domain/database';
 import { User } from 'src/domain/users';
+import { ConversationFileEntity, ConversationFileRepository } from '../../database/entities/conversation-file';
 import { UploadedFile } from '../interfaces';
 import { buildFile } from './utils';
 
@@ -15,7 +16,7 @@ export class GetFiles {
   constructor(
     public readonly data: {
       user: User;
-      bucketIdOrType: number | BucketType;
+      bucketIdOrType: number | BucketType | 'all';
       page: number;
       pageSize?: number;
       query?: string;
@@ -40,14 +41,18 @@ export class GetFilesHandler implements IQueryHandler<GetFiles, GetFilesResponse
     private readonly buckets: BucketRepository,
     @InjectRepository(FileEntity)
     private readonly files: FileRepository,
+    @InjectRepository(ConversationFileEntity)
+    private readonly conversionFiles: ConversationFileRepository,
   ) {}
 
   async execute(query: GetFiles): Promise<GetFilesResponse> {
     const { page, pageSize, query: searchQuery, bucketIdOrType, user, conversationId, files, withContent } = query.data;
 
+    const fileFilter = { ids: files ?? [], enabled: !!files?.length };
+
     const where: FindOptionsWhere<FileEntity> = {};
     const bucketWhere: FindOptionsWhere<BucketEntity> = {};
-    if (!conversationId) {
+    if (!conversationId && bucketIdOrType !== 'all') {
       if (isBucketType(bucketIdOrType)) {
         bucketWhere.type = bucketIdOrType;
       } else {
@@ -67,8 +72,10 @@ export class GetFilesHandler implements IQueryHandler<GetFiles, GetFilesResponse
       }
     }
 
-    if (conversationId) {
-      where.conversationId = conversationId;
+    if (conversationId || bucketIdOrType == 'all') {
+      const files = await this.conversionFiles.findBy({ conversationId });
+      fileFilter.ids.push(...files.map((x) => x.fileId));
+      fileFilter.enabled = true;
       where.userId = user.id;
     }
 
@@ -76,8 +83,8 @@ export class GetFilesHandler implements IQueryHandler<GetFiles, GetFilesResponse
       where.fileName = Raw((alias) => `LOWER(${alias}) Like '%${searchQuery}%'`);
     }
 
-    if (files && files.length > 0) {
-      where.id = In(files);
+    if (fileFilter.enabled) {
+      where.id = In(fileFilter.ids);
     }
 
     const options: FindManyOptions<FileEntity> = { where };

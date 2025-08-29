@@ -1,5 +1,5 @@
 import { IconFile, IconRotate2, IconTrash } from '@tabler/icons-react';
-import React, { memo } from 'react';
+import React from 'react';
 import { FileDto } from 'src/api';
 import { extractType } from 'src/pages/utils';
 
@@ -9,11 +9,12 @@ type FileItemProps = {
   loading?: boolean;
 };
 
-function FileItemComponent({ file, onRemove, loading }: FileItemProps) {
+export const FileItemComponent = ({ file, onRemove, loading }: FileItemProps) => {
   const fileName = file.fileName;
   const fileType = 'mimeType' in file ? extractType(file) : undefined;
 
   const handleRemove = (e: React.MouseEvent) => {
+    console.log('handleRemove for ', file);
     e.preventDefault();
     if (onRemove && 'id' in file) {
       onRemove(file);
@@ -51,10 +52,4 @@ function FileItemComponent({ file, onRemove, loading }: FileItemProps) {
       </div>
     </div>
   );
-}
-
-export const FileItem = memo(FileItemComponent, (prevProps, nextProps) => {
-  return (
-    prevProps.file === nextProps.file && prevProps.loading === nextProps.loading && prevProps.onRemove === nextProps.onRemove
-  );
-});
+};
