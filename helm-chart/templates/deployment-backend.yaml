@@ -54,7 +54,7 @@ spec:
               port: 3000
             initialDelaySeconds: 10
             periodSeconds: 5
-            failureThreshold: 2
+            failureThreshold: 5
           livenessProbe:
             httpGet:
               path: /api/health
