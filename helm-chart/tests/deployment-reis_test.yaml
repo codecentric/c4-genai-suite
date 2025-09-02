@@ -41,6 +41,24 @@ tests:
           path: metadata.name
           value: RELEASE-NAME-my-custom-name-rei-s
 
+  - it: should base image tag on the Chart version when not explicitly overridden
+    template: deployment-reis.yaml
+    chart:
+      version: 44.71.3
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: "ghcr.io/codecentric/c4-genai-suite/reis:v44.71.3"
+
+  - it: should use custom image tag when explicitly overridden
+    template: deployment-reis.yaml
+    set:
+      reis.image.tag: "v1.2.3"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: "ghcr.io/codecentric/c4-genai-suite/reis:v1.2.3"
+
   - it: has update strategy Rolling Update by default
     template: deployment-reis.yaml
     asserts:

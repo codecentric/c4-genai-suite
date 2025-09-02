@@ -36,6 +36,24 @@ tests:
           path: metadata.name
           value: RELEASE-NAME-my-custom-name-frontend
 
+  - it: should base image tag on the Chart version when not explicitly overridden
+    template: deployment-frontend.yaml
+    chart:
+      version: 43.70.2
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: "ghcr.io/codecentric/c4-genai-suite/frontend:v43.70.2"
+
+  - it: should use custom image tag when explicitly overridden
+    template: deployment-frontend.yaml
+    set:
+      frontend.image.tag: "v1.2.3"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: "ghcr.io/codecentric/c4-genai-suite/frontend:v1.2.3"
+
   - it: has update strategy Rolling Update by default
     template: deployment-frontend.yaml
     asserts:
