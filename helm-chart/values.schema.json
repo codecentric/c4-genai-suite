@@ -45,25 +45,20 @@
                     "description": "The name of the ingressClass. One of: public-traefik, internal-traefik",
                     "default": "\"\""
                 },
-                "clusterIssuer": {
-                    "type": "string",
-                    "description": "The cluster issuer for Let's Encrypt. Should be `letsencrypt-<ENVIRONMENT>`",
-                    "default": "\"\""
-                },
                 "host": {
                     "type": "string",
                     "description": "The host for ingress",
-                    "default": "\"\""
-                },
-                "tlsSecretName": {
-                    "type": "string",
-                    "description": "The TLS secret name. Should be c4-tls-cert",
                     "default": "\"\""
                 },
                 "annotations": {
                     "type": "object",
                     "description": "Map of annotations to add for ingress",
                     "default": {}
+                },
+                "tls": {
+                    "type": "boolean",
+                    "description": "Specifies if a `tls` section should be created.",
+                    "default": false
                 }
             }
         },

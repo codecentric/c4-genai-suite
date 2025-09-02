@@ -6,11 +6,10 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ include "c4genaisuite.fullname" . }}
+  {{- with .Values.ingress.annotations }}
   annotations:
-    cert-manager.io/cluster-issuer: {{ .Values.ingress.clusterIssuer }}
-    {{- if .Values.ingress.annotations }}
-    {{- toYaml .Values.ingress.annotations | nindent 4 }}
-    {{- end }}
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   labels:
     {{ include "c4genaisuite.commonLabels" . | nindent 4 }}
     app.kubernetes.io/component: ingress
@@ -38,8 +37,10 @@ spec:
                 port:
                   name: http
           {{- end }}
+  {{ if .Values.ingress.tls }}
   tls:
-    - secretName: {{ .Values.ingress.tlsSecretName }}
+    - secretName: {{ printf "%s-tls" .Values.ingress.host }}
       hosts:
         - {{ .Values.ingress.host }}
+  {{- end }}
 {{- end }}

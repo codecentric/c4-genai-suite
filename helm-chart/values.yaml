@@ -18,14 +18,12 @@ ingress:
   enabled: false
   ## @param ingress.ingressClassName [string] The name of the ingressClass. One of: public-traefik, internal-traefik
   ingressClassName: ""
-  ## @param ingress.clusterIssuer [string] The cluster issuer for Let's Encrypt. Should be `letsencrypt-<ENVIRONMENT>`
-  clusterIssuer: ""
   ## @param ingress.host [string] The host for ingress
   host: ""
-  ## @param ingress.tlsSecretName [string] The TLS secret name. Should be c4-tls-cert
-  tlsSecretName: ""
   ## @param ingress.annotations Map of annotations to add for ingress
   annotations: {}
+  ## @param ingress.tls Specifies if a `tls` section should be created.
+  tls: false
 
 ## @section Backend
 backend:

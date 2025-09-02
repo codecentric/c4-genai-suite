@@ -33,18 +33,31 @@ tests:
           path: metadata.name
           value: RELEASE-NAME-my-custom-name
 
-  - it: leaves the TLS secret name empty by default
+  - it: does not create the TLS section by default
     asserts:
-      - isNullOrEmpty:
-          path: spec.tls[0].secretName
+      - notExists:
+          path: spec.tls
 
-  - it: sets the TLS secret name to the correct value if provided
+  - it: sets the TLS secret name to the chart name plus a suffix
     set:
-      ingress.tlsSecretName: "my-tls-cert"
+      ingress.tls: true
+      ingress.host: "c4.example.com"
     asserts:
       - equal:
           path: spec.tls[0].secretName
-          value: "my-tls-cert"
+          value: "c4.example.com-tls"
+
+  - it: sets the first TLS host to the ingress host
+    set:
+      ingress.tls: true
+      ingress.host: "c4.example.com"
+    asserts:
+      - lengthEqual:
+          path: spec.tls[0].hosts
+          count: 1
+      - equal:
+          path: spec.tls[0].hosts[0]
+          value: "c4.example.com"
 
   - it: sets the host name correctly
     set:
@@ -56,3 +69,16 @@ tests:
       - equal:
           path: spec.rules[0].host
           value: "c4.example.com"
+
+  - it: sets custom ingress annotations
+    set:
+      ingress.annotations:
+        piff: paff
+        smack: whack
+    asserts:
+      - equal:
+          path: metadata.annotations.piff
+          value: paff
+      - equal:
+          path: metadata.annotations.smack
+          value: whack

@@ -26,7 +26,7 @@ helm install codecentric-c4-genai-suite oci://ghcr.io/codecentric/c4-genai-suite
 ingress:
   enabled: true
   host: c4.example.com
-  tlsSecretName: my-tls-cert
+  tls: true
 
 backend:
   auth:
@@ -68,14 +68,13 @@ reis:
 
 ### Ingress
 
-| Name                       | Description                                                                 | Value   |
-| -------------------------- | --------------------------------------------------------------------------- | ------- |
-| `ingress.enabled`          | Specifies whether an Ingress resource should be created.                    | `false` |
-| `ingress.ingressClassName` | The name of the ingressClass. One of: public-traefik, internal-traefik      | `""`    |
-| `ingress.clusterIssuer`    | The cluster issuer for Let's Encrypt. Should be `letsencrypt-<ENVIRONMENT>` | `""`    |
-| `ingress.host`             | The host for ingress                                                        | `""`    |
-| `ingress.tlsSecretName`    | The TLS secret name. Should be c4-tls-cert                                  | `""`    |
-| `ingress.annotations`      | Map of annotations to add for ingress                                       | `{}`    |
+| Name                       | Description                                                            | Value   |
+| -------------------------- | ---------------------------------------------------------------------- | ------- |
+| `ingress.enabled`          | Specifies whether an Ingress resource should be created.               | `false` |
+| `ingress.ingressClassName` | The name of the ingressClass. One of: public-traefik, internal-traefik | `""`    |
+| `ingress.host`             | The host for ingress                                                   | `""`    |
+| `ingress.annotations`      | Map of annotations to add for ingress                                  | `{}`    |
+| `ingress.tls`              | Specifies if a `tls` section should be created.                        | `false` |
 
 ### Backend
 
@@ -406,3 +405,11 @@ database (Azure OpenAI or PGVector).
 
 To achieve a zero-downtime migration, install the new chart in parallel with the old chart, verify that everything is
 working as expected, and then uninstall the old chart.
+
+## 8.5.3 to 9.0.0
+
+There are breaking changes regarding the Ingress resource:
+
+- TLS is no longer enabled by default. To enable it, you have to set `ingress.tls` to `true`.
+- The value `ingress.tlsSecretName` is no longer required and should be removed.
+- The cluster issuer can no longer be set via the value `ingress.clusterIssuer`. You have to add the annotation `cert-manager.io/cluster-issuer: <your-issuer>` for yourself by adding it to the value `ingress.annotations`.
