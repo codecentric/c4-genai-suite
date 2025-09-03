@@ -3,6 +3,7 @@ from langchain_community.embeddings import FakeEmbeddings
 from langchain_ollama import OllamaEmbeddings
 from langchain_core.embeddings import Embeddings
 from langchain_aws.embeddings.bedrock import BedrockEmbeddings
+from langchain_nvidia_ai_endpoints import NVIDIAEmbeddings
 from rei_s.config import Config
 
 
@@ -64,6 +65,19 @@ def get_embeddings(config: Config) -> Embeddings:
             aws_access_key_id=config.embeddings_bedrock_aws_access_key_id,
             aws_secret_access_key=config.embeddings_bedrock_aws_secret_access_key,
             region_name=config.embeddings_bedrock_region_name,
+        )
+    elif config.embeddings_type.lower() == "nvidia":
+        if config.embeddings_nvidia_api_key is None:
+            raise ValueError("The env variable `EMBEDDINGS_NVIDIA_MODEL` is missing.")
+        if config.embeddings_nvidia_base_url is None:
+            raise ValueError("The env variable `EMBEDDINGS_NVIDIA_BASE_URL` is missing.")
+        if config.embeddings_nvidia_model is None:
+            raise ValueError("The env variable `EMBEDDINGS_NVIDIA_API_KEY` is missing.")
+
+        return NVIDIAEmbeddings(
+            model=config.embeddings_nvidia_model,
+            base_url=config.embeddings_nvidia_base_url,
+            api_key=config.embeddings_nvidia_api_key.get_secret_value(),
         )
     elif config.embeddings_type.lower() == "random-test-embeddings":
         # use text-embedding-3-large size, which is at the time of writing the

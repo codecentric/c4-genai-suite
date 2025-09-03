@@ -43,7 +43,7 @@ class Config(BaseSettings, frozen=True):  # type: ignore
     batch_size: Annotated[int, Field(gt=0)] | None = None
     filesize_threshold: Annotated[int, Field(gt=0)] = 10**5
 
-    embeddings_type: Literal["azure-openai", "openai", "random-test-embeddings", "ollama", "bedrock"]
+    embeddings_type: Literal["azure-openai", "openai", "random-test-embeddings", "ollama", "bedrock", "nvidia"]
     # needed for Azure OpenAI
     embeddings_azure_openai_endpoint: str | None = None
     embeddings_azure_openai_api_key: SecretStr | None = None
@@ -62,6 +62,10 @@ class Config(BaseSettings, frozen=True):  # type: ignore
     # needed for ollama
     embeddings_ollama_endpoint: str | None = None
     embeddings_ollama_model_name: str | None = None
+    # needed for Nvidia
+    embeddings_nvidia_model: str | None = None
+    embeddings_nvidia_base_url: str | None = None
+    embeddings_nvidia_api_key: SecretStr | None = None
 
     stt_type: Literal["azure-openai-whisper"] | None = None
     stt_azure_openai_whisper_endpoint: str | None = None
@@ -129,6 +133,14 @@ class Config(BaseSettings, frozen=True):  # type: ignore
                 "EMBEDDINGS_OLLAMA_MODEL_NAME": self.embeddings_ollama_model_name,
             }
             check_needed(needed_for_azure_open_ai, "EMBEDDINGS_TYPE", "ollama")
+
+        if self.embeddings_type == "nvidia":
+            needed_for_azure_open_ai = {
+                "EMBEDDINGS_NVIDIA_MODEL": self.embeddings_nvidia_model,
+                "EMBEDDINGS_NVIDIA_BASE_URL": self.embeddings_nvidia_base_url,
+                "EMBEDDINGS_NVIDIA_API_KEY": self.embeddings_nvidia_api_key,
+            }
+            check_needed(needed_for_azure_open_ai, "EMBEDDINGS_TYPE", "nvidia")
 
         return self
 

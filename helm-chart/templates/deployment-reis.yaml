@@ -81,6 +81,20 @@ spec:
                   name: {{ .Values.reis.embeddings.openAi.existingApiKeySecret }}
                   key: openAiApiKey
             {{- end }}
+            {{- if .Values.reis.embeddings.bedrock.existingApiKeySecret }}
+            - name: EMBEDDINGS_BEDROCK_AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.reis.embeddings.bedrock.existingApiKeySecret }}
+                  key: bedrockApiKey
+            {{- end }}
+            {{- if .Values.reis.embeddings.nvidia.existingApiKeySecret }}
+            - name: EMBEDDINGS_NVIDIA_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.reis.embeddings.nvidia.existingApiKeySecret }}
+                  key: nvidiaApiKey
+            {{- end }}
             {{- if .Values.reis.speechToText.azureOpenAiWhisper.existingApiKeySecret }}
             - name: STT_AZURE_OPENAI_WHISPER_API_KEY
               valueFrom:
