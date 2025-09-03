@@ -24,11 +24,9 @@ data:
   EMBEDDINGS_BEDROCK_MODEL_ID: {{ .Values.reis.embeddings.bedrock.modelId | quote }}
   EMBEDDINGS_BEDROCK_REGION_NAME: {{ .Values.reis.embeddings.bedrock.regionName | quote }}
   EMBEDDINGS_BEDROCK_AWS_ACCESS_KEY_ID: {{ .Values.reis.embeddings.bedrock.accessKeyId | quote }}
-  EMBEDDINGS_BEDROCK_AWS_SECRET_ACCESS_KEY: {{ .Values.reis.embeddings.bedrock.secretAccessKey | quote }}
   {{- else if eq .Values.reis.embeddings.type "nvidia" }}
   EMBEDDINGS_NVIDIA_MODEL: {{ .Values.reis.embeddings.nvidia.model | quote }}
   EMBEDDINGS_NVIDIA_BASE_URL: {{ .Values.reis.embeddings.nvidia.baseUrl | quote }}
-  EMBEDDINGS_NVIDIA_API_KEY: {{ .Values.reis.embeddings.nvidia.apiKey | quote }}
   {{- else }}
   {{ fail "Invalid embedding type. Must be one of openai, azure-openai." }}
   {{- end }}

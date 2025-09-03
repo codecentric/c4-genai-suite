@@ -606,7 +606,7 @@
                     "properties": {
                         "type": {
                             "type": "string",
-                            "description": "The embedding api type to use, one of: azure-openai, openai",
+                            "description": "The embedding api type to use, one of: azure-openai, openai, bedrock, nvidia, ollama",
                             "default": "\"\""
                         },
                         "azureOpenAi": {
@@ -670,6 +670,76 @@
                                 "modelName": {
                                     "type": "string",
                                     "description": "The OpenAI model name.",
+                                    "default": "\"\""
+                                }
+                            }
+                        },
+                        "bedrock": {
+                            "type": "object",
+                            "properties": {
+                                "modelId": {
+                                    "type": "string",
+                                    "description": "The model ID.",
+                                    "default": "\"\""
+                                },
+                                "regionName": {
+                                    "type": "string",
+                                    "description": "The AWS region.",
+                                    "default": "\"\""
+                                },
+                                "accessKeyId": {
+                                    "type": "string",
+                                    "description": "The AWS access key Id.",
+                                    "default": "\"\""
+                                },
+                                "secretAccessKey": {
+                                    "type": "string",
+                                    "description": "The AWS secret access key.",
+                                    "default": "\"\""
+                                },
+                                "existingApiKeySecret": {
+                                    "type": "string",
+                                    "description": "Name of the Kubernetes Secret containing the Bedrock API Key. The key must be `bedrockApiKey`.",
+                                    "default": "\"\""
+                                }
+                            }
+                        },
+                        "nvidia": {
+                            "type": "object",
+                            "properties": {
+                                "baseUrl": {
+                                    "type": "string",
+                                    "description": "The API URL for NVIDIA.",
+                                    "default": "\"\""
+                                },
+                                "apiKey": {
+                                    "type": "string",
+                                    "description": "API key for NVIDIA.",
+                                    "default": "\"\""
+                                },
+                                "existingApiKeySecret": {
+                                    "type": "string",
+                                    "description": "Name of the Kubernetes Secret containing the NVIDIA API Key. The key must be `nvidiaApiKey`.",
+                                    "default": "\"\""
+                                },
+                                "modelName": {
+                                    "type": "string",
+                                    "description": "The model name for NVIDIA.",
+                                    "default": "\"\""
+                                }
+                            }
+                        },
+                        "ollama": {
+                            "type": "object",
+                            "properties": {
+                                "endpoint": {
+                                    "type": "string",
+                                    "description": "The endpoint for Ollama.",
+                                    "default": "\"\""
+                                },
+                                "modelName": {
+                                    "type": "string",
+                                    "description": "The model name for Ollama.",
                                     "default": "\"\""
                                 }
                             }

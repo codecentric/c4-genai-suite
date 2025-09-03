@@ -175,6 +175,40 @@ tests:
           count: 1
           any: true
 
+  - it: mounts Bedrock API Key secret as environment variable in the container
+    template: deployment-reis.yaml
+    set:
+      reis.embeddings.type: bedrock
+      reis.embeddings.bedrock.existingApiKeySecret: my-bedrock-secret
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: EMBEDDINGS_BEDROCK_AWS_SECRET_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                name: my-bedrock-secret
+                key: bedrockApiKey
+          count: 1
+          any: true
+
+  - it: mounts NVIDIA API Key secret as environment variable in the container
+    template: deployment-reis.yaml
+    set:
+      reis.embeddings.type: nvidia
+      reis.embeddings.nvidia.existingApiKeySecret: my-nvidia-secret
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: EMBEDDINGS_NVIDIA_API_KEY
+            valueFrom:
+              secretKeyRef:
+                name: my-nvidia-secret
+                key: nvidiaApiKey
+          count: 1
+          any: true
+
   - it: mounts Azure OpenAI Whisper API Key secret as environment variable in the container
     template: deployment-reis.yaml
     set:

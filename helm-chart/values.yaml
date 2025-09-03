@@ -249,7 +249,7 @@ reis:
       ## @param reis.metrics.serviceMonitor.labels Map of labels to add to the REIS ServiceMonitor
       labels: {}
   embeddings:
-    ## @param reis.embeddings.type [string] The embedding api type to use, one of: azure-openai, openai
+    ## @param reis.embeddings.type [string] The embedding api type to use, one of: azure-openai, openai, bedrock, nvidia, ollama
     type: ""
     azureOpenAi:
       ## @param reis.embeddings.azureOpenAi.apiKey [string] API key for Azure OpenAI.
@@ -274,6 +274,31 @@ reis:
       ## @param reis.embeddings.openAi.deploymentName [string] The OpenAI deployment name.
       deploymentName: ""
       ## @param reis.embeddings.openAi.modelName [string] The OpenAI model name.
+      modelName: ""
+    bedrock:
+      ## @param reis.embeddings.bedrock.modelId [string] The model ID.
+      modelId: ""
+      ## @param reis.embeddings.bedrock.regionName [string] The AWS region.
+      regionName: ""
+      ## @param reis.embeddings.bedrock.accessKeyId [string] The AWS access key Id.
+      accessKeyId: ""
+      ## @param reis.embeddings.bedrock.secretAccessKey [string] The AWS secret access key.
+      secretAccessKey: ""
+      ## @param reis.embeddings.bedrock.existingApiKeySecret [string] Name of the Kubernetes Secret containing the Bedrock API Key. The key must be `bedrockApiKey`.
+      existingApiKeySecret: ""
+    nvidia:
+      ## @param reis.embeddings.nvidia.baseUrl [string] The API URL for NVIDIA.
+      baseUrl: ""
+      ## @param reis.embeddings.nvidia.apiKey [string] API key for NVIDIA.
+      apiKey: ""
+      ## @param reis.embeddings.nvidia.existingApiKeySecret [string] Name of the Kubernetes Secret containing the NVIDIA API Key. The key must be `nvidiaApiKey`.
+      existingApiKeySecret: ""
+      ## @param reis.embeddings.nvidia.modelName [string] The model name for NVIDIA.
+      modelName: ""
+    ollama:
+      ## @param reis.embeddings.ollama.endpoint [string] The endpoint for Ollama.
+      endpoint: ""
+      ## @param reis.embeddings.ollama.modelName [string] The model name for Ollama.
       modelName: ""
   speechToText:
     ## @param reis.speechToText.type [string] The speech-to-text api type to use, one of: azure-openai-whisper. Leave empty to disable.
