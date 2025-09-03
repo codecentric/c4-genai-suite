@@ -81,12 +81,12 @@ spec:
                   name: {{ .Values.reis.embeddings.openAi.existingApiKeySecret }}
                   key: openAiApiKey
             {{- end }}
-            {{- if .Values.reis.embeddings.bedrock.existingApiKeySecret }}
+            {{- if .Values.reis.embeddings.bedrock.existingAccessKeySecret }}
             - name: EMBEDDINGS_BEDROCK_AWS_SECRET_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.reis.embeddings.bedrock.existingApiKeySecret }}
-                  key: bedrockApiKey
+                  name: {{ .Values.reis.embeddings.bedrock.existingAccessKeySecret }}
+                  key: bedrockSecretAccessKey
             {{- end }}
             {{- if .Values.reis.embeddings.nvidia.existingApiKeySecret }}
             - name: EMBEDDINGS_NVIDIA_API_KEY

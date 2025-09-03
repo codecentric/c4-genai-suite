@@ -179,7 +179,7 @@ tests:
     template: deployment-reis.yaml
     set:
       reis.embeddings.type: bedrock
-      reis.embeddings.bedrock.existingApiKeySecret: my-bedrock-secret
+      reis.embeddings.bedrock.existingAccessKeySecret: my-bedrock-secret
     asserts:
       - contains:
           path: spec.template.spec.containers[0].env
@@ -188,7 +188,7 @@ tests:
             valueFrom:
               secretKeyRef:
                 name: my-bedrock-secret
-                key: bedrockApiKey
+                key: bedrockSecretAccessKey
           count: 1
           any: true
 

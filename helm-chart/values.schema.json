@@ -697,9 +697,9 @@
                                     "description": "The AWS secret access key.",
                                     "default": "\"\""
                                 },
-                                "existingApiKeySecret": {
+                                "existingAccessKeySecret": {
                                     "type": "string",
-                                    "description": "Name of the Kubernetes Secret containing the Bedrock API Key. The key must be `bedrockApiKey`.",
+                                    "description": "Name of the Kubernetes Secret containing the Bedrock Secret Access Key. The key must be `bedrockSecretAccessKey`.",
                                     "default": "\"\""
                                 }
                             }
@@ -722,9 +722,9 @@
                                     "description": "Name of the Kubernetes Secret containing the NVIDIA API Key. The key must be `nvidiaApiKey`.",
                                     "default": "\"\""
                                 },
-                                "modelName": {
+                                "model": {
                                     "type": "string",
-                                    "description": "The model name for NVIDIA.",
+                                    "description": "The model for NVIDIA.",
                                     "default": "\"\""
                                 }
                             }
