@@ -28,7 +28,7 @@ data:
   EMBEDDINGS_NVIDIA_MODEL: {{ .Values.reis.embeddings.nvidia.model | quote }}
   EMBEDDINGS_NVIDIA_BASE_URL: {{ .Values.reis.embeddings.nvidia.baseUrl | quote }}
   {{- else }}
-  {{ fail "Invalid embedding type. Must be one of openai, azure-openai." }}
+  {{ fail "Invalid embedding type. Must be one of openai, azure-openai, bedrock, nvidia, ollama." }}
   {{- end }}
   HOST: {{ .Values.reis.host | quote }}
   METRICS_PORT: {{ .Values.reis.metrics.port | quote }}

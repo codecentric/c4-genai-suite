@@ -80,7 +80,7 @@ tests:
           path: data.EMBEDDINGS_TYPE
           value: azure-openai
 
-  - it: sets OpenAI values if embeddings type is openai
+  - it: sets OpenAI embedding values if embeddings type is openai
     set:
       reis.embeddings.type: openai
       reis.embeddings.openAi.endpoint: https://openai.endpoint.test
@@ -93,7 +93,7 @@ tests:
           path: data.EMBEDDINGS_OPENAI_MODEL_NAME
           value: "unittest/modelname"
 
-  - it: sets Azure OpenAI values if type if azure-openai
+  - it: sets Azure OpenAI embedding values if embeddings type is azure-openai
     set:
       reis.embeddings.type: azure-openai
       reis.embeddings.azureOpenAi.endpoint: https://azure-openai.endpoint.test
@@ -113,3 +113,46 @@ tests:
       - equal:
           path: data.EMBEDDINGS_AZURE_OPENAI_API_VERSION
           value: "v0.0.0"
+
+  - it: sets AWS Bedrock embedding values if embeddings type is bedrock
+    set:
+      reis.embeddings.type: bedrock
+      reis.embeddings.bedrock.modelId: unittest/modelId
+      reis.embeddings.bedrock.regionName: unittest/regionname
+      reis.embeddings.bedrock.accessKeyId: unittest/accessKeyId
+    asserts:
+      - equal:
+          path: data.EMBEDDINGS_BEDROCK_MODEL_ID
+          value: "unittest/modelId"
+      - equal:
+          path: data.EMBEDDINGS_BEDROCK_REGION_NAME
+          value: "unittest/regionname"
+      - equal:
+          path: data.EMBEDDINGS_BEDROCK_AWS_ACCESS_KEY_ID
+          value: "unittest/accessKeyId"
+
+  - it: sets Ollama embedding values if embeddings type is ollama
+    set:
+      reis.embeddings.type: ollama
+      reis.embeddings.ollama.endpoint: https://our-ollama.xyz
+      reis.embeddings.ollama.modelName: unittest/modelName
+    asserts:
+      - equal:
+          path: data.EMBEDDINGS_OLLAMA_MODEL_NAME
+          value: "unittest/modelName"
+      - equal:
+          path: data.EMBEDDINGS_OLLAMA_ENDPOINT
+          value: "https://our-ollama.xyz"
+
+  - it: sets NVIDIA embedding values if embeddings type is nvidia
+    set:
+      reis.embeddings.type: nvidia
+      reis.embeddings.nvidia.baseUrl: https://our-nim.xyz
+      reis.embeddings.nvidia.model: unittest/model
+    asserts:
+      - equal:
+          path: data.EMBEDDINGS_NVIDIA_MODEL
+          value: "unittest/model"
+      - equal:
+          path: data.EMBEDDINGS_NVIDIA_BASE_URL
+          value: "https://our-nim.xyz"
