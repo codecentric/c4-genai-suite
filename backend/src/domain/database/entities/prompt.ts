@@ -1,6 +1,6 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { VisibilityType } from '../../prompt';
 import { schema } from '../typeorm.helper';
-import { VisibilityType } from 'src/domain/prompt/interfaces';
 import { PromptCategoryEntity } from './prompt-category';
 
 @Entity({ name: 'prompts', schema })
@@ -17,8 +17,9 @@ export class PromptEntity {
   @Column({ nullable: false })
   content!: string;
 
-  @OneToMany(() => PromptEntity, (prompt) => prompt.categories)
-  categories?: [string];
+  @ManyToMany(() => PromptCategoryEntity)
+  @JoinTable()
+  categories?: PromptCategoryEntity[];
 
   @Column()
   visibility!: VisibilityType;

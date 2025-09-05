@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsArray, IsDefined, IsEnum, IsOptional, IsString } from 'class-validator';
-import { VisibilityType } from 'src/domain/prompt/interfaces';
+import { VisibilityType } from 'src/domain/prompt';
 
 export class CreatePromptCategoryDto {
   @ApiProperty({
