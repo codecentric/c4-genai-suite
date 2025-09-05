@@ -1,5 +1,5 @@
 import { Column, Entity, PrimaryColumn } from 'typeorm';
-import { VisibilityType } from 'src/domain/prompt';
+import { VisibilityType } from '../../prompt';
 import { schema } from '../typeorm.helper';
 
 @Entity({ name: 'prompt-categories', schema })

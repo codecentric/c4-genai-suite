@@ -1,5 +1,5 @@
 import { Column, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { VisibilityType } from 'src/domain/prompt';
+import { VisibilityType } from '../../prompt';
 import { schema } from '../typeorm.helper';
 import { PromptCategoryEntity } from './prompt-category';
 
