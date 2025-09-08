@@ -243,7 +243,7 @@ async function createUsageEntity(date: Date, userEntity: UserEntity, usageReposi
   const usageEntity = new UsageEntity();
   usageEntity.date = startOfDay(date);
   usageEntity.userId = userEntity.id;
-  usageEntity.userGroup = userEntity.userGroupId ?? 'admin';
+  usageEntity.userGroup = userEntity.userGroups?.[0]?.id ?? 'admin';
   usageEntity.counter = 'token_usage';
   usageEntity.key = 'azure-open-ai';
   usageEntity.subKey = 'gpt-4o';

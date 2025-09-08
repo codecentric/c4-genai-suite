@@ -56,7 +56,7 @@ export class RateMessageHandler implements ICommandHandler<RateMessage, RateMess
       date: new Date(),
       key: rating,
       subKey: conversation.llm || 'none',
-      userGroup: user.userGroupId,
+      userGroup: user.userGroupIds?.[0],
       userId: user.id,
     });
 

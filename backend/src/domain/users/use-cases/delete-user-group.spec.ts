@@ -38,8 +38,30 @@ describe('DeleteUserGroup', () => {
   it('should throw BadRequestException if user group has existing users', async () => {
     const userGroupId = crypto.randomUUID();
     const userId = crypto.randomUUID();
-    const user = { id: userId, name: 'user1' };
-    jest.spyOn(userGroupRepository, 'findOne').mockResolvedValueOnce({ id: userGroupId, users: [{ user }] } as UserGroupEntity);
+    const user = {
+      id: userId,
+      name: 'user1',
+      email: 'user1@test.com',
+      userGroups: [],
+      conversations: [],
+      files: [],
+      configurations: [],
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    } as unknown as import('../../database').UserEntity;
+    jest.spyOn(userGroupRepository, 'findOne').mockResolvedValueOnce({
+      id: userGroupId,
+      name: 'test-group',
+      isAdmin: false,
+      isBuiltIn: false,
+      users: [user],
+      configurations: [],
+      configurationIds: [],
+      monthlyTokens: undefined,
+      monthlyUserTokens: undefined,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    } as UserGroupEntity);
     const command = new DeleteUserGroup(userGroupId);
     await expect(handler.execute(command)).rejects.toThrow('Cannot delete a user group with existing users.');
   });

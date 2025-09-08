@@ -42,12 +42,26 @@ export class AuthService implements OnModuleInit {
     this.config = config;
   }
 
-  private async setSessionUser(req: Request, user: User | undefined) {
+  private async setSessionUser(req: Request, user: User | UserEntity | undefined) {
     await new Promise((resolve) => {
       if (!user) {
         req.session.destroy(resolve);
       } else {
-        req.session.user = user;
+        let sessionUser: User;
+        if ('userGroups' in user && Array.isArray(user.userGroups)) {
+          sessionUser = {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            userGroupIds: user.userGroups.map((g) => g.id),
+          };
+          if ('picture' in user && typeof user.picture === 'string') sessionUser.picture = user.picture;
+          if ('hasPassword' in user && typeof user.hasPassword === 'boolean') sessionUser.hasPassword = user.hasPassword;
+          if ('hasApiKey' in user && typeof user.hasApiKey === 'boolean') sessionUser.hasApiKey = user.hasApiKey;
+        } else {
+          sessionUser = user as User;
+        }
+        req.session.user = sessionUser;
         req.session.save(resolve);
       }
     });
@@ -128,17 +142,25 @@ export class AuthService implements OnModuleInit {
       return;
     }
 
-    const count = await this.users.countBy({ userGroupId: BUILTIN_USER_GROUP_ADMIN });
+    // Count users in admin group using join table
+    const count = await this.users
+      .createQueryBuilder('user')
+      .leftJoin('user.userGroups', 'userGroup')
+      .where('userGroup.id = :adminId', { adminId: BUILTIN_USER_GROUP_ADMIN })
+      .getCount();
 
     // If no admin has been created yet, the first user becomes the admin.
     if (count > 0 && !adminRoleRequired) {
       return;
     }
 
-    const existing = await this.users.findOneBy({ email: email });
+    const existing = await this.users.findOne({
+      where: { email: email },
+      relations: ['userGroups'],
+    });
 
     if (existing) {
-      existing.userGroupId = BUILTIN_USER_GROUP_ADMIN;
+      existing.userGroups = [{ id: BUILTIN_USER_GROUP_ADMIN } as UserGroupEntity];
       existing.passwordHash ||= await bcrypt.hash(password, 10);
       existing.apiKey ||= apiKey;
 
@@ -152,7 +174,7 @@ export class AuthService implements OnModuleInit {
         email,
         name: email,
         passwordHash: await bcrypt.hash(password, 10),
-        userGroupId: BUILTIN_USER_GROUP_ADMIN,
+        userGroups: [{ id: BUILTIN_USER_GROUP_ADMIN } as UserGroupEntity],
       });
 
       this.logger.log(`Created initial user with email '${email}'.`);
@@ -204,22 +226,24 @@ export class AuthService implements OnModuleInit {
   async login(user: User, req: Request) {
     const userFilter = user.email ? { email: user.email } : { id: user.id };
     // Check if the user exist in the database.
-    let fromDB = await this.users.findOneBy(userFilter);
+    let fromDB = await this.users.findOne({ where: userFilter, relations: ['userGroups'] });
 
     if (!fromDB) {
-      const countAdmins = await this.users.countBy({ userGroupId: BUILTIN_USER_GROUP_ADMIN });
+      // Count users in admin group using join table
+      const countAdmins = await this.users
+        .createQueryBuilder('user')
+        .leftJoin('user.userGroups', 'userGroup')
+        .where('userGroup.id = :adminId', { adminId: BUILTIN_USER_GROUP_ADMIN })
+        .getCount();
 
       // If no admin has been created yet, the first user becomes the admin.
-      if (countAdmins === 0) {
-        user.userGroupId = BUILTIN_USER_GROUP_ADMIN;
-      } else {
-        user.userGroupId = BUILTIN_USER_GROUP_DEFAULT;
-      }
-
-      await this.users.save(user);
+      const groupId = countAdmins === 0 ? BUILTIN_USER_GROUP_ADMIN : BUILTIN_USER_GROUP_DEFAULT;
+      user.userGroupIds = [groupId];
+      // Save user with userGroups relation
+      await this.users.save({ ...user, userGroups: user.userGroupIds.map((id) => ({ id }) as UserGroupEntity) });
 
       // Reload the user again to get the default values from the database.
-      fromDB = await this.users.findOneBy(userFilter);
+      fromDB = await this.users.findOne({ where: userFilter, relations: ['userGroups'] });
     }
 
     await this.setSessionUser(req, fromDB ?? undefined);
