@@ -284,7 +284,7 @@ reis:
       accessKeyId: ""
       ## @param reis.embeddings.bedrock.secretAccessKey [string] The AWS secret access key.
       secretAccessKey: ""
-      ## @param reis.embeddings.bedrock.existingAccessKeySecret [string] Name of the Kubernetes Secret containing the Bedrock Secret Access Key. The key must be `bedrockSecretAccessKey`.
+      ## @param reis.embeddings.bedrock.existingAccessKeySecret [string] Name of the Kubernetes Secret containing the Bedrock Secret Access Key. The secret must have the keys `bedrockAccessKeyId` and `bedrockSecretAccessKey`.
       existingAccessKeySecret: ""
     nvidia:
       ## @param reis.embeddings.nvidia.baseUrl [string] The API URL for NVIDIA.

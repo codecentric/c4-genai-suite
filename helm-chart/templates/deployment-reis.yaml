@@ -82,6 +82,11 @@ spec:
                   key: openAiApiKey
             {{- end }}
             {{- if .Values.reis.embeddings.bedrock.existingAccessKeySecret }}
+            - name: EMBEDDINGS_BEDROCK_AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.reis.embeddings.bedrock.existingAccessKeySecret }}
+                  key: bedrockAccessKeyId
             - name: EMBEDDINGS_BEDROCK_AWS_SECRET_ACCESS_KEY
               valueFrom:
                 secretKeyRef:

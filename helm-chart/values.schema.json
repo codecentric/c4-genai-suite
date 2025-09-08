@@ -699,7 +699,7 @@
                                 },
                                 "existingAccessKeySecret": {
                                     "type": "string",
-                                    "description": "Name of the Kubernetes Secret containing the Bedrock Secret Access Key. The key must be `bedrockSecretAccessKey`.",
+                                    "description": "Name of the Kubernetes Secret containing the Bedrock Secret Access Key. The secret must have the keys `bedrockAccessKeyId` and `bedrockSecretAccessKey`.",
                                     "default": "\"\""
                                 }
                             }

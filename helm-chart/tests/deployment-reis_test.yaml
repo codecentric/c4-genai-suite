@@ -184,6 +184,16 @@ tests:
       - contains:
           path: spec.template.spec.containers[0].env
           content:
+            name: EMBEDDINGS_BEDROCK_AWS_ACCESS_KEY_ID
+            valueFrom:
+              secretKeyRef:
+                name: my-bedrock-secret
+                key: bedrockAccessKeyId
+          count: 1
+          any: true
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
             name: EMBEDDINGS_BEDROCK_AWS_SECRET_ACCESS_KEY
             valueFrom:
               secretKeyRef:

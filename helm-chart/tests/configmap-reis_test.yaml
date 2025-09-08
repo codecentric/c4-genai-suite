@@ -127,9 +127,6 @@ tests:
       - equal:
           path: data.EMBEDDINGS_BEDROCK_REGION_NAME
           value: "unittest/regionname"
-      - equal:
-          path: data.EMBEDDINGS_BEDROCK_AWS_ACCESS_KEY_ID
-          value: "unittest/accessKeyId"
 
   - it: sets Ollama embedding values if embeddings type is ollama
     set:
@@ -156,3 +153,6 @@ tests:
       - equal:
           path: data.EMBEDDINGS_NVIDIA_BASE_URL
           value: "https://our-nim.xyz"
+
+
+
