@@ -14,12 +14,15 @@ RUN npm ci
 COPY frontend .
 RUN VITE_VERSION="$VERSION" npm run build
 
+FROM caddy:2.10.2-alpine AS caddy
+
 FROM base
 WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=80
 
-RUN apk update && apk add --no-cache caddy=2.10.0-r1 tini=0.19.0-r3
+RUN apk update && apk add --no-cache tini=0.19.0-r3
+COPY --from=caddy /usr/bin/caddy /usr/bin/caddy
 COPY Caddyfile /etc/caddy/Caddyfile
 
 COPY --from=backend_build /src/backend/dist /app/backend/dist
