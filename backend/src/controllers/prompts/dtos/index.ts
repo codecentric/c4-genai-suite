@@ -73,7 +73,7 @@ export class CreatePromptDto {
   })
   @IsOptional()
   @IsArray()
-  categories?: [number];
+  categories?: string[];
 
   @ApiProperty({
     description: 'The visibility of the prompt (e.g., public, private).',

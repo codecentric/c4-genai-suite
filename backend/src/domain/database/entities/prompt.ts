@@ -1,14 +1,14 @@
-import { Column, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { VisibilityType } from '../../prompt';
+import { Column, CreateDateColumn, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { VisibilityType } from '../../prompt/interfaces';
 import { schema } from '../typeorm.helper';
 import { PromptCategoryEntity } from './prompt-category';
 
 @Entity({ name: 'prompts', schema })
 export class PromptEntity {
   @PrimaryGeneratedColumn()
-  id!: string;
+  id!: number;
 
-  @Column({ nullable: true })
+  @Column({ nullable: false })
   title!: string;
 
   @Column({ nullable: true })
@@ -25,5 +25,11 @@ export class PromptEntity {
   visibility!: VisibilityType;
 
   @Column({ nullable: true })
-  raiting!: number;
+  rating!: number;
+
+  @CreateDateColumn({ type: 'timestamptz' })
+  createdAt!: Date;
+
+  @UpdateDateColumn({ type: 'timestamptz' })
+  updatedAt!: Date;
 }

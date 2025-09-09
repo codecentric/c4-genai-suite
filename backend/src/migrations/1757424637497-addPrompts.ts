@@ -1,14 +1,14 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class AddPrompts1757081968480 implements MigrationInterface {
-  name = 'AddPrompts1757081968480';
+export class AddPrompts1757424637497 implements MigrationInterface {
+  name = 'AddPrompts1757424637497';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
-      `CREATE TABLE "company_chat"."prompt-categories" ("label" character varying NOT NULL, "description" character varying NOT NULL, "creationDate" TIMESTAMP NOT NULL, "visibility" character varying NOT NULL, CONSTRAINT "PK_fcceccb98fc892cc5b3e40c1097" PRIMARY KEY ("label"))`,
+      `CREATE TABLE "company_chat"."prompt-categories" ("label" character varying NOT NULL, "description" character varying NOT NULL, "creationDate" TIMESTAMP NOT NULL, "visibility" character varying NOT NULL, "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), CONSTRAINT "PK_fcceccb98fc892cc5b3e40c1097" PRIMARY KEY ("label"))`,
     );
     await queryRunner.query(
-      `CREATE TABLE "company_chat"."prompts" ("id" SERIAL NOT NULL, "title" character varying, "description" character varying, "content" character varying NOT NULL, "visibility" character varying NOT NULL, "raiting" integer, CONSTRAINT "PK_21f33798862975179e40b216a1d" PRIMARY KEY ("id"))`,
+      `CREATE TABLE "company_chat"."prompts" ("id" SERIAL NOT NULL, "title" character varying NOT NULL, "description" character varying, "content" character varying NOT NULL, "visibility" character varying NOT NULL, "rating" integer, "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), CONSTRAINT "PK_21f33798862975179e40b216a1d" PRIMARY KEY ("id"))`,
     );
     await queryRunner.query(
       `CREATE TABLE "company_chat"."prompts_categories_prompt-categories" ("promptsId" integer NOT NULL, "promptCategoriesLabel" character varying NOT NULL, CONSTRAINT "PK_645256b9fc1fe950d6f6e7c3003" PRIMARY KEY ("promptsId", "promptCategoriesLabel"))`,
