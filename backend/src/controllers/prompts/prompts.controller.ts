@@ -2,6 +2,7 @@ import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreatePrompt, CreatePromptResponse } from 'src/domain/prompt/use-cases/create-prompt';
+import { CreatePrompt, CreatePromptResponse } from 'src/domain/prompt/use-cases/create-prompt';
 import { LocalAuthGuard } from '../../domain/auth';
 import { CreatePromptCategoryDto, CreatePromptDto, PromptCategoryDto, PromptDto } from './dtos';
 
