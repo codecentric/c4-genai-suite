@@ -40,8 +40,18 @@ export class PromptController {
       }),
     );
 
-    // Map entity to DTO using fromDomain method
-    return PromptDto.fromDomain(response.prompt);
+    // Map entity to DTO
+    const promptDto: PromptDto = {
+      id: response.prompt.id.toString(),
+      title: response.prompt.title,
+      description: response.prompt.description,
+      content: response.prompt.content,
+      visibility: response.prompt.visibility,
+      categories: response.prompt.categories?.map(cat => cat.label) || [],
+      rating: response.prompt.rating,
+    };
+
+    return promptDto;
   }
 
   @Get()

@@ -64,7 +64,9 @@ describe('Prompts', () => {
     expect(typedBody.content).toBe(newPrompt.content);
     expect(typedBody.visibility).toBe(newPrompt.visibility);
     expect(typedBody.categories).toHaveLength(2);
-    expect(typedBody.categories).toEqual(expect.arrayContaining(['technical', 'creative']));
+    expect(typedBody.categories).toEqual(
+      expect.arrayContaining([expect.objectContaining({ label: 'technical' }), expect.objectContaining({ label: 'creative' })]),
+    );
   });
 
   it('should create a prompt with only required fields', async () => {
@@ -81,8 +83,8 @@ describe('Prompts', () => {
     expect(typedBody.title).toBe(newPrompt.title);
     expect(typedBody.content).toBe(newPrompt.content);
     expect(typedBody.visibility).toBe(newPrompt.visibility);
-    expect(typedBody.description).toBeNull();
-    expect(typedBody.rating).toBeNull();
+    expect(typedBody.description).toBeUndefined();
+    expect(typedBody.rating).toBeUndefined();
     expect(typedBody.categories).toEqual([]);
   });
 
@@ -98,7 +100,16 @@ describe('Prompts', () => {
 
     const typedBody = response.body as PromptDto;
     expect(typedBody.categories).toHaveLength(1); // Only 'technical' exists
-    expect(typedBody.categories).toEqual(['technical']);
+    expect(typedBody.categories).toEqual([expect.objectContaining({ label: 'technical' })]);
+  });
+
+  it('should fail to create a prompt without required fields', async () => {
+    const invalidPrompt = {
+      description: 'Missing title and content',
+      visibility: VisibilityType.PUBLIC,
+    };
+
+    await request(app.getHttpServer()).post('/prompt').send(invalidPrompt).expect(HttpStatus.BAD_REQUEST);
   });
 
   it('should fail to create a prompt with invalid visibility', async () => {
