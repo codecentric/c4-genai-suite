@@ -1,10 +1,13 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
-import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreatePrompt, CreatePromptResponse } from 'src/domain/prompt/use-cases/create-prompt';
-import { CreatePromptCategoryDto, CreatePromptDto, PromptCategoryDto, PromptDto } from './dtos/index';
+import { LocalAuthGuard } from '../../domain/auth';
+import { CreatePromptCategoryDto, CreatePromptDto, PromptCategoryDto, PromptDto } from './dtos';
 
 @Controller('prompt')
+@ApiTags('prompts')
+@UseGuards(LocalAuthGuard)
 export class PromptController {
   constructor(private readonly commandBus: CommandBus) {}
 
@@ -36,18 +39,8 @@ export class PromptController {
       }),
     );
 
-    // Map entity to DTO
-    const promptDto: PromptDto = {
-      id: response.prompt.id.toString(),
-      title: response.prompt.title,
-      description: response.prompt.description,
-      content: response.prompt.content,
-      visibility: response.prompt.visibility,
-      categories: response.prompt.categories?.map(cat => cat.label) || [],
-      rating: response.prompt.rating,
-    };
-
-    return promptDto;
+    // Map entity to DTO using fromDomain method
+    return PromptDto.fromDomain(response.prompt);
   }
 
   @Get()

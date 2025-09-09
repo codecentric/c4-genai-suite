@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsArray, IsDefined, IsEnum, IsOptional, IsString } from 'class-validator';
+import { PromptEntity } from 'src/domain/database/entities/prompt';
 import { VisibilityType } from 'src/domain/prompt';
 
 export class CreatePromptCategoryDto {
@@ -57,6 +58,7 @@ export class CreatePromptDto {
     required: false,
   })
   @IsOptional()
+  @IsString()
   description?: string;
 
   @ApiProperty({
@@ -97,4 +99,17 @@ export class PromptDto extends CreatePromptDto {
     required: true,
   })
   rating!: number;
+
+  static fromDomain(this: void, source: PromptEntity) {
+    const result = new PromptDto();
+    result.id = source.id.toString();
+    result.title = source.title;
+    result.description = source.description;
+    result.content = source.content;
+    result.visibility = source.visibility;
+    result.categories = source.categories?.map((cat) => cat.label) || [];
+    result.rating = source.rating;
+
+    return result;
+  }
 }

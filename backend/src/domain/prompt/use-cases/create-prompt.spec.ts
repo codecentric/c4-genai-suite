@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
-import { PromptCategoryEntity } from '../../database/entities/prompt-category';
 import { PromptEntity } from '../../database/entities/prompt';
+import { PromptCategoryEntity } from '../../database/entities/prompt-category';
 import { VisibilityType } from '../interfaces';
 import { CreatePrompt, CreatePromptHandler } from './create-prompt';
 

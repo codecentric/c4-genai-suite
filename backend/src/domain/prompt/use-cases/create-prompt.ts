@@ -1,9 +1,9 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
-import { PromptCategoryEntity } from '../../database/entities/prompt-category';
-import { PromptEntity } from '../../database/entities/prompt';
 import { assignDefined } from 'src/lib';
+import { PromptEntity } from '../../database/entities/prompt';
+import { PromptCategoryEntity } from '../../database/entities/prompt-category';
 import { Prompt } from '../interfaces';
 
 type Values = Pick<Prompt, 'title' | 'description' | 'content' | 'visibility'> & {

@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { PromptCategoryEntity } from '../database/entities/prompt-category';
 import { PromptEntity } from '../database/entities/prompt';
+import { PromptCategoryEntity } from '../database/entities/prompt-category';
 import { CreatePromptHandler } from './use-cases/create-prompt';
 
 @Module({
