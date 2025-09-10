@@ -74,7 +74,7 @@ export interface UpsertConfigurationDto {
      * @type {Array<string>}
      * @memberof UpsertConfigurationDto
      */
-    userGroupsIds?: Array<string>;
+    userGroupIds?: Array<string>;
     /**
      * The suggestions to be shown for the chat.
      * @type {Array<ChatSuggestionDto>}
@@ -110,7 +110,7 @@ export function UpsertConfigurationDtoFromJSONTyped(json: any, ignoreDiscriminat
         'chatFooter': json['chatFooter'] == null ? undefined : json['chatFooter'],
         'executorEndpoint': json['executorEndpoint'] == null ? undefined : json['executorEndpoint'],
         'executorHeaders': json['executorHeaders'] == null ? undefined : json['executorHeaders'],
-        'userGroupsIds': json['userGroupsIds'] == null ? undefined : json['userGroupsIds'],
+        'userGroupIds': json['userGroupIds'] == null ? undefined : json['userGroupIds'],
         'chatSuggestions': json['chatSuggestions'] == null ? undefined : ((json['chatSuggestions'] as Array<any>).map(ChatSuggestionDtoFromJSON)),
     };
 }
@@ -128,7 +128,7 @@ export function UpsertConfigurationDtoToJSON(value?: UpsertConfigurationDto | nu
         'chatFooter': value['chatFooter'],
         'executorEndpoint': value['executorEndpoint'],
         'executorHeaders': value['executorHeaders'],
-        'userGroupsIds': value['userGroupsIds'],
+        'userGroupIds': value['userGroupIds'],
         'chatSuggestions': value['chatSuggestions'] == null ? undefined : ((value['chatSuggestions'] as Array<any>).map(ChatSuggestionDtoToJSON)),
     };
 }

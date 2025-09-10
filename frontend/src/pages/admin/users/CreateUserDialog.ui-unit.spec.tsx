@@ -7,7 +7,7 @@ import { render, required } from '../test-utils';
 import { CreateUserDialog } from './UpsertUserDialog';
 
 describe('User Page', () => {
-  const groupArray: UserGroupDto[] = [
+  const mockUserGroups: UserGroupDto[] = [
     {
       id: 'admin',
       isAdmin: true,
@@ -24,31 +24,41 @@ describe('User Page', () => {
       monthlyUserTokens: 0,
       name: 'Default',
     },
+    {
+      id: 'group',
+      isAdmin: false,
+      isBuiltIn: false,
+      monthlyTokens: 0,
+      monthlyUserTokens: 0,
+      name: 'Group',
+    },
   ];
 
-  it('should disable API key generation button when the default user group is selected ', async () => {
-    render(<CreateUserDialog userGroups={groupArray} onCreate={() => {}} onClose={() => {}} />);
+  it('should disable API key generation button when the user group admin is not selected ', async () => {
+    render(<CreateUserDialog userGroups={mockUserGroups} onCreate={() => {}} onClose={() => {}} />);
 
     const user = userEvent.setup();
 
-    const userGroup = screen.getByLabelText(required(texts.common.userGroup));
-    await user.click(userGroup);
-    const option = screen.getByRole('option', { name: /Default/i });
-    await user.click(option);
+    // Because the Default user group is already selected, we do not have to add it.
+    const userGroups = screen.getByLabelText(required(texts.common.userGroups));
+    await user.click(userGroups);
+    const adminOption = screen.getByRole('option', { name: /Admin/i });
+    await user.click(adminOption); // add
+    await user.click(adminOption); // remove again
 
     const generateButton = screen.getByRole('button', { name: texts.users.generateAPIKey });
     expect(generateButton).toBeDisabled();
   });
 
   it('should generate a random API Key if user group admin is selected', async () => {
-    render(<CreateUserDialog userGroups={groupArray} onCreate={() => {}} onClose={() => {}} />);
+    render(<CreateUserDialog userGroups={mockUserGroups} onCreate={() => {}} onClose={() => {}} />);
 
     const user = userEvent.setup();
 
-    const userGroup = screen.getByLabelText(required(texts.common.userGroup));
+    const userGroup = screen.getByLabelText(required(texts.common.userGroups));
     await user.click(userGroup);
-    const option = screen.getByRole('option', { name: /Admin/i });
-    await user.click(option);
+    const adminOption = screen.getByRole('option', { name: /Admin/i });
+    await user.click(adminOption);
 
     const generateButton = screen.getByRole('button', { name: texts.users.generateAPIKey });
     await user.click(generateButton);
@@ -56,15 +66,29 @@ describe('User Page', () => {
     await waitFor(() => expect(apiKeyInput).toHaveValue());
   });
 
-  it('should set the user group to default on initial state', () => {
-    render(<CreateUserDialog userGroups={groupArray} onCreate={() => {}} onClose={() => {}} />);
+  it('should select the user group default on initial state', () => {
+    render(<CreateUserDialog userGroups={mockUserGroups} onCreate={() => {}} onClose={() => {}} />);
 
-    const userGroup = screen.getByLabelText(required(texts.common.userGroup));
-    expect(userGroup).toHaveValue('Default');
+    // eslint-disable-next-line testing-library/no-node-access
+    expect(document.querySelector('input[name="userGroupIds"]')).toHaveValue('default');
+  });
+
+  it('should select multiple user groups', async () => {
+    render(<CreateUserDialog userGroups={mockUserGroups} onCreate={() => {}} onClose={() => {}} />);
+
+    const user = userEvent.setup();
+
+    const userGroup = screen.getByLabelText(required(texts.common.userGroups));
+    await user.click(userGroup);
+    const groupOption = screen.getByRole('option', { name: /Group/i });
+    await user.click(groupOption);
+
+    // eslint-disable-next-line testing-library/no-node-access
+    expect(document.querySelector('input[name="userGroupIds"]')).toHaveValue('default,group');
   });
 
   it('should alert when username and email are empty', async () => {
-    render(<CreateUserDialog userGroups={groupArray} onCreate={() => {}} onClose={() => {}} />);
+    render(<CreateUserDialog userGroups={mockUserGroups} onCreate={() => {}} onClose={() => {}} />);
 
     const user = userEvent.setup();
     const saveBtn = screen.getAllByRole('button', { name: 'Save' });
@@ -73,7 +97,7 @@ describe('User Page', () => {
   });
 
   it('should alert when password and confirm password do not match', async () => {
-    render(<CreateUserDialog userGroups={groupArray} onCreate={() => {}} onClose={() => {}} />);
+    render(<CreateUserDialog userGroups={mockUserGroups} onCreate={() => {}} onClose={() => {}} />);
 
     const user = userEvent.setup();
     const username = screen.getByLabelText(required('Name'));

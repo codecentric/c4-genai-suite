@@ -75,7 +75,7 @@ export function UsersPage() {
                 <tr>
                   <th>{texts.common.name}</th>
                   <th>{texts.common.email}</th>
-                  <th>{texts.common.userGroup}</th>
+                  <th>{texts.common.userGroups}</th>
                   <th className="w-24">{texts.common.apiKey}</th>
                   <th className="w-24">{texts.common.password}</th>
                 </tr>
@@ -85,7 +85,12 @@ export function UsersPage() {
                   <tr className="cursor-pointer hover:bg-gray-50" key={user.id} onClick={() => setToUpdate(user)}>
                     <td className="overflow-hidden font-semibold">{user.name}</td>
                     <td className="truncate overflow-hidden">{user.email}</td>
-                    <td className="overflow-hidden">{userGroups.find((x) => x.id === user.userGroupId)?.name}</td>
+                    <td className="overflow-hidden">
+                      {userGroups
+                        .filter((x) => user.userGroupIds.includes(x.id))
+                        .map((group) => group.name)
+                        .join(', ')}
+                    </td>
                     <td className="overflow-hidden">{formatBoolean(user.hasApiKey)}</td>
                     <td className="overflow-hidden">{formatBoolean(user.hasPassword)}</td>
                   </tr>

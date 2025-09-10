@@ -299,7 +299,7 @@ export const de: typeof en = {
     updateFailed: 'Aktualisierung fehlgeschlagen',
   },
   users: {
-    apiKeyHint: 'Ein API Key kann nur für Benutzer in der Benutzergruppe Admin generiert werden',
+    apiKeyHint: 'Ein API-Key kann nur für Benutzer in der Benutzergruppe Admin generiert werden.',
     create: 'Benutzer erstellen',
     empty: 'Keine Benutzer gefunden.',
     removeConfirmText: 'Möchtest du den Benutzer wirklich löschen?',
@@ -312,14 +312,14 @@ export const de: typeof en = {
   },
   theme: {
     agentName: 'Name des Agenten',
-    agentNameHints: 'Wie der Agent im Chat benannt wird.',
+    agentNameHints: 'Wie der Agent im Chat benannt wird',
     appName: 'Name der App',
     language: 'Sprache',
     languages: {
       de: 'Deutsch',
       en: 'Englisch',
     },
-    appNameHints: 'Der Name dieser App, verwendet für den Titel und das Menü.',
+    appNameHints: 'Der Name dieser App, verwendet für den Titel und das Menü',
     customCss: 'Benutzerdefiniertes CSS',
     footer: 'Chat-Fußzeile',
     footerHints:

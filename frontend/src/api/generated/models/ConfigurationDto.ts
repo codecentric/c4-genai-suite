@@ -98,7 +98,7 @@ export interface ConfigurationDto {
      * @type {Array<string>}
      * @memberof ConfigurationDto
      */
-    userGroupsIds?: Array<string>;
+    userGroupIds?: Array<string>;
     /**
      * Extension information.
      * @type {Array<ExtensionUserInfoDto>}
@@ -143,7 +143,7 @@ export function ConfigurationDtoFromJSONTyped(json: any, ignoreDiscriminator: bo
         'chatSuggestions': json['chatSuggestions'] == null ? undefined : ((json['chatSuggestions'] as Array<any>).map(ChatSuggestionDtoFromJSON)),
         'executorEndpoint': json['executorEndpoint'] == null ? undefined : json['executorEndpoint'],
         'executorHeaders': json['executorHeaders'] == null ? undefined : json['executorHeaders'],
-        'userGroupsIds': json['userGroupsIds'] == null ? undefined : json['userGroupsIds'],
+        'userGroupIds': json['userGroupIds'] == null ? undefined : json['userGroupIds'],
         'extensions': json['extensions'] == null ? undefined : ((json['extensions'] as Array<any>).map(ExtensionUserInfoDtoFromJSON)),
         'configurableArguments': json['configurableArguments'] == null ? undefined : ExtensionArgumentObjectSpecDtoFromJSON(json['configurableArguments']),
     };
@@ -164,7 +164,7 @@ export function ConfigurationDtoToJSON(value?: ConfigurationDto | null): any {
         'chatSuggestions': value['chatSuggestions'] == null ? undefined : ((value['chatSuggestions'] as Array<any>).map(ChatSuggestionDtoToJSON)),
         'executorEndpoint': value['executorEndpoint'],
         'executorHeaders': value['executorHeaders'],
-        'userGroupsIds': value['userGroupsIds'],
+        'userGroupIds': value['userGroupIds'],
         'extensions': value['extensions'] == null ? undefined : ((value['extensions'] as Array<any>).map(ExtensionUserInfoDtoToJSON)),
         'configurableArguments': ExtensionArgumentObjectSpecDtoToJSON(value['configurableArguments']),
     };

@@ -1,4 +1,14 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryColumn, Repository, UpdateDateColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinTable,
+  ManyToMany,
+  OneToMany,
+  PrimaryColumn,
+  Repository,
+  UpdateDateColumn,
+} from 'typeorm';
 import { schema } from '../typeorm.helper';
 import { ConfigurationUserEntity } from './configuration-user';
 import { ConversationEntity } from './conversation';
@@ -30,15 +40,16 @@ export class UserEntity {
   @OneToMany(() => FileEntity, (file) => file.user, { onDelete: 'CASCADE' })
   files!: FileEntity[];
 
-  @ManyToOne(() => UserGroupEntity, (userGroup) => userGroup.users, { onDelete: 'NO ACTION' })
-  userGroup!: UserGroupEntity;
+  @ManyToMany(() => UserGroupEntity, (userGroup) => userGroup.users, { cascade: true, eager: true })
+  @JoinTable({
+    name: 'users_user-groups',
+    joinColumn: { name: 'userId', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'userGroupId', referencedColumnName: 'id' },
+  })
+  userGroups!: UserGroupEntity[];
 
   @OneToMany(() => ConfigurationUserEntity, (uc) => uc.user)
   configurations!: ConfigurationUserEntity[];
-
-  //TODO: make this non nullable
-  @Column({ nullable: true })
-  userGroupId!: string;
 
   @CreateDateColumn({ type: 'timestamptz' })
   createdAt!: Date;

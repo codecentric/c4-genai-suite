@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SessionData, Store } from 'express-session';
 import { SessionEntity, SessionRepository } from '../database';
+import { buildUser } from '../users/use-cases/utils';
 
 @Injectable()
 export class SessionStorage extends Store {
@@ -21,7 +22,7 @@ export class SessionStorage extends Store {
           user: true,
         },
       });
-      const sessionData = session?.value ? { ...session.value, user: session.user } : undefined;
+      const sessionData = session?.value ? { ...session.value, user: session.user ? buildUser(session.user) : null } : undefined;
       callback(undefined, sessionData);
     } catch (err) {
       callback(err);

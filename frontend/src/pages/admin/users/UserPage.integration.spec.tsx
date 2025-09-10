@@ -13,7 +13,7 @@ const generateMockUsers = (count: number): UserDto[] => {
       id: i.toString(),
       name: `User ${i + 1}`,
       email: `user${i + 1}@example.com`,
-      userGroupId: 'default',
+      userGroupIds: ['default'],
       hasPassword: i % 2 === 0,
       hasApiKey: false,
     }),

@@ -39,11 +39,11 @@ export interface UpsertUserDto {
      */
     password?: string;
     /**
-     * The user group ID.
-     * @type {string}
+     * The user group IDs.
+     * @type {Array<string>}
      * @memberof UpsertUserDto
      */
-    userGroupId: string;
+    userGroupIds: Array<string>;
     /**
      * The API Key.
      * @type {string}
@@ -58,7 +58,7 @@ export interface UpsertUserDto {
 export function instanceOfUpsertUserDto(value: object): value is UpsertUserDto {
     if (!('name' in value) || value['name'] === undefined) return false;
     if (!('email' in value) || value['email'] === undefined) return false;
-    if (!('userGroupId' in value) || value['userGroupId'] === undefined) return false;
+    if (!('userGroupIds' in value) || value['userGroupIds'] === undefined) return false;
     return true;
 }
 
@@ -75,7 +75,7 @@ export function UpsertUserDtoFromJSONTyped(json: any, ignoreDiscriminator: boole
         'name': json['name'],
         'email': json['email'],
         'password': json['password'] == null ? undefined : json['password'],
-        'userGroupId': json['userGroupId'],
+        'userGroupIds': json['userGroupIds'],
         'apiKey': json['apiKey'] == null ? undefined : json['apiKey'],
     };
 }
@@ -89,7 +89,7 @@ export function UpsertUserDtoToJSON(value?: UpsertUserDto | null): any {
         'name': value['name'],
         'email': value['email'],
         'password': value['password'],
-        'userGroupId': value['userGroupId'],
+        'userGroupIds': value['userGroupIds'],
         'apiKey': value['apiKey'],
     };
 }

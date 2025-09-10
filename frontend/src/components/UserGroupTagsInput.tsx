@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useApi } from 'src/api';
 import { texts } from 'src/texts';
 
-type UserGroupTagsInputFormValues = { userGroupsIds?: string[] };
+type UserGroupTagsInputFormValues = { userGroupIds?: string[] };
 
 type UserGroupTagsProps<T> = { form: UseFormReturnType<T> };
 
@@ -35,16 +35,16 @@ export function UserGroupTagsInput<T extends UserGroupTagsInputFormValues>({ for
 
   const selectedGroupNames = form
     .getValues()
-    .userGroupsIds?.map((id) => userGroups?.items.find((group) => group.id === id)?.name ?? '')
+    .userGroupIds?.map((id) => userGroups?.items.find((group) => group.id === id)?.name ?? '')
     .filter(Boolean);
 
   const handleTagChange = (selectedNames: string[]) => {
     const selectedIds = userGroups?.items.filter((group) => selectedNames.includes(group.name)).map((group) => group.id) ?? [];
-    form.setValues({ ...form.values, userGroupsIds: selectedIds });
+    form.setValues({ ...form.values, userGroupIds: selectedIds });
   };
 
   const inputProps = {
-    ...form.getInputProps('userGroupsIds'),
+    ...form.getInputProps('userGroupIds'),
     value: selectedGroupNames,
     onChange: handleTagChange,
   };
