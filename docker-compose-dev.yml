@@ -25,6 +25,8 @@ services:
       NODE_ENV: production
       SESSION_SECRET: random
       # settings related to oicd
+      AUTH_USER_GROUPS_PROPERTY_NAME: groups
+      AUTH_USE_USER_GROUPS_FROM_AUTH_PROVIDER: true
       AUTH_OAUTH_AUTHORIZATION_URL: http://localhost:9999/default/authorize
       AUTH_OAUTH_BRAND_NAME: Local OICD
       AUTH_OAUTH_CLIENTID: client_id

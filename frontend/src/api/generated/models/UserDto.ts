@@ -51,11 +51,11 @@ export interface UserDto {
      */
     apiKey?: string;
     /**
-     * The user group ID.
-     * @type {string}
+     * The user group IDs.
+     * @type {Array<string>}
      * @memberof UserDto
      */
-    userGroupId: string;
+    userGroupIds: Array<string>;
     /**
      * Indicates if the user has a password configured.
      * @type {boolean}
@@ -77,7 +77,7 @@ export function instanceOfUserDto(value: object): value is UserDto {
     if (!('id' in value) || value['id'] === undefined) return false;
     if (!('name' in value) || value['name'] === undefined) return false;
     if (!('email' in value) || value['email'] === undefined) return false;
-    if (!('userGroupId' in value) || value['userGroupId'] === undefined) return false;
+    if (!('userGroupIds' in value) || value['userGroupIds'] === undefined) return false;
     if (!('hasPassword' in value) || value['hasPassword'] === undefined) return false;
     if (!('hasApiKey' in value) || value['hasApiKey'] === undefined) return false;
     return true;
@@ -98,7 +98,7 @@ export function UserDtoFromJSONTyped(json: any, ignoreDiscriminator: boolean): U
         'email': json['email'],
         'picture': json['picture'] == null ? undefined : json['picture'],
         'apiKey': json['apiKey'] == null ? undefined : json['apiKey'],
-        'userGroupId': json['userGroupId'],
+        'userGroupIds': json['userGroupIds'],
         'hasPassword': json['hasPassword'],
         'hasApiKey': json['hasApiKey'],
     };
@@ -115,7 +115,7 @@ export function UserDtoToJSON(value?: UserDto | null): any {
         'email': value['email'],
         'picture': value['picture'],
         'apiKey': value['apiKey'],
-        'userGroupId': value['userGroupId'],
+        'userGroupIds': value['userGroupIds'],
         'hasPassword': value['hasPassword'],
         'hasApiKey': value['hasApiKey'],
     };

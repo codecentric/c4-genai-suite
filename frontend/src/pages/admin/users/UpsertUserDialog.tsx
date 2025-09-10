@@ -2,11 +2,11 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { Button, Portal } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
 import { IconClipboard } from '@tabler/icons-react';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import * as Yup from 'yup';
-import { UpsertUserDto, useApi, UserDto, UserGroupDto } from 'src/api';
+import { instanceOfUserDto, UpsertUserDto, useApi, UserDto, UserGroupDto } from 'src/api';
 import { ConfirmDialog, FormAlert, Forms, Modal } from 'src/components';
 import { useDeleteUser } from 'src/pages/admin/users/hooks/useDeleteUser';
 import { useUpsertUser } from 'src/pages/admin/users/hooks/useUpsertUser';
@@ -20,8 +20,8 @@ const SCHEME = Yup.object({
   // Required email.
   email: Yup.string().label(texts.common.email).required().email(),
 
-  // Required user group.
-  userGroupId: Yup.string().label(texts.common.userGroup).required(),
+  // Required user groups.
+  userGroupIds: Yup.array(Yup.string()).label(texts.common.userGroups).required(),
 
   // The password to confirm.
   passwordConfirm: Yup.string()
@@ -60,12 +60,16 @@ export const CreateUserDialog = (props: Omit<CreateUserProps, 'type'>): JSX.Elem
 function UpsertUserDialog(props: UpsertUserDialogProps) {
   const isCreating = props.type === 'create';
   const { onClose, userGroups } = props;
-
   const clipboard = useClipboard();
-
   const api = useApi();
 
-  const defaultValues = isCreating ? { userGroupId: userGroups[1].id } : props.target;
+  const defaultValues = isCreating
+    ? {
+        userGroupIds: ['default'],
+        name: '',
+        email: '',
+      }
+    : props.target;
 
   const userUpsert = useUpsertUser(api, isCreating ? null : props.target, isCreating ? props.onCreate : props.onUpdate, onClose);
   const userDelete = useDeleteUser(api, isCreating ? null : props.target, isCreating ? null : props.onDelete, onClose);
@@ -77,10 +81,14 @@ function UpsertUserDialog(props: UpsertUserDialogProps) {
     return sorted.map((g) => ({ label: g.name, value: g.id }));
   }, [userGroups]);
 
+  const containsAdminGroup = (userGroupIds: (string | undefined)[]) => userGroupIds?.includes('admin') ?? false;
+  const [userIsAdmin, setUserIsAdmin] = useState(
+    !isCreating && instanceOfUserDto(props.target) && containsAdminGroup(props.target['userGroupIds'] ?? []),
+  );
+  const [hasApiKey, setHasApiKey] = useState(false);
   const form = useForm<UpsertUserDto>({ resolver: RESOLVER, defaultValues });
-  const userIsAdmin = form.watch('userGroupId') === 'admin';
-  const hasApiKey = form.watch('apiKey') || (!isCreating && props.target.hasApiKey);
-
+  form.watch(({ userGroupIds }) => setUserIsAdmin(containsAdminGroup(userGroupIds ?? [])));
+  form.watch(({ apiKey }) => setHasApiKey(Boolean(apiKey) || (!isCreating && props.target.hasApiKey)));
   return (
     <Portal>
       <FormProvider {...form}>
@@ -119,23 +127,17 @@ function UpsertUserDialog(props: UpsertUserDialogProps) {
           >
             <fieldset disabled={isPending}>
               <FormAlert common={texts.users.updateFailed} error={userUpsert.error} />
-
               <Forms.Text required name="name" label={texts.common.name} />
-
               <Forms.Text required name="email" label={texts.common.email} />
-
               <Forms.Select
                 required
-                data-testid="userGroupId1"
-                name="userGroupId"
-                options={userGroupsOptions}
-                label={texts.common.userGroup}
+                multiple
+                name="userGroupIds"
+                options={userGroupsOptions ?? []}
+                label={texts.common.userGroups}
               />
-
               <Forms.Password name="password" label={texts.common.password} />
-
               <Forms.Password name="passwordConfirm" label={texts.common.passwordConfirm} />
-
               <Forms.Row name="apiKey" label={texts.common.apiKey} hints={!userIsAdmin && texts.users.apiKeyHint}>
                 <div className="flex items-center gap-2">
                   {form?.getValues('apiKey') && (

@@ -64,13 +64,7 @@ class InternalTool extends NamedStructuredTool {
 
   protected async _call(arg: z.infer<typeof this.schema>): Promise<string> {
     const { query } = arg;
-
-    console.log(`DuckDuckGo Web Search for query: ${query}`);
-
     const items = (await search(query)).results.slice(0, this.maxResults);
-
-    console.log(items);
-
     const toolResult = [];
     const sources: Source[] = [];
     for (const item of items) {
