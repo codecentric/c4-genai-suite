@@ -70,8 +70,6 @@ jobs:
         with:
           lfs: true
       - uses: AnimMouse/setup-ffmpeg@v1
-        with:
-          version: 6.1
       - run: pipx install poetry
       - uses: actions/setup-python@v5
         with:
