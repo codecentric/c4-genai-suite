@@ -26,12 +26,21 @@ export class CheckUsageMiddleware implements ChatMiddleware {
   async invoke(context: ChatContext, getContext: GetContext, next: ChatNextDelegate): Promise<any> {
     const user = context.user;
 
-    if (user.userGroupId === BUILTIN_USER_GROUP_ADMIN || user.userGroupId === BUILTIN_USER_GROUP_DEFAULT) {
+    if (
+      Array.isArray(user.userGroupIds) &&
+      (user.userGroupIds.includes(BUILTIN_USER_GROUP_ADMIN) || user.userGroupIds.includes(BUILTIN_USER_GROUP_DEFAULT))
+    ) {
       await next(context);
       return;
     }
 
-    const userGroup = await this.userGroups.findOneBy({ id: user.userGroupId });
+    // For now, use the first group for quota checks (could be extended to check all groups)
+    const userGroupId = Array.isArray(user.userGroupIds) && user.userGroupIds.length > 0 ? user.userGroupIds[0] : undefined;
+    if (!userGroupId) {
+      await next(context);
+      return;
+    }
+    const userGroup = await this.userGroups.findOneBy({ id: userGroupId });
     const monthlyTokens = userGroup?.monthlyTokens ?? 0;
     const monthlyUserTokens = userGroup?.monthlyUserTokens ?? 0;
 
@@ -47,7 +56,7 @@ export class CheckUsageMiddleware implements ChatMiddleware {
       const groupUsage =
         (await this.usages.sum('count', {
           date: And(MoreThanOrEqual(dateFrom), LessThan(dateTo)),
-          userGroup: user.userGroupId,
+          userGroup: userGroupId,
         })) ?? 0;
 
       if (groupUsage >= monthlyTokens) {

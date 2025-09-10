@@ -72,7 +72,7 @@ export class ConfigurationEntity {
   users!: ConfigurationUserEntity[];
 
   @RelationId('userGroups')
-  userGroupsIds!: string[];
+  userGroupIds!: string[];
 
   @CreateDateColumn({ type: 'timestamptz' })
   createdAt!: Date;
