@@ -1910,14 +1910,14 @@ typing-extensions = ">=4.7"
 
 [[package]]
 name = "langchain-nvidia-ai-endpoints"
-version = "0.3.17"
+version = "0.3.18"
 description = "An integration package connecting NVIDIA AI Endpoints and LangChain"
 optional = false
 python-versions = "<4.0,>=3.9"
 groups = ["main"]
 files = [
-    {file = "langchain_nvidia_ai_endpoints-0.3.17-py3-none-any.whl", hash = "sha256:90ad6e12e3ab96eb3b7074f61b7a69e43691d1d55833b1af063e1129abc25eea"},
-    {file = "langchain_nvidia_ai_endpoints-0.3.17.tar.gz", hash = "sha256:fafb56cc71401256a803a1a59a5c436c880532219eecaa2e63d716cf0af51801"},
+    {file = "langchain_nvidia_ai_endpoints-0.3.18-py3-none-any.whl", hash = "sha256:899b5f32d880543bd20e8d011cadcb98c804d9480938c4a8e3397c3215304c76"},
+    {file = "langchain_nvidia_ai_endpoints-0.3.18.tar.gz", hash = "sha256:798d219a3d5a9cffb87a1907d9d0fb707ec93da8f44adb74198dd4af445a532f"},
 ]
 
 [package.dependencies]
@@ -6223,4 +6223,4 @@ cffi = ["cffi (>=1.11)"]
 [metadata]
 lock-version = "2.1"
 python-versions = "<4.0,>=3.12.0"
-content-hash = "f1fe1da29cf6418113ad50f9d97408a1bf4c73d6755d92f549ed7b5fe768f813"
+content-hash = "887f1d8bd8dfb584d5ac013eae6533681e48fcc330cce4c09dfcb2d886618be2"
