@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDefined, IsNotEmpty, IsOptional, IsString, Length } from 'class-validator';
+import { IsArray, IsDefined, IsNotEmpty, IsOptional, IsString, Length } from 'class-validator';
 import { User, UserGroup } from 'src/domain/users';
 
 export class UpsertUserDto {
@@ -30,12 +30,14 @@ export class UpsertUserDto {
   password?: string;
 
   @ApiProperty({
-    description: 'The user group ID.',
+    description: 'The user group IDs.',
     required: true,
+    type: [String],
   })
   @IsDefined()
-  @IsString()
-  userGroupId!: string;
+  @IsArray()
+  @IsString({ each: true })
+  userGroupIds!: string[];
 
   @ApiProperty({
     description: 'The API Key.',
@@ -99,10 +101,11 @@ export class UserDto {
   apiKey?: string;
 
   @ApiProperty({
-    description: 'The user group ID.',
+    description: 'The user group IDs.',
     required: true,
+    type: [String],
   })
-  userGroupId!: string;
+  userGroupIds!: string[];
 
   @ApiProperty({
     description: 'Indicates if the user has a password configured.',
@@ -124,7 +127,7 @@ export class UserDto {
     result.hasPassword = source.hasPassword ?? false;
     result.hasApiKey = source.hasApiKey ?? false;
     result.name = source.name;
-    result.userGroupId = source.userGroupId;
+    result.userGroupIds = source.userGroupIds;
 
     return result;
   }

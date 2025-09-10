@@ -11,8 +11,8 @@ export interface User {
   // The URL to an external picture.
   picture?: string;
 
-  // The user group ID.
-  userGroupId: string;
+  // The user group IDs.
+  userGroupIds: string[];
 
   // Indicates if the user has a password configured.
   hasPassword?: boolean;

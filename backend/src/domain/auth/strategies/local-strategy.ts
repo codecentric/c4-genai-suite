@@ -26,6 +26,7 @@ export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
     if (key) {
       return this.userRepository.findOneBy({ apiKey: key });
     } else if (request.session.user) {
+      console.log('request.session.user', request.session.user);
       return request.session.user;
     }
 

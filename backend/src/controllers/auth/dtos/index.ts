@@ -124,10 +124,11 @@ export class ProfileDto {
   isAdmin!: boolean;
 
   static fromDomain(source: User) {
+    console.log('user for profile', source);
     const result = new ProfileDto();
     result.id = source.id;
     result.email = source.email;
-    result.isAdmin = source.userGroupId === BUILTIN_USER_GROUP_ADMIN;
+    result.isAdmin = Array.isArray(source.userGroupIds) && source.userGroupIds.includes(BUILTIN_USER_GROUP_ADMIN);
     result.name = source.name ?? source.email;
     result.picture = source.picture;
 
