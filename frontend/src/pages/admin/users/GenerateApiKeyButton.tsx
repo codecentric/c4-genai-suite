@@ -1,3 +1,4 @@
+import { Button } from '@mantine/core';
 import { UseFormReturnType } from '@mantine/form';
 import { texts } from 'src/texts';
 
@@ -18,8 +19,8 @@ export function GenerateApiKeyButton({ disabled, form }: { disabled?: boolean; f
   };
 
   return (
-    <button type="button" aria-label={texts.users.generateAPIKey} className="btn" onClick={generateKey} disabled={disabled}>
+    <Button onClick={generateKey} disabled={disabled}>
       {texts.common.generate}
-    </button>
+    </Button>
   );
 }
