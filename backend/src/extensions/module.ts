@@ -8,6 +8,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from 'src/domain/auth/module';
 import { BucketEntity, CacheEntity, FileEntity } from 'src/domain/database';
 import { Extension } from 'src/domain/extensions';
+import { ContextExtension } from './examples/show-context';
+import { UserArgsExtension } from './examples/user-args';
 import { AzureOpenAIModelExtension } from './models/azure-open-ai';
 import { AzureOpenAIReasoningModelExtension } from './models/azure-open-ai-reasoning';
 import { BedrockModelExtension } from './models/bedrock-ai';
@@ -22,13 +24,11 @@ import { HubPromptExtension } from './other/hub';
 import { LangfuseExtension } from './other/langfuse';
 import { SpeechToTextExtension } from './other/speech-to-text';
 import { SummaryPromptExtension } from './other/summary';
-import { Always42Extension } from './tools/always-42';
 import { AzureAISearchExtension } from './tools/azure-ai-search';
 import { AzureDallEExtension } from './tools/azure-dall-e';
 import { BingWebSearchExtension } from './tools/bing-web-search';
 import { BraveWebSearchExtension } from './tools/brave-web-search';
 import { CalculatorExtension } from './tools/calculator';
-import { ConfirmExtension } from './tools/confirm';
 import { DallEExtension } from './tools/dall-e';
 import { DuckduckgoWebSearchExtension } from './tools/duckduckgo-web-search';
 import { FilesExtension } from './tools/files';
@@ -37,9 +37,6 @@ import { FilesVisionExtension } from './tools/files-vision';
 import { GroundingWithBingSearchExtension } from './tools/grounding-with-bing';
 import { MCPToolsExtension } from './tools/mcp-tools';
 import { OpenApiExtension } from './tools/open-api';
-import { ContextExtension } from './tools/show-context';
-import { SimpleInputExtension } from './tools/simple-input';
-import { UserArgsExtension } from './tools/user-args';
 import { WholeFilesExtension } from './tools/whole-files-conversation';
 
 const extensionClassSuffix = 'Extension';
@@ -106,7 +103,6 @@ export class ExtensionLibraryModule {
       imports: [ConfigModule, AuthModule, CqrsModule, TypeOrmModule.forFeature([CacheEntity, BucketEntity, FileEntity])],
       providers: [
         ...dynamicProviders,
-        Always42Extension,
         AzureAISearchExtension,
         AzureDallEExtension,
         AzureOpenAIModelExtension,
@@ -115,7 +111,6 @@ export class ExtensionLibraryModule {
         BingWebSearchExtension,
         BraveWebSearchExtension,
         CalculatorExtension,
-        ConfirmExtension,
         ContextExtension,
         CustomPromptExtension,
         DallEExtension,
@@ -133,7 +128,6 @@ export class ExtensionLibraryModule {
         OpenAICompatibleModelExtension,
         OpenAIModelExtension,
         OpenApiExtension,
-        SimpleInputExtension,
         SpeechToTextExtension,
         SummaryPromptExtension,
         UserArgsExtension,

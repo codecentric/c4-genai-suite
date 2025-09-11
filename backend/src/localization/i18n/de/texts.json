@@ -53,7 +53,7 @@
       "description": "OpenAI LLM-Integration für Reasoning-Modelle"
     },
     "langfuse": {
-      "title": "DEV: Langfuse",
+      "title": "Langfuse",
       "description": "Langfuse-Integration",
       "baseUrl": "Base url",
       "baseUrlHint": "Basis-URL von Langfuse (wenn self-hosted)",
@@ -65,7 +65,7 @@
       "description": "Mistral LLM-Integration"
     },
     "ollama": {
-      "title": "DEV: Ollama",
+      "title": "Ollama",
       "description": "Ollama LLM-Integration"
     },
     "openai": {
@@ -74,7 +74,7 @@
       "endpointHint": "Basis-URL des OpenAI-Endpunkts"
     },
     "openaiCompatible": {
-      "title": "DEV: OpenAI kompatibel",
+      "title": "OpenAI kompatibel",
       "description": "OpenAI-kompatible LLM-Integration"
     },
     "vertexai": {
@@ -93,10 +93,6 @@
       "title": "Summary Prompt",
       "description": "Definiert den Zusammenfassungs-Prompt, der für die Gesprächsbeschriftung verwendet wird.",
       "promptHint": "Verwende den {content}-Platzhalter für den tatsächlichen Verlauf."
-    },
-    "always42": {
-      "title": "DEV: Add 42",
-      "description": "Addiert immer 42 zur Summe von zwei Zahlen"
     },
     "azureSearch": {
       "title": "Azure AI Search",
@@ -123,10 +119,6 @@
       "title": "Duckduckgo Web Search",
       "description": "Führt eine Websuche mit Duckduckgo durch",
       "maxResults": "Anzahl der Suchergebnisse"
-    },
-    "confirm": {
-      "title": "DEV: Confirm",
-      "description": "Fragt nach Bestätigung"
     },
     "azureDalle": {
       "title": "Azure Dall-E",
@@ -193,21 +185,9 @@
       "endpointHint": "Endpunkt als URL.",
       "headersHint": "Ein Header pro Zeile als Schlüssel=Wert"
     },
-    "context": {
-      "title": "DEV: Contexts",
-      "description": "Zeigt den aktuellen Kontext"
-    },
-    "simpleInput": {
-      "title": "DEV: Simple Input",
-      "description": "Fragt nach einer Eingabe vom Benutzer"
-    },
     "speechToText": {
       "title": "Spracheingabe",
       "description": "Erlaubt Spracheingaben über ein Mikrofon-Icon"
-    },
-    "userArgs": {
-      "title": "DEV: User Args",
-      "description": "Zeigt die aktuellen Benutzerargumente"
     },
     "filesInConversation": {
       "title": "Suche in Dateien im Chat",
@@ -262,6 +242,26 @@
       "value": "Wert (Template)",
       "valueHint": "Wert, der beim Toolaufruf verwendet wird.",
       "errorToolCall": "Es ist ein Fehler aufgetreten beim Aufruf des Tools '{tool}'"
+    },
+    "always42": {
+      "title": "DEV: Add 42",
+      "description": "Addiert immer 42 zur Summe von zwei Zahlen"
+    },
+    "confirm": {
+      "title": "DEV: Confirm",
+      "description": "Fragt nach Bestätigung"
+    },
+    "context": {
+      "title": "DEV: Contexts",
+      "description": "Zeigt den aktuellen Kontext"
+    },
+    "userArgs": {
+      "title": "DEV: User Args",
+      "description": "Zeigt die aktuellen Benutzerargumente"
+    },
+    "simpleInput": {
+      "title": "DEV: Simple Input",
+      "description": "Fragt nach einer Eingabe vom Benutzer"
     }
   },
   "chat": {
