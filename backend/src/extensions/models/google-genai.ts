@@ -46,6 +46,7 @@ export class GoogleGenAIModelExtension implements Extension<VertexAIModelExtensi
           title: this.i18n.t('texts.extensions.common.temperature'),
           minimum: 0,
           maximum: 2,
+          default: 1,
           format: 'slider',
 
           description: this.i18n.t('texts.extensions.common.temperatureHint'),

@@ -55,6 +55,7 @@ export class BedrockModelExtension implements Extension<BedrockConverseExtension
           minimum: 0,
           maximum: 1,
           format: 'slider',
+          default: 0.5,
           description: this.i18n.t('texts.extensions.common.temperatureHint'),
         },
         topP: {
