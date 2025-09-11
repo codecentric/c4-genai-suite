@@ -2,7 +2,7 @@ import { Observable, Subscription } from 'rxjs';
 import { create } from 'zustand';
 import { AppClient, ConversationDto, FileDto, MessageDto, SourceDto, StreamEventDto } from 'src/api';
 import { DocumentSource } from '../../SourcesChunkPreview';
-import { ChatMessage } from '../types';
+import { ChatMessage, ReasoningStep } from '../types';
 
 type ChatData = {
   messages: ChatMessage[];
@@ -47,6 +47,10 @@ type ChatActions = {
     api: AppClient,
     editMessageId: number | undefined,
   ) => Observable<StreamEventDto>;
+
+  addReasoningStep: (chatId: number, messageId: number, step: ReasoningStep) => void;
+  updateReasoningStep: (chatId: number, messageId: number, stepId: string, update: Partial<ReasoningStep>) => void;
+  clearReasoning: (chatId: number, messageId: number) => void;
 
   setSelectedDocument: (document: DocumentSource | undefined) => void;
   setSelectedSource: (source: SourceDto | undefined) => void;
@@ -220,5 +224,66 @@ export const useChatStore = create<ChatState & ChatActions>()((set, get) => {
     setSelectedSource: (selectedSource) => {
       set({ selectedSource });
     },
+
+    addReasoningStep: (chatId, messageId, step) =>
+      set((state) => {
+        const chatData = state.chatDataMap.get(chatId);
+        if (!chatData) return state;
+
+        const messages = [...chatData.messages];
+        const messageIndex = messages.findIndex((msg) => msg.id === messageId);
+        if (messageIndex === -1) return state;
+
+        const message = messages[messageIndex];
+        const currentReasoning = message.reasoning || [];
+        const newReasoning = [...currentReasoning, step];
+
+        messages[messageIndex] = { ...message, reasoning: newReasoning };
+
+        const newMap = new Map(state.chatDataMap);
+        newMap.set(chatId, { ...chatData, messages });
+        return { chatDataMap: newMap };
+      }),
+
+    updateReasoningStep: (chatId, messageId, stepId, update) =>
+      set((state) => {
+        const chatData = state.chatDataMap.get(chatId);
+        if (!chatData) return state;
+
+        const messages = [...chatData.messages];
+        const messageIndex = messages.findIndex((msg) => msg.id === messageId);
+        if (messageIndex === -1) return state;
+
+        const message = messages[messageIndex];
+        const reasoning = message.reasoning || [];
+        const stepIndex = reasoning.findIndex((step) => step.id === stepId);
+        if (stepIndex === -1) return state;
+
+        const newReasoning = [...reasoning];
+        newReasoning[stepIndex] = { ...reasoning[stepIndex], ...update };
+
+        messages[messageIndex] = { ...message, reasoning: newReasoning };
+
+        const newMap = new Map(state.chatDataMap);
+        newMap.set(chatId, { ...chatData, messages });
+        return { chatDataMap: newMap };
+      }),
+
+    clearReasoning: (chatId, messageId) =>
+      set((state) => {
+        const chatData = state.chatDataMap.get(chatId);
+        if (!chatData) return state;
+
+        const messages = [...chatData.messages];
+        const messageIndex = messages.findIndex((msg) => msg.id === messageId);
+        if (messageIndex === -1) return state;
+
+        const message = messages[messageIndex];
+        messages[messageIndex] = { ...message, reasoning: [] };
+
+        const newMap = new Map(state.chatDataMap);
+        newMap.set(chatId, { ...chatData, messages });
+        return { chatDataMap: newMap };
+      }),
   };
 });

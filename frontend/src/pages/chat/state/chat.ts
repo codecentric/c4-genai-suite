@@ -14,6 +14,7 @@ import {
   useApi,
 } from 'src/api';
 import { texts } from 'src/texts';
+import { ReasoningStep } from './types';
 import { useChatStore } from './zustand/chatStore';
 import { useListOfChatsStore } from './zustand/listOfChatsStore';
 
@@ -285,5 +286,18 @@ export const useStateOfSelectedSource = () => {
   return {
     selectedSource,
     setSelectedSource,
+  };
+};
+
+export const useStateOfReasoning = (chatId: number, messageId: number) => {
+  const addReasoningStep = useChatStore((state) => state.addReasoningStep);
+  const updateReasoningStep = useChatStore((state) => state.updateReasoningStep);
+  const clearReasoning = useChatStore((state) => state.clearReasoning);
+
+  return {
+    addReasoningStep: (step: ReasoningStep) => addReasoningStep(chatId, messageId, step),
+    updateReasoningStep: (stepId: string, update: Partial<ReasoningStep>) =>
+      updateReasoningStep(chatId, messageId, stepId, update),
+    clearReasoning: () => clearReasoning(chatId, messageId),
   };
 };
