@@ -62,8 +62,8 @@ export function UsersPage() {
           <div className="flex gap-4">
             <Search value={query} onSearch={setQuery} />
 
-            <Button leftSection={<IconPlus />} onClick={() => setToCreate(true)}>
-              {texts.users.create}
+            <Button onClick={() => setToCreate(true)}>
+              <IconPlus className="mr-2" /> {texts.users.create}
             </Button>
           </div>
         </div>
