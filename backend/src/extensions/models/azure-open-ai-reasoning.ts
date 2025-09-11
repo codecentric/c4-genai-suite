@@ -1,4 +1,5 @@
 import { CallbackHandlerMethods } from '@langchain/core/callbacks/base';
+import { LLMResult } from '@langchain/core/outputs';
 import { AzureChatOpenAI } from '@langchain/openai';
 import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from 'src/domain/chat';
 import { Extension, ExtensionConfiguration, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions';
@@ -65,7 +66,29 @@ export class AzureOpenAIReasoningModelExtension implements Extension<AzureOpenAI
       invoke: async (context: ChatContext, getContext: GetContext, next: ChatNextDelegate): Promise<any> => {
         context.llms[this.spec.name] = await context.cache.get(this.spec.name, extension.values, () => {
           // The model does not provide the token usage, therefore estimate it.
-          const callbacks = [getEstimatedUsageCallback('azure-open-ai-reasoning', extension.values.deploymentName, getContext)];
+          const callbacks = [
+            getEstimatedUsageCallback('azure-open-ai-reasoning', extension.values.deploymentName, getContext),
+            // Custom callback to capture thinking responses
+            {
+              handleLLMStart: () => {
+                const currentContext = getContext();
+                if (currentContext?.result) {
+                  currentContext.result.next({ type: 'thinking', content: '', thinking_type: 'start' });
+                }
+              },
+              handleLLMEnd: (output: LLMResult) => {
+                const currentContext = getContext();
+                if (currentContext?.result) {
+                  // Check if the output contains reasoning information
+                  const reasoning = output?.generations?.[0]?.[0]?.generationInfo?.reasoning;
+                  if (reasoning) {
+                    currentContext.result.next({ type: 'thinking', content: reasoning, thinking_type: 'content' });
+                  }
+                  currentContext.result.next({ type: 'thinking', content: '', thinking_type: 'end' });
+                }
+              },
+            },
+          ];
 
           // Stream the result token by token to the frontend.
           return this.createModel(extension.values, callbacks, true);

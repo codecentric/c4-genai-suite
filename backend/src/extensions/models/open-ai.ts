@@ -1,4 +1,5 @@
 import { CallbackHandlerMethods } from '@langchain/core/callbacks/base';
+import { LLMResult } from '@langchain/core/outputs';
 import { ChatOpenAI } from '@langchain/openai';
 import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from 'src/domain/chat';
 import { Extension, ExtensionConfiguration, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions';
@@ -82,7 +83,7 @@ export class OpenAIModelExtension implements Extension<OpenAIModelExtensionConfi
         context.llms[this.spec.name] = await context.cache.get(this.spec.name, extension.values, () => {
           const callbacks: CallbackHandlerMethods[] = [
             {
-              handleLLMEnd: (output) => {
+              handleLLMEnd: (output: LLMResult) => {
                 // Do not capture the context to make this class cacheable if needed.
                 const context = getContext();
 
@@ -99,6 +100,27 @@ export class OpenAIModelExtension implements Extension<OpenAIModelExtensionConfi
 
                 if (tokenCount > 0) {
                   context.tokenUsage = { tokenCount, model: extension.values.modelName, llm: 'open-ai' };
+                }
+
+                // Check if the output contains reasoning information
+                const reasoning = output?.generations?.[0]?.[0]?.generationInfo?.reasoning;
+                if (reasoning) {
+                  context.result.next({ type: 'thinking', content: reasoning, thinking_type: 'content' });
+                }
+              },
+            },
+            // Additional callback specifically for thinking responses
+            {
+              handleLLMStart: () => {
+                const currentContext = getContext();
+                if (currentContext?.result) {
+                  currentContext.result.next({ type: 'thinking', content: '', thinking_type: 'start' });
+                }
+              },
+              handleLLMEnd: (output: LLMResult) => {
+                const currentContext = getContext();
+                if (currentContext?.result) {
+                  currentContext.result.next({ type: 'thinking', content: '', thinking_type: 'end' });
                 }
               },
             },

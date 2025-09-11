@@ -1,3 +1,5 @@
+import { CallbackHandlerMethods } from '@langchain/core/callbacks/base';
+import { LLMResult } from '@langchain/core/outputs';
 import { ChatOpenAI } from '@langchain/openai';
 import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from 'src/domain/chat';
 import { Extension, ExtensionConfiguration, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions';
@@ -84,7 +86,30 @@ export class OpenAICompatibleModelExtension implements Extension<OpenAICompatibl
     const middleware = {
       invoke: async (context: ChatContext, getContext: GetContext, next: ChatNextDelegate): Promise<any> => {
         context.llms[this.spec.name] = await context.cache.get(this.spec.name, extension.values, () => {
-          return this.createModel(extension.values, true);
+          // Add callbacks to capture thinking responses
+          const callbacks: CallbackHandlerMethods[] = [
+            {
+              handleLLMStart: () => {
+                const currentContext = getContext();
+                if (currentContext?.result) {
+                  currentContext.result.next({ type: 'thinking', content: '', thinking_type: 'start' });
+                }
+              },
+              handleLLMEnd: (output: LLMResult) => {
+                const currentContext = getContext();
+                if (currentContext?.result) {
+                  // Check if the output contains reasoning information
+                  const reasoning = output?.generations?.[0]?.[0]?.generationInfo?.reasoning;
+                  if (reasoning) {
+                    currentContext.result.next({ type: 'thinking', content: reasoning, thinking_type: 'content' });
+                  }
+                  currentContext.result.next({ type: 'thinking', content: '', thinking_type: 'end' });
+                }
+              },
+            },
+          ];
+
+          return this.createModel(extension.values, callbacks, true);
         });
 
         return next(context);
@@ -94,10 +119,15 @@ export class OpenAICompatibleModelExtension implements Extension<OpenAICompatibl
     return Promise.resolve([middleware]);
   }
 
-  private createModel(configuration: OpenAICompatibleModelExtensionConfiguration, streaming = false) {
+  private createModel(
+    configuration: OpenAICompatibleModelExtensionConfiguration,
+    callbacks?: CallbackHandlerMethods[],
+    streaming = false,
+  ) {
     const { apiKey, baseUrl, modelName, frequencyPenalty, presencePenalty, temperature, effort } = configuration;
 
     return new ChatOpenAI({
+      callbacks,
       frequencyPenalty,
       modelName,
       openAIApiKey: apiKey,

@@ -121,6 +121,20 @@ export class ExecuteMiddleware implements ChatMiddleware {
       } else if (hasBeenStarted && eventType === 'on_llm_stream' && !hasChainStream) {
         hasLlmStream = true;
         const chunk = event.data?.chunk as ChatGenerationChunk;
+
+        // Check for thinking content in reasoning models - multiple potential locations
+        if (chunk?.generationInfo?.reasoning) {
+          result.next({ type: 'thinking', content: chunk.generationInfo.reasoning, thinking_type: 'content' });
+        } else if ((chunk as any)?.reasoning) {
+          result.next({ type: 'thinking', content: (chunk as any).reasoning, thinking_type: 'content' });
+        } else if (chunk?.text && chunk.text.includes('<thinking>')) {
+          // Extract thinking content if it's embedded in text
+          const thinkingMatch = chunk.text.match(/<thinking>(.*?)<\/thinking>/s);
+          if (thinkingMatch) {
+            result.next({ type: 'thinking', content: thinkingMatch[1], thinking_type: 'content' });
+          }
+        }
+
         const content = normalizedMessageContent(chunk);
 
         // Content can either be a string or an array of objects.
@@ -131,6 +145,20 @@ export class ExecuteMiddleware implements ChatMiddleware {
       } else if (hasBeenStarted && eventType === 'on_chain_stream' && !hasLlmStream) {
         hasChainStream = true;
         const chunk = event.data?.chunk as ChatGenerationChunk;
+
+        // Check for thinking content in reasoning models for chain stream - multiple potential locations
+        if (chunk?.generationInfo?.reasoning) {
+          result.next({ type: 'thinking', content: chunk.generationInfo.reasoning, thinking_type: 'content' });
+        } else if ((chunk as any)?.reasoning) {
+          result.next({ type: 'thinking', content: (chunk as any).reasoning, thinking_type: 'content' });
+        } else if (chunk?.text && chunk.text.includes('<thinking>')) {
+          // Extract thinking content if it's embedded in text
+          const thinkingMatch = chunk.text.match(/<thinking>(.*?)<\/thinking>/s);
+          if (thinkingMatch) {
+            result.next({ type: 'thinking', content: thinkingMatch[1], thinking_type: 'content' });
+          }
+        }
+
         const content = normalizedMessageContent(chunk);
 
         // Content can either be a string or an array of objects.

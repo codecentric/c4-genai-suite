@@ -9,6 +9,7 @@ import { useStateOfIsAiWriting } from '../../state/chat';
 import { ChatItemDebug } from '../ChatItemDebug';
 import { ChatItemLogging } from '../ChatItemLogging';
 import ChatItemSources from '../ChatItemSources';
+import { ChatItemThinking } from '../ChatItemThinking';
 import { ChatItemTools } from '../ChatItemTools';
 import { AIChatItemActions } from './AIChatItemActions';
 import { AiAvatar } from './AiAvatar';
@@ -49,6 +50,7 @@ export const AIChatItem = ({ agentName, message, isLast, selectDocument }: ChatI
       </div>
       {message.error && <Alert text={message.error} className="mt-1" />}
       <ChatItemTools tools={message.toolsInUse || {}} />
+      <ChatItemThinking thinking={message.thinking} isThinking={message.isThinking} />
       {message.ui && <ChatItemUserInput key={message.ui.id} request={message.ui} />}
       <Markdown animateText={isLast && newReply} className="box-border max-w-full">
         {textContent}

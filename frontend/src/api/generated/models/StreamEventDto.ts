@@ -62,6 +62,13 @@ import {
     StreamSummaryDtoFromJSONTyped,
     StreamSummaryDtoToJSON,
 } from './StreamSummaryDto';
+import type { StreamThinkingEventDto } from './StreamThinkingEventDto';
+import {
+    instanceOfStreamThinkingEventDto,
+    StreamThinkingEventDtoFromJSON,
+    StreamThinkingEventDtoFromJSONTyped,
+    StreamThinkingEventDtoToJSON,
+} from './StreamThinkingEventDto';
 import type { StreamTokenEventDto } from './StreamTokenEventDto';
 import {
     instanceOfStreamTokenEventDto,
@@ -96,7 +103,7 @@ import {
  * 
  * @export
  */
-export type StreamEventDto = { type: 'chunk' } & StreamTokenEventDto | { type: 'completed' } & StreamCompletedEventDto | { type: 'debug' } & StreamDebugEvent | { type: 'error' } & StreamErrorEventDto | { type: 'logging' } & StreamLoggingEvent | { type: 'saved' } & StreamMessageSavedDto | { type: 'sources' } & StreamSourcesEvent | { type: 'summary' } & StreamSummaryDto | { type: 'tool_end' } & StreamToolEndEventDto | { type: 'tool_start' } & StreamToolStartEventDto | { type: 'ui' } & StreamUIEventDto;
+export type StreamEventDto = { type: 'chunk' } & StreamTokenEventDto | { type: 'completed' } & StreamCompletedEventDto | { type: 'debug' } & StreamDebugEvent | { type: 'error' } & StreamErrorEventDto | { type: 'logging' } & StreamLoggingEvent | { type: 'saved' } & StreamMessageSavedDto | { type: 'sources' } & StreamSourcesEvent | { type: 'summary' } & StreamSummaryDto | { type: 'thinking' } & StreamThinkingEventDto | { type: 'tool_end' } & StreamToolEndEventDto | { type: 'tool_start' } & StreamToolStartEventDto | { type: 'ui' } & StreamUIEventDto;
 
 export function StreamEventDtoFromJSON(json: any): StreamEventDto {
     return StreamEventDtoFromJSONTyped(json, false);
@@ -123,6 +130,8 @@ export function StreamEventDtoFromJSONTyped(json: any, ignoreDiscriminator: bool
             return Object.assign({}, StreamSourcesEventFromJSONTyped(json, true), { type: 'sources' } as const);
         case 'summary':
             return Object.assign({}, StreamSummaryDtoFromJSONTyped(json, true), { type: 'summary' } as const);
+        case 'thinking':
+            return Object.assign({}, StreamThinkingEventDtoFromJSONTyped(json, true), { type: 'thinking' } as const);
         case 'tool_end':
             return Object.assign({}, StreamToolEndEventDtoFromJSONTyped(json, true), { type: 'tool_end' } as const);
         case 'tool_start':
@@ -155,6 +164,8 @@ export function StreamEventDtoToJSON(value?: StreamEventDto | null): any {
             return StreamSourcesEventToJSON(value);
         case 'summary':
             return StreamSummaryDtoToJSON(value);
+        case 'thinking':
+            return StreamThinkingEventDtoToJSON(value);
         case 'tool_end':
             return StreamToolEndEventDtoToJSON(value);
         case 'tool_start':

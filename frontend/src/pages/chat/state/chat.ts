@@ -124,6 +124,16 @@ export const useChatStream = (chatId: number) => {
             if (chunk.type === 'image_url') chatStore.appendToStreamingMessage(chatId, `![image](${chunk.image.url})`);
             return;
           }
+          case 'thinking':
+            return chatStore.updateMessage(chatId, actualAiMessageId, (oldMessage) => ({
+              thinking:
+                msg.thinkingType === 'start'
+                  ? msg.content
+                  : msg.thinkingType === 'content'
+                    ? (oldMessage.thinking || '') + msg.content
+                    : oldMessage.thinking || '',
+              isThinking: msg.thinkingType !== 'end',
+            }));
           case 'tool_start':
             return chatStore.updateMessage(chatId, actualAiMessageId, (oldMessage) => ({
               toolsInUse: { ...oldMessage.toolsInUse, [msg.tool.name]: 'Started' },

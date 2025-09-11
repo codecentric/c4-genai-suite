@@ -1640,6 +1640,19 @@
         },
         "required": ["content", "type"]
       },
+      "StreamThinkingEventDto": {
+        "type": "object",
+        "properties": {
+          "content": { "type": "string", "description": "The thinking content." },
+          "thinking_type": {
+            "type": "string",
+            "description": "The type of thinking content.",
+            "enum": ["start", "content", "end"]
+          },
+          "type": { "type": "string", "enum": ["thinking"] }
+        },
+        "required": ["content", "thinking_type", "type"]
+      },
       "StreamEventHolderDto": {
         "type": "object",
         "properties": {
@@ -1656,7 +1669,8 @@
               { "$ref": "#/components/schemas/StreamTokenEventDto" },
               { "$ref": "#/components/schemas/StreamToolEndEventDto" },
               { "$ref": "#/components/schemas/StreamToolStartEventDto" },
-              { "$ref": "#/components/schemas/StreamUIEventDto" }
+              { "$ref": "#/components/schemas/StreamUIEventDto" },
+              { "$ref": "#/components/schemas/StreamThinkingEventDto" }
             ],
             "discriminator": {
               "propertyName": "type",
@@ -1671,7 +1685,8 @@
                 "chunk": "#/components/schemas/StreamTokenEventDto",
                 "tool_end": "#/components/schemas/StreamToolEndEventDto",
                 "tool_start": "#/components/schemas/StreamToolStartEventDto",
-                "ui": "#/components/schemas/StreamUIEventDto"
+                "ui": "#/components/schemas/StreamUIEventDto",
+                "thinking": "#/components/schemas/StreamThinkingEventDto"
               }
             }
           }
