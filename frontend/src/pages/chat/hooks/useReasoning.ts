@@ -24,12 +24,13 @@ export const useReasoning = (chatId: number, messageId: number) => {
   }, [clearReasoning]);
 
   const createReasoningStep = useCallback(
-    (title: string, content: string, status: ReasoningStep['status'] = 'pending'): ReasoningStep => ({
-      id: `reasoning-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+    (title: string, content: string, status: ReasoningStep['status'] = 'pending', tokens?: string): ReasoningStep => ({
+      id: `reasoning-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
       title,
       content,
-      timestamp: new Date(),
       status,
+      timestamp: new Date(),
+      tokens,
     }),
     [],
   );

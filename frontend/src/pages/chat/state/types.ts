@@ -6,6 +6,7 @@ export interface ReasoningStep {
   content: string;
   timestamp: Date;
   status: 'pending' | 'in-progress' | 'completed' | 'error';
+  tokens?: string; // Raw reasoning tokens during processing
 }
 
 type MessageMetaInfoState = {

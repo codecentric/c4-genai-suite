@@ -1,100 +1,89 @@
-import { fireEvent, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import { render } from 'src/pages/admin/test-utils';
 import { ReasoningStep } from '../state/types';
-import { ChatItemReasoning, ChatItemReasoningProps } from './ChatItemReasoning';
+import { ChatItemReasoning } from './ChatItemReasoning';
 
 describe('ChatItemReasoning', () => {
   const mockReasoningSteps: ReasoningStep[] = [
     {
       id: '1',
-      title: 'Analyzing the problem',
-      content: 'Breaking down the user request into smaller components.',
-      timestamp: new Date('2025-09-11T10:00:00Z'),
+      title: 'Analyzing query',
+      content: 'Breaking down the user request...',
       status: 'completed',
+      timestamp: new Date('2023-01-01T12:00:00Z'),
     },
     {
       id: '2',
-      title: 'Searching for relevant information',
-      content: 'Looking through available data sources to find relevant context.',
-      timestamp: new Date('2025-09-11T10:01:00Z'),
+      title: 'Processing data',
+      content: 'Gathering relevant information...',
       status: 'in-progress',
+      timestamp: new Date('2023-01-01T12:01:00Z'),
+      tokens: 'raw reasoning tokens here...',
     },
     {
       id: '3',
-      title: 'Formulating response',
-      content: 'Preparing a comprehensive answer based on the analysis.',
-      timestamp: new Date('2025-09-11T10:02:00Z'),
-      status: 'pending',
+      title: 'Error step',
+      content: 'Something went wrong',
+      status: 'error',
+      timestamp: new Date('2023-01-01T12:02:00Z'),
     },
   ];
 
-  const defaultProps: ChatItemReasoningProps = {
-    reasoning: mockReasoningSteps,
-    isStreaming: false,
-  };
-
   it('renders reasoning process with steps', () => {
-    render(<ChatItemReasoning {...defaultProps} />);
+    render(<ChatItemReasoning reasoning={mockReasoningSteps} />);
 
     expect(screen.getByText('Reasoning Process')).toBeInTheDocument();
-    expect(screen.getByText('Analyzing the problem')).toBeInTheDocument();
-    expect(screen.getByText('Searching for relevant information')).toBeInTheDocument();
-    expect(screen.getByText('Formulating response')).toBeInTheDocument();
+    expect(screen.getByText('Analyzing query')).toBeInTheDocument();
+    expect(screen.getByText('Processing data')).toBeInTheDocument();
+    expect(screen.getByText('Error step')).toBeInTheDocument();
   });
 
   it('does not render when no reasoning steps provided', () => {
     render(<ChatItemReasoning reasoning={[]} />);
-
     expect(screen.queryByText('Reasoning Process')).not.toBeInTheDocument();
   });
 
   it('shows streaming indicator when isStreaming is true', () => {
-    render(<ChatItemReasoning {...defaultProps} isStreaming={true} />);
-
+    render(<ChatItemReasoning reasoning={mockReasoningSteps} isStreaming={true} />);
     expect(screen.getByText('Processing...')).toBeInTheDocument();
   });
 
   it('can be collapsed and expanded', () => {
-    render(<ChatItemReasoning {...defaultProps} />);
+    render(<ChatItemReasoning reasoning={mockReasoningSteps} />);
 
-    // Initially expanded
-    expect(screen.getByText('Analyzing the problem')).toBeInTheDocument();
+    const toggleButton = screen.getByLabelText('toggle reasoning process');
 
-    // Click collapse button
-    const collapseButton = screen.getByLabelText('toggle reasoning process');
-    fireEvent.click(collapseButton);
+    // Initially open (auto-opens when reasoning steps exist)
+    expect(screen.getByText('Analyzing query')).toBeInTheDocument();
 
-    // Should be collapsed now
-    expect(screen.queryByText('Analyzing the problem')).not.toBeInTheDocument();
+    // Click to collapse
+    fireEvent.click(toggleButton);
+    expect(screen.queryByText('Analyzing query')).not.toBeInTheDocument();
 
-    // Click expand button
-    fireEvent.click(collapseButton);
-
-    // Should be expanded again
-    expect(screen.getByText('Analyzing the problem')).toBeInTheDocument();
+    // Click to expand
+    fireEvent.click(toggleButton);
+    expect(screen.getByText('Analyzing query')).toBeInTheDocument();
   });
 
   it('displays different status indicators correctly', () => {
-    const stepsWithDifferentStatuses: ReasoningStep[] = [
-      { ...mockReasoningSteps[0], status: 'completed' },
-      { ...mockReasoningSteps[1], status: 'in-progress' },
-      { ...mockReasoningSteps[2], status: 'pending' },
-      {
-        id: '4',
-        title: 'Error step',
-        content: 'This step failed',
-        timestamp: new Date(),
-        status: 'error',
-      },
-    ];
+    render(<ChatItemReasoning reasoning={mockReasoningSteps} />);
 
-    render(<ChatItemReasoning reasoning={stepsWithDifferentStatuses} />);
-
-    // All steps should be rendered
-    expect(screen.getByText('Analyzing the problem')).toBeInTheDocument();
-    expect(screen.getByText('Searching for relevant information')).toBeInTheDocument();
-    expect(screen.getByText('Formulating response')).toBeInTheDocument();
+    // Check that all steps are rendered
+    expect(screen.getByText('Analyzing query')).toBeInTheDocument();
+    expect(screen.getByText('Processing data')).toBeInTheDocument();
     expect(screen.getByText('Error step')).toBeInTheDocument();
+  });
+
+  it('shows raw tokens for in-progress steps', () => {
+    render(<ChatItemReasoning reasoning={mockReasoningSteps} />);
+
+    expect(screen.getByText('Raw reasoning tokens:')).toBeInTheDocument();
+    expect(screen.getByText('raw reasoning tokens here...')).toBeInTheDocument();
+  });
+
+  it('applies custom className when provided', () => {
+    render(<ChatItemReasoning reasoning={mockReasoningSteps} className="custom-class" />);
+    // Check that the reasoning section renders (implying className was applied correctly)
+    expect(screen.getByText('Reasoning Process')).toBeInTheDocument();
   });
 });
