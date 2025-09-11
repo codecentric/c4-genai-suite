@@ -35,6 +35,20 @@ export class GPTImage1Extension implements Extension<GPTImage1ExtensionConfigura
           format: 'password',
           description: 'Your OpenAI API key.',
         },
+        quality: {
+          type: 'string',
+          title: 'Quality',
+          required: false,
+          format: 'select',
+          enum: ['auto', 'high', 'medium', 'low'],
+        },
+        size: {
+          type: 'string',
+          title: 'Size',
+          required: false,
+          format: 'select',
+          enum: ['auto', '1024x1024', '1536x1024', '1024x1536'],
+        },
       },
     };
   }
@@ -42,10 +56,11 @@ export class GPTImage1Extension implements Extension<GPTImage1ExtensionConfigura
   async getMiddlewares(user: User, extension: ExtensionEntity<GPTImage1ExtensionConfiguration>): Promise<ChatMiddleware[]> {
     const middleware = {
       invoke: async (context: ChatContext, getContext: GetContext, next: ChatNextDelegate): Promise<any> => {
-        /*const tool = await context.cache.get(this.spec.name, configuration, () => {
-          return Promise.resolve(new InternalTool(this.authService, this.commandBus, this.spec, configuration));
-        });*/
-        context.tools.push(new InternalTool(this.authService, this.commandBus, this.spec, extension.values));
+        const tool = await context.cache.get(this.spec.name, extension.values, () => {
+          const client = this.createGptImageClient(extension.values);
+          return Promise.resolve(new InternalTool(this.authService, client, this.commandBus, this.spec, extension.values));
+        });
+        context.tools.push(tool);
 
         return next(context);
       },
@@ -53,16 +68,20 @@ export class GPTImage1Extension implements Extension<GPTImage1ExtensionConfigura
 
     return Promise.resolve([middleware]);
   }
+
+  protected createGptImageClient(configuration: GPTImage1ExtensionConfiguration) {
+    return new OpenAI({
+      apiKey: configuration.apiKey,
+    });
+  }
 }
 
 class InternalTool extends Tool {
   readonly name: string;
   readonly description =
     'A tool to generate images from a prompt using GPT-Image-1. It returns a link to an image. Show the image to the user by using Markdown to embed the image into your response, like `![alttext](link/from/the/response)`.';
-  readonly displayName: string;
   readonly returnDirect = false;
   private readonly logger = new Logger(InternalTool.name);
-  private readonly apiKey: string;
 
   get lc_id() {
     return [...this.lc_namespace, this.name];
@@ -70,69 +89,44 @@ class InternalTool extends Tool {
 
   constructor(
     private readonly authService: AuthService,
+    private readonly client: OpenAI,
     private readonly commandBus: CommandBus,
     spec: ExtensionSpec,
-    configuration: GPTImage1ExtensionConfiguration,
+    private readonly configuration: GPTImage1ExtensionConfiguration,
   ) {
     super();
     this.name = spec.name;
-    this.displayName = spec.title;
-    this.apiKey = configuration.apiKey;
   }
 
   protected async _call(prompt: string): Promise<string> {
     try {
-      const client = new OpenAI({
-        apiKey: this.apiKey,
-      });
-
-      // Generate the image
-      const response = await client.images.generate({
+      const response = await this.client.images.generate({
         model: 'gpt-image-1',
         prompt: prompt,
         n: 1,
-        size: '1024x1024',
+        size: this.configuration.size,
       });
 
-      this.logger.debug('OpenAI API response:', JSON.stringify(response, null, 2));
-
-      // Check for both possible response formats
       const imageData = response?.data?.[0];
+
       if (!imageData) {
         throw new Error('No image data received from OpenAI');
       }
 
-      // Try to get the image URL or base64 data
-      const imageUrl = imageData.url || (imageData.b64_json ? `data:image/png;base64,${imageData.b64_json}` : null);
-
-      if (!imageUrl) {
-        throw new Error('No image URL or b64_json data received from OpenAI');
-      }
-
-      // Handle the image data
+      const id = uuid.v4();
+      const contentType = response.output_format || 'png';
       let imageBuffer: Buffer;
-      let contentType = 'image/png';
+      let fileName;
 
       if (imageData.b64_json) {
-        // Handle base64 encoded response
         imageBuffer = Buffer.from(imageData.b64_json, 'base64');
-      } else if (imageData.url) {
-        // Handle URL response by downloading the image
-        const imageResponse = await fetch(imageData.url);
-        if (!imageResponse.ok) {
-          throw new Error(`Failed to download image: ${imageResponse.statusText}`);
-        }
-        imageBuffer = Buffer.from(await imageResponse.arrayBuffer());
-        contentType = imageResponse.headers.get('content-type') || contentType;
+        fileName = `${id}.${contentType}`;
       } else {
         throw new Error('No valid image data format received from OpenAI');
       }
 
-      const id = uuid.v4();
-
-      // Upload the image to our blob storage
       await this.commandBus.execute(
-        new UploadBlob(id, imageBuffer, contentType, `generated-image-${id}.png`, imageBuffer.length, BlobCategory.LLM_IMAGE),
+        new UploadBlob(id, imageBuffer, contentType, fileName, imageBuffer.length, BlobCategory.LLM_IMAGE),
       );
 
       return `${this.authService.config.baseUrl}/blobs/${id}`;
@@ -147,6 +141,8 @@ class InternalTool extends Tool {
   }
 }
 
-class GPTImage1ExtensionConfiguration implements ExtensionConfiguration {
-  apiKey!: string;
-}
+export type GPTImage1ExtensionConfiguration = ExtensionConfiguration & {
+  apiKey: string;
+  quality: 'auto' | 'high' | 'medium' | 'low';
+  size: 'auto' | '1024x1024' | '1536x1024' | '1024x1536';
+};

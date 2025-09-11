@@ -26,6 +26,7 @@ import { SpeechToTextExtension } from './other/speech-to-text';
 import { SummaryPromptExtension } from './other/summary';
 import { AzureAISearchExtension } from './tools/azure-ai-search';
 import { AzureDallEExtension } from './tools/azure-dall-e';
+import { AzureGPTImage1Extension } from './tools/azure-gpt-image-1';
 import { BingWebSearchExtension } from './tools/bing-web-search';
 import { BraveWebSearchExtension } from './tools/brave-web-search';
 import { CalculatorExtension } from './tools/calculator';
@@ -106,6 +107,7 @@ export class ExtensionLibraryModule {
         ...dynamicProviders,
         AzureAISearchExtension,
         AzureDallEExtension,
+        AzureGPTImage1Extension,
         AzureOpenAIModelExtension,
         AzureOpenAIReasoningModelExtension,
         BedrockModelExtension,
