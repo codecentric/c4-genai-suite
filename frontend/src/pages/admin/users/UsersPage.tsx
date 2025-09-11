@@ -3,7 +3,7 @@ import { IconPlus } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { useApi, UserDto, UserGroupDto } from 'src/api';
-import { Page, Pagingation, Search } from 'src/components';
+import { Page, Pagination, Search } from 'src/components';
 import { useEventCallback } from 'src/hooks';
 import { formatBoolean } from 'src/lib';
 import { texts } from 'src/texts';
@@ -99,7 +99,7 @@ export function UsersPage() {
               </tbody>
             </table>
 
-            <Pagingation page={page} pageSize={20} total={loadedUsers?.total || 0} onPage={doChangePage} />
+            <Pagination page={page} pageSize={20} total={loadedUsers?.total || 0} onPage={doChangePage} />
           </div>
         </div>
       </Page>

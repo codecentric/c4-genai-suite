@@ -14,7 +14,7 @@ interface PaginationProps {
   onPage: (page: number) => void;
 }
 
-export function Pagingation(props: PaginationProps) {
+export function Pagination(props: PaginationProps) {
   const { onPage, page, pageSize, total } = props;
 
   const numberOfPages = Math.ceil(total / pageSize);
