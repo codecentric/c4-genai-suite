@@ -34,6 +34,7 @@ import { DuckduckgoWebSearchExtension } from './tools/duckduckgo-web-search';
 import { FilesExtension } from './tools/files';
 import { FilesConversationExtension } from './tools/files-conversation';
 import { FilesVisionExtension } from './tools/files-vision';
+import { GPTImage1Extension } from './tools/gpt-image-1';
 import { GroundingWithBingSearchExtension } from './tools/grounding-with-bing';
 import { MCPToolsExtension } from './tools/mcp-tools';
 import { OpenApiExtension } from './tools/open-api';
@@ -119,6 +120,7 @@ export class ExtensionLibraryModule {
         FilesExtension,
         FilesVisionExtension,
         GoogleGenAIModelExtension,
+        GPTImage1Extension,
         GroundingWithBingSearchExtension,
         HubPromptExtension,
         LangfuseExtension,
