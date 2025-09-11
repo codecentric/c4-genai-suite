@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { toast } from 'react-toastify';
 import { type ExtensionBucketSettingsDto, FileDto, useApi } from 'src/api';
-import { Pagingation } from 'src/components';
+import { Pagination } from 'src/components';
 import { useTypedMutationStates } from 'src/hooks';
 import { useConversationBucketAvailabilities } from 'src/hooks/api/extensions';
 import { buildError } from 'src/lib';
@@ -123,7 +123,7 @@ export function Files({ conversationId, userBucket, configurationId }: FileProps
           {isDragActive ? <p>{texts.common.dropZoneDrop}</p> : <p>{texts.common.dropZone}</p>}
         </div>
 
-        <Pagingation page={page} pageSize={pageSize} total={total} onPage={setPage} />
+        <Pagination page={page} pageSize={pageSize} total={total} onPage={setPage} />
       </div>
       {loadedFiles && loadedFiles.items?.length > 0 ? (
         <div className="flex justify-between gap-2 pb-2">
