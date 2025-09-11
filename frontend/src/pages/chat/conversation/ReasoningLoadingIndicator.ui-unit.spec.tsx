@@ -9,17 +9,17 @@ describe('ReasoningLoadingIndicator', () => {
   it('renders simple loading indicator by default', () => {
     render(<ReasoningLoadingIndicator {...defaultProps} />);
 
-    expect(screen.getByText('Analyzing your request...')).toBeInTheDocument();
+    expect(screen.getByText('Thinking')).toBeInTheDocument();
   });
 
-  it('shows current step when provided', () => {
-    render(<ReasoningLoadingIndicator currentStep="Understanding the problem" />);
+  it('shows current step when provided in detailed mode', () => {
+    render(<ReasoningLoadingIndicator currentStep="Understanding the problem" detailed={true} />);
 
-    expect(screen.getByText('Processing: Understanding the problem')).toBeInTheDocument();
+    expect(screen.getByText('Understanding the problem')).toBeInTheDocument();
   });
 
-  it('shows custom message when provided', () => {
-    render(<ReasoningLoadingIndicator message="Custom loading message" />);
+  it('shows custom message when provided in detailed mode', () => {
+    render(<ReasoningLoadingIndicator message="Custom loading message" detailed={true} />);
 
     expect(screen.getByText('Custom loading message')).toBeInTheDocument();
   });
@@ -28,7 +28,7 @@ describe('ReasoningLoadingIndicator', () => {
     render(<ReasoningLoadingIndicator detailed={true} />);
 
     expect(screen.getByText('Reasoning in Progress')).toBeInTheDocument();
-    expect(screen.getByText('Thinking')).toBeInTheDocument();
+    expect(screen.getByText('AI is analyzing your request...')).toBeInTheDocument();
   });
 
   it('shows progress when provided in detailed mode', () => {
@@ -40,7 +40,7 @@ describe('ReasoningLoadingIndicator', () => {
   it('shows current step and progress in detailed mode', () => {
     render(<ReasoningLoadingIndicator detailed={true} currentStep="Analyzing data" progress={50} />);
 
-    expect(screen.getByText('Processing: Analyzing data')).toBeInTheDocument();
+    expect(screen.getByText('Analyzing data')).toBeInTheDocument();
     expect(screen.getByText('50%')).toBeInTheDocument();
   });
 });
