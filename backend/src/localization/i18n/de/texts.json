@@ -262,6 +262,16 @@
     "simpleInput": {
       "title": "DEV: Simple Input",
       "description": "Fragt nach einer Eingabe vom Benutzer"
+    },
+    "gpt-image-1": {
+      "title": "GPT-Image-1",
+      "description": "Bilder mit OpenAI gpt-image-1 generieren.",
+      "quality": "Qualität",
+      "size": "Größe"
+    },
+    "azure-gpt-image-1": {
+      "title": "Azure GPT-Image-1",
+      "description": "Bilder mit Azure OpenAI gpt-image-1 generieren."
     }
   },
   "chat": {
