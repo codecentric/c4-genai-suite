@@ -5,6 +5,9 @@ import { Extension, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions
 import { User } from 'src/domain/users';
 import { I18nService } from '../../localization/i18n.service';
 
+/**
+ * This
+ */
 @Extension()
 export class SimpleInputExtension implements Extension {
   constructor(private readonly i18n: I18nService) {}
