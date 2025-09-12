@@ -475,6 +475,28 @@ export class StreamSummaryDto {
   type!: typeof StreamSummaryDto.TYPE_NAME;
 }
 
+export class StreamThinkingEventDto {
+  static TYPE_NAME = 'thinking';
+
+  @ApiProperty({
+    description: 'The thinking content.',
+    required: true,
+  })
+  content!: string;
+
+  @ApiProperty({
+    description: 'The type of thinking content.',
+    required: true,
+    enum: ['start', 'content', 'end'],
+  })
+  thinking_type!: 'start' | 'content' | 'end';
+
+  @ApiProperty({
+    enum: [StreamThinkingEventDto.TYPE_NAME],
+  })
+  type!: typeof StreamThinkingEventDto.TYPE_NAME;
+}
+
 export class StreamDebugEvent {
   static TYPE_NAME = 'debug';
 
@@ -566,6 +588,7 @@ export class StreamCompletedEventDto {
   StreamToolStartEventDto,
   StreamUIEventDto,
   StreamSummaryDto,
+  StreamThinkingEventDto,
 )
 export class StreamEventHolderDto {
   @ApiProperty({
@@ -582,6 +605,7 @@ export class StreamEventHolderDto {
       { $ref: getSchemaPath(StreamToolEndEventDto) },
       { $ref: getSchemaPath(StreamToolStartEventDto) },
       { $ref: getSchemaPath(StreamUIEventDto) },
+      { $ref: getSchemaPath(StreamThinkingEventDto) },
     ],
     discriminator: {
       propertyName: 'type',
@@ -597,6 +621,7 @@ export class StreamEventHolderDto {
         [StreamToolEndEventDto.TYPE_NAME]: getSchemaPath(StreamToolEndEventDto),
         [StreamToolStartEventDto.TYPE_NAME]: getSchemaPath(StreamToolStartEventDto),
         [StreamUIEventDto.TYPE_NAME]: getSchemaPath(StreamUIEventDto),
+        [StreamThinkingEventDto.TYPE_NAME]: getSchemaPath(StreamThinkingEventDto),
       },
     },
   })

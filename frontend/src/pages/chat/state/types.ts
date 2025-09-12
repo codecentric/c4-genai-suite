@@ -9,6 +9,8 @@ type MessageMetaInfoState = {
   error?: string;
   isAiWriting?: boolean;
   ui?: StreamUIRequestDto;
+  thinking?: string;
+  isThinking?: boolean;
 };
 
 export type ChatMessage = MessageDto & Partial<MessageMetaInfoState>;

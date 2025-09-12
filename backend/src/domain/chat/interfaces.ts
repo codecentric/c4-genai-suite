@@ -222,7 +222,8 @@ export type StreamEvent =
   | StreamTokenEvent
   | StreamToolEndEvent
   | StreamToolStartEvent
-  | StreamUIEvent;
+  | StreamUIEvent
+  | StreamThinkingEvent;
 
 export interface StreamTokenEvent {
   type: 'chunk';
@@ -278,6 +279,12 @@ export interface StreamSummaryEvent {
 export interface StreamCompletedEvent {
   type: 'completed';
   metadata: ChatMetadata;
+}
+
+export interface StreamThinkingEvent {
+  type: 'thinking';
+  content: string;
+  thinking_type: 'start' | 'content' | 'end';
 }
 
 export interface ChatUIRequest {

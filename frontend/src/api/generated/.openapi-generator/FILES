@@ -70,6 +70,7 @@ models/StreamMessageSavedDto.ts
 models/StreamMetadataDto.ts
 models/StreamSourcesEvent.ts
 models/StreamSummaryDto.ts
+models/StreamThinkingEventDto.ts
 models/StreamTokenEventDto.ts
 models/StreamToolEndEventDto.ts
 models/StreamToolInfoDto.ts
