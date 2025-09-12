@@ -157,7 +157,7 @@ export async function buildConfiguration(
   withExtensions: boolean = false,
   onlyEnabledExtensions: boolean = false,
 ): Promise<ConfigurationModel> {
-  const { userGroupsIds, extensions: configuredExtensions, ...other } = source;
+  const { userGroupIds, extensions: configuredExtensions, ...other } = source;
 
   const extensions =
     withExtensions && extensionExplorer && configuredExtensions
@@ -171,5 +171,5 @@ export async function buildConfiguration(
         )
       : [];
 
-  return { ...other, userGroupsIds: userGroupsIds || [], extensions: extensions.filter((x) => !!x) };
+  return { ...other, userGroupIds: userGroupIds || [], extensions: extensions.filter((x) => !!x) };
 }

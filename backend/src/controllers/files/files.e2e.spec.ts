@@ -5,6 +5,7 @@ import * as request from 'supertest';
 import { DataSource, Repository } from 'typeorm';
 import { AppModule } from '../../app.module';
 import { ConfigurationEntity, ConversationEntity, MessageEntity, UserEntity } from '../../domain/database';
+import { UserGroupEntity } from '../../domain/database/entities/user-group';
 import { initAppWithDataBaseAndValidUser } from '../../utils/testUtils';
 
 jest.mock('../../domain/files/use-cases/generated/apis', () => {
@@ -240,7 +241,7 @@ function createUserEntity(repository: Repository<UserEntity>): Promise<UserEntit
   entity.id = '1';
   entity.name = 'test';
   entity.email = 'newuser@test.com';
-  entity.userGroupId = 'admin';
+  entity.userGroups = [{ id: 'admin' } as UserGroupEntity];
   return repository.save(entity);
 }
 

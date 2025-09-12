@@ -18,7 +18,7 @@ type Values = Partial<
     | 'executorHeaders'
     | 'name'
     | 'description'
-    | 'userGroupsIds'
+    | 'userGroupIds'
   >
 >;
 
@@ -53,7 +53,7 @@ export class UpdateConfigurationHandler implements ICommandHandler<UpdateConfigu
       executorHeaders,
       name,
       description,
-      userGroupsIds,
+      userGroupIds,
     } = values;
 
     const entity = await this.configurations.findOne({
@@ -67,8 +67,8 @@ export class UpdateConfigurationHandler implements ICommandHandler<UpdateConfigu
       throw new NotFoundException();
     }
 
-    if (userGroupsIds) {
-      entity.userGroups = await this.userGroups.findBy({ id: In(userGroupsIds) });
+    if (userGroupIds) {
+      entity.userGroups = await this.userGroups.findBy({ id: In(userGroupIds) });
     }
 
     // Assign the object manually to avoid updating unexpected values.

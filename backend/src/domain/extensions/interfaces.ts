@@ -25,7 +25,7 @@ export interface ConfigurationModel {
 
   executorHeaders?: string;
 
-  userGroupsIds: string[];
+  userGroupIds: string[];
 
   extensions?: ConfiguredExtension<ExtensionConfiguration>[];
 }

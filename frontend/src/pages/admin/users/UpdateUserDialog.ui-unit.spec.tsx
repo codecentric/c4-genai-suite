@@ -11,7 +11,7 @@ describe('UpdateUserDialog', () => {
     id: '1',
     name: 'tester',
     email: 'testuser@example.com',
-    userGroupId: 'admin',
+    userGroupIds: ['admin'],
     hasPassword: false,
     hasApiKey: true,
   };
@@ -39,7 +39,7 @@ describe('UpdateUserDialog', () => {
   it('should open update dialog with provided user data', () => {
     render(<UpdateUserDialog {...defaultProps} />);
 
-    const [first, ...other] = mockUser.userGroupId;
+    const [first, ...other] = mockUser.userGroupIds[0];
 
     expect(screen.getByLabelText(required(texts.common.name))).toHaveValue(mockUser.name);
     expect(screen.getByLabelText(required(texts.common.email))).toHaveValue(mockUser.email);

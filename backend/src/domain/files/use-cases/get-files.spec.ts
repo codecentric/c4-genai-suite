@@ -15,14 +15,14 @@ describe('Get Files', () => {
     id: '1',
     name: 'Test User',
     email: 'test@example.com',
-    userGroupId: 'group1',
+    userGroupIds: ['group1'],
   };
 
   const mockUserDifferent: User = {
     id: '2',
     name: 'Test User 2',
     email: 'test2@example.com',
-    userGroupId: 'grou21',
+    userGroupIds: ['grou21'],
   };
 
   const findFiles = (statement: FindManyOptions<FileEntity> | undefined, users: FileEntity[]): Promise<FileEntity[]> => {

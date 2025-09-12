@@ -1924,7 +1924,7 @@
           },
           "executorEndpoint": { "type": "string", "description": "The optional executor endpoint." },
           "executorHeaders": { "type": "string", "description": "The optional executor headers." },
-          "userGroupsIds": { "description": "The allowed user groups.", "type": "array", "items": { "type": "string" } },
+          "userGroupIds": { "description": "The allowed user groups.", "type": "array", "items": { "type": "string" } },
           "extensions": {
             "description": "Extension information.",
             "type": "array",
@@ -2453,11 +2453,11 @@
           "email": { "type": "string", "description": "The email address." },
           "picture": { "type": "string", "description": " The URL to an external picture." },
           "apiKey": { "type": "string", "description": "The API Key." },
-          "userGroupId": { "type": "string", "description": "The user group ID." },
+          "userGroupIds": { "description": "The user group IDs.", "type": "array", "items": { "type": "string" } },
           "hasPassword": { "type": "boolean", "description": "Indicates if the user has a password configured." },
           "hasApiKey": { "type": "boolean", "description": "Indicates if the user has an api key configured." }
         },
-        "required": ["id", "name", "email", "userGroupId", "hasPassword", "hasApiKey"]
+        "required": ["id", "name", "email", "userGroupIds", "hasPassword", "hasApiKey"]
       },
       "UsersDto": {
         "type": "object",
@@ -2473,10 +2473,10 @@
           "name": { "type": "string", "description": "The display name." },
           "email": { "type": "string", "description": "The email address." },
           "password": { "type": "string", "description": "The optional password." },
-          "userGroupId": { "type": "string", "description": "The user group ID." },
+          "userGroupIds": { "description": "The user group IDs.", "type": "array", "items": { "type": "string" } },
           "apiKey": { "type": "string", "description": "The API Key.", "nullable": true }
         },
-        "required": ["name", "email", "userGroupId"]
+        "required": ["name", "email", "userGroupIds"]
       },
       "ChangePasswordDto": {
         "type": "object",

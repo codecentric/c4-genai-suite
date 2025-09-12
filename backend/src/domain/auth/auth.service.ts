@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { Request } from 'express';
+import { DeepPartial, In } from 'typeorm';
 import * as uuid from 'uuid';
 import {
   BUILTIN_USER_GROUP_ADMIN,
@@ -31,6 +32,8 @@ export class AuthService implements OnModuleInit {
     const config: AuthConfig = {
       baseUrl: configService.get('AUTH_BASEURL') || configService.getOrThrow('BASE_URL'),
       trustProxy: configService.get('AUTH_TRUST_PROXY') === 'true',
+      userGroupsPropertyName: configService.get('AUTH_USER_GROUPS_PROPERTY_NAME', 'groups'),
+      acceptUserGroupsFromAuthProvider: configService.get('AUTH_USE_USER_GROUPS_FROM_AUTH_PROVIDER', false),
     };
 
     this.configureGithub(configService, config);
@@ -42,12 +45,19 @@ export class AuthService implements OnModuleInit {
     this.config = config;
   }
 
-  private async setSessionUser(req: Request, user: User | undefined) {
+  private async setSessionUser(req: Request, user: User | UserEntity | undefined) {
     await new Promise((resolve) => {
       if (!user) {
         req.session.destroy(resolve);
       } else {
-        req.session.user = user;
+        req.session.user =
+          'userGroups' in user && Array.isArray(user.userGroups)
+            ? {
+                ...user,
+                userGroupIds: user.userGroups.map((g) => g.id),
+              }
+            : (user as User);
+        console.log('session user', req.session.user);
         req.session.save(resolve);
       }
     });
@@ -114,7 +124,7 @@ export class AuthService implements OnModuleInit {
   }
 
   async onModuleInit(): Promise<any> {
-    await this.setupUsers();
+    await this.setupUserGroups();
     await this.setupAdmins();
   }
 
@@ -128,21 +138,22 @@ export class AuthService implements OnModuleInit {
       return;
     }
 
-    const count = await this.users.countBy({ userGroupId: BUILTIN_USER_GROUP_ADMIN });
-
-    // If no admin has been created yet, the first user becomes the admin.
-    if (count > 0 && !adminRoleRequired) {
+    const numberOfAdmins = await this.getNumberOfAdmins();
+    if (numberOfAdmins > 0 && !adminRoleRequired) {
       return;
     }
 
-    const existing = await this.users.findOneBy({ email: email });
+    const userFromDb = await this.users.findOne({
+      where: { email: email },
+      relations: ['userGroups'],
+    });
 
-    if (existing) {
-      existing.userGroupId = BUILTIN_USER_GROUP_ADMIN;
-      existing.passwordHash ||= await bcrypt.hash(password, 10);
-      existing.apiKey ||= apiKey;
+    if (userFromDb) {
+      userFromDb.userGroups = [{ id: BUILTIN_USER_GROUP_ADMIN } as UserGroupEntity];
+      userFromDb.passwordHash ||= await bcrypt.hash(password, 10);
+      userFromDb.apiKey ||= apiKey;
 
-      await this.users.save(existing);
+      await this.users.save(userFromDb);
 
       this.logger.log(`Created user with email '${email}'.`);
     } else {
@@ -152,17 +163,17 @@ export class AuthService implements OnModuleInit {
         email,
         name: email,
         passwordHash: await bcrypt.hash(password, 10),
-        userGroupId: BUILTIN_USER_GROUP_ADMIN,
+        userGroups: [{ id: BUILTIN_USER_GROUP_ADMIN } as UserGroupEntity],
       });
 
       this.logger.log(`Created initial user with email '${email}'.`);
     }
   }
 
-  private async setupUsers() {
-    const count = await this.userGroups.count();
+  private async setupUserGroups() {
+    const numberOfGroups = await this.userGroups.count();
 
-    if (count > 0) {
+    if (numberOfGroups > 0) {
       return;
     }
 
@@ -188,6 +199,7 @@ export class AuthService implements OnModuleInit {
 
   async loginWithPassword(email: string, password: string, req: Request) {
     const user = await this.users.findOneBy({ email });
+    console.log('user from login with password', user);
 
     // We cannot compare the password in the database due to the salt.
     if (!user?.passwordHash) {
@@ -204,24 +216,42 @@ export class AuthService implements OnModuleInit {
   async login(user: User, req: Request) {
     const userFilter = user.email ? { email: user.email } : { id: user.id };
     // Check if the user exist in the database.
-    let fromDB = await this.users.findOneBy(userFilter);
+    let fromDB = await this.users.findOne({ where: userFilter, relations: ['userGroups'] });
+
+    const assumedGroups = this.config.acceptUserGroupsFromAuthProvider
+      ? await this.userGroups.findBy({ id: In(user.userGroupIds) })
+      : [];
 
     if (!fromDB) {
-      const countAdmins = await this.users.countBy({ userGroupId: BUILTIN_USER_GROUP_ADMIN });
-
-      // If no admin has been created yet, the first user becomes the admin.
-      if (countAdmins === 0) {
-        user.userGroupId = BUILTIN_USER_GROUP_ADMIN;
-      } else {
-        user.userGroupId = BUILTIN_USER_GROUP_DEFAULT;
-      }
-
-      await this.users.save(user);
-
-      // Reload the user again to get the default values from the database.
-      fromDB = await this.users.findOneBy(userFilter);
+      const userGroups = await this.defineGroupsForFirstUser(assumedGroups);
+      fromDB = await this.saveAndReloadUser({ ...user, userGroups: userGroups }, userFilter);
+    } else if (this.config.acceptUserGroupsFromAuthProvider) {
+      console.log('persisting user groups from user info', assumedGroups);
+      // The groups from the auth provider override the existing groups. They can be empty.
+      fromDB = await this.saveAndReloadUser({ ...user, userGroups: assumedGroups }, userFilter);
     }
 
     await this.setSessionUser(req, fromDB ?? undefined);
+  }
+
+  private async defineGroupsForFirstUser(assumedGroups: UserGroupEntity[]) {
+    const thereIsNoAdmin = (await this.getNumberOfAdmins()) === 0;
+    // If no admin has been created yet, the new user becomes an admin.
+    const mandatoryGroup = { id: thereIsNoAdmin ? BUILTIN_USER_GROUP_ADMIN : BUILTIN_USER_GROUP_DEFAULT } as UserGroupEntity;
+    return assumedGroups.includes(mandatoryGroup) ? assumedGroups : [...assumedGroups, mandatoryGroup];
+  }
+
+  private async saveAndReloadUser(user: DeepPartial<UserEntity>, userFilter: Partial<User>) {
+    await this.users.save(user);
+    // Reload the user again to get the default values from the database.
+    return await this.users.findOne({ where: userFilter, relations: ['userGroups'] });
+  }
+
+  private async getNumberOfAdmins() {
+    return await this.users
+      .createQueryBuilder('user')
+      .leftJoin('user.userGroups', 'userGroup')
+      .where('userGroup.id = :adminId', { adminId: BUILTIN_USER_GROUP_ADMIN })
+      .getCount();
   }
 }
