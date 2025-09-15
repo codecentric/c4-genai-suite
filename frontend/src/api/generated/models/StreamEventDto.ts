@@ -48,6 +48,20 @@ import {
     StreamMessageSavedDtoFromJSONTyped,
     StreamMessageSavedDtoToJSON,
 } from './StreamMessageSavedDto';
+import type { StreamReasoningDto } from './StreamReasoningDto';
+import {
+    instanceOfStreamReasoningDto,
+    StreamReasoningDtoFromJSON,
+    StreamReasoningDtoFromJSONTyped,
+    StreamReasoningDtoToJSON,
+} from './StreamReasoningDto';
+import type { StreamReasoningEndDto } from './StreamReasoningEndDto';
+import {
+    instanceOfStreamReasoningEndDto,
+    StreamReasoningEndDtoFromJSON,
+    StreamReasoningEndDtoFromJSONTyped,
+    StreamReasoningEndDtoToJSON,
+} from './StreamReasoningEndDto';
 import type { StreamSourcesEvent } from './StreamSourcesEvent';
 import {
     instanceOfStreamSourcesEvent,
@@ -96,7 +110,7 @@ import {
  * 
  * @export
  */
-export type StreamEventDto = { type: 'chunk' } & StreamTokenEventDto | { type: 'completed' } & StreamCompletedEventDto | { type: 'debug' } & StreamDebugEvent | { type: 'error' } & StreamErrorEventDto | { type: 'logging' } & StreamLoggingEvent | { type: 'saved' } & StreamMessageSavedDto | { type: 'sources' } & StreamSourcesEvent | { type: 'summary' } & StreamSummaryDto | { type: 'tool_end' } & StreamToolEndEventDto | { type: 'tool_start' } & StreamToolStartEventDto | { type: 'ui' } & StreamUIEventDto;
+export type StreamEventDto = { type: 'chunk' } & StreamTokenEventDto | { type: 'completed' } & StreamCompletedEventDto | { type: 'debug' } & StreamDebugEvent | { type: 'error' } & StreamErrorEventDto | { type: 'logging' } & StreamLoggingEvent | { type: 'reasoning' } & StreamReasoningDto | { type: 'reasoning_end' } & StreamReasoningEndDto | { type: 'saved' } & StreamMessageSavedDto | { type: 'sources' } & StreamSourcesEvent | { type: 'summary' } & StreamSummaryDto | { type: 'tool_end' } & StreamToolEndEventDto | { type: 'tool_start' } & StreamToolStartEventDto | { type: 'ui' } & StreamUIEventDto;
 
 export function StreamEventDtoFromJSON(json: any): StreamEventDto {
     return StreamEventDtoFromJSONTyped(json, false);
@@ -117,6 +131,10 @@ export function StreamEventDtoFromJSONTyped(json: any, ignoreDiscriminator: bool
             return Object.assign({}, StreamErrorEventDtoFromJSONTyped(json, true), { type: 'error' } as const);
         case 'logging':
             return Object.assign({}, StreamLoggingEventFromJSONTyped(json, true), { type: 'logging' } as const);
+        case 'reasoning':
+            return Object.assign({}, StreamReasoningDtoFromJSONTyped(json, true), { type: 'reasoning' } as const);
+        case 'reasoning_end':
+            return Object.assign({}, StreamReasoningEndDtoFromJSONTyped(json, true), { type: 'reasoning_end' } as const);
         case 'saved':
             return Object.assign({}, StreamMessageSavedDtoFromJSONTyped(json, true), { type: 'saved' } as const);
         case 'sources':
@@ -149,6 +167,10 @@ export function StreamEventDtoToJSON(value?: StreamEventDto | null): any {
             return StreamErrorEventDtoToJSON(value);
         case 'logging':
             return StreamLoggingEventToJSON(value);
+        case 'reasoning':
+            return StreamReasoningDtoToJSON(value);
+        case 'reasoning_end':
+            return StreamReasoningEndDtoToJSON(value);
         case 'saved':
             return StreamMessageSavedDtoToJSON(value);
         case 'sources':

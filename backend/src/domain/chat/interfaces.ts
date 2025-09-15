@@ -9,7 +9,7 @@ import { ConfigurationModel, ExtensionArgument } from '../extensions';
 import { UploadedFile } from '../files';
 import { User } from '../users';
 
-// Chat errors are exposed to the user.
+// Chat errors are exposed dto the user.
 export class ChatError extends Error {
   constructor(public readonly message: string) {
     super(message);
@@ -214,6 +214,8 @@ export type MessageType = (typeof MESSAGE_TYPES)[number];
 export type StreamEvent =
   | StreamSummaryEvent
   | StreamCompletedEvent
+  | StreamReasoningEvent
+  | StreamReasoningEndEvent
   | StreamDebugEvent
   | StreamSourcesEvent
   | StreamLoggingEvent
@@ -273,6 +275,15 @@ export interface StreamUIEvent {
 export interface StreamSummaryEvent {
   type: 'summary';
   content: string;
+}
+
+export interface StreamReasoningEvent {
+  type: 'reasoning';
+  content: string;
+}
+
+export interface StreamReasoningEndEvent {
+  type: 'reasoning_end';
 }
 
 export interface StreamCompletedEvent {

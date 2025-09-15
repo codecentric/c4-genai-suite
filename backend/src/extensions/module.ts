@@ -15,6 +15,7 @@ import { AzureOpenAIReasoningModelExtension } from './models/azure-open-ai-reaso
 import { BedrockModelExtension } from './models/bedrock-ai';
 import { GoogleGenAIModelExtension } from './models/google-genai';
 import { MistralModelExtension } from './models/mistral';
+import { NvidiaModelExtension } from './models/nvidia';
 import { OllamaModelExtension } from './models/ollama';
 import { OpenAIModelExtension } from './models/open-ai';
 import { OpenAICompatibleModelExtension } from './models/open-ai-compatible';
@@ -128,6 +129,7 @@ export class ExtensionLibraryModule {
         LangfuseExtension,
         MCPToolsExtension,
         MistralModelExtension,
+        NvidiaModelExtension,
         OllamaModelExtension,
         OpenAICompatibleModelExtension,
         OpenAIModelExtension,

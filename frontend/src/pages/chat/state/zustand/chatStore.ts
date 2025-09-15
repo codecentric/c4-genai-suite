@@ -2,7 +2,7 @@ import { Observable, Subscription } from 'rxjs';
 import { create } from 'zustand';
 import { AppClient, ConversationDto, FileDto, MessageDto, SourceDto, StreamEventDto } from 'src/api';
 import { DocumentSource } from '../../SourcesChunkPreview';
-import { ChatMessage, ReasoningStep } from '../types';
+import { ChatMessage } from '../types';
 
 type ChatData = {
   messages: ChatMessage[];
@@ -48,9 +48,8 @@ type ChatActions = {
     editMessageId: number | undefined,
   ) => Observable<StreamEventDto>;
 
-  addReasoningStep: (chatId: number, messageId: number, step: ReasoningStep) => void;
-  updateReasoningStep: (chatId: number, messageId: number, stepId: string, update: Partial<ReasoningStep>) => void;
-  clearReasoning: (chatId: number, messageId: number) => void;
+  updateReasoning: (chatId: number, content: string) => void;
+  clearReasoning: (chatId: number) => void;
 
   setSelectedDocument: (document: DocumentSource | undefined) => void;
   setSelectedSource: (source: SourceDto | undefined) => void;
@@ -225,61 +224,36 @@ export const useChatStore = create<ChatState & ChatActions>()((set, get) => {
       set({ selectedSource });
     },
 
-    addReasoningStep: (chatId, messageId, step) =>
+    updateReasoning: (chatId, content) =>
       set((state) => {
         const chatData = state.chatDataMap.get(chatId);
-        if (!chatData) return state;
+        if (!chatData || !chatData.streamingMessageId) return state;
 
         const messages = [...chatData.messages];
-        const messageIndex = messages.findIndex((msg) => msg.id === messageId);
+        const messageIndex = messages.findIndex((msg) => msg.id === chatData.streamingMessageId);
         if (messageIndex === -1) return state;
 
         const message = messages[messageIndex];
-        const currentReasoning = message.reasoning || [];
-        const newReasoning = [...currentReasoning, step];
+        const currentReasoningContent = message.reasoning ?? '';
 
-        messages[messageIndex] = { ...message, reasoning: newReasoning };
+        messages[messageIndex] = { ...message, reasoning: currentReasoningContent + content, reasoningInProgress: true };
 
         const newMap = new Map(state.chatDataMap);
         newMap.set(chatId, { ...chatData, messages });
         return { chatDataMap: newMap };
       }),
 
-    updateReasoningStep: (chatId, messageId, stepId, update) =>
+    clearReasoning: (chatId) =>
       set((state) => {
         const chatData = state.chatDataMap.get(chatId);
-        if (!chatData) return state;
+        if (!chatData || !chatData.streamingMessageId) return state;
 
         const messages = [...chatData.messages];
-        const messageIndex = messages.findIndex((msg) => msg.id === messageId);
+        const messageIndex = messages.findIndex((msg) => msg.id === chatData.streamingMessageId);
         if (messageIndex === -1) return state;
 
         const message = messages[messageIndex];
-        const reasoning = message.reasoning || [];
-        const stepIndex = reasoning.findIndex((step) => step.id === stepId);
-        if (stepIndex === -1) return state;
-
-        const newReasoning = [...reasoning];
-        newReasoning[stepIndex] = { ...reasoning[stepIndex], ...update };
-
-        messages[messageIndex] = { ...message, reasoning: newReasoning };
-
-        const newMap = new Map(state.chatDataMap);
-        newMap.set(chatId, { ...chatData, messages });
-        return { chatDataMap: newMap };
-      }),
-
-    clearReasoning: (chatId, messageId) =>
-      set((state) => {
-        const chatData = state.chatDataMap.get(chatId);
-        if (!chatData) return state;
-
-        const messages = [...chatData.messages];
-        const messageIndex = messages.findIndex((msg) => msg.id === messageId);
-        if (messageIndex === -1) return state;
-
-        const message = messages[messageIndex];
-        messages[messageIndex] = { ...message, reasoning: [] };
+        messages[messageIndex] = { ...message, reasoningInProgress: false };
 
         const newMap = new Map(state.chatDataMap);
         newMap.set(chatId, { ...chatData, messages });

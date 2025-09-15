@@ -35,7 +35,7 @@ export class AzureDallEExtension extends DallEExtension {
     const { apiKey, modelName, apiVersion, instanceName, quality, size, style } = configuration;
 
     return new AzureDallEAPIWrapper({
-      modelName,
+      model: modelName,
       quality,
       style,
       size,
@@ -50,19 +50,12 @@ export class AzureDallEExtension extends DallEExtension {
 export class AzureDallEAPIWrapper extends DallEAPIWrapper {
   constructor(fields: DallEAPIWrapperParams & { instanceName: string; apiVersion: string }) {
     super(fields);
-    const client = new AzureOpenAI({
+    this.client = new AzureOpenAI({
       apiKey: fields.apiKey,
       apiVersion: fields.apiVersion,
-      deployment: fields.modelName,
+      deployment: fields.model,
       endpoint: `https://${fields.instanceName}.openai.azure.com`,
     });
-    this.client = client;
-    client.images.generate = (body, options) => {
-      return client.post(`/deployments/${fields.modelName}/images/generations?api-version=${fields.apiVersion}`, {
-        body,
-        ...options,
-      });
-    };
   }
 }
 

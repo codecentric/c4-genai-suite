@@ -108,6 +108,7 @@ export class OpenAICompatibleModelExtension implements Extension<OpenAICompatibl
       configuration: {
         baseURL: baseUrl,
       },
+      useResponsesApi: true,
       reasoning: effort ? { effort } : undefined,
     });
   }

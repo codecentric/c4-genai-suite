@@ -88,6 +88,7 @@ export const en = {
     welcomeText: 'How may I help you?',
     placeholder: 'Message {{configuration}}',
     rateConversation: 'Was this conversation helpful so far?',
+    reasoning: 'Reasoning',
     rating: {
       incorrect: 'Not factually correct',
       instructions_not_followed: "Didn't follow instructions",

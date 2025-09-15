@@ -1640,6 +1640,19 @@
         },
         "required": ["content", "type"]
       },
+      "StreamReasoningDto": {
+        "type": "object",
+        "properties": {
+          "content": { "type": "string", "description": "The content ." },
+          "type": { "type": "string", "enum": ["reasoning"] }
+        },
+        "required": ["content", "type"]
+      },
+      "StreamReasoningEndDto": {
+        "type": "object",
+        "properties": { "type": { "type": "string", "enum": ["reasoning_end"] } },
+        "required": ["type"]
+      },
       "StreamEventHolderDto": {
         "type": "object",
         "properties": {
@@ -1656,7 +1669,9 @@
               { "$ref": "#/components/schemas/StreamTokenEventDto" },
               { "$ref": "#/components/schemas/StreamToolEndEventDto" },
               { "$ref": "#/components/schemas/StreamToolStartEventDto" },
-              { "$ref": "#/components/schemas/StreamUIEventDto" }
+              { "$ref": "#/components/schemas/StreamUIEventDto" },
+              { "$ref": "#/components/schemas/StreamReasoningDto" },
+              { "$ref": "#/components/schemas/StreamReasoningEndDto" }
             ],
             "discriminator": {
               "propertyName": "type",
@@ -1671,7 +1686,9 @@
                 "chunk": "#/components/schemas/StreamTokenEventDto",
                 "tool_end": "#/components/schemas/StreamToolEndEventDto",
                 "tool_start": "#/components/schemas/StreamToolStartEventDto",
-                "ui": "#/components/schemas/StreamUIEventDto"
+                "ui": "#/components/schemas/StreamUIEventDto",
+                "reasoning": "#/components/schemas/StreamReasoningDto",
+                "reasoning_end": "#/components/schemas/StreamReasoningEndDto"
               }
             }
           }

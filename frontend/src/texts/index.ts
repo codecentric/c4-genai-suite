@@ -111,6 +111,7 @@ function load() {
       rowsSelected: (rowCount: number) => translate('common.rowsSelected', { rowCount }),
     },
     chat: {
+      reasoning: translate('chat.reasoning'),
       conversationNotFound: translate('chat.conversationNotFound'),
       noAccessToConversation: translate('chat.noAccessToConversation'),
       errorLoadingMessagesOrConversation: translate('chat.errorLoadingMessagesOrConversation'),

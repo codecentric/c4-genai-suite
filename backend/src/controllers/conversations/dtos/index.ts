@@ -460,6 +460,30 @@ export class StreamMessageSavedDto {
   type!: typeof StreamMessageSavedDto.TYPE_NAME;
 }
 
+export class StreamReasoningDto {
+  static TYPE_NAME = 'reasoning';
+
+  @ApiProperty({
+    description: 'The content .',
+    required: true,
+  })
+  content!: string;
+
+  @ApiProperty({
+    enum: [StreamReasoningDto.TYPE_NAME],
+  })
+  type!: typeof StreamReasoningDto.TYPE_NAME;
+}
+
+export class StreamReasoningEndDto {
+  static TYPE_NAME = 'reasoning_end';
+
+  @ApiProperty({
+    enum: [StreamReasoningEndDto.TYPE_NAME],
+  })
+  type!: typeof StreamReasoningEndDto.TYPE_NAME;
+}
+
 export class StreamSummaryDto {
   static TYPE_NAME = 'summary';
 
@@ -566,6 +590,8 @@ export class StreamCompletedEventDto {
   StreamToolStartEventDto,
   StreamUIEventDto,
   StreamSummaryDto,
+  StreamReasoningDto,
+  StreamReasoningEndDto,
 )
 export class StreamEventHolderDto {
   @ApiProperty({
@@ -582,6 +608,8 @@ export class StreamEventHolderDto {
       { $ref: getSchemaPath(StreamToolEndEventDto) },
       { $ref: getSchemaPath(StreamToolStartEventDto) },
       { $ref: getSchemaPath(StreamUIEventDto) },
+      { $ref: getSchemaPath(StreamReasoningDto) },
+      { $ref: getSchemaPath(StreamReasoningEndDto) },
     ],
     discriminator: {
       propertyName: 'type',
@@ -597,6 +625,8 @@ export class StreamEventHolderDto {
         [StreamToolEndEventDto.TYPE_NAME]: getSchemaPath(StreamToolEndEventDto),
         [StreamToolStartEventDto.TYPE_NAME]: getSchemaPath(StreamToolStartEventDto),
         [StreamUIEventDto.TYPE_NAME]: getSchemaPath(StreamUIEventDto),
+        [StreamReasoningDto.TYPE_NAME]: getSchemaPath(StreamReasoningDto),
+        [StreamReasoningEndDto.TYPE_NAME]: getSchemaPath(StreamReasoningEndDto),
       },
     },
   })

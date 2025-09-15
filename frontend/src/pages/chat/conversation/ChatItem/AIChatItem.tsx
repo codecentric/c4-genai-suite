@@ -8,7 +8,6 @@ import { texts } from 'src/texts';
 import { useStateOfIsAiWriting } from '../../state/chat';
 import { ChatItemDebug } from '../ChatItemDebug';
 import { ChatItemLogging } from '../ChatItemLogging';
-import { ChatItemReasoning } from '../ChatItemReasoning';
 import ChatItemSources from '../ChatItemSources';
 import { ChatItemTools } from '../ChatItemTools';
 import { ReasoningLoadingIndicator } from '../ReasoningLoadingIndicator';
@@ -52,16 +51,12 @@ export const AIChatItem = ({ agentName, message, isLast, selectDocument }: ChatI
       {message.error && <Alert text={message.error} className="mt-1" />}
       <ChatItemTools tools={message.toolsInUse || {}} />
       {message.ui && <ChatItemUserInput key={message.ui.id} request={message.ui} />}
+      {message.reasoning?.length && (
+        <ReasoningLoadingIndicator message={message.reasoning} inProgress={message.reasoningInProgress} />
+      )}
       <Markdown animateText={isLast && newReply} className="box-border max-w-full">
         {textContent}
       </Markdown>
-      {/* Show reasoning loading indicator when AI is writing but no reasoning steps yet */}
-      {isLast && isWriting && (!message.reasoning || message.reasoning.length === 0) && (
-        <ReasoningLoadingIndicator detailed={true} message="AI is analyzing your request..." />
-      )}
-      {message.reasoning && message.reasoning.length > 0 && (
-        <ChatItemReasoning reasoning={message.reasoning} isStreaming={isLast && isWriting} />
-      )}
       {message.sources && message.sources?.length > 0 ? (
         <ChatItemSources sources={message.sources || []} selectDocument={selectDocument} />
       ) : (

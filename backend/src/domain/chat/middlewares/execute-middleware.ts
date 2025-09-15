@@ -8,7 +8,7 @@ import { AgentExecutor, AgentExecutorInput, createOpenAIToolsAgent } from 'langc
 import { I18nService } from '../../../localization/i18n.service';
 import { MetricsService } from '../../../metrics/metrics.service';
 import { ChatContext, ChatError, ChatMiddleware, NormalizedMessageContents } from '../interfaces';
-import { normalizedMessageContent } from '../utils';
+import { getReasoningContent, normalizedMessageContent } from '../utils';
 
 type EventActionType = 'start' | 'stream' | 'end';
 type EventContextType = 'llm' | 'chat_model' | 'prompt' | 'tool' | 'chain';
@@ -113,6 +113,18 @@ export class ExecuteMiddleware implements ChatMiddleware {
 
     const getToolName = (toolId: string) => tools.find((x) => x.name === toolId)?.displayName || toolId;
 
+    let isReasoning = false;
+    const handleReasoning = (chunk: ChatGenerationChunk | MessageContent) => {
+      const reasoningContent = getReasoningContent(chunk);
+      if (reasoningContent?.length) {
+        isReasoning = true;
+        result.next({ type: 'reasoning', content: reasoningContent });
+      } else if (isReasoning) {
+        isReasoning = false;
+        result.next({ type: 'reasoning_end' });
+      }
+    };
+
     for await (const event of stream) {
       const eventType = event.event as EventType;
 
@@ -122,6 +134,7 @@ export class ExecuteMiddleware implements ChatMiddleware {
         hasLlmStream = true;
         const chunk = event.data?.chunk as ChatGenerationChunk;
         const content = normalizedMessageContent(chunk);
+        handleReasoning(chunk);
 
         // Content can either be a string or an array of objects.
         if (content.length > 0) {
@@ -132,6 +145,7 @@ export class ExecuteMiddleware implements ChatMiddleware {
         hasChainStream = true;
         const chunk = event.data?.chunk as ChatGenerationChunk;
         const content = normalizedMessageContent(chunk);
+        handleReasoning(chunk);
 
         // Content can either be a string or an array of objects.
         if (content.length > 0) {
@@ -141,6 +155,7 @@ export class ExecuteMiddleware implements ChatMiddleware {
       } else if (eventType === 'on_chain_end' && !!event.data.output) {
         const output = event.data.output as MessageContent;
         const result = normalizedMessageContent(output);
+        handleReasoning(result);
 
         if (result.length > 0) {
           lastResult = result;
