@@ -1,11 +1,13 @@
 import { DynamicStructuredToolInput } from '@langchain/core/dist/tools';
+import { BaseChatModel } from '@langchain/core/language_models/chat_models';
 import { StringOutputParser } from '@langchain/core/output_parsers';
 import { ChatPromptTemplate } from '@langchain/core/prompts';
 import { DynamicStructuredTool } from '@langchain/core/tools';
 import { forwardRef, Inject, Logger } from '@nestjs/common';
 import { QueryBus } from '@nestjs/cqrs';
+import { generateText } from 'ai';
 import { z } from 'zod';
-import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from 'src/domain/chat';
+import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext, isLanguageModelContext } from 'src/domain/chat';
 import { Extension, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions';
 import { User } from 'src/domain/users';
 import { GetFiles, GetFilesResponse, matchExtension } from '../../domain/files';
@@ -112,6 +114,7 @@ export class FilesVisionExtension implements Extension<FilesVisionExtensionConfi
           new NamedDynamicStructuredTool({
             ...commonArguments,
             description: description,
+            schema: z.object({}),
             func: async () => {
               const llm = context.llms[context.llm ?? ''];
               if (!llm) {
@@ -139,23 +142,36 @@ export class FilesVisionExtension implements Extension<FilesVisionExtensionConfi
                 return '';
               }
 
-              const messages: Parameters<typeof ChatPromptTemplate.fromMessages>[0] = [
-                {
-                  role: 'human',
-                  content: images.map((imageUrl) => ({
-                    type: 'image_url',
-                    image_url: imageUrl,
-                  })),
-                },
-                ['user', context.input],
-              ];
-
               try {
-                const prompt = ChatPromptTemplate.fromMessages(messages);
-                const outputParser = new StringOutputParser();
-                const outputChain = prompt.pipe(llm).pipe(outputParser);
-                const result = await outputChain.invoke({});
-                return `Add the following content to your response without modification: ${result}`;
+                if (isLanguageModelContext(llm)) {
+                  const { text } = await generateText({
+                    model: llm.model,
+                    prompt: [
+                      { role: 'user' as const, content: images.map((x) => ({ type: 'image', image: x })) },
+                      { role: 'user' as const, content: context.input },
+                    ],
+                    ...llm.options,
+                  });
+
+                  return `Add the following content to your response without modification: ${text}`;
+                } else {
+                  const messages: Parameters<typeof ChatPromptTemplate.fromMessages>[0] = [
+                    {
+                      role: 'human',
+                      content: images.map((imageUrl) => ({
+                        type: 'image_url',
+                        image_url: imageUrl,
+                      })),
+                    },
+                    ['user', context.input],
+                  ];
+                  const prompt = ChatPromptTemplate.fromMessages(messages);
+                  const outputParser = new StringOutputParser();
+                  //TODO: fixme
+                  const outputChain = prompt.pipe(llm as unknown as BaseChatModel).pipe(outputParser);
+                  const result = await outputChain.invoke({});
+                  return `Add the following content to your response without modification: ${result}`;
+                }
               } catch (err) {
                 //TODO: for unsupported models there should be error handling
                 this.logger.error('Error reading image', err);

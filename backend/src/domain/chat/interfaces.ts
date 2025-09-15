@@ -4,6 +4,7 @@ import { type BaseChatModel, type BaseChatModelCallOptions } from '@langchain/co
 import { type ChatPromptTemplate } from '@langchain/core/prompts';
 import { type RunnableSequence } from '@langchain/core/runnables';
 import { type StructuredToolInterface } from '@langchain/core/tools';
+import { CallSettings, LanguageModel } from 'ai';
 import { Subject } from 'rxjs';
 import { ConfigurationModel, ExtensionArgument } from '../extensions';
 import { UploadedFile } from '../files';
@@ -77,6 +78,15 @@ export interface MessagesHistory {
   addSources(externalExtensionId: string, sources: Source[]): void;
 }
 
+export interface LanguageModelContext {
+  model: LanguageModel;
+  options: Partial<CallSettings>;
+}
+
+export function isLanguageModelContext(instance: BaseChatModel | LanguageModelContext): instance is LanguageModelContext {
+  return (instance as BaseChatModel).invoke == null;
+}
+
 export interface ChatContext {
   // The abort controller.
   readonly abort: AbortController;
@@ -124,7 +134,7 @@ export interface ChatContext {
   user: User;
 
   // LLM to use as the agent.
-  llms: Record<string, BaseChatModel<BaseChatModelCallOptions>>;
+  llms: Record<string, BaseChatModel<BaseChatModelCallOptions> | LanguageModelContext>;
 
   agentFactory?: (args: AgentArgument) => Promise<RunnableSequence> | RunnableSequence;
 

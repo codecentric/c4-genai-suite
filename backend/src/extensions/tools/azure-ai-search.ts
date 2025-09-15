@@ -65,7 +65,7 @@ export class AzureAISearchExtension implements Extension<AzureAISearchExtensionC
 
   getMiddlewares(_user: User, extension: ExtensionEntity<AzureAISearchExtensionConfiguration>): Promise<ChatMiddleware[]> {
     const middleware = {
-      invoke: async (context: ChatContext, getContext: GetContext, next: ChatNextDelegate): Promise<any> => {
+      invoke: async (context: ChatContext, _: GetContext, next: ChatNextDelegate): Promise<any> => {
         context.tools.push(new InternalTool(extension.values, extension.externalId));
         return next(context);
       },

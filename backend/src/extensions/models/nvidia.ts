@@ -1,40 +1,9 @@
-import {
-  AIMessageChunk,
-  ChatMessageChunk,
-  FunctionMessageChunk,
-  HumanMessageChunk,
-  SystemMessageChunk,
-  ToolMessageChunk,
-} from '@langchain/core/messages';
-import { ChatOpenAI, ChatOpenAICompletions, ChatOpenAIFields } from '@langchain/openai';
-import { Record } from 'openai/internal/builtin-types';
-import { ChatCompletionChunk } from 'openai/resources';
+import { createOpenAICompatible } from '@ai-sdk/openai-compatible';
+import { CallSettings, generateText } from 'ai';
 import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from 'src/domain/chat';
 import { Extension, ExtensionConfiguration, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions';
 import { User } from 'src/domain/users';
 import { I18nService } from '../../localization/i18n.service';
-
-export class ChatNvidiaCompletions extends ChatOpenAICompletions {
-  protected _convertCompletionsDeltaToBaseMessageChunk(
-    delta: Record<string, any>,
-    rawResponse: ChatCompletionChunk,
-    defaultRole?: 'system' | 'developer' | 'assistant' | 'user' | 'function' | 'tool',
-  ): AIMessageChunk | HumanMessageChunk | SystemMessageChunk | FunctionMessageChunk | ToolMessageChunk | ChatMessageChunk {
-    const result = super._convertCompletionsDeltaToBaseMessageChunk(delta, rawResponse, defaultRole);
-    if (result instanceof AIMessageChunk && delta['reasoning_content']) {
-      result.additional_kwargs['reasoning_content'] = delta['reasoning_content'];
-    }
-
-    return result;
-  }
-}
-
-export class ChatNvidia extends ChatOpenAI {
-  constructor(fields: ChatOpenAIFields) {
-    super(fields);
-    this.completions = new ChatNvidiaCompletions(fields);
-  }
-}
 
 @Extension()
 export class NvidiaModelExtension implements Extension<NvidiaModelExtensionConfiguration> {
@@ -107,9 +76,15 @@ export class NvidiaModelExtension implements Extension<NvidiaModelExtensionConfi
   }
 
   async test(configuration: NvidiaModelExtensionConfiguration) {
-    const model = this.createModel(configuration);
+    const { model, options } = this.createModel(configuration);
 
-    await model.invoke('Just a test call');
+    const { text } = await generateText({
+      model,
+      prompt: 'Just a test call',
+      ...options,
+    });
+
+    return text != null;
   }
 
   getMiddlewares(_: User, extension: ExtensionEntity<NvidiaModelExtensionConfiguration>): Promise<ChatMiddleware[]> {
@@ -126,22 +101,28 @@ export class NvidiaModelExtension implements Extension<NvidiaModelExtensionConfi
     return Promise.resolve([middleware]);
   }
 
-  private createModel(configuration: NvidiaModelExtensionConfiguration, streaming = false) {
-    const { apiKey, baseUrl, modelName, frequencyPenalty, presencePenalty, temperature, effort } = configuration;
-
-    return new ChatNvidia({
-      frequencyPenalty,
-      model: modelName,
-      apiKey,
-      presencePenalty,
-      streaming,
-      temperature,
-      configuration: {
-        baseURL: baseUrl,
-      },
-      reasoning: effort ? { effort } : undefined,
-      useResponsesApi: false,
+  private createModel(config: NvidiaModelExtensionConfiguration, streaming = false) {
+    const open = createOpenAICompatible({
+      name: 'nvidia',
+      apiKey: config.apiKey,
+      baseURL: config.baseUrl,
+      includeUsage: true,
     });
+
+    return {
+      model: open(config.modelName),
+      options: {
+        presencePenalty: config.presencePenalty,
+        frequencyPenalty: config.frequencyPenalty,
+        seed: config.seed,
+        streaming,
+        providerOptions: {
+          openai: {
+            reasoningEffort: config.effort,
+          },
+        },
+      } as Partial<CallSettings>,
+    };
   }
 }
 
@@ -153,5 +134,5 @@ type NvidiaModelExtensionConfiguration = ExtensionConfiguration & {
   seed: number;
   presencePenalty: number;
   frequencyPenalty: number;
-  effort?: 'low' | 'medium' | 'high';
+  effort?: 'minimal' | 'low' | 'medium' | 'high';
 };

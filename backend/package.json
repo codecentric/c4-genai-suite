@@ -38,12 +38,14 @@
     "migration:revert": "npm run typeorm -- -d src/config/typeorm-migration.config.ts migration:revert"
   },
   "dependencies": {
+    "@ai-sdk/openai-compatible": "^1.0.17",
     "@azure/ai-agents": "^1.1.0",
     "@azure/core-util": "^1.13.0",
     "@azure/identity": "^4.11.0",
     "@langchain/aws": "0.1.15",
     "@langchain/community": "^0.3.55",
     "@langchain/core": "^0.3.75",
+    "@langchain/deepseek": "^0.1.0",
     "@langchain/google-genai": "^0.2.17",
     "@langchain/google-vertexai": "^0.2.17",
     "@langchain/mistralai": "^0.2.1",
@@ -61,6 +63,7 @@
     "@nestjs/terminus": "^11.0.0",
     "@nestjs/typeorm": "^11.0.0",
     "@willsoto/nestjs-prometheus": "^6.0.2",
+    "ai": "^5.0.44",
     "bcrypt": "^6.0.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
@@ -68,6 +71,7 @@
     "date-fns": "^4.1.0",
     "dotenv": "^16.6.1",
     "duck-duck-scrape": "^2.2.7",
+    "expr-eval": "^2.0.2",
     "express-session": "^1.18.2",
     "json-diff-ts": "^4.6.3",
     "langchain": "^0.3.33",
@@ -102,6 +106,7 @@
     "@testcontainers/postgresql": "^11.0.3",
     "@types/bcrypt": "5.0.2",
     "@types/cookie-parser": "1.4.9",
+    "@types/expr-eval": "^1.0.2",
     "@types/express": "5.0.3",
     "@types/express-session": "1.18.2",
     "@types/jest": "29.5.14",
@@ -136,6 +141,7 @@
   "overrides": {
     "@browserbasehq/stagehand@1.14.0": {
       "openai": "^5.8.2"
-    }
+    },
+    "zod": "3.25.51"
   }
 }
