@@ -6,6 +6,8 @@ type MessageMetaInfoState = {
   debug: string[];
   sources: SourceDto[];
   logging: string[];
+  reasoning: string;
+  reasoningInProgress: boolean;
   error?: string;
   isAiWriting?: boolean;
   ui?: StreamUIRequestDto;

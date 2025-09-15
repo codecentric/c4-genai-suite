@@ -8,6 +8,12 @@ function isTextItem(item: MessageContentComplex): item is MessageContentText {
   return !!(item as MessageContentText).text;
 }
 
+export function getReasoningContent(source: MessageContent | AIMessageChunk | ChatGenerationChunk): string | undefined {
+  if (is(source, AIMessageChunk)) {
+    return source.additional_kwargs?.['reasoning_content'] as string;
+  }
+}
+
 export function normalizedMessageContent(
   source: MessageContent | AIMessageChunk | ChatGenerationChunk,
 ): NormalizedMessageContents {

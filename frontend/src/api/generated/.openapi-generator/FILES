@@ -68,6 +68,8 @@ models/StreamEventHolderDto.ts
 models/StreamLoggingEvent.ts
 models/StreamMessageSavedDto.ts
 models/StreamMetadataDto.ts
+models/StreamReasoningDto.ts
+models/StreamReasoningEndDto.ts
 models/StreamSourcesEvent.ts
 models/StreamSummaryDto.ts
 models/StreamTokenEventDto.ts

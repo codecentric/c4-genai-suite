@@ -61,6 +61,8 @@ export * from './StreamEventHolderDto';
 export * from './StreamLoggingEvent';
 export * from './StreamMessageSavedDto';
 export * from './StreamMetadataDto';
+export * from './StreamReasoningDto';
+export * from './StreamReasoningEndDto';
 export * from './StreamSourcesEvent';
 export * from './StreamSummaryDto';
 export * from './StreamTokenEventDto';

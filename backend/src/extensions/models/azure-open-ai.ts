@@ -120,7 +120,7 @@ export class AzureOpenAIModelExtension implements Extension<AzureOpenAIModelExte
     const { apiKey, apiVersion, deploymentName, frequencyPenalty, instanceName, presencePenalty, temperature, topP } =
       configuration;
 
-    const llm = new AzureChatOpenAI({
+    return new AzureChatOpenAI({
       azureOpenAIApiDeploymentName: deploymentName,
       azureOpenAIApiInstanceName: instanceName,
       azureOpenAIApiKey: apiKey,
@@ -132,8 +132,6 @@ export class AzureOpenAIModelExtension implements Extension<AzureOpenAIModelExte
       temperature,
       topP,
     });
-
-    return llm;
   }
 }
 

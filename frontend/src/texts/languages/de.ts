@@ -90,6 +90,7 @@ export const de: typeof en = {
     welcomeText: 'Wie kann ich dir helfen?',
     placeholder: 'Nachricht an {{configuration}}',
     rateConversation: 'War dieser Chat bisher hilfreich?',
+    reasoning: 'Reasoning',
     rating: {
       incorrect: 'Inhaltlich nicht korrekt',
       instructions_not_followed: 'Anweisungen nicht befolgt',

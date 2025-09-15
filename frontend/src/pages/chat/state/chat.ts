@@ -124,6 +124,14 @@ export const useChatStream = (chatId: number) => {
             if (chunk.type === 'image_url') chatStore.appendToStreamingMessage(chatId, `![image](${chunk.image.url})`);
             return;
           }
+          case 'reasoning': {
+            chatStore.updateReasoning(chatId, msg.content);
+            return;
+          }
+          case 'reasoning_end': {
+            chatStore.clearReasoning(chatId);
+            return;
+          }
           case 'tool_start':
             return chatStore.updateMessage(chatId, actualAiMessageId, (oldMessage) => ({
               toolsInUse: { ...oldMessage.toolsInUse, [msg.tool.name]: 'Started' },

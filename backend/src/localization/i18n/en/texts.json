@@ -77,6 +77,10 @@
       "title": "OpenAI compatible",
       "description": "Open AI compatible LLM integration"
     },
+    "nvidia": {
+      "title": "Nvidia NIM",
+      "description": "Nvidia NIM LLM integration"
+    },
     "vertexai": {
       "title": "VertexAI",
       "description": "Vertex AI LLM integration"

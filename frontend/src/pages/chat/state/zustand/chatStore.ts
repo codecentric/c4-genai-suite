@@ -48,6 +48,9 @@ type ChatActions = {
     editMessageId: number | undefined,
   ) => Observable<StreamEventDto>;
 
+  updateReasoning: (chatId: number, content: string) => void;
+  clearReasoning: (chatId: number) => void;
+
   setSelectedDocument: (document: DocumentSource | undefined) => void;
   setSelectedSource: (source: SourceDto | undefined) => void;
 };
@@ -220,5 +223,41 @@ export const useChatStore = create<ChatState & ChatActions>()((set, get) => {
     setSelectedSource: (selectedSource) => {
       set({ selectedSource });
     },
+
+    updateReasoning: (chatId, content) =>
+      set((state) => {
+        const chatData = state.chatDataMap.get(chatId);
+        if (!chatData || !chatData.streamingMessageId) return state;
+
+        const messages = [...chatData.messages];
+        const messageIndex = messages.findIndex((msg) => msg.id === chatData.streamingMessageId);
+        if (messageIndex === -1) return state;
+
+        const message = messages[messageIndex];
+        const currentReasoningContent = message.reasoning ?? '';
+
+        messages[messageIndex] = { ...message, reasoning: currentReasoningContent + content, reasoningInProgress: true };
+
+        const newMap = new Map(state.chatDataMap);
+        newMap.set(chatId, { ...chatData, messages });
+        return { chatDataMap: newMap };
+      }),
+
+    clearReasoning: (chatId) =>
+      set((state) => {
+        const chatData = state.chatDataMap.get(chatId);
+        if (!chatData || !chatData.streamingMessageId) return state;
+
+        const messages = [...chatData.messages];
+        const messageIndex = messages.findIndex((msg) => msg.id === chatData.streamingMessageId);
+        if (messageIndex === -1) return state;
+
+        const message = messages[messageIndex];
+        messages[messageIndex] = { ...message, reasoningInProgress: false };
+
+        const newMap = new Map(state.chatDataMap);
+        newMap.set(chatId, { ...chatData, messages });
+        return { chatDataMap: newMap };
+      }),
   };
 });

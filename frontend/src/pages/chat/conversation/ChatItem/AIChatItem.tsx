@@ -10,6 +10,7 @@ import { ChatItemDebug } from '../ChatItemDebug';
 import { ChatItemLogging } from '../ChatItemLogging';
 import ChatItemSources from '../ChatItemSources';
 import { ChatItemTools } from '../ChatItemTools';
+import { ReasoningLoadingIndicator } from '../ReasoningLoadingIndicator';
 import { AIChatItemActions } from './AIChatItemActions';
 import { AiAvatar } from './AiAvatar';
 import { ChatItemProps } from './ChatItem';
@@ -50,6 +51,9 @@ export const AIChatItem = ({ agentName, message, isLast, selectDocument }: ChatI
       {message.error && <Alert text={message.error} className="mt-1" />}
       <ChatItemTools tools={message.toolsInUse || {}} />
       {message.ui && <ChatItemUserInput key={message.ui.id} request={message.ui} />}
+      {message.reasoning?.length && (
+        <ReasoningLoadingIndicator message={message.reasoning} inProgress={message.reasoningInProgress} />
+      )}
       <Markdown animateText={isLast && newReply} className="box-border max-w-full">
         {textContent}
       </Markdown>
