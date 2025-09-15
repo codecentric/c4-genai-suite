@@ -37,7 +37,7 @@ export class ChatNvidia extends ChatOpenAI {
 }
 
 @Extension()
-export class NvidiaModelExtension implements Extension<OpenAICompatibleModelExtensionConfiguration> {
+export class NvidiaModelExtension implements Extension<NvidiaModelExtensionConfiguration> {
   constructor(private readonly i18n: I18nService) {}
 
   get spec(): ExtensionSpec {
@@ -106,15 +106,15 @@ export class NvidiaModelExtension implements Extension<OpenAICompatibleModelExte
     };
   }
 
-  async test(configuration: OpenAICompatibleModelExtensionConfiguration) {
+  async test(configuration: NvidiaModelExtensionConfiguration) {
     const model = this.createModel(configuration);
 
     await model.invoke('Just a test call');
   }
 
-  getMiddlewares(_: User, extension: ExtensionEntity<OpenAICompatibleModelExtensionConfiguration>): Promise<ChatMiddleware[]> {
+  getMiddlewares(_: User, extension: ExtensionEntity<NvidiaModelExtensionConfiguration>): Promise<ChatMiddleware[]> {
     const middleware = {
-      invoke: async (context: ChatContext, getContext: GetContext, next: ChatNextDelegate): Promise<any> => {
+      invoke: async (context: ChatContext, _: GetContext, next: ChatNextDelegate): Promise<any> => {
         context.llms[this.spec.name] = await context.cache.get(this.spec.name, extension.values, () => {
           return this.createModel(extension.values, true);
         });
@@ -126,14 +126,13 @@ export class NvidiaModelExtension implements Extension<OpenAICompatibleModelExte
     return Promise.resolve([middleware]);
   }
 
-  private createModel(configuration: OpenAICompatibleModelExtensionConfiguration, streaming = false) {
+  private createModel(configuration: NvidiaModelExtensionConfiguration, streaming = false) {
     const { apiKey, baseUrl, modelName, frequencyPenalty, presencePenalty, temperature, effort } = configuration;
 
     return new ChatNvidia({
       frequencyPenalty,
       model: modelName,
       apiKey,
-      openAIApiKey: apiKey,
       presencePenalty,
       streaming,
       temperature,
@@ -146,7 +145,7 @@ export class NvidiaModelExtension implements Extension<OpenAICompatibleModelExte
   }
 }
 
-type OpenAICompatibleModelExtensionConfiguration = ExtensionConfiguration & {
+type NvidiaModelExtensionConfiguration = ExtensionConfiguration & {
   apiKey: string;
   baseUrl: string;
   modelName: string;

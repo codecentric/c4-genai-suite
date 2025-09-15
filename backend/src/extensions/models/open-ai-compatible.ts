@@ -100,8 +100,8 @@ export class OpenAICompatibleModelExtension implements Extension<OpenAICompatibl
 
     return new ChatOpenAI({
       frequencyPenalty,
-      modelName,
-      openAIApiKey: apiKey,
+      model: modelName,
+      apiKey,
       presencePenalty,
       streaming,
       temperature,

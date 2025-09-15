@@ -9,7 +9,7 @@ import { ConfigurationModel, ExtensionArgument } from '../extensions';
 import { UploadedFile } from '../files';
 import { User } from '../users';
 
-// Chat errors are exposed dto the user.
+// Chat errors are exposed to the user.
 export class ChatError extends Error {
   constructor(public readonly message: string) {
     super(message);

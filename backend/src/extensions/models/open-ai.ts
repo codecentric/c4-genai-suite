@@ -122,8 +122,8 @@ export class OpenAIModelExtension implements Extension<OpenAIModelExtensionConfi
     return new ChatOpenAI({
       callbacks,
       frequencyPenalty,
-      modelName,
-      openAIApiKey: apiKey,
+      model: modelName,
+      apiKey,
       presencePenalty,
       streaming,
       temperature,
