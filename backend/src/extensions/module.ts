@@ -26,6 +26,7 @@ import { SpeechToTextExtension } from './other/speech-to-text';
 import { SummaryPromptExtension } from './other/summary';
 import { AzureAISearchExtension } from './tools/azure-ai-search';
 import { AzureDallEExtension } from './tools/azure-dall-e';
+import { AzureGPTImage1Extension } from './tools/azure-gpt-image-1';
 import { BingWebSearchExtension } from './tools/bing-web-search';
 import { BraveWebSearchExtension } from './tools/brave-web-search';
 import { CalculatorExtension } from './tools/calculator';
@@ -34,6 +35,7 @@ import { DuckduckgoWebSearchExtension } from './tools/duckduckgo-web-search';
 import { FilesExtension } from './tools/files';
 import { FilesConversationExtension } from './tools/files-conversation';
 import { FilesVisionExtension } from './tools/files-vision';
+import { GPTImage1Extension } from './tools/gpt-image-1';
 import { GroundingWithBingSearchExtension } from './tools/grounding-with-bing';
 import { MCPToolsExtension } from './tools/mcp-tools';
 import { OpenApiExtension } from './tools/open-api';
@@ -105,6 +107,7 @@ export class ExtensionLibraryModule {
         ...dynamicProviders,
         AzureAISearchExtension,
         AzureDallEExtension,
+        AzureGPTImage1Extension,
         AzureOpenAIModelExtension,
         AzureOpenAIReasoningModelExtension,
         BedrockModelExtension,
@@ -119,6 +122,7 @@ export class ExtensionLibraryModule {
         FilesExtension,
         FilesVisionExtension,
         GoogleGenAIModelExtension,
+        GPTImage1Extension,
         GroundingWithBingSearchExtension,
         HubPromptExtension,
         LangfuseExtension,
