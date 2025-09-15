@@ -128,7 +128,6 @@ export class OpenAIModelExtension implements Extension<OpenAIModelExtensionConfi
       streaming,
       temperature,
       reasoning: effort ? { effort } : undefined,
-      useResponsesApi: true,
     });
   }
 }
