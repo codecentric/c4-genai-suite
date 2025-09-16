@@ -39,7 +39,7 @@ pytest-mock = "3.15.0"
 pytest-responses = "0.5.1"
 pytest-github-report = "0.0.1"
 pytest-error-for-skips = "2.0.2"
-faker = "37.7.0"
+faker = "37.8.0"
 responses = "0.25.8"
 
 [tool.poetry.scripts]
