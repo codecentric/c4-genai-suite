@@ -1,8 +1,7 @@
-import { StructuredTool } from '@langchain/core/tools';
 import { Logger, NotFoundException } from '@nestjs/common';
 import { QueryBus } from '@nestjs/cqrs';
 import { z } from 'zod';
-import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from 'src/domain/chat';
+import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext, NamedStructuredTool } from 'src/domain/chat';
 import { Extension, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions';
 import { User } from 'src/domain/users';
 import { Bucket, GetFiles, GetFilesResponse, SearchFiles, SearchFilesResponse } from '../../domain/files';
@@ -107,7 +106,7 @@ export class FilesConversationExtension extends FilesExtension<FilesConversation
   }
 }
 
-class InternalTool extends StructuredTool {
+class InternalTool extends NamedStructuredTool {
   readonly name: string;
   readonly displayName = 'Files in chat';
   private readonly logger = new Logger(`${FilesConversationExtension.name}$${InternalTool.name}`);

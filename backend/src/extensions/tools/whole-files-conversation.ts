@@ -1,8 +1,7 @@
-import { StructuredTool } from '@langchain/core/tools';
 import { forwardRef, Inject, Logger } from '@nestjs/common';
 import { QueryBus } from '@nestjs/cqrs';
 import { z } from 'zod';
-import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from 'src/domain/chat';
+import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext, NamedStructuredTool } from 'src/domain/chat';
 import { Extension, ExtensionConfiguration, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions';
 import { User } from 'src/domain/users';
 import { GetFiles, GetFilesResponse } from '../../domain/files';
@@ -137,7 +136,7 @@ export class WholeFilesExtension implements Extension<WholeFilesExtensionConfigu
   }
 }
 
-class InternalTool extends StructuredTool {
+class InternalTool extends NamedStructuredTool {
   readonly name: string;
   readonly displayName = 'Complete Files';
   private readonly logger = new Logger(`${WholeFilesExtension.name}$${InternalTool.name}`);

@@ -1,9 +1,8 @@
-import { StructuredTool } from '@langchain/core/tools';
 import { forwardRef, Inject, Logger, NotFoundException } from '@nestjs/common';
 import { QueryBus } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { z } from 'zod';
-import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from 'src/domain/chat';
+import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext, NamedStructuredTool } from 'src/domain/chat';
 import { BucketEntity, BucketRepository, FileEntity, FileRepository } from 'src/domain/database';
 import { Extension, ExtensionArgument, ExtensionConfiguration, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions';
 import { Bucket, GetDocumentContent, GetDocumentContentResponse, SearchFiles, SearchFilesResponse } from 'src/domain/files';
@@ -171,7 +170,7 @@ export class FilesExtension<T extends FilesExtensionConfiguration = FilesExtensi
   }
 }
 
-class InternalTool extends StructuredTool {
+class InternalTool extends NamedStructuredTool {
   readonly name: string;
   readonly displayName = 'Files';
   private readonly logger = new Logger(`${FilesExtension.name}$${InternalTool.name}`);

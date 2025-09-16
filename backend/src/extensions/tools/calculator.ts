@@ -1,13 +1,12 @@
-import { Calculator } from '@langchain/community/tools/calculator';
-import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from 'src/domain/chat';
+import { Parser } from 'expr-eval';
+import z from 'zod';
+import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext, NamedStructuredTool } from 'src/domain/chat';
 import { Extension, ExtensionSpec } from 'src/domain/extensions';
 import { I18nService } from '../../localization/i18n.service';
 
 @Extension()
 export class CalculatorExtension implements Extension {
   constructor(private readonly i18n: I18nService) {}
-
-  private readonly tool = new Calculator();
 
   get spec(): ExtensionSpec {
     return {
@@ -44,12 +43,31 @@ export class CalculatorExtension implements Extension {
 
   getMiddlewares(): Promise<ChatMiddleware[]> {
     const middleware = {
-      invoke: async (context: ChatContext, getContext: GetContext, next: ChatNextDelegate): Promise<any> => {
-        context.tools.push(this.tool);
+      invoke: async (context: ChatContext, _: GetContext, next: ChatNextDelegate): Promise<any> => {
+        context.tools.push(new InternalTool());
         return next(context);
       },
     };
 
     return Promise.resolve([middleware]);
+  }
+}
+
+class InternalTool extends NamedStructuredTool {
+  readonly name = 'calculator';
+  readonly description =
+    'Useful for getting the result of a math expression. The input to this tool should be a valid mathematical expression that could be executed by a simple calculator.';
+  readonly displayName = 'Calculator';
+
+  get lc_id() {
+    return [...this.lc_namespace, this.name];
+  }
+
+  readonly schema = z.object({
+    input: z.string(),
+  });
+
+  protected async _call({ input }: z.infer<typeof this.schema>): Promise<string> {
+    return Promise.resolve(String(Parser.evaluate(input)));
   }
 }

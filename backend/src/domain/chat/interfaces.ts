@@ -3,8 +3,10 @@ import { type BaseListChatMessageHistory } from '@langchain/core/chat_history';
 import { type BaseChatModel, type BaseChatModelCallOptions } from '@langchain/core/language_models/chat_models';
 import { type ChatPromptTemplate } from '@langchain/core/prompts';
 import { type RunnableSequence } from '@langchain/core/runnables';
-import { type StructuredToolInterface } from '@langchain/core/tools';
+import { StructuredTool, type StructuredToolInterface } from '@langchain/core/tools';
+import { CallSettings, LanguageModel } from 'ai';
 import { Subject } from 'rxjs';
+import * as z from 'zod';
 import { ConfigurationModel, ExtensionArgument } from '../extensions';
 import { UploadedFile } from '../files';
 import { User } from '../users';
@@ -77,12 +79,74 @@ export interface MessagesHistory {
   addSources(externalExtensionId: string, sources: Source[]): void;
 }
 
+export interface LanguageModelContext {
+  model: LanguageModel;
+  options: Partial<CallSettings>;
+}
+
+export function isLanguageModelContext(instance: BaseChatModel | LanguageModelContext): instance is LanguageModelContext {
+  return (instance as BaseChatModel).invoke == null;
+}
+
+export abstract class NamedStructuredTool<
+  T extends z.ZodRawShape = z.ZodRawShape,
+  TSchema extends z.ZodObject<T> = z.ZodObject<T>,
+  TToolOutput = string | Record<string, any> | undefined | void,
+> extends StructuredTool {
+  abstract displayName: string;
+  abstract schema: TSchema;
+
+  execute(input: z.infer<TSchema>): Promise<TToolOutput> {
+    return this._call(input);
+  }
+
+  get lc_id() {
+    return [...this.lc_namespace, this.name];
+  }
+}
+
+export type NamedDynamicStructuredToolInput<TSchema extends z.ZodObject<z.ZodRawShape>, TToolOutput> = {
+  name: string;
+  description: string;
+  displayName: string;
+  schema: TSchema;
+  func: (arg: z.infer<TSchema>) => Promise<TToolOutput>;
+  returnDirect?: boolean;
+};
+
+export class NamedDynamicStructuredTool<
+  T extends z.ZodRawShape = z.ZodRawShape,
+  TSchema extends z.ZodObject<T> = z.ZodObject<T>,
+  TToolOutput = string | Record<string, any> | undefined | void,
+> extends NamedStructuredTool<T, TSchema, TToolOutput> {
+  displayName: string;
+  name: string;
+  schema: TSchema;
+  description: string;
+  func: (arg: z.infer<typeof this.schema>) => Promise<TToolOutput>;
+  returnDirect: boolean;
+
+  constructor({ displayName, func, schema, ...toolInput }: NamedDynamicStructuredToolInput<TSchema, TToolOutput>) {
+    super({});
+    this.displayName = displayName;
+    this.func = func;
+    this.schema = schema;
+    this.name = toolInput.name;
+    this.description = toolInput.description;
+    this.returnDirect = toolInput.returnDirect ?? false;
+  }
+
+  protected async _call(arg: z.infer<typeof this.schema>): Promise<TToolOutput> {
+    return this.func(arg);
+  }
+}
+
 export interface ChatContext {
   // The abort controller.
   readonly abort: AbortController;
 
   // Tools this agent has access to.
-  readonly tools: (StructuredToolInterface & { displayName?: string })[];
+  readonly tools: NamedStructuredTool[];
 
   // The input.
   readonly input: string;
@@ -124,7 +188,7 @@ export interface ChatContext {
   user: User;
 
   // LLM to use as the agent.
-  llms: Record<string, BaseChatModel<BaseChatModelCallOptions>>;
+  llms: Record<string, BaseChatModel<BaseChatModelCallOptions> | LanguageModelContext>;
 
   agentFactory?: (args: AgentArgument) => Promise<RunnableSequence> | RunnableSequence;
 

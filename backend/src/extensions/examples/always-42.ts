@@ -1,6 +1,5 @@
-import { StructuredTool } from '@langchain/core/tools';
 import { z } from 'zod';
-import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from 'src/domain/chat';
+import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext, NamedStructuredTool } from 'src/domain/chat';
 import { Extension, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions';
 import { User } from 'src/domain/users';
 import { I18nService } from '../../localization/i18n.service';
@@ -32,7 +31,7 @@ export class Always42Extension implements Extension {
   }
 }
 
-class InternalTool extends StructuredTool {
+class InternalTool extends NamedStructuredTool {
   readonly name: string;
   readonly description = 'Calculates the sum of two numbers';
   readonly displayName = 'Always 42';

@@ -1,6 +1,12 @@
-import { StructuredTool } from '@langchain/core/tools';
 import { z } from 'zod';
-import { ChatContext, ChatMiddleware, ChatNextDelegate, ExtensionUserArgumentValues, GetContext } from 'src/domain/chat';
+import {
+  ChatContext,
+  ChatMiddleware,
+  ChatNextDelegate,
+  ExtensionUserArgumentValues,
+  GetContext,
+  NamedStructuredTool,
+} from 'src/domain/chat';
 import { Extension, ExtensionArgument, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions';
 import { User } from 'src/domain/users';
 import { I18nService } from '../../localization/i18n.service';
@@ -96,7 +102,7 @@ export class UserArgsExtension implements Extension {
   }
 }
 
-class InternalTool extends StructuredTool {
+class InternalTool extends NamedStructuredTool {
   readonly name: string;
   readonly description = 'Shows the current user arguments.';
   readonly displayName = 'User Args';
@@ -112,8 +118,7 @@ class InternalTool extends StructuredTool {
     private readonly context: ChatContext,
     extensionExternalId: string,
   ) {
-    super();
-
+    super({});
     this.name = extensionExternalId;
   }
 

@@ -1,13 +1,23 @@
-import { MessageContent } from '@langchain/core/messages';
+import type { BaseChatModel } from '@langchain/core/language_models/chat_models';
+import { BaseMessage, MessageContent } from '@langchain/core/messages';
 import { ChatGenerationChunk } from '@langchain/core/outputs';
 import { Runnable, RunnableWithMessageHistory } from '@langchain/core/runnables';
 import { StructuredToolInterface } from '@langchain/core/tools';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { stepCountIs, streamText, tool, ToolSet } from 'ai';
 import { AgentExecutor, AgentExecutorInput, createOpenAIToolsAgent } from 'langchain/agents';
 import { I18nService } from '../../../localization/i18n.service';
 import { MetricsService } from '../../../metrics/metrics.service';
-import { ChatContext, ChatError, ChatMiddleware, NormalizedMessageContents } from '../interfaces';
+import {
+  ChatContext,
+  ChatError,
+  ChatMiddleware,
+  isLanguageModelContext,
+  LanguageModelContext,
+  NamedStructuredTool,
+  NormalizedMessageContents,
+} from '../interfaces';
 import { getReasoningContent, normalizedMessageContent } from '../utils';
 
 type EventActionType = 'start' | 'stream' | 'end';
@@ -42,25 +52,94 @@ export class ExecuteMiddleware implements ChatMiddleware {
     }
   }
 
-  async execute(context: ChatContext) {
-    const { llm: chosenLlm, agentFactory, configuration, llms, input, result, prompt, tools, history } = context;
+  async handleAiSdkChainExecution(llm: LanguageModelContext, context: ChatContext) {
+    const { input, systemMessages, abort, result, history, tools } = context;
 
+    const messages = await history?.getMessages();
+
+    const mapTool = (langchainTool: NamedStructuredTool) => {
+      return {
+        name: langchainTool.name,
+        tool: tool({
+          name: langchainTool.name,
+          inputSchema: langchainTool.schema,
+          execute: (input) => langchainTool.execute(input),
+          description: langchainTool.description,
+        }),
+      };
+    };
+
+    const allTools = tools.reduce((prev, curr) => {
+      const { name, tool } = mapTool(curr);
+      prev[name] = tool;
+      return prev;
+    }, {} as ToolSet);
+
+    const mapBaseMessage = (message: BaseMessage) => {
+      const normalized = normalizedMessageContent(message.content)?.[0];
+      const text = normalized?.type === 'text' ? normalized.text : '';
+
+      const type = message.getType();
+      switch (type) {
+        case 'human':
+          return { role: 'user' as const, content: text };
+        case 'system':
+          return { role: 'system' as const, content: text };
+        case 'ai':
+          return { role: 'assistant' as const, content: text };
+      }
+    };
+
+    const { fullStream, text } = streamText({
+      model: llm.model,
+      tools: allTools,
+      toolChoice: 'auto',
+      prompt: [
+        ...systemMessages.map((x) => ({ role: 'system' as const, content: x })),
+        ...(messages?.map((x) => mapBaseMessage(x)).filter((x) => !!x) ?? []),
+        { role: 'user' as const, content: input },
+      ],
+      ...llm.options,
+      abortSignal: abort.signal,
+      stopWhen: stepCountIs(1000),
+    });
+
+    for await (const event of fullStream) {
+      if (event.type === 'tool-call') {
+        const toolName = tools.find((x) => x.name === event.toolName)?.displayName ?? event.toolName;
+        result.next({ type: 'tool_start', tool: { name: toolName } });
+      }
+      if (event.type === 'tool-result') {
+        const toolName = tools.find((x) => x.name === event.toolName)?.displayName ?? event.toolName;
+        result.next({ type: 'tool_end', tool: { name: toolName } });
+      }
+      if (event.type === 'tool-error') {
+        console.log({ event });
+        const toolName = tools.find((x) => x.name === event.toolName)?.displayName ?? event.toolName;
+        result.next({ type: 'tool_end', tool: { name: toolName } });
+      }
+      if (event.type === 'reasoning-delta') {
+        result.next({ type: 'reasoning', content: event.text });
+      }
+      if (event.type === 'reasoning-end') {
+        result.next({ type: 'reasoning_end' });
+      }
+      if (event.type === 'text-delta') {
+        result.next({ type: 'chunk', content: [{ type: 'text', text: event.text }] });
+      }
+    }
+
+    await history?.addAIMessage(await text);
+  }
+
+  async handleLangChainExecution(llm: BaseChatModel, context: ChatContext) {
     const shouldLogLLMAgent = this.configService.get<string>('LOG_LLM_AGENT', 'false');
-    if (configuration.executorEndpoint) {
-      return;
-    }
-
-    const llm = llms[chosenLlm ?? ''];
-
-    if (!llm) {
-      throw new ChatError(this.i18n.t('texts.chat.errorMissingLLM'));
-    }
+    const { agentFactory, input, result, prompt, tools, history } = context;
+    let runnable: Runnable;
 
     if (!prompt) {
       throw new ChatError(this.i18n.t('texts.chat.errorMissingPrompt'));
     }
-
-    let runnable: Runnable;
 
     if (tools.length > 0) {
       const agent = await (agentFactory ?? createOpenAIToolsAgent)({
@@ -190,6 +269,26 @@ export class ExecuteMiddleware implements ChatMiddleware {
       // If the llm does not support streaming we have a fallback.
       result.next({ type: 'chunk', content: lastResult });
     }
+  }
+
+  async execute(context: ChatContext) {
+    const { llm: chosenLlm, configuration, llms } = context;
+
+    if (configuration.executorEndpoint) {
+      return;
+    }
+
+    const llm = llms[chosenLlm ?? ''];
+
+    if (!llm) {
+      throw new ChatError(this.i18n.t('texts.chat.errorMissingLLM'));
+    }
+
+    if (isLanguageModelContext(llm)) {
+      return this.handleAiSdkChainExecution(llm, context);
+    }
+
+    return this.handleLangChainExecution(llm, context);
   }
 }
 

@@ -1,10 +1,9 @@
-import { StructuredTool } from '@langchain/core/tools';
 import { Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { addMilliseconds, addYears } from 'date-fns';
 import { MoreThan } from 'typeorm';
 import { z } from 'zod';
-import { ChatContext, ChatMiddleware, ChatNextDelegate, FormActionType, GetContext } from 'src/domain/chat';
+import { ChatContext, ChatMiddleware, ChatNextDelegate, FormActionType, GetContext, NamedStructuredTool } from 'src/domain/chat';
 import { CacheEntity, CacheRepository } from 'src/domain/database';
 import { Extension, ExtensionConfiguration, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions';
 import { User } from 'src/domain/users';
@@ -115,7 +114,7 @@ export class OpenApiExtension implements Extension<OpenApiExtensionConfiguration
   }
 }
 
-class InternalTool extends StructuredTool {
+class InternalTool extends NamedStructuredTool {
   readonly name: string;
   readonly schema: z.ZodObject<any, any, any, any>;
   readonly displayName: string;
