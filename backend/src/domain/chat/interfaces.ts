@@ -82,6 +82,9 @@ export interface MessagesHistory {
 export interface LanguageModelContext {
   model: LanguageModel;
   options: Partial<CallSettings>;
+  // metadata (e.g. for usage counting)
+  modelName: string;
+  providerName: string;
 }
 
 export function isLanguageModelContext(instance: BaseChatModel | LanguageModelContext): instance is LanguageModelContext {

@@ -1,15 +1,11 @@
 import { modelExtensionTestSuite } from './model-test.base';
 import { OllamaModelExtension } from './ollama';
 
-const instance = {
-  invoke: jest.fn().mockReturnThis(),
-};
+jest.mock('ollama-ai-provider-v2', () => ({
+  createOllama: jest.fn(() => () => 'mocked model'),
+}));
+jest.mock('ai', () => ({
+  generateText: jest.fn(() => () => 'test output'),
+}));
 
-jest.mock('@langchain/ollama', () => {
-  return {
-    ChatOllama: jest.fn().mockImplementation(() => {
-      return instance;
-    }),
-  };
-});
-describe('OllamaModelExtension', () => modelExtensionTestSuite(OllamaModelExtension, instance));
+describe('OllamaModelExtension', () => modelExtensionTestSuite(OllamaModelExtension));

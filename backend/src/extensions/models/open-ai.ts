@@ -1,5 +1,5 @@
-import { CallbackHandlerMethods } from '@langchain/core/callbacks/base';
-import { ChatOpenAI } from '@langchain/openai';
+import { createOpenAI } from '@ai-sdk/openai';
+import { CallSettings, generateText } from 'ai';
 import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from 'src/domain/chat';
 import { Extension, ExtensionConfiguration, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions';
 import { User } from 'src/domain/users';
@@ -65,48 +65,29 @@ export class OpenAIModelExtension implements Extension<OpenAIModelExtensionConfi
           type: 'string',
           title: this.i18n.t('texts.extensions.common.effort'),
           required: false,
-          enum: ['', 'low', 'medium', 'high'],
+          enum: ['', 'minimal', 'low', 'medium', 'high'],
         },
       },
     };
   }
 
   async test(configuration: OpenAIModelExtensionConfiguration) {
-    const model = this.createModel(configuration);
+    const { model, options } = this.createModel(configuration);
 
-    await model.invoke('Just a test call');
+    const { text } = await generateText({
+      model,
+      prompt: 'Just a test call',
+      ...options,
+    });
+
+    return text != null;
   }
 
   getMiddlewares(_: User, extension: ExtensionEntity<OpenAIModelExtensionConfiguration>): Promise<ChatMiddleware[]> {
     const middleware = {
       invoke: async (context: ChatContext, getContext: GetContext, next: ChatNextDelegate): Promise<any> => {
         context.llms[this.spec.name] = await context.cache.get(this.spec.name, extension.values, () => {
-          const callbacks: CallbackHandlerMethods[] = [
-            {
-              handleLLMEnd: (output) => {
-                // Do not capture the context to make this class cacheable if needed.
-                const context = getContext();
-
-                if (!context) {
-                  return;
-                }
-
-                // This is provider specific, therefore we cannot handle it in the execute step.
-                const { completionTokens, promptTokens } = (output.llmOutput?.estimatedTokenUsage as OpenAITokenEstimation) || {};
-
-                let tokenCount = 0;
-                tokenCount += completionTokens ?? 0;
-                tokenCount += promptTokens ?? 0;
-
-                if (tokenCount > 0) {
-                  context.tokenUsage = { tokenCount, model: extension.values.modelName, llm: 'open-ai' };
-                }
-              },
-            },
-          ];
-
-          // The model does not support any streaming parameters.
-          return this.createModel(extension.values, callbacks, true);
+          return this.createModel(extension.values, true);
         });
 
         return next(context);
@@ -116,19 +97,31 @@ export class OpenAIModelExtension implements Extension<OpenAIModelExtensionConfi
     return Promise.resolve([middleware]);
   }
 
-  private createModel(configuration: OpenAIModelExtensionConfiguration, callbacks?: CallbackHandlerMethods[], streaming = false) {
-    const { apiKey, modelName, frequencyPenalty, presencePenalty, temperature, effort } = configuration;
+  private createModel(configuration: OpenAIModelExtensionConfiguration, streaming = false) {
+    const { apiKey, modelName, frequencyPenalty, presencePenalty, temperature, seed, effort } = configuration;
 
-    return new ChatOpenAI({
-      callbacks,
-      frequencyPenalty,
-      model: modelName,
-      apiKey,
-      presencePenalty,
-      streaming,
-      temperature,
-      reasoning: effort ? { effort } : undefined,
+    const open = createOpenAI({
+      name: 'open-ai',
+      apiKey: apiKey,
     });
+
+    return {
+      model: open(modelName),
+      options: {
+        presencePenalty,
+        frequencyPenalty,
+        temperature,
+        seed,
+        streaming,
+        providerOptions: {
+          openai: {
+            reasoningEffort: effort,
+          },
+        },
+      } as Partial<CallSettings>,
+      modelName: modelName,
+      providerName: 'open-ai',
+    };
   }
 }
 
@@ -139,10 +132,5 @@ type OpenAIModelExtensionConfiguration = ExtensionConfiguration & {
   seed: number;
   presencePenalty: number;
   frequencyPenalty: number;
-  effort?: 'low' | 'medium' | 'high';
-};
-
-type OpenAITokenEstimation = {
-  completionTokens?: number;
-  promptTokens?: number;
+  effort?: 'minimal' | 'low' | 'medium' | 'high';
 };

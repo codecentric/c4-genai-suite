@@ -1,4 +1,5 @@
-import { ChatOpenAI } from '@langchain/openai';
+import { createOpenAICompatible } from '@ai-sdk/openai-compatible';
+import { CallSettings, generateText } from 'ai';
 import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from 'src/domain/chat';
 import { Extension, ExtensionConfiguration, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions';
 import { User } from 'src/domain/users';
@@ -76,9 +77,15 @@ export class OpenAICompatibleModelExtension implements Extension<OpenAICompatibl
   }
 
   async test(configuration: OpenAICompatibleModelExtensionConfiguration) {
-    const model = this.createModel(configuration);
+    const { model, options } = this.createModel(configuration);
 
-    await model.invoke('Just a test call');
+    const { text } = await generateText({
+      model,
+      prompt: 'Just a test call',
+      ...options,
+    });
+
+    return text != null;
   }
 
   getMiddlewares(_: User, extension: ExtensionEntity<OpenAICompatibleModelExtensionConfiguration>): Promise<ChatMiddleware[]> {
@@ -96,20 +103,32 @@ export class OpenAICompatibleModelExtension implements Extension<OpenAICompatibl
   }
 
   private createModel(configuration: OpenAICompatibleModelExtensionConfiguration, streaming = false) {
-    const { apiKey, baseUrl, modelName, frequencyPenalty, presencePenalty, temperature, effort } = configuration;
+    const { apiKey, baseUrl, modelName, frequencyPenalty, presencePenalty, temperature, seed, effort } = configuration;
 
-    return new ChatOpenAI({
-      frequencyPenalty,
-      model: modelName,
-      apiKey,
-      presencePenalty,
-      streaming,
-      temperature,
-      configuration: {
-        baseURL: baseUrl,
-      },
-      reasoning: effort ? { effort } : undefined,
+    const open = createOpenAICompatible({
+      name: 'openai-compatible',
+      apiKey: apiKey,
+      baseURL: baseUrl,
+      includeUsage: true,
     });
+
+    return {
+      model: open(modelName),
+      options: {
+        presencePenalty,
+        frequencyPenalty,
+        temperature,
+        seed,
+        streaming,
+        providerOptions: {
+          openai: {
+            reasoningEffort: effort,
+          },
+        },
+      } as Partial<CallSettings>,
+      modelName: modelName,
+      providerName: 'openai-compatible',
+    };
   }
 }
 

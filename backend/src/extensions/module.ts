@@ -19,7 +19,7 @@ import { NvidiaModelExtension } from './models/nvidia';
 import { OllamaModelExtension } from './models/ollama';
 import { OpenAIModelExtension } from './models/open-ai';
 import { OpenAICompatibleModelExtension } from './models/open-ai-compatible';
-import { VertexAIModelExtension } from './models/vertex-al';
+import { VertexAIModelExtension } from './models/vertex-ai';
 import { CustomPromptExtension } from './other/custom';
 import { HubPromptExtension } from './other/hub';
 import { LangfuseExtension } from './other/langfuse';

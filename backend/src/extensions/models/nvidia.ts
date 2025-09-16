@@ -39,6 +39,7 @@ export class NvidiaModelExtension implements Extension<NvidiaModelExtensionConfi
           title: this.i18n.t('texts.extensions.common.temperature'),
           minimum: 0,
           maximum: 2,
+          default: 1,
           format: 'slider',
           description: this.i18n.t('texts.extensions.common.temperatureHint'),
         },
@@ -69,7 +70,7 @@ export class NvidiaModelExtension implements Extension<NvidiaModelExtensionConfi
           type: 'string',
           title: this.i18n.t('texts.extensions.common.effort'),
           required: false,
-          enum: ['', 'low', 'medium', 'high'],
+          enum: ['', 'minimal', 'low', 'medium', 'high'],
         },
       },
     };
@@ -115,6 +116,7 @@ export class NvidiaModelExtension implements Extension<NvidiaModelExtensionConfi
         presencePenalty: config.presencePenalty,
         frequencyPenalty: config.frequencyPenalty,
         seed: config.seed,
+        temperature: config.temperature,
         streaming,
         providerOptions: {
           openai: {
@@ -122,6 +124,8 @@ export class NvidiaModelExtension implements Extension<NvidiaModelExtensionConfi
           },
         },
       } as Partial<CallSettings>,
+      modelName: config.modelName,
+      providerName: 'nvidia',
     };
   }
 }

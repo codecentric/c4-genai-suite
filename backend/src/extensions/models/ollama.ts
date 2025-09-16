@@ -1,5 +1,5 @@
-import { ChatOllama } from '@langchain/ollama';
-import { createToolCallingAgent } from 'langchain/agents';
+import { CallSettings, generateText } from 'ai';
+import { createOllama } from 'ollama-ai-provider-v2';
 import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from 'src/domain/chat';
 import { Extension, ExtensionConfiguration, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions';
 import { User } from 'src/domain/users';
@@ -32,17 +32,23 @@ export class OllamaModelExtension implements Extension<OllamaModelExtensionConfi
   }
 
   async test(configuration: OllamaModelExtensionConfiguration) {
-    const model = this.createModel(configuration);
-    await model.invoke('Just a test call');
+    const { model, options } = this.createModel(configuration);
+
+    const { text } = await generateText({
+      model,
+      prompt: 'Just a test call',
+      ...options,
+    });
+
+    return text != null;
   }
 
   getMiddlewares(_: User, extension: ExtensionEntity<OllamaModelExtensionConfiguration>): Promise<ChatMiddleware[]> {
     const middleware = {
       invoke: async (context: ChatContext, _: GetContext, next: ChatNextDelegate): Promise<any> => {
         context.llms[this.spec.name] = await context.cache.get(this.spec.name, extension.values, () => {
-          return this.createModel(extension.values);
+          return this.createModel(extension.values, true);
         });
-        context.agentFactory = createToolCallingAgent;
 
         return next(context);
       },
@@ -51,13 +57,22 @@ export class OllamaModelExtension implements Extension<OllamaModelExtensionConfi
     return Promise.resolve([middleware]);
   }
 
-  private createModel(configuration: OllamaModelExtensionConfiguration) {
+  private createModel(configuration: OllamaModelExtensionConfiguration, streaming = false) {
     const { endpoint, modelName } = configuration;
 
-    return new ChatOllama({
-      baseUrl: endpoint,
-      model: modelName,
+    const open = createOllama({
+      name: 'ollama',
+      baseURL: endpoint,
     });
+
+    return {
+      model: open(modelName),
+      options: {
+        streaming,
+      } as Partial<CallSettings>,
+      modelName: modelName,
+      providerName: 'ollama',
+    };
   }
 }
 

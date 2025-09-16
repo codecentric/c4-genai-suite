@@ -1,11 +1,9 @@
-import { CallbackHandlerMethods } from '@langchain/core/callbacks/base';
-import { ChatGoogleGenerativeAI } from '@langchain/google-genai';
-import { createToolCallingAgent } from 'langchain/agents';
+import { createGoogleGenerativeAI } from '@ai-sdk/google';
+import { CallSettings, generateText } from 'ai';
 import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from 'src/domain/chat';
 import { Extension, ExtensionConfiguration, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions';
 import { User } from 'src/domain/users';
 import { I18nService } from '../../localization/i18n.service';
-import { getEstimatedUsageCallback } from './internal/utils';
 
 @Extension()
 export class GoogleGenAIModelExtension implements Extension<VertexAIModelExtensionConfiguration> {
@@ -75,20 +73,23 @@ export class GoogleGenAIModelExtension implements Extension<VertexAIModelExtensi
   }
 
   async test(configuration: VertexAIModelExtensionConfiguration) {
-    const model = this.createModel(configuration);
+    const { model, options } = this.createModel(configuration);
 
-    await model.invoke('Just a test call');
+    const { text } = await generateText({
+      model,
+      prompt: 'Just a test call',
+      ...options,
+    });
+
+    return text != null;
   }
 
   getMiddlewares(_: User, extension: ExtensionEntity<VertexAIModelExtensionConfiguration>): Promise<ChatMiddleware[]> {
     const middleware = {
       invoke: async (context: ChatContext, getContext: GetContext, next: ChatNextDelegate): Promise<any> => {
-        context.llms[this.spec.name] = await context.cache.get('google-genai', extension.values, () => {
-          // The model does not provide the token usage, therefore estimate it.
-          const callbacks = [getEstimatedUsageCallback('google-genai', extension.values.modelName, getContext)];
-          return this.createModel(extension.values, callbacks);
+        context.llms[this.spec.name] = await context.cache.get(this.spec.name, extension.values, () => {
+          return this.createModel(extension.values);
         });
-        context.agentFactory = createToolCallingAgent;
 
         return next(context);
       },
@@ -97,10 +98,23 @@ export class GoogleGenAIModelExtension implements Extension<VertexAIModelExtensi
     return Promise.resolve([middleware]);
   }
 
-  private createModel(configuration: VertexAIModelExtensionConfiguration, callbacks?: CallbackHandlerMethods[]) {
+  private createModel(configuration: VertexAIModelExtensionConfiguration) {
     const { modelName, apiKey, temperature, topP, topK } = configuration;
 
-    return new ChatGoogleGenerativeAI({ model: modelName, apiKey, temperature, topP, topK, callbacks });
+    const open = createGoogleGenerativeAI({
+      apiKey,
+    });
+
+    return {
+      model: open(modelName),
+      options: {
+        topP,
+        topK,
+        temperature,
+      } as Partial<CallSettings>,
+      modelName: modelName,
+      providerName: 'google-genai',
+    };
   }
 }
 

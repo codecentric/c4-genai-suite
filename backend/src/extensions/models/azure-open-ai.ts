@@ -1,10 +1,9 @@
-import { CallbackHandlerMethods } from '@langchain/core/callbacks/base';
-import { AzureChatOpenAI } from '@langchain/openai';
-import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from 'src/domain/chat';
+import { createAzure } from '@ai-sdk/azure';
+import { CallSettings, generateText } from 'ai';
+import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext, LanguageModelContext } from 'src/domain/chat';
 import { Extension, ExtensionConfiguration, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions';
 import { User } from 'src/domain/users';
 import { I18nService } from '../../localization/i18n.service';
-import { getEstimatedUsageCallback } from './internal/utils';
 
 @Extension()
 export class AzureOpenAIModelExtension implements Extension<AzureOpenAIModelExtensionConfiguration> {
@@ -34,13 +33,6 @@ export class AzureOpenAIModelExtension implements Extension<AzureOpenAIModelExte
           type: 'string',
           title: this.i18n.t('texts.extensions.common.instanceName'),
           required: true,
-        },
-        apiVersion: {
-          type: 'string',
-          title: this.i18n.t('texts.extensions.common.apiVersion'),
-          required: true,
-          format: 'select',
-          examples: ['2024-02-01', '2023-05-15', '2022-12-01', '2024-12-01-preview'],
         },
         temperature: {
           type: 'number',
@@ -89,20 +81,22 @@ export class AzureOpenAIModelExtension implements Extension<AzureOpenAIModelExte
   }
 
   async test(configuration: AzureOpenAIModelExtensionConfiguration) {
-    const model = this.createModel(configuration);
+    const { model, options } = this.createModel(configuration);
 
-    await model.invoke('Just a test call');
+    const { text } = await generateText({
+      model,
+      prompt: 'Just a test call',
+      ...options,
+    });
+
+    return text != null;
   }
 
   getMiddlewares(_: User, extension: ExtensionEntity<AzureOpenAIModelExtensionConfiguration>): Promise<ChatMiddleware[]> {
     const middleware = {
       invoke: async (context: ChatContext, getContext: GetContext, next: ChatNextDelegate): Promise<any> => {
         context.llms[this.spec.name] = await context.cache.get(this.spec.name, extension.values, () => {
-          // The model does not provide the token usage, therefore estimate it.
-          const callbacks = [getEstimatedUsageCallback('azure-open-ai', extension.values.deploymentName, getContext)];
-
-          // Stream the result token by token to the frontend.
-          return this.createModel(extension.values, callbacks, true);
+          return this.createModel(extension.values, true);
         });
 
         return next(context);
@@ -112,26 +106,33 @@ export class AzureOpenAIModelExtension implements Extension<AzureOpenAIModelExte
     return Promise.resolve([middleware]);
   }
 
-  private createModel(
-    configuration: AzureOpenAIModelExtensionConfiguration,
-    callbacks?: CallbackHandlerMethods[],
-    streaming = false,
-  ) {
-    const { apiKey, apiVersion, deploymentName, frequencyPenalty, instanceName, presencePenalty, temperature, topP } =
-      configuration;
+  private createModel(configuration: AzureOpenAIModelExtensionConfiguration, streaming = false): LanguageModelContext {
+    const { apiKey, deploymentName, frequencyPenalty, instanceName, presencePenalty, temperature, seed, topP } = configuration;
 
-    return new AzureChatOpenAI({
-      azureOpenAIApiDeploymentName: deploymentName,
-      azureOpenAIApiInstanceName: instanceName,
-      azureOpenAIApiKey: apiKey,
-      azureOpenAIApiVersion: apiVersion,
-      callbacks,
-      frequencyPenalty,
-      presencePenalty,
-      streaming,
-      temperature,
-      topP,
+    const open = createAzure({
+      apiKey,
+      resourceName: instanceName,
     });
+
+    return {
+      model: open(deploymentName),
+      options: {
+        presencePenalty,
+        frequencyPenalty,
+        temperature,
+        seed,
+        topP,
+        streaming,
+        providerOptions: {
+          openai: {
+            // TODO: can we unify reasoning models?
+            // reasoningEffort: effort,
+          },
+        },
+      } as Partial<CallSettings>,
+      modelName: deploymentName,
+      providerName: 'azure-open-ai',
+    };
   }
 }
 

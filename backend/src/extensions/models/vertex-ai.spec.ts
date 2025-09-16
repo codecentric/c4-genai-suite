@@ -1,16 +1,11 @@
 import { modelExtensionTestSuite } from './model-test.base';
-import { VertexAIModelExtension } from './vertex-al';
+import { VertexAIModelExtension } from './vertex-ai';
 
-const instance = {
-  invoke: jest.fn().mockReturnThis(),
-};
+jest.mock('@ai-sdk/openai', () => ({
+  createVertex: jest.fn(() => () => 'mocked model'),
+}));
+jest.mock('ai', () => ({
+  generateText: jest.fn(() => () => 'test output'),
+}));
 
-jest.mock('@langchain/google-vertexai', () => {
-  return {
-    ChatVertexAI: jest.fn().mockImplementation(() => {
-      return instance;
-    }),
-  };
-});
-
-describe('VertexAIModelExtension', () => modelExtensionTestSuite(VertexAIModelExtension, instance));
+describe('VertexAIModelExtension', () => modelExtensionTestSuite(VertexAIModelExtension));

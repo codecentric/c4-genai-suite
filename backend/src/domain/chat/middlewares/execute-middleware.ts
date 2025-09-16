@@ -90,7 +90,7 @@ export class ExecuteMiddleware implements ChatMiddleware {
       }
     };
 
-    const { fullStream, text } = streamText({
+    const { fullStream, text, usage } = streamText({
       model: llm.model,
       tools: allTools,
       toolChoice: 'auto',
@@ -130,6 +130,11 @@ export class ExecuteMiddleware implements ChatMiddleware {
     }
 
     await history?.addAIMessage(await text);
+
+    // TODO: we might want to implement a token estimation, since some models do not provide `usage`.
+    const totalTokens = (await usage).totalTokens ?? 0;
+    context.tokenUsage ??= { tokenCount: 0, model: llm.modelName, llm: llm.providerName };
+    context.tokenUsage.tokenCount += totalTokens;
   }
 
   async handleLangChainExecution(llm: BaseChatModel, context: ChatContext) {

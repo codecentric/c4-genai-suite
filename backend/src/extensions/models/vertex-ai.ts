@@ -1,10 +1,9 @@
-import { CallbackHandlerMethods } from '@langchain/core/callbacks/base';
-import { ChatVertexAI } from '@langchain/google-vertexai';
+import { createVertex } from '@ai-sdk/google-vertex';
+import { CallSettings, generateText } from 'ai';
 import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from 'src/domain/chat';
 import { Extension, ExtensionConfiguration, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions';
 import { User } from 'src/domain/users';
 import { I18nService } from '../../localization/i18n.service';
-import { getEstimatedUsageCallback } from './internal/utils';
 
 @Extension()
 export class VertexAIModelExtension implements Extension<VertexAIModelExtensionConfiguration> {
@@ -23,7 +22,7 @@ export class VertexAIModelExtension implements Extension<VertexAIModelExtensionC
           title: this.i18n.t('texts.extensions.common.modelName'),
           required: true,
           format: 'select',
-          enum: ['gemini-1.0-pro', 'gemini-1.0-pro-vision'],
+          examples: ['gemini-1.0-pro', 'gemini-1.0-pro-vision'],
           showInList: true,
         },
       },
@@ -31,20 +30,22 @@ export class VertexAIModelExtension implements Extension<VertexAIModelExtensionC
   }
 
   async test(configuration: VertexAIModelExtensionConfiguration) {
-    const model = this.createModel(configuration);
+    const { model, options } = this.createModel(configuration);
 
-    await model.invoke('Just a test call');
+    const { text } = await generateText({
+      model,
+      prompt: 'Just a test call',
+      ...options,
+    });
+
+    return text != null;
   }
 
   getMiddlewares(_: User, extension: ExtensionEntity<VertexAIModelExtensionConfiguration>): Promise<ChatMiddleware[]> {
     const middleware = {
       invoke: async (context: ChatContext, getContext: GetContext, next: ChatNextDelegate): Promise<any> => {
-        context.llms[this.spec.name] = await context.cache.get('open-ai-model', extension.values, () => {
-          // The model does not provide the token usage, therefore estimate it.
-          const callbacks = [getEstimatedUsageCallback('vertex-ai', extension.values.modelName, getContext)];
-
-          // The model does not support any streaming parameters.
-          return this.createModel(extension.values, callbacks);
+        context.llms[this.spec.name] = await context.cache.get(this.spec.name, extension.values, () => {
+          return this.createModel(extension.values);
         });
 
         return next(context);
@@ -54,10 +55,17 @@ export class VertexAIModelExtension implements Extension<VertexAIModelExtensionC
     return Promise.resolve([middleware]);
   }
 
-  private createModel(configuration: VertexAIModelExtensionConfiguration, callbacks?: CallbackHandlerMethods[]) {
+  private createModel(configuration: VertexAIModelExtensionConfiguration) {
     const { modelName } = configuration;
 
-    return new ChatVertexAI({ modelName, callbacks });
+    const open = createVertex({});
+
+    return {
+      model: open(modelName),
+      options: {} as Partial<CallSettings>,
+      modelName: modelName,
+      providerName: 'vertex-ai',
+    };
   }
 }
 
