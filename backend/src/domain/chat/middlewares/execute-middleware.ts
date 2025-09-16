@@ -7,7 +7,6 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { stepCountIs, streamText, tool, ToolSet } from 'ai';
 import { AgentExecutor, AgentExecutorInput, createOpenAIToolsAgent } from 'langchain/agents';
-import * as z from 'zod';
 import { I18nService } from '../../../localization/i18n.service';
 import { MetricsService } from '../../../metrics/metrics.service';
 import {
@@ -16,6 +15,7 @@ import {
   ChatMiddleware,
   isLanguageModelContext,
   LanguageModelContext,
+  NamedStructuredTool,
   NormalizedMessageContents,
 } from '../interfaces';
 import { getReasoningContent, normalizedMessageContent } from '../utils';
@@ -57,13 +57,13 @@ export class ExecuteMiddleware implements ChatMiddleware {
 
     const messages = await history?.getMessages();
 
-    const mapTool = (langchainTool: StructuredToolInterface & { _call?: (input: unknown) => Promise<unknown> }) => {
+    const mapTool = (langchainTool: NamedStructuredTool) => {
       return {
         name: langchainTool.name,
         tool: tool({
           name: langchainTool.name,
-          inputSchema: langchainTool.schema as z.Schema<z.ZodTypeAny>,
-          execute: (input) => langchainTool._call?.(input) ?? '',
+          inputSchema: langchainTool.schema,
+          execute: (input) => langchainTool.execute(input),
           description: langchainTool.description,
         }),
       };

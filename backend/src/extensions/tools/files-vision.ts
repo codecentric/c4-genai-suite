@@ -1,26 +1,22 @@
-import { DynamicStructuredToolInput } from '@langchain/core/dist/tools';
 import { BaseChatModel } from '@langchain/core/language_models/chat_models';
 import { StringOutputParser } from '@langchain/core/output_parsers';
 import { ChatPromptTemplate } from '@langchain/core/prompts';
-import { DynamicStructuredTool } from '@langchain/core/tools';
 import { forwardRef, Inject, Logger } from '@nestjs/common';
 import { QueryBus } from '@nestjs/cqrs';
 import { generateText } from 'ai';
 import { z } from 'zod';
-import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext, isLanguageModelContext } from 'src/domain/chat';
+import {
+  ChatContext,
+  ChatMiddleware,
+  ChatNextDelegate,
+  GetContext,
+  isLanguageModelContext,
+  NamedDynamicStructuredTool,
+} from 'src/domain/chat';
 import { Extension, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions';
 import { User } from 'src/domain/users';
 import { GetFiles, GetFilesResponse, matchExtension } from '../../domain/files';
 import { I18nService } from '../../localization/i18n.service';
-
-export class NamedDynamicStructuredTool extends DynamicStructuredTool {
-  displayName: string;
-
-  constructor({ displayName, ...toolInput }: DynamicStructuredToolInput & { displayName: string }) {
-    super(toolInput);
-    this.displayName = displayName;
-  }
-}
 
 type FilesVisionExtensionConfiguration = { fileNameExtensions: string[]; maxFiles: [] };
 
@@ -88,6 +84,7 @@ export class FilesVisionExtension implements Extension<FilesVisionExtensionConfi
           context.tools.push(
             new NamedDynamicStructuredTool({
               ...commonArguments,
+              schema: z.object({}),
               description:
                 'Call this tool to understand an image uploaded by the user. Currently the user did not upload an image. If you expect one, ask the user to upload it via the paperclip symbol.',
               func: async () => {},

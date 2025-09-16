@@ -1,10 +1,10 @@
-import { Tool } from '@langchain/core/tools';
 import { forwardRef, Inject, Logger } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import OpenAI from 'openai';
 import * as uuid from 'uuid';
+import { z } from 'zod';
 import { AuthService } from 'src/domain/auth';
-import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from 'src/domain/chat';
+import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext, NamedStructuredTool } from 'src/domain/chat';
 import { Extension, ExtensionConfiguration, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions';
 import { UploadBlob } from 'src/domain/settings';
 import { User } from 'src/domain/users';
@@ -84,12 +84,17 @@ export class GPTImage1Extension implements Extension<GPTImage1ExtensionConfigura
   }
 }
 
-class InternalTool extends Tool {
+class InternalTool extends NamedStructuredTool {
   readonly name: string;
   readonly description =
     'A tool to generate images from a prompt using GPT-Image-1. It returns a link to an image. Show the image to the user by using Markdown to embed the image into your response, like `![alttext](link/from/the/response)`.';
   readonly returnDirect = false;
   private readonly logger = new Logger(InternalTool.name);
+  readonly displayName = this.name;
+
+  readonly schema = z.object({
+    prompt: z.string(),
+  });
 
   get lc_id() {
     return [...this.lc_namespace, this.name];
@@ -106,7 +111,7 @@ class InternalTool extends Tool {
     this.name = spec.name;
   }
 
-  protected async _call(prompt: string): Promise<string> {
+  protected async _call({ prompt }: z.infer<typeof this.schema>): Promise<string> {
     try {
       const response = await this.client.images.generate({
         model: 'gpt-image-1',

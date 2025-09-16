@@ -1,5 +1,3 @@
-import { DynamicStructuredToolInput } from '@langchain/core/dist/tools';
-import { DynamicStructuredTool } from '@langchain/core/tools';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { SSEClientTransport } from '@modelcontextprotocol/sdk/client/sse.js';
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
@@ -13,11 +11,19 @@ import {
   ReadResourceResultSchema,
 } from '@modelcontextprotocol/sdk/types.js';
 import { JsonSchemaObject, jsonSchemaToZod } from '@n8n/json-schema-to-zod';
+import type { JsonSchema } from '@n8n/json-schema-to-zod/dist/types/types';
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { diff } from 'json-diff-ts';
 import { renderString } from 'nunjucks';
 import { z } from 'zod';
-import { ChatContext, ChatMiddleware, ChatNextDelegate, FormActionType, GetContext } from 'src/domain/chat';
+import {
+  ChatContext,
+  ChatMiddleware,
+  ChatNextDelegate,
+  FormActionType,
+  GetContext,
+  NamedDynamicStructuredTool,
+} from 'src/domain/chat';
 import {
   Extension,
   ExtensionArgument,
@@ -29,6 +35,10 @@ import {
 import { User } from 'src/domain/users';
 import { I18nService } from '../../localization/i18n.service';
 import { transformMCPToolResponse } from './mcp-types/transformer';
+
+function jsonSchemaToZodInternal(schema: JsonSchema): z.ZodObject<z.ZodRawShape> {
+  return jsonSchemaToZod(schema);
+}
 
 type MCPListToolsResultSchema = z.infer<typeof ListToolsResultSchema>;
 
@@ -67,15 +77,6 @@ interface Configuration {
 interface ExtensionState extends Pick<Configuration, 'endpoint'> {
   tools?: MCPListToolsResultSchema['tools'];
   changed?: boolean;
-}
-
-export class NamedDynamicStructuredTool extends DynamicStructuredTool {
-  displayName: string;
-
-  constructor({ displayName, ...toolInput }: DynamicStructuredToolInput & { displayName: string }) {
-    super(toolInput);
-    this.displayName = displayName;
-  }
 }
 
 // zod has no password type since it is handled as string so we introduce a whitelist to map password fields
@@ -470,7 +471,7 @@ export class MCPToolsExtension implements Extension<Configuration> {
               displayName,
               name: `${extension.externalId}_${name}`,
               description: params.description || description || name,
-              schema: jsonSchemaToZod(schema),
+              schema: jsonSchemaToZodInternal(schema),
               func: async (args: Record<string, any>) => {
                 const attributes = params.attributes ?? {};
                 const adminArgs = this.applyTemplates(context, this.getTemplateArgs(attributes, 'admin'));

@@ -1,7 +1,6 @@
-import { StructuredTool } from '@langchain/core/tools';
 import { Parser } from 'expr-eval';
 import z from 'zod';
-import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from 'src/domain/chat';
+import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext, NamedStructuredTool } from 'src/domain/chat';
 import { Extension, ExtensionSpec } from 'src/domain/extensions';
 import { I18nService } from '../../localization/i18n.service';
 
@@ -54,7 +53,7 @@ export class CalculatorExtension implements Extension {
   }
 }
 
-class InternalTool extends StructuredTool {
+class InternalTool extends NamedStructuredTool {
   readonly name = 'calculator';
   readonly description =
     'Useful for getting the result of a math expression. The input to this tool should be a valid mathematical expression that could be executed by a simple calculator.';

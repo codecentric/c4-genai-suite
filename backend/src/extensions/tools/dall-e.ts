@@ -1,10 +1,10 @@
-import { Tool } from '@langchain/core/tools';
 import { DallEAPIWrapper } from '@langchain/openai';
 import { forwardRef, Inject, Logger } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import * as uuid from 'uuid';
+import * as z from 'zod';
 import { AuthService } from 'src/domain/auth';
-import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from 'src/domain/chat';
+import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext, NamedStructuredTool } from 'src/domain/chat';
 import { Extension, ExtensionConfiguration, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions';
 import { UploadBlob } from 'src/domain/settings';
 import { User } from 'src/domain/users';
@@ -106,7 +106,7 @@ export class DallEExtension implements Extension<DallEExtensionConfiguration> {
   }
 }
 
-class InternalTool extends Tool {
+class InternalTool extends NamedStructuredTool {
   readonly name: string;
   readonly description =
     'A tool to generate images from a prompt. It returns a link to an image. Show the image to the user by using Markdown to embed the image into your response, like `![alttext](link/from/the/response)`.';
@@ -117,6 +117,10 @@ class InternalTool extends Tool {
   get lc_id() {
     return [...this.lc_namespace, this.name];
   }
+
+  readonly schema = z.object({
+    input: z.string(),
+  });
 
   constructor(
     private readonly authService: AuthService,
@@ -129,9 +133,9 @@ class InternalTool extends Tool {
     this.displayName = spec.title;
   }
 
-  protected async _call(arg: string): Promise<string> {
+  protected async _call({ input }: z.infer<typeof this.schema>): Promise<string> {
     try {
-      const image = (await this.wrapper.invoke(arg)) as string;
+      const image = (await this.wrapper.invoke(input)) as string;
 
       // Download the image to put it in our store.
       const downloaded = await fetch(image);

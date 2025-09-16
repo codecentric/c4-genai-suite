@@ -7,10 +7,9 @@ import {
 } from '@azure/ai-agents';
 import { delay } from '@azure/core-util';
 import { ClientSecretCredential } from '@azure/identity';
-import { StructuredTool } from '@langchain/core/tools';
 import { Logger } from '@nestjs/common';
 import { z } from 'zod';
-import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext, Source } from 'src/domain/chat';
+import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext, NamedStructuredTool, Source } from 'src/domain/chat';
 import { Extension, ExtensionConfiguration, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions';
 import { User } from 'src/domain/users';
 import { I18nService } from '../../localization/i18n.service';
@@ -84,7 +83,7 @@ export class GroundingWithBingSearchExtension implements Extension<GroundingWith
   }
 }
 
-class InternalTool extends StructuredTool {
+class InternalTool extends NamedStructuredTool {
   readonly name: string;
   readonly description: string;
   readonly displayName = 'Grounding with Bing Search';
