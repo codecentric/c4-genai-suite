@@ -59,7 +59,7 @@
     "tailwind-merge": "^3.2.0",
     "universal-cookie": "^8.0.0",
     "yup": "^1.4.0",
-    "zod": "^3.25.76",
+    "zod": "^4.1.9",
     "zustand": "^5.0.0"
   },
   "devDependencies": {
