@@ -1,5 +1,3 @@
-import { AIMessageChunk, MessageContent } from '@langchain/core/messages';
-import { ChatGenerationChunk } from '@langchain/core/outputs';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -54,5 +52,5 @@ export class GetHistoryHandler implements IQueryHandler<GetHistory, GetHistoryRe
 }
 
 type MessageEntityData = {
-  content: MessageContent | AIMessageChunk | ChatGenerationChunk;
+  content: string;
 };

@@ -175,10 +175,6 @@ class InternalTool extends NamedStructuredTool {
   readonly displayName = 'Files';
   private readonly logger = new Logger(`${FilesExtension.name}$${InternalTool.name}`);
 
-  get lc_id() {
-    return [...this.lc_namespace, this.name];
-  }
-
   readonly schema = z.object({
     query: z.string().describe('The query'),
   });

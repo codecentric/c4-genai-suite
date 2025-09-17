@@ -1,9 +1,3 @@
-import { type BaseCallbackHandler, type CallbackHandlerMethods } from '@langchain/core/callbacks/base';
-import { type BaseListChatMessageHistory } from '@langchain/core/chat_history';
-import { type BaseChatModel, type BaseChatModelCallOptions } from '@langchain/core/language_models/chat_models';
-import { type ChatPromptTemplate } from '@langchain/core/prompts';
-import { type RunnableSequence } from '@langchain/core/runnables';
-import { StructuredTool, type StructuredToolInterface } from '@langchain/core/tools';
 import { CallSettings, LanguageModel } from 'ai';
 import { Subject } from 'rxjs';
 import * as z from 'zod';
@@ -68,15 +62,50 @@ export interface ChatUI {
   form(text: string, schema: ExtensionArgument): Promise<ChatUICallbackResult>;
 }
 
-export interface AgentArgument {
-  llm: BaseChatModel<BaseChatModelCallOptions>;
-  tools: StructuredToolInterface[];
-  prompt: ChatPromptTemplate;
-  streamRunnable?: boolean;
+export abstract class BaseMessage {
+  type!: 'ai' | 'human';
+  content: string;
+  constructor(content: string) {
+    this.content = content;
+  }
+  getType(): 'ai' | 'human' {
+    return this.type;
+  }
 }
 
-export interface MessagesHistory {
-  addSources(externalExtensionId: string, sources: Source[]): void;
+export class AIMessage extends BaseMessage {
+  readonly type = 'ai' as const;
+  constructor(content: string) {
+    super(content);
+  }
+}
+
+export class HumanMessage extends BaseMessage {
+  readonly type = 'human' as const;
+  constructor(content: string) {
+    super(content);
+  }
+}
+
+export abstract class MessagesHistory {
+  /** Returns a list of messages stored in the store. */
+  public abstract getMessages(): Promise<BaseMessage[]>;
+  /** Add a message object to the store. */
+  public abstract addMessage(message: BaseMessage): Promise<void>;
+  /** Add source annotations. */
+  public abstract addSources(externalExtensionId: string, sources: Source[]): void;
+
+  public addUserMessage(message: string): Promise<void> {
+    return this.addMessage(new HumanMessage(message));
+  }
+  public addAIMessage(message: string): Promise<void> {
+    return this.addMessage(new AIMessage(message));
+  }
+  public async addMessages(messages: BaseMessage[]): Promise<void> {
+    for (const message of messages) {
+      await this.addMessage(message);
+    }
+  }
 }
 
 export interface LanguageModelContext {
@@ -87,24 +116,21 @@ export interface LanguageModelContext {
   providerName: string;
 }
 
-export function isLanguageModelContext(instance: BaseChatModel | LanguageModelContext): instance is LanguageModelContext {
-  return (instance as BaseChatModel).invoke == null;
-}
-
 export abstract class NamedStructuredTool<
   T extends z.ZodRawShape = z.ZodRawShape,
   TSchema extends z.ZodObject<T> = z.ZodObject<T>,
   TToolOutput = string | Record<string, any> | undefined | void,
-> extends StructuredTool {
+> {
   abstract displayName: string;
   abstract schema: TSchema;
 
+  abstract name: string;
+  abstract description: string;
+
+  protected abstract _call(arg: z.infer<typeof this.schema>): Promise<TToolOutput>;
+
   execute(input: z.infer<TSchema>): Promise<TToolOutput> {
     return this._call(input);
-  }
-
-  get lc_id() {
-    return [...this.lc_namespace, this.name];
   }
 }
 
@@ -130,7 +156,7 @@ export class NamedDynamicStructuredTool<
   returnDirect: boolean;
 
   constructor({ displayName, func, schema, ...toolInput }: NamedDynamicStructuredToolInput<TSchema, TToolOutput>) {
-    super({});
+    super();
     this.displayName = displayName;
     this.func = func;
     this.schema = schema;
@@ -178,9 +204,6 @@ export interface ChatContext {
   // The context values.
   readonly context: ConversationContext;
 
-  // The callbacks for the chain.
-  readonly callbacks: (BaseCallbackHandler | CallbackHandlerMethods)[];
-
   // Configures the summary generation.
   summaryConfig?: { prompt: string; historyLength?: number };
 
@@ -191,12 +214,7 @@ export interface ChatContext {
   user: User;
 
   // LLM to use as the agent.
-  llms: Record<string, BaseChatModel<BaseChatModelCallOptions> | LanguageModelContext>;
-
-  agentFactory?: (args: AgentArgument) => Promise<RunnableSequence> | RunnableSequence;
-
-  // The prompt to use, must have an input key.
-  prompt?: ChatPromptTemplate;
+  llms: Record<string, LanguageModelContext>;
 
   // The chosen LLM.
   llm?: string;
@@ -205,7 +223,7 @@ export interface ChatContext {
   tokenUsage?: TokenUsage;
 
   // The history of previous messages
-  history?: BaseListChatMessageHistory & MessagesHistory;
+  history?: MessagesHistory;
 }
 
 export interface TokenUsage {

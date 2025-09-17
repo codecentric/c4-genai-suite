@@ -1,17 +1,8 @@
-import { BaseMessage } from '@langchain/core/messages';
 import { Injectable, Logger } from '@nestjs/common';
 import { stepCountIs, streamText, tool, ToolSet } from 'ai';
 import { I18nService } from '../../../localization/i18n.service';
 import { MetricsService } from '../../../metrics/metrics.service';
-import {
-  ChatContext,
-  ChatError,
-  ChatMiddleware,
-  isLanguageModelContext,
-  LanguageModelContext,
-  NamedStructuredTool,
-} from '../interfaces';
-import { normalizedMessageContent } from '../utils';
+import { BaseMessage, ChatContext, ChatError, ChatMiddleware, LanguageModelContext, NamedStructuredTool } from '../interfaces';
 
 @Injectable()
 export class ExecuteMiddleware implements ChatMiddleware {
@@ -45,14 +36,14 @@ export class ExecuteMiddleware implements ChatMiddleware {
 
     const messages = await history?.getMessages();
 
-    const mapTool = (langchainTool: NamedStructuredTool) => {
+    const mapTool = (namedTool: NamedStructuredTool) => {
       return {
-        name: langchainTool.name,
+        name: namedTool.name,
         tool: tool({
-          name: langchainTool.name,
-          inputSchema: langchainTool.schema,
-          execute: (input) => langchainTool.execute(input),
-          description: langchainTool.description,
+          name: namedTool.name,
+          inputSchema: namedTool.schema,
+          execute: (input) => namedTool.execute(input),
+          description: namedTool.description,
         }),
       };
     };
@@ -64,15 +55,12 @@ export class ExecuteMiddleware implements ChatMiddleware {
     }, {} as ToolSet);
 
     const mapBaseMessage = (message: BaseMessage) => {
-      const normalized = normalizedMessageContent(message.content)?.[0];
-      const text = normalized?.type === 'text' ? normalized.text : '';
+      const text = message.content;
 
       const type = message.getType();
       switch (type) {
         case 'human':
           return { role: 'user' as const, content: text };
-        case 'system':
-          return { role: 'system' as const, content: text };
         case 'ai':
           return { role: 'assistant' as const, content: text };
       }
@@ -102,7 +90,7 @@ export class ExecuteMiddleware implements ChatMiddleware {
         result.next({ type: 'tool_end', tool: { name: toolName } });
       }
       if (event.type === 'tool-error') {
-        console.log({ event });
+        this.logger.error({ event });
         const toolName = tools.find((x) => x.name === event.toolName)?.displayName ?? event.toolName;
         result.next({ type: 'tool_end', tool: { name: toolName } });
       }
@@ -116,7 +104,7 @@ export class ExecuteMiddleware implements ChatMiddleware {
         result.next({ type: 'chunk', content: [{ type: 'text', text: event.text }] });
       }
       if (event.type === 'error') {
-        console.log({ event });
+        this.logger.error({ event });
       }
     }
 
@@ -141,8 +129,6 @@ export class ExecuteMiddleware implements ChatMiddleware {
       throw new ChatError(this.i18n.t('texts.chat.errorMissingLLM'));
     }
 
-    if (isLanguageModelContext(llm)) {
-      return this.handleAiSdkChainExecution(llm, context);
-    }
+    return this.handleAiSdkChainExecution(llm, context);
   }
 }

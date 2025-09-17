@@ -96,10 +96,6 @@ class InternalTool extends NamedStructuredTool {
     prompt: z.string(),
   });
 
-  get lc_id() {
-    return [...this.lc_namespace, this.name];
-  }
-
   constructor(
     private readonly authService: AuthService,
     private readonly client: OpenAI,

@@ -87,10 +87,6 @@ class InternalTool extends NamedStructuredTool {
   readonly vectorField: string;
   private readonly logger = new Logger(InternalTool.name);
 
-  get lc_id() {
-    return [...this.lc_namespace, this.name];
-  }
-
   readonly schema = z.object({
     query: z.string().describe('A precise search query containing keywords, phrases or questions.'),
   });

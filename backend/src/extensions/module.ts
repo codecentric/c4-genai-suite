@@ -19,10 +19,7 @@ import { NvidiaModelExtension } from './models/nvidia';
 import { OllamaModelExtension } from './models/ollama';
 import { OpenAIModelExtension } from './models/open-ai';
 import { OpenAICompatibleModelExtension } from './models/open-ai-compatible';
-import { VertexAIModelExtension } from './models/vertex-ai';
 import { CustomPromptExtension } from './other/custom';
-import { HubPromptExtension } from './other/hub';
-import { LangfuseExtension } from './other/langfuse';
 import { SpeechToTextExtension } from './other/speech-to-text';
 import { SummaryPromptExtension } from './other/summary';
 import { AzureAISearchExtension } from './tools/azure-ai-search';
@@ -125,8 +122,6 @@ export class ExtensionLibraryModule {
         GoogleGenAIModelExtension,
         GPTImage1Extension,
         GroundingWithBingSearchExtension,
-        HubPromptExtension,
-        LangfuseExtension,
         MCPToolsExtension,
         MistralModelExtension,
         NvidiaModelExtension,
@@ -137,7 +132,6 @@ export class ExtensionLibraryModule {
         SpeechToTextExtension,
         SummaryPromptExtension,
         UserArgsExtension,
-        VertexAIModelExtension,
         WholeFilesExtension,
       ],
     };

@@ -75,7 +75,6 @@ export class SendMessageHandler implements IQueryHandler<SendMessage, SendMessag
       const context: ChatContext = {
         abort: new AbortController(),
         cache: this.cache,
-        callbacks: [],
         context: conversation.context || {},
         conversationId: conversation.id,
         configuration: configuration,

@@ -1,6 +1,5 @@
-import { StructuredToolInterface } from '@langchain/core/tools';
 import { generateText } from 'ai';
-import { ChatContext } from 'src/domain/chat';
+import { ChatContext, NamedStructuredTool } from 'src/domain/chat';
 import { Extension, ExtensionConfiguration, ExtensionEntity } from 'src/domain/extensions';
 import { User } from 'src/domain/users';
 import { I18nService } from '../../localization/i18n.service';
@@ -27,7 +26,7 @@ export function modelExtensionTestSuite(modelExtension: ExtensionConstructor) {
     };
 
     const context = {
-      tools: [] as StructuredToolInterface[],
+      tools: [] as NamedStructuredTool[],
       llms: {},
       cache: {
         get: (_key: string, _args: any, resolver: () => Promise<any>) => {

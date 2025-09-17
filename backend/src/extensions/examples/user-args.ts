@@ -107,10 +107,6 @@ class InternalTool extends NamedStructuredTool {
   readonly description = 'Shows the current user arguments.';
   readonly displayName = 'User Args';
 
-  get lc_id() {
-    return [...this.lc_namespace, this.name];
-  }
-
   readonly schema = z.object({});
 
   constructor(
@@ -118,7 +114,7 @@ class InternalTool extends NamedStructuredTool {
     private readonly context: ChatContext,
     extensionExternalId: string,
   ) {
-    super({});
+    super();
     this.name = extensionExternalId;
   }
 

@@ -1,4 +1,3 @@
-import { Embeddings } from '@langchain/core/embeddings';
 import { ChatMiddleware, ExtensionUserArgumentValues } from '../chat';
 import { ChatSuggestion } from '../shared';
 import { User } from '../users';
@@ -153,14 +152,6 @@ export interface ExtensionSpec {
   triggers?: string[];
 }
 
-export interface ExtensionEmbeddings {
-  // The embedding.
-  embeddings: Embeddings;
-
-  // The optional name.
-  name?: string;
-}
-
 export type ExtensionState = {
   [param: string]: any;
   changed?: boolean;
@@ -289,8 +280,6 @@ export interface Extension<
   test?(configuration: TConfig): Promise<any>;
 
   getMiddlewares(user: User, extension: ExtensionEntity<TConfig>, userArgumentValues?: TUserValues): Promise<ChatMiddleware[]>;
-
-  getEmbedding?(user: User, configuration: TConfig): Promise<ExtensionEmbeddings>;
 }
 
 export const EXTENSION_METADATA = 'EXTENSION';

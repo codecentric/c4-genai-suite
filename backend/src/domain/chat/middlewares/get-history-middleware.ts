@@ -1,18 +1,18 @@
-import { BaseListChatMessageHistory } from '@langchain/core/chat_history';
-import {
-  AIMessage,
-  AIMessageChunk,
-  BaseMessage,
-  HumanMessage,
-  mapChatMessagesToStoredMessages,
-  mapStoredMessagesToChatMessages,
-} from '@langchain/core/messages';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { onErrorResumeNextWith } from 'rxjs';
 import { ExtensionSource, MessageEntity, MessageRepository } from 'src/domain/database';
-import { is } from 'src/lib';
-import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext, MessagesHistory, Source } from '../interfaces';
+import {
+  AIMessage,
+  BaseMessage,
+  ChatContext,
+  ChatMiddleware,
+  ChatNextDelegate,
+  GetContext,
+  HumanMessage,
+  MessagesHistory,
+  Source,
+} from '../interfaces';
 
 @Injectable()
 export class GetHistoryMiddleware implements ChatMiddleware {
@@ -30,20 +30,14 @@ export class GetHistoryMiddleware implements ChatMiddleware {
 
     const history = new InternalChatHistory(conversationId, configuration.id, context, this.messages);
 
-    await history.addMessage(
-      new HumanMessage({
-        content: context.input,
-      }),
-      true,
-      context.editMessageId,
-    );
+    await history.addMessage(new HumanMessage(context.input), true, context.editMessageId);
 
     context.history = history;
     await next(context);
   }
 }
 
-class InternalChatHistory extends BaseListChatMessageHistory implements MessagesHistory {
+class InternalChatHistory extends MessagesHistory {
   private readonly logger = new Logger(InternalChatHistory.name);
   private readonly tools: string[] = [];
   private readonly debug: string[] = [];
@@ -104,25 +98,27 @@ class InternalChatHistory extends BaseListChatMessageHistory implements Messages
   }
 
   async addMessage(message: BaseMessage, persistHuman?: boolean, editMessageId?: number): Promise<void> {
-    const data = mapChatMessagesToStoredMessages([message]).map(({ type, data }) => ({
-      type,
+    const data = {
+      type: message.getType(),
+      data: {
+        content: message.content,
+      },
       conversation: {
         id: this.conversationId,
       },
-      data,
       // The tools is used for the UI only to display the used tools for old conversations.
       tools: isAIMessage(message) ? this.tools : [],
       // The debug information are only relevant for AI messages.
       debug: isAIMessage(message) ? this.debug : [],
       // The sources information are only relevant for AI messages.
       sources: isAIMessage(message) ? this.sources : [],
-    }));
+    };
 
     try {
       if (isAIMessage(message)) {
         this.publishSourcesReferences();
         const entity = await this.messages.save({
-          ...data[0],
+          ...data,
           parentId: this.currentParentId,
           configurationId: this.configurationId,
         });
@@ -153,7 +149,7 @@ class InternalChatHistory extends BaseListChatMessageHistory implements Messages
         const entity = await this.messages.save({
           parentId: this.currentParentId,
           configurationId: this.configurationId,
-          ...data[0],
+          ...data,
         });
         this.currentParentId = entity.id;
         this.context.result.next({ type: 'saved', messageId: entity.id, messageType: 'human' });
@@ -164,7 +160,24 @@ class InternalChatHistory extends BaseListChatMessageHistory implements Messages
   }
 }
 
+function mapStoredMessagesToChatMessages(messages: MessageEntity[]): BaseMessage[] {
+  return messages.map((message) => {
+    // TODO: maybe we should not svae this json structure but migrate to a string column
+    const data = message.data as { content: string };
+    const text = data.content;
+
+    switch (message.type) {
+      case 'human':
+        return new HumanMessage(text);
+      case 'ai':
+        return new AIMessage(text);
+      default:
+        throw new Error(`Unsupported message type '${message.type}'.`);
+    }
+  });
+}
+
 function isAIMessage(message: BaseMessage) {
   // For whatever reason there are two kind of messages for that.
-  return is(message, AIMessage) || is(message, AIMessageChunk);
+  return message.getType() === 'ai';
 }

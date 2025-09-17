@@ -36,10 +36,6 @@ class InternalTool extends NamedStructuredTool {
   readonly description = 'Calculates the sum of two numbers';
   readonly displayName = 'Always 42';
 
-  get lc_id() {
-    return [...this.lc_namespace, this.name];
-  }
-
   readonly schema = z.object({
     lhs: z
       .number() //

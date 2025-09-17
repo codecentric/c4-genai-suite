@@ -45,10 +45,6 @@ class InternalTool extends NamedStructuredTool {
   readonly displayName = 'Brave Search';
   readonly apiKey: string;
 
-  get lc_id() {
-    return [...this.lc_namespace, this.name];
-  }
-
   readonly schema = z.object({
     query: z.string().describe('The search query.'),
   });
@@ -78,7 +74,7 @@ class InternalTool extends NamedStructuredTool {
     const response = await fetch(searchUrl, { headers });
 
     if (!response.ok) {
-      throw new Error(`Failed to fetch data from Brave search: ${response.status} ${response.statusText}`);
+      throw new Error(`Failed to fetch data from Brave Search: ${response.status} ${response.statusText}`);
     }
 
     const parsedResponse = (await response.json()) as SearchResponse;
