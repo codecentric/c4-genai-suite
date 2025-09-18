@@ -63,25 +63,37 @@ export interface ChatUI {
 }
 
 export abstract class BaseMessage {
-  type!: 'ai' | 'human';
+  role!: 'assistant' | 'user';
   content: string;
   constructor(content: string) {
     this.content = content;
   }
   getType(): 'ai' | 'human' {
-    return this.type;
+    if (this.isHuman()) {
+      return 'human';
+    }
+    return 'ai';
+  }
+  getRole(): 'assistant' | 'user' {
+    return this.role;
+  }
+  isHuman(): this is HumanMessage {
+    return this.role === 'user';
+  }
+  isAI(): this is AIMessage {
+    return this.role === 'assistant';
   }
 }
 
 export class AIMessage extends BaseMessage {
-  readonly type = 'ai' as const;
+  readonly role = 'assistant' as const;
   constructor(content: string) {
     super(content);
   }
 }
 
 export class HumanMessage extends BaseMessage {
-  readonly type = 'human' as const;
+  readonly role = 'user' as const;
   constructor(content: string) {
     super(content);
   }
@@ -224,6 +236,9 @@ export interface ChatContext {
 
   // The history of previous messages
   history?: MessagesHistory;
+
+  // whether open telemetry is enabled
+  telemetry?: boolean;
 }
 
 export interface TokenUsage {

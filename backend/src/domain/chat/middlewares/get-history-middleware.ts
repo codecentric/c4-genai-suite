@@ -107,15 +107,15 @@ class InternalChatHistory extends MessagesHistory {
         id: this.conversationId,
       },
       // The tools is used for the UI only to display the used tools for old conversations.
-      tools: isAIMessage(message) ? this.tools : [],
+      tools: message.isAI() ? this.tools : [],
       // The debug information are only relevant for AI messages.
-      debug: isAIMessage(message) ? this.debug : [],
+      debug: message.isAI() ? this.debug : [],
       // The sources information are only relevant for AI messages.
-      sources: isAIMessage(message) ? this.sources : [],
+      sources: message.isAI() ? this.sources : [],
     };
 
     try {
-      if (isAIMessage(message)) {
+      if (message.isAI()) {
         this.publishSourcesReferences();
         const entity = await this.messages.save({
           ...data,
@@ -162,7 +162,7 @@ class InternalChatHistory extends MessagesHistory {
 
 function mapStoredMessagesToChatMessages(messages: MessageEntity[]): BaseMessage[] {
   return messages.map((message) => {
-    // TODO: maybe we should not svae this json structure but migrate to a string column
+    // TODO: maybe we should not save this json structure but migrate to a string column
     const data = message.data as { content: string };
     const text = data.content;
 
@@ -175,9 +175,4 @@ function mapStoredMessagesToChatMessages(messages: MessageEntity[]): BaseMessage
         throw new Error(`Unsupported message type '${message.type}'.`);
     }
   });
-}
-
-function isAIMessage(message: BaseMessage) {
-  // For whatever reason there are two kind of messages for that.
-  return message.getType() === 'ai';
 }

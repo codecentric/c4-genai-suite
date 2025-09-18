@@ -1,6 +1,6 @@
 import { forwardRef, Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { streamText } from 'ai';
+import { generateText } from 'ai';
 import { I18nService } from '../../../localization/i18n.service';
 import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from '../interfaces';
 import { GetConversation, GetConversationResponse } from '../use-cases';
@@ -26,7 +26,7 @@ export class SummarizeHistoryMiddleware implements ChatMiddleware {
 
     const allUserMessages = messages
       .reverse()
-      .filter((message) => message.getType() === 'human')
+      .filter((message) => message.isHuman())
       .flatMap((humanMessage) =>
         normalizedMessageContent(humanMessage.content)
           .filter((item) => item.type === 'text')
@@ -55,18 +55,17 @@ export class SummarizeHistoryMiddleware implements ChatMiddleware {
       context.summaryConfig?.prompt ??
       "Summarize the following content ALWAYS in the same language as the content as short as possible in not more than 3 words. Write it as if it is Headline of an Article. Dont't use new lines!";
 
-    const { text } = streamText({
-      model: llm.model,
-      prompt: [
-        { role: 'system' as const, content: historyPrompt },
-        { role: 'user' as const, content: userMessages.join(' ') },
-      ],
-      ...llm.options,
-    });
-
     try {
-      const name = await text;
-      return name ?? this.i18n.t('texts.chat.noSummary');
+      const { text } = await generateText({
+        model: llm.model,
+        prompt: [
+          { role: 'system' as const, content: historyPrompt },
+          { role: 'user' as const, content: userMessages.join(' ') },
+        ],
+        ...llm.options,
+      });
+
+      return text ?? this.i18n.t('texts.chat.noSummary');
     } catch (err) {
       this.logger.error('Failed to get conversation summary.', err);
     }
