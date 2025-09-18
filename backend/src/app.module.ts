@@ -14,6 +14,7 @@ import { ExtensionsController } from './controllers/extensions/extensions.contro
 import { FilesController } from './controllers/files/files.controller';
 import { UserFilesController } from './controllers/files/user-files.controller';
 import { HealthController } from './controllers/health/health.controller';
+import { PromptController } from './controllers/prompts/prompts.controller';
 import { SettingsController } from './controllers/settings/settings.controller';
 import { UsagesController } from './controllers/usages/usages.controller';
 import { UserGroupsController } from './controllers/users/user-groups.controller';
@@ -24,6 +25,7 @@ import { UserEntity } from './domain/database';
 import { initSchemaIfNotExistsAndMoveMigrations, schema } from './domain/database/typeorm.helper';
 import { ExtensionModule } from './domain/extensions';
 import { FilesModule } from './domain/files';
+import { PromptModule } from './domain/prompt/module';
 import { SettingsModule } from './domain/settings';
 import { UsersModule } from './domain/users/module';
 import { ExtensionLibraryModule } from './extensions';
@@ -47,6 +49,7 @@ import { PrometheusModule } from './metrics/prometheus.module';
       },
     }),
     PrometheusModule.forRoot(),
+    PromptModule,
     SettingsModule,
     UsersModule,
     TerminusModule,
@@ -82,6 +85,7 @@ import { PrometheusModule } from './metrics/prometheus.module';
     ConfigurationsController,
     ExtensionsController,
     FilesController,
+    PromptController,
     SettingsController,
     UsagesController,
     UserFilesController,
