@@ -34,11 +34,10 @@ updates:
     schedule:
       interval: "daily"
     groups:
-      langchain:
+      ai-sdk:
         patterns:
-          - "langchain"
-          - "langfuse-langchain"
-          - "@langchain/*"
+          - "ai"
+          - "@ai-sdk/*"
       nestjs:
         patterns:
           - "nest-"
