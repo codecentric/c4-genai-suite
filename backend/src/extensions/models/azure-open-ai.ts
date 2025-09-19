@@ -78,9 +78,16 @@ export class AzureOpenAIModelExtension implements Extension<AzureOpenAIModelExte
         },
         effort: {
           type: 'string',
-          title: this.i18n.t('texts.extensions.common.effort'),
+          title: this.i18n.t('texts.extensions.common.reasoningEffort'),
           required: false,
           enum: ['', 'low', 'medium', 'high'],
+        },
+        summary: {
+          type: 'string',
+          title: this.i18n.t('texts.extensions.common.reasoningSummary'),
+          required: false,
+          default: 'detailed',
+          enum: ['detailed', 'auto'],
         },
       },
     };
@@ -113,7 +120,7 @@ export class AzureOpenAIModelExtension implements Extension<AzureOpenAIModelExte
   }
 
   private createModel(configuration: AzureOpenAIModelExtensionConfiguration, streaming = false): LanguageModelContext {
-    const { apiKey, deploymentName, frequencyPenalty, instanceName, presencePenalty, effort, temperature, seed, topP } =
+    const { apiKey, deploymentName, frequencyPenalty, instanceName, presencePenalty, effort, summary, temperature, seed, topP } =
       configuration;
 
     const azure = createAzure({
@@ -140,7 +147,7 @@ export class AzureOpenAIModelExtension implements Extension<AzureOpenAIModelExte
           openai: effort
             ? {
                 reasoningEffort: effort ? effort : undefined,
-                reasoningSummary: 'detailed',
+                reasoningSummary: summary || 'detailed',
               }
             : {},
         },
@@ -161,4 +168,5 @@ type AzureOpenAIModelExtensionConfiguration = ExtensionConfiguration & {
   frequencyPenalty?: number;
   topP?: number;
   effort?: 'low' | 'medium' | 'high';
+  summary?: 'detailed' | 'auto';
 };

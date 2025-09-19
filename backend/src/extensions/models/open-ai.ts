@@ -63,9 +63,16 @@ export class OpenAIModelExtension implements Extension<OpenAIModelExtensionConfi
         },
         effort: {
           type: 'string',
-          title: this.i18n.t('texts.extensions.common.effort'),
+          title: this.i18n.t('texts.extensions.common.reasoningEffort'),
           required: false,
           enum: ['', 'minimal', 'low', 'medium', 'high'],
+        },
+        summary: {
+          type: 'string',
+          title: this.i18n.t('texts.extensions.common.reasoningSummary'),
+          required: false,
+          default: 'detailed',
+          enum: ['detailed', 'auto'],
         },
       },
     };
@@ -85,7 +92,7 @@ export class OpenAIModelExtension implements Extension<OpenAIModelExtensionConfi
 
   getMiddlewares(_: User, extension: ExtensionEntity<OpenAIModelExtensionConfiguration>): Promise<ChatMiddleware[]> {
     const middleware = {
-      invoke: async (context: ChatContext, getContext: GetContext, next: ChatNextDelegate): Promise<any> => {
+      invoke: async (context: ChatContext, _: GetContext, next: ChatNextDelegate): Promise<any> => {
         context.llms[this.spec.name] = await context.cache.get(this.spec.name, extension.values, () => {
           return this.createModel(extension.values, true);
         });
@@ -98,7 +105,7 @@ export class OpenAIModelExtension implements Extension<OpenAIModelExtensionConfi
   }
 
   private createModel(configuration: OpenAIModelExtensionConfiguration, streaming = false) {
-    const { apiKey, modelName, frequencyPenalty, presencePenalty, temperature, seed, effort } = configuration;
+    const { apiKey, modelName, frequencyPenalty, presencePenalty, temperature, seed, effort, summary } = configuration;
 
     const open = createOpenAI({
       name: 'open-ai',
@@ -106,7 +113,7 @@ export class OpenAIModelExtension implements Extension<OpenAIModelExtensionConfi
     });
 
     return {
-      model: open(modelName),
+      model: open.responses(modelName),
       options: {
         presencePenalty,
         frequencyPenalty,
@@ -114,9 +121,12 @@ export class OpenAIModelExtension implements Extension<OpenAIModelExtensionConfi
         seed,
         streaming,
         providerOptions: {
-          openai: {
-            reasoningEffort: effort,
-          },
+          openai: effort
+            ? {
+                reasoningEffort: effort ? effort : undefined,
+                reasoningSummary: summary || 'detailed',
+              }
+            : {},
         },
       } as Partial<CallSettings>,
       modelName: modelName,
@@ -133,4 +143,5 @@ type OpenAIModelExtensionConfiguration = ExtensionConfiguration & {
   presencePenalty: number;
   frequencyPenalty: number;
   effort?: 'minimal' | 'low' | 'medium' | 'high';
+  summary?: 'detailed' | 'auto';
 };

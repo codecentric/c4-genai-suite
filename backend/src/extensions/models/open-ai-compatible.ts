@@ -68,9 +68,16 @@ export class OpenAICompatibleModelExtension implements Extension<OpenAICompatibl
         },
         effort: {
           type: 'string',
-          title: this.i18n.t('texts.extensions.common.effort'),
+          title: this.i18n.t('texts.extensions.common.reasoningEffort'),
           required: false,
           enum: ['', 'low', 'medium', 'high'],
+        },
+        summary: {
+          type: 'string',
+          title: this.i18n.t('texts.extensions.common.reasoningSummary'),
+          required: false,
+          default: 'detailed',
+          enum: ['detailed', 'auto'],
         },
       },
     };
@@ -103,7 +110,7 @@ export class OpenAICompatibleModelExtension implements Extension<OpenAICompatibl
   }
 
   private createModel(configuration: OpenAICompatibleModelExtensionConfiguration, streaming = false) {
-    const { apiKey, baseUrl, modelName, frequencyPenalty, presencePenalty, temperature, seed, effort } = configuration;
+    const { apiKey, baseUrl, modelName, frequencyPenalty, presencePenalty, temperature, seed, effort, summary } = configuration;
 
     const open = createOpenAICompatible({
       name: 'openai-compatible',
@@ -121,9 +128,12 @@ export class OpenAICompatibleModelExtension implements Extension<OpenAICompatibl
         seed,
         streaming,
         providerOptions: {
-          openai: {
-            reasoningEffort: effort,
-          },
+          openai: effort
+            ? {
+                reasoningEffort: effort ? effort : undefined,
+                reasoningSummary: summary || 'detailed',
+              }
+            : {},
         },
       } as Partial<CallSettings>,
       modelName: modelName,
@@ -141,4 +151,5 @@ type OpenAICompatibleModelExtensionConfiguration = ExtensionConfiguration & {
   presencePenalty: number;
   frequencyPenalty: number;
   effort?: 'low' | 'medium' | 'high';
+  summary?: 'detailed' | 'auto';
 };
