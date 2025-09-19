@@ -1,18 +1,14 @@
 import { ActionIcon, Button, Portal } from '@mantine/core';
 import { IconFilter, IconPaperclip } from '@tabler/icons-react';
-import { useMutation } from '@tanstack/react-query';
 import React, { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
-import { toast } from 'react-toastify';
-import { ConfigurationDto, FileDto, useApi } from 'src/api';
+import { ConfigurationDto, FileDto } from 'src/api';
 import { Icon, Markdown } from 'src/components';
 import { ExtensionContext, JSONObject, useEventCallback, useExtensionContext, usePersistentState, useTheme } from 'src/hooks';
 import { useSpeechRecognitionToggle } from 'src/hooks/useSpeechRecognitionToggle';
-import { buildError } from 'src/lib';
-import { FileItem } from 'src/pages/chat/conversation/FileItem';
+import { FileItemComponent } from 'src/pages/chat/conversation/FileItem';
 import { FilterModal } from 'src/pages/chat/conversation/FilterModal';
 import { Language, SpeechRecognitionButton } from 'src/pages/chat/conversation/SpeechRecognitionButton';
-import { VirtualFile } from 'src/pages/chat/state/zustand/userFilesStore';
 import { texts } from 'src/texts';
 import { useChatDropzone } from '../useChatDropzone';
 import { Suggestions } from './Suggestions';
@@ -33,7 +29,6 @@ interface ChatInputProps {
   submitMessage: (input: string, files?: FileDto[]) => void;
 }
 export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEmpty, submitMessage }: ChatInputProps) {
-  const api = useApi();
   const extensionsWithFilter = configuration?.extensions?.filter(isExtensionWithUserArgs) ?? [];
   const { updateContext, context } = useExtensionContext(chatId);
   const [defaultValues, setDefaultValues] = useState<UserArgumentDefaultValueByExtensionIDAndName>({});
@@ -49,7 +44,7 @@ export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEm
     uploadMutations,
     upload,
     userBucket,
-    removeLocalFile,
+    remove,
   } = useChatDropzone();
 
   const speechRecognitionLanguages: Language[] = [
@@ -128,18 +123,6 @@ export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEm
     setShowFilter(false);
   };
 
-  const deleteFile = useMutation({
-    mutationFn: async (file: VirtualFile) => {
-      return api.files.deleteUserFile(file.id);
-    },
-    onSuccess: (_) => {
-      toast.success(texts.files.deleted);
-    },
-    onError: async (error) => {
-      toast.error(await buildError(texts.files.removeFileFailed, error));
-    },
-    onSettled: () => refetchConversationFiles(),
-  });
   const handleUploadFileFromInput = (event: ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files ? Array.from(event.target.files) : [];
     handleUploadFile(files);
@@ -204,10 +187,10 @@ export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEm
 
         <div className="flex flex-wrap gap-2">
           {chatFiles.map((file) => (
-            <FileItem key={file.id} file={file} onRemove={() => (file.local ? removeLocalFile(file) : deleteFile.mutate(file))} />
+            <FileItemComponent key={file.id} file={file} onRemove={remove} />
           ))}
           {uploadingFiles.map((file) => (
-            <FileItem key={file.name} file={{ fileName: file.name }} loading={true} />
+            <FileItemComponent key={file.name} file={{ fileName: file.name }} loading={true} />
           ))}
         </div>
 

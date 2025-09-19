@@ -147,8 +147,8 @@
       "descriptionHint": "Beschreibt das Tool und die Daten im Index.",
       "bucketHint": "Zu verwendender Bucket.",
       "takeHint": "Die Anzahl der zurückzugebenden Ergebnisse.",
-      "filesInChat": "Dateien im Chat",
-      "filesInChatHint": "Dateien in einen Chat hochladen. Dateien sind nur in dem Chat verfügbar, in dem sie hochgeladen wurden. Der Wert 'Take' wird ignoriert",
+      "showSources": "Quellen anzeigen",
+      "showSourcesHint": "Zeigt die Quellen der Dateien an",
       "errorFileTooLarge": "Die hochgeladene Datei ist größer als für dieses Format erlaubt.",
       "errorNotAllowedFileType": "Dateiformat nicht erlaubt.",
       "errorNotSupportedFileType": "Dateiformat nicht unterstützt.",
@@ -204,7 +204,9 @@
       "maxFiles": "Max. Dateien",
       "maxFilesHint": "Maximale Anzahl von Dateien im Chat",
       "showSources": "Quellen anzeigen",
-      "showSourcesHint": "Zeigt die Quellen der Dateien an"
+      "showSourcesHint": "Zeigt die Quellen der Dateien an",
+      "vectorize": "Inhalte indizieren",
+      "vectorizeHint": "Ermöglicht eine semantische Suche auf den Inhalten der Dateien"
     },
     "filesVision": {
       "title": "Bilder im Chat",

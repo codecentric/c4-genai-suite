@@ -25,7 +25,6 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Request, Response } from 'express';
-import { Observable } from 'rxjs';
 import { LocalAuthGuard } from 'src/domain/auth';
 import {
   CallbackService,
@@ -46,7 +45,6 @@ import {
   SendMessageResponse,
   StartConversation,
   StartConversationResponse,
-  StreamEvent,
   UpdateConversation,
   UpdateConversationResponse,
 } from 'src/domain/chat';
@@ -244,11 +242,7 @@ export class ConversationsController {
     response.send(bytes);
   }
 
-  private async streamResponse(
-    @Req() req: Request,
-    @Res() response: Response,
-    getStream: () => Promise<Observable<StreamEvent>>,
-  ) {
+  private async streamResponse(@Req() req: Request, @Res() response: Response, getStream: () => Promise<SendMessageResponse>) {
     response.set({
       'Cache-Control': 'private, no-cache, no-store, must-revalidate, max-age=0, no-transform',
       Connection: 'keep-alive',
@@ -266,7 +260,7 @@ export class ConversationsController {
     };
 
     try {
-      const stream = await getStream();
+      const { stream, abort } = await getStream();
       const subscription = stream.subscribe({
         next: (event) => sendEvent('message', event),
         error: (err: Error) => sendEvent('error', err),
@@ -276,6 +270,7 @@ export class ConversationsController {
       req.on('close', () => {
         subscription.unsubscribe();
         response.end();
+        abort.abort('cancelled');
       });
     } catch (err) {
       this.logger.error('Error during message processing', err);
@@ -308,12 +303,9 @@ export class ConversationsController {
     @Param('messageId', ParseIntPipe) messageId: number,
     @Body() dto: SendMessageDto,
   ) {
-    return this.streamResponse(req, response, async () => {
-      const { stream }: SendMessageResponse = await this.queryBus.execute(
-        new SendMessage(id, req.user, dto.query, dto.files, messageId),
-      );
-      return stream;
-    });
+    return this.streamResponse(req, response, () =>
+      this.queryBus.execute(new SendMessage(id, req.user, dto.query, dto.files, messageId)),
+    );
   }
 
   @Post(':id/messages/sse')
@@ -330,10 +322,7 @@ export class ConversationsController {
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: SendMessageDto,
   ) {
-    return this.streamResponse(req, response, async () => {
-      const { stream }: SendMessageResponse = await this.queryBus.execute(new SendMessage(id, req.user, dto.query, dto.files));
-      return stream;
-    });
+    return this.streamResponse(req, response, () => this.queryBus.execute(new SendMessage(id, req.user, dto.query, dto.files)));
   }
 
   @Patch(':id/messages/:messageId')

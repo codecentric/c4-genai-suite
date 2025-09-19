@@ -52,6 +52,7 @@ export interface DeleteFileRequest {
 
 export interface DeleteUserFileRequest {
     fileId: number;
+    conversationId?: number;
 }
 
 export interface GetBucketRequest {
@@ -201,6 +202,10 @@ export class FilesApi extends runtime.BaseAPI {
 
         const queryParameters: any = {};
 
+        if (requestParameters['conversationId'] != null) {
+            queryParameters['conversationId'] = requestParameters['conversationId'];
+        }
+
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
@@ -217,8 +222,8 @@ export class FilesApi extends runtime.BaseAPI {
      * Deletes a file.
      * 
      */
-    async deleteUserFile(fileId: number, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.deleteUserFileRaw({ fileId: fileId }, initOverrides);
+    async deleteUserFile(fileId: number, conversationId?: number, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.deleteUserFileRaw({ fileId: fileId, conversationId: conversationId }, initOverrides);
     }
 
     /**
