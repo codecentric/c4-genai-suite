@@ -22,7 +22,7 @@ export async function initAppWithDataBaseAndValidUser(
   const roleGuardMock = jest.spyOn(roleGuard, 'canActivate');
   const mockUser: User = {
     id: '1',
-    userGroupId: '1',
+    userGroupIds: ['1'],
     name: 'Test User',
     email: 'stuff@stuff.com',
   };

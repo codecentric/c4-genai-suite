@@ -29,4 +29,6 @@ export interface AuthConfig {
     userInfoURL: string;
   };
   enablePassword?: boolean;
+  userGroupsPropertyName: string;
+  acceptUserGroupsFromAuthProvider?: boolean;
 }

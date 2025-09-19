@@ -27,6 +27,7 @@ export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
       const hashedApiKey = createHash('sha256').update(apiKey).digest('hex');
       return await this.userRepository.findOneBy({ apiKey: hashedApiKey });
     } else if (request.session.user) {
+      console.log('request.session.user', request.session.user);
       return request.session.user;
     }
 
