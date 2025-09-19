@@ -1,22 +1,21 @@
 import { useEffect, useRef } from 'react';
-import { usePersistentState } from 'src/hooks/stored';
+import { useStateOfSelectedAssistant } from 'src/pages/chat/state/listOfAssistants';
 import { useStateOfAssistants } from 'src/pages/chat/state/listOfAssistants';
 import { useMutateNewChat } from './state/listOfChats';
 
 export function NewChatRedirect() {
   const createNewConversation = useMutateNewChat();
-  const [lastSelectedAssistantId] = usePersistentState<number | null>('lastSelectedAssistantId', null);
+  const assistant = useStateOfSelectedAssistant();
   const assistants = useStateOfAssistants();
   const hasRun = useRef(false);
 
   useEffect(() => {
     if (!hasRun.current && assistants.length) {
       hasRun.current = true;
-      // Use last selected assistant ID, or fallback to first assistant
-      const assistantId = lastSelectedAssistantId || assistants[0]?.id;
-      createNewConversation.mutate(assistantId);
+      createNewConversation.mutate(assistant.id);
     }
-  }, [lastSelectedAssistantId, assistants, createNewConversation]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [assistant, createNewConversation]);
 
   return null;
 }

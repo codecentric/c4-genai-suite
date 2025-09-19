@@ -73,7 +73,7 @@ export const useStateMutateRemoveChat = () => {
   const chat = useStateOfChat();
   const removeChat = useListOfChatsStore((s) => s.removeChat);
   const createNewChat = useMutateNewChat();
-  const [lastSelectedAssistantId] = usePersistentState<number | null>('lastSelectedAssistantId', null);
+  const [persistentAssistantId] = usePersistentState<number | null>('selectedAssistantId', null);
 
   return useMutation({
     mutationFn: (id: number) => api.conversations.deleteConversation(id),
@@ -81,7 +81,7 @@ export const useStateMutateRemoveChat = () => {
       removeChat(deletedId);
       if (deletedId === chat.id) {
         // Use last selected assistant instead of the deleted chat's assistant
-        createNewChat.mutate(lastSelectedAssistantId || undefined);
+        createNewChat.mutate(persistentAssistantId || undefined);
       }
     },
     onError: async () => {
@@ -94,14 +94,16 @@ export const useStateMutateRemoveAllChats = () => {
   const api = useApi();
   const setChats = useListOfChatsStore((s) => s.setChats);
   const createNewChat = useMutateNewChat();
-  const [lastSelectedAssistantId] = usePersistentState<number | null>('lastSelectedAssistantId', null);
+  const [persistentAssistantId] = usePersistentState<number | null>('selectedAssistantId', null);
+  const currentChat = useStateOfChat();
 
   return useMutation({
     mutationFn: () => api.conversations.deleteConversations(),
     onSuccess: () => {
       setChats([]);
-      // Use last selected assistant instead of current chat's assistant
-      createNewChat.mutate(lastSelectedAssistantId || undefined);
+      // Prioritize current chat's assistant for session reliability, fall back to persisted selection (used on page load when no current chat exists)
+      const assistantId = currentChat?.configurationId || persistentAssistantId;
+      createNewChat.mutate(assistantId || undefined);
     },
     onError: async (error) => {
       toast.error(await buildError(texts.chat.clearConversationsFailed, error));
@@ -114,14 +116,14 @@ export const useMutateNewChat = () => {
   const context = useTransientContext();
   const navigate = useTransientNavigate();
   const assistants = useStateOfAssistants();
-  const [lastSelectedAssistantId] = usePersistentState<number | null>('lastSelectedAssistantId', null);
+  const [persistentAssistantId] = usePersistentState<number | null>('selectedAssistantId', null);
 
   return useMutation({
     mutationFn: (assistantId?: number) => {
       // Use the provided assistantId, then lastSelectedAssistantId, then fallback to first assistant
-      const configurationId = assistantId || lastSelectedAssistantId || assistants?.[0]?.id;
+      const configurationId = assistantId || persistentAssistantId || assistants?.[0]?.id;
       return api.conversations.postConversation({
-        configurationId: configurationId,
+        configurationId,
         context,
       });
     },
