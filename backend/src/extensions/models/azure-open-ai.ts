@@ -76,6 +76,12 @@ export class AzureOpenAIModelExtension implements Extension<AzureOpenAIModelExte
           format: 'slider',
           description: this.i18n.t('texts.extensions.common.frequencyPenaltyHint'),
         },
+        effort: {
+          type: 'string',
+          title: this.i18n.t('texts.extensions.common.effort'),
+          required: false,
+          enum: ['', 'low', 'medium', 'high'],
+        },
       },
     };
   }
@@ -107,27 +113,36 @@ export class AzureOpenAIModelExtension implements Extension<AzureOpenAIModelExte
   }
 
   private createModel(configuration: AzureOpenAIModelExtensionConfiguration, streaming = false): LanguageModelContext {
-    const { apiKey, deploymentName, frequencyPenalty, instanceName, presencePenalty, temperature, seed, topP } = configuration;
+    const { apiKey, deploymentName, frequencyPenalty, instanceName, presencePenalty, effort, temperature, seed, topP } =
+      configuration;
 
-    const open = createAzure({
+    const azure = createAzure({
       apiKey,
       resourceName: instanceName,
     });
 
+    const reasoningOptions: Partial<CallSettings> = !effort
+      ? {
+          presencePenalty,
+          frequencyPenalty,
+          temperature,
+          topP,
+        }
+      : {};
+
     return {
-      model: open(deploymentName),
+      model: azure.responses(deploymentName),
       options: {
-        presencePenalty,
-        frequencyPenalty,
-        temperature,
+        ...reasoningOptions,
         seed,
-        topP,
         streaming,
         providerOptions: {
-          openai: {
-            // TODO: can we unify reasoning models?
-            // reasoningEffort: effort,
-          },
+          openai: effort
+            ? {
+                reasoningEffort: effort ? effort : undefined,
+                reasoningSummary: 'detailed',
+              }
+            : {},
         },
       } as Partial<CallSettings>,
       modelName: deploymentName,
@@ -140,10 +155,10 @@ type AzureOpenAIModelExtensionConfiguration = ExtensionConfiguration & {
   apiKey: string;
   deploymentName: string;
   instanceName: string;
-  apiVersion: string;
-  temperature: number;
   seed: number;
-  presencePenalty: number;
-  frequencyPenalty: number;
-  topP: number;
+  temperature?: number;
+  presencePenalty?: number;
+  frequencyPenalty?: number;
+  topP?: number;
+  effort?: 'low' | 'medium' | 'high';
 };

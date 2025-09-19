@@ -11,7 +11,6 @@ import { Extension } from 'src/domain/extensions';
 import { ContextExtension } from './examples/show-context';
 import { UserArgsExtension } from './examples/user-args';
 import { AzureOpenAIModelExtension } from './models/azure-open-ai';
-import { AzureOpenAIReasoningModelExtension } from './models/azure-open-ai-reasoning';
 import { BedrockModelExtension } from './models/bedrock-ai';
 import { GoogleGenAIModelExtension } from './models/google-genai';
 import { MistralModelExtension } from './models/mistral';
@@ -107,7 +106,6 @@ export class ExtensionLibraryModule {
         AzureDallEExtension,
         AzureGPTImage1Extension,
         AzureOpenAIModelExtension,
-        AzureOpenAIReasoningModelExtension,
         BedrockModelExtension,
         BingWebSearchExtension,
         BraveWebSearchExtension,
