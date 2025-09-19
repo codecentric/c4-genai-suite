@@ -111,10 +111,6 @@ class InternalTool extends NamedStructuredTool {
   readonly displayName = 'Files in chat';
   private readonly logger = new Logger(`${FilesConversationExtension.name}$${InternalTool.name}`);
 
-  get lc_id() {
-    return [...this.lc_namespace, this.name];
-  }
-
   readonly schema = z.object({
     query: z.string().describe('The query'),
   });

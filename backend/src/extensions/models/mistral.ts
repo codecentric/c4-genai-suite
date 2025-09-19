@@ -1,10 +1,9 @@
-import { CallbackHandlerMethods } from '@langchain/core/callbacks/base';
-import { ChatMistralAI } from '@langchain/mistralai';
-import { ChatContext, ChatError, ChatMiddleware, ChatNextDelegate, GetContext } from 'src/domain/chat';
+import { createMistral } from '@ai-sdk/mistral';
+import { CallSettings, generateText } from 'ai';
+import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from 'src/domain/chat';
 import { Extension, ExtensionConfiguration, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions';
 import { User } from 'src/domain/users';
 import { I18nService } from '../../localization/i18n.service';
-import { getEstimatedUsageCallback } from './internal/utils';
 
 @Extension()
 export class MistralModelExtension implements Extension<MistralModelExtensionConfiguration> {
@@ -45,26 +44,22 @@ export class MistralModelExtension implements Extension<MistralModelExtensionCon
   }
 
   async test(configuration: MistralModelExtensionConfiguration) {
-    const model = this.createModel(configuration);
+    const { model, options } = this.createModel(configuration);
 
-    await model.invoke('Just a test call');
+    const { text } = await generateText({
+      model,
+      prompt: 'Just a test call',
+      ...options,
+    });
+
+    return text != null;
   }
 
   getMiddlewares(_: User, extension: ExtensionEntity<MistralModelExtensionConfiguration>): Promise<ChatMiddleware[]> {
     const middleware = {
       invoke: async (context: ChatContext, getContext: GetContext, next: ChatNextDelegate): Promise<any> => {
-        const isLargeModel = extension.values.modelName.startsWith('mistral-large');
-
-        if (context.tools.length > 0 && !isLargeModel) {
-          throw new ChatError('Tools are only supported with mistral-large model.');
-        }
-
         context.llms[this.spec.name] = await context.cache.get(this.spec.name, extension.values, () => {
-          // The model does not provide the token usage, therefore estimate it.
-          const callbacks = [getEstimatedUsageCallback('mistral', extension.values.modelName, getContext)];
-
-          // Stream the result token by token to the frontend.
-          return this.createModel(extension.values, callbacks, true);
+          return this.createModel(extension.values, true);
         });
 
         return next(context);
@@ -74,14 +69,21 @@ export class MistralModelExtension implements Extension<MistralModelExtensionCon
     return Promise.resolve([middleware]);
   }
 
-  private createModel(
-    configuration: MistralModelExtensionConfiguration,
-    callbacks?: CallbackHandlerMethods[],
-    streaming = false,
-  ) {
+  private createModel(configuration: MistralModelExtensionConfiguration, streaming = false) {
     const { apiKey, modelName } = configuration;
 
-    return new ChatMistralAI({ apiKey, modelName, callbacks, streaming });
+    const open = createMistral({
+      apiKey: apiKey,
+    });
+
+    return {
+      model: open(modelName),
+      options: {
+        streaming,
+      } as Partial<CallSettings>,
+      modelName: modelName,
+      providerName: 'mistral',
+    };
   }
 }
 

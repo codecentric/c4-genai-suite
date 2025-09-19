@@ -1,13 +1,12 @@
-import { StructuredToolInterface } from '@langchain/core/tools';
-import { ChatContext } from 'src/domain/chat';
+import { generateText } from 'ai';
+import { ChatContext, NamedStructuredTool } from 'src/domain/chat';
 import { Extension, ExtensionConfiguration, ExtensionEntity } from 'src/domain/extensions';
 import { User } from 'src/domain/users';
 import { I18nService } from '../../localization/i18n.service';
 
 type ExtensionConstructor = new (i18n: I18nService) => Extension;
 
-export function modelExtensionTestSuite(modelExtension: ExtensionConstructor, instance: { invoke: () => void }) {
-  let invokeMock: jest.SpyInstance;
+export function modelExtensionTestSuite(modelExtension: ExtensionConstructor) {
   let extension: Extension;
 
   const i18n = {
@@ -16,7 +15,6 @@ export function modelExtensionTestSuite(modelExtension: ExtensionConstructor, in
 
   beforeEach(() => {
     extension = new modelExtension(i18n);
-    invokeMock = jest.spyOn(instance, 'invoke').mockReturnThis();
   });
 
   it('should have getMiddlewares method', async () => {
@@ -28,7 +26,7 @@ export function modelExtensionTestSuite(modelExtension: ExtensionConstructor, in
     };
 
     const context = {
-      tools: [] as StructuredToolInterface[],
+      tools: [] as NamedStructuredTool[],
       llms: {},
       cache: {
         get: (_key: string, _args: any, resolver: () => Promise<any>) => {
@@ -56,6 +54,6 @@ export function modelExtensionTestSuite(modelExtension: ExtensionConstructor, in
     const configuration: ExtensionConfiguration = {};
     await extension.test?.(configuration);
     expect(extension.test?.bind(extension)).toBeDefined();
-    expect(invokeMock).toHaveBeenCalled();
+    expect(generateText).toHaveBeenCalled();
   });
 }

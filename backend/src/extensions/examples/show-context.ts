@@ -36,10 +36,6 @@ class InternalTool extends NamedStructuredTool {
   readonly description = 'Shows the current context.';
   readonly displayName = 'Context';
 
-  get lc_id() {
-    return [...this.lc_namespace, this.name];
-  }
-
   readonly schema = z.object({});
 
   constructor(

@@ -45,6 +45,16 @@ npm run migration:run
 npm run migration:revert
 ```
 
+## Langfuse
+
+To enable langfuse tracing, the following environment variables need to be set:
+
+```
+LANGFUSE_SECRET_KEY="sk-lf-..."
+LANGFUSE_PUBLIC_KEY="pk-lf-..."
+LANGFUSE_BASEURL="https://cloud.langfuse.com"
+```
+
 ## Create Extensions
 
 Each extension class needs to meet the following criteria:

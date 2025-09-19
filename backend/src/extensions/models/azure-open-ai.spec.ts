@@ -1,16 +1,14 @@
 import { AzureOpenAIModelExtension } from './azure-open-ai';
 import { modelExtensionTestSuite } from './model-test.base';
 
-const instance = {
-  invoke: jest.fn().mockReturnThis(),
-};
+jest.mock('@ai-sdk/azure', () => ({
+  createAzure: jest.fn(() => ({
+    responses: jest.fn(() => () => 'mocked model'),
+  })),
+}));
 
-jest.mock('@langchain/openai', () => {
-  return {
-    AzureChatOpenAI: jest.fn().mockImplementation(() => {
-      return instance;
-    }),
-  };
-});
+jest.mock('ai', () => ({
+  generateText: jest.fn(() => () => 'test output'),
+}));
 
-describe('OpenAIModelExtension', () => modelExtensionTestSuite(AzureOpenAIModelExtension, instance));
+describe('OpenAIModelExtension', () => modelExtensionTestSuite(AzureOpenAIModelExtension));

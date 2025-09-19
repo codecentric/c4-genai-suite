@@ -59,10 +59,6 @@ class InternalTool extends NamedStructuredTool {
     'Useful for getting the result of a math expression. The input to this tool should be a valid mathematical expression that could be executed by a simple calculator.';
   readonly displayName = 'Calculator';
 
-  get lc_id() {
-    return [...this.lc_namespace, this.name];
-  }
-
   readonly schema = z.object({
     input: z.string(),
   });

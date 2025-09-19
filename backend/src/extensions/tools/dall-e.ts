@@ -1,6 +1,6 @@
-import { DallEAPIWrapper } from '@langchain/openai';
 import { forwardRef, Inject, Logger } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
+import OpenAI from 'openai';
 import * as uuid from 'uuid';
 import * as z from 'zod';
 import { AuthService } from 'src/domain/auth';
@@ -70,18 +70,20 @@ export class DallEExtension implements Extension<DallEExtensionConfiguration> {
   }
 
   async test(configuration: DallEExtensionConfiguration) {
-    const wrapper = this.createWrapper(configuration);
+    const client = this.createDallEClient(configuration);
 
-    await wrapper.invoke('Dog');
+    await client.images.generate({
+      model: configuration.modelName,
+      prompt: 'test',
+    });
   }
 
   async getMiddlewares(_user: User, extension: ExtensionEntity<DallEExtensionConfiguration>): Promise<ChatMiddleware[]> {
     const middleware = {
       invoke: async (context: ChatContext, getContext: GetContext, next: ChatNextDelegate): Promise<any> => {
         const tool = await context.cache.get(this.spec.name, extension.values, () => {
-          const wrapper = this.createWrapper(extension.values);
-
-          return Promise.resolve(new InternalTool(this.authService, wrapper, this.commandBus, this.spec));
+          const client = this.createDallEClient(extension.values);
+          return Promise.resolve(new InternalTool(this.authService, client, this.commandBus, this.spec, extension.values));
         });
 
         context.tools.push(tool);
@@ -93,15 +95,9 @@ export class DallEExtension implements Extension<DallEExtensionConfiguration> {
     return Promise.resolve([middleware]);
   }
 
-  protected createWrapper(configuration: DallEExtensionConfiguration) {
-    const { apiKey, modelName, quality, size, style } = configuration;
-
-    return new DallEAPIWrapper({
-      modelName,
-      quality,
-      style,
-      size,
-      openAIApiKey: apiKey,
+  protected createDallEClient(configuration: DallEExtensionConfiguration) {
+    return new OpenAI({
+      apiKey: configuration.apiKey,
     });
   }
 }
@@ -114,19 +110,16 @@ class InternalTool extends NamedStructuredTool {
   readonly returnDirect = false;
   private readonly logger = new Logger(InternalTool.name);
 
-  get lc_id() {
-    return [...this.lc_namespace, this.name];
-  }
-
   readonly schema = z.object({
     input: z.string(),
   });
 
   constructor(
     private readonly authService: AuthService,
-    private readonly wrapper: DallEAPIWrapper,
+    private readonly client: OpenAI,
     private readonly commandBus: CommandBus,
     spec: ExtensionSpec,
+    private readonly configuration: DallEExtensionConfiguration,
   ) {
     super();
     this.name = spec.name;
@@ -135,28 +128,33 @@ class InternalTool extends NamedStructuredTool {
 
   protected async _call({ input }: z.infer<typeof this.schema>): Promise<string> {
     try {
-      const image = (await this.wrapper.invoke(input)) as string;
+      const response = await this.client.images.generate({
+        model: this.configuration.modelName,
+        prompt: input,
+        size: this.configuration.size,
+        response_format: 'b64_json',
+      });
 
-      // Download the image to put it in our store.
-      const downloaded = await fetch(image);
-      if (!downloaded.ok) {
-        return 'Failed to download image';
+      const imageData = response?.data?.[0];
+
+      if (!imageData) {
+        throw new Error('No image data received from OpenAI');
       }
 
-      // Would be great to have a solution that streams the buffer to the database.
-      const buffer = await downloaded.arrayBuffer();
-
       const id = uuid.v4();
+      const contentType = response.output_format || 'png';
+      let imageBuffer: Buffer;
+      let fileName;
+
+      if (imageData.b64_json) {
+        imageBuffer = Buffer.from(imageData.b64_json, 'base64');
+        fileName = `${id}.${contentType}`;
+      } else {
+        throw new Error('No valid image data format received from OpenAI');
+      }
 
       await this.commandBus.execute(
-        new UploadBlob(
-          id,
-          Buffer.from(buffer),
-          downloaded.headers.get('Content-Type') || 'unknown',
-          downloaded.headers.get('filename') || 'unknown',
-          buffer.byteLength,
-          BlobCategory.LLM_IMAGE,
-        ),
+        new UploadBlob(id, imageBuffer, contentType, fileName, imageBuffer.length, BlobCategory.LLM_IMAGE),
       );
 
       return `${this.authService.config.baseUrl}/blobs/${id}`;

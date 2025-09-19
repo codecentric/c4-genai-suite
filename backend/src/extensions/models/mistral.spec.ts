@@ -1,16 +1,11 @@
 import { MistralModelExtension } from './mistral';
 import { modelExtensionTestSuite } from './model-test.base';
 
-const instance = {
-  invoke: jest.fn().mockReturnThis(),
-};
+jest.mock('@ai-sdk/mistral', () => ({
+  createMistral: jest.fn(() => () => 'mocked model'),
+}));
+jest.mock('ai', () => ({
+  generateText: jest.fn(() => () => 'test output'),
+}));
 
-jest.mock('@langchain/mistralai', () => {
-  return {
-    ChatMistralAI: jest.fn().mockImplementation(() => {
-      return instance;
-    }),
-  };
-});
-
-describe('MistralModelExtension', () => modelExtensionTestSuite(MistralModelExtension, instance));
+describe('MistralModelExtension', () => modelExtensionTestSuite(MistralModelExtension));

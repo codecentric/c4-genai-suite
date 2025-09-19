@@ -1,4 +1,3 @@
-import { mapChatMessagesToStoredMessages } from '@langchain/core/messages';
 import { Injectable } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { isString } from 'class-validator';
@@ -57,7 +56,10 @@ export class ExecutorMiddleware implements ChatMiddleware {
       context: context.context,
     };
 
-    const stored = mapChatMessagesToStoredMessages(messages);
+    const stored = messages.map((msg) => ({
+      type: msg.getType(),
+      data: { content: msg.content },
+    }));
 
     for (const message of context.systemMessages) {
       request.history.push({ content: message, type: 'ai' });
@@ -68,12 +70,8 @@ export class ExecutorMiddleware implements ChatMiddleware {
         throw new InternalError('Only string messages are supported.');
       }
 
-      // FIXME: find out if 'system' should be part of `MessageType` or if the check below
-      //  can omit `messageType === 'system'`
-      //  Then change to:
-      // const type = message.type as MessageType;
       const messageType = message.type;
-      if (messageType === 'human' || messageType === 'system' || messageType === 'ai') {
+      if (messageType === 'human' || messageType === 'ai') {
         request.history.push({ content: message.data.content, type: 'ai' });
       }
     }

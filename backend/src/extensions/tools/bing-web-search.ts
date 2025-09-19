@@ -48,10 +48,6 @@ class InternalTool extends NamedStructuredTool {
   readonly endpoint = 'https://api.bing.microsoft.com/v7.0/search';
   private readonly logger = new Logger(InternalTool.name);
 
-  get lc_id() {
-    return [...this.lc_namespace, this.name];
-  }
-
   readonly schema = z.object({
     query: z.string().describe('The search query.'),
   });

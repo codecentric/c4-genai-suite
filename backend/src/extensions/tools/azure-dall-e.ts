@@ -1,4 +1,3 @@
-import { DallEAPIWrapper, DallEAPIWrapperParams } from '@langchain/openai';
 import { AzureOpenAI } from 'openai';
 import { Extension, ExtensionSpec } from 'src/domain/extensions';
 import { DallEExtension, DallEExtensionConfiguration } from './dall-e';
@@ -31,30 +30,12 @@ export class AzureDallEExtension extends DallEExtension {
     };
   }
 
-  protected createWrapper(configuration: AzureDallEExtensionConfiguration) {
-    const { apiKey, modelName, apiVersion, instanceName, quality, size, style } = configuration;
-
-    return new AzureDallEAPIWrapper({
-      model: modelName,
-      quality,
-      style,
-      size,
-      openAIApiKey: apiKey,
-      apiKey,
-      instanceName,
-      apiVersion,
-    });
-  }
-}
-
-export class AzureDallEAPIWrapper extends DallEAPIWrapper {
-  constructor(fields: DallEAPIWrapperParams & { instanceName: string; apiVersion: string }) {
-    super(fields);
-    this.client = new AzureOpenAI({
-      apiKey: fields.apiKey,
-      apiVersion: fields.apiVersion,
-      deployment: fields.model,
-      endpoint: `https://${fields.instanceName}.openai.azure.com`,
+  protected createDallEClient(configuration: AzureDallEExtensionConfiguration): AzureOpenAI {
+    return new AzureOpenAI({
+      apiKey: configuration.apiKey,
+      apiVersion: configuration.apiVersion,
+      deployment: configuration.modelName,
+      endpoint: `https://${configuration.instanceName}.openai.azure.com/`,
     });
   }
 }

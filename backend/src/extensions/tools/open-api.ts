@@ -120,10 +120,6 @@ class InternalTool extends NamedStructuredTool {
   readonly displayName: string;
   readonly description: string;
 
-  get lc_id() {
-    return [...this.lc_namespace, this.name];
-  }
-
   constructor(
     private readonly cache: CacheRepository,
     private readonly context: ChatContext,

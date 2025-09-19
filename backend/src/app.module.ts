@@ -30,6 +30,7 @@ import { SettingsModule } from './domain/settings';
 import { UsersModule } from './domain/users/module';
 import { ExtensionLibraryModule } from './extensions';
 import { I18nModule } from './localization/i18n.module';
+import { OpenTelemetryModule } from './metrics/opentelemetry.module';
 import { PrometheusModule } from './metrics/prometheus.module';
 
 @Module({
@@ -50,6 +51,7 @@ import { PrometheusModule } from './metrics/prometheus.module';
     }),
     PrometheusModule.forRoot(),
     PromptModule,
+    OpenTelemetryModule,
     SettingsModule,
     UsersModule,
     TerminusModule,

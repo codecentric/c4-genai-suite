@@ -1,11 +1,9 @@
-import { ChatBedrockConverse } from '@langchain/aws';
-import { CallbackHandlerMethods } from '@langchain/core/callbacks/base';
-import { createToolCallingAgent } from 'langchain/agents';
+import { createAmazonBedrock } from '@ai-sdk/amazon-bedrock';
+import { CallSettings, generateText } from 'ai';
 import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from 'src/domain/chat';
 import { Extension, ExtensionConfiguration, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions';
 import { User } from 'src/domain/users';
 import { I18nService } from '../../localization/i18n.service';
-import { getEstimatedUsageCallback } from './internal/utils';
 
 @Extension()
 export class BedrockModelExtension implements Extension<BedrockConverseExtensionConfiguration> {
@@ -72,19 +70,23 @@ export class BedrockModelExtension implements Extension<BedrockConverseExtension
   }
 
   async test(configuration: BedrockConverseExtensionConfiguration) {
-    const model = this.createModel(configuration);
-    await model.invoke('Just a test call');
+    const { model, options } = this.createModel(configuration);
+
+    const { text } = await generateText({
+      model,
+      prompt: 'Just a test call',
+      ...options,
+    });
+
+    return text != null;
   }
 
   getMiddlewares(_: User, extension: ExtensionEntity<BedrockConverseExtensionConfiguration>): Promise<ChatMiddleware[]> {
     const middleware = {
       invoke: async (context: ChatContext, getContext: GetContext, next: ChatNextDelegate): Promise<any> => {
         context.llms[this.spec.name] = await context.cache.get(this.spec.name, extension.values, () => {
-          const callbacks = [getEstimatedUsageCallback('bedrock-ai', extension.values.model, getContext)];
-
-          return this.createModel(extension.values, callbacks);
+          return this.createModel(extension.values);
         });
-        context.agentFactory = createToolCallingAgent;
 
         return next(context);
       },
@@ -93,17 +95,24 @@ export class BedrockModelExtension implements Extension<BedrockConverseExtension
     return Promise.resolve([middleware]);
   }
 
-  private createModel(configuration: BedrockConverseExtensionConfiguration, callbacks?: CallbackHandlerMethods[]) {
+  private createModel(configuration: BedrockConverseExtensionConfiguration) {
     const { model, region, accessKeyId, secretAccessKey, temperature, topP } = configuration;
 
-    return new ChatBedrockConverse({
-      model,
+    const open = createAmazonBedrock({
       region,
-      temperature,
-      topP,
-      credentials: { accessKeyId, secretAccessKey },
-      callbacks,
+      accessKeyId,
+      secretAccessKey,
     });
+
+    return {
+      model: open(model),
+      options: {
+        topP,
+        temperature,
+      } as Partial<CallSettings>,
+      modelName: model,
+      providerName: 'bedrock-ai',
+    };
   }
 }
 

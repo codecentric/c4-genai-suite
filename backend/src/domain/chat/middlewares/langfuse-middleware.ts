@@ -14,8 +14,7 @@ export class LangfuseMiddleware implements ChatMiddleware {
     const secretKey = this.configService.get<string>('LANGFUSE_SECRET_KEY');
     const baseUrl = this.configService.get<string>('LANGFUSE_BASE_URL', 'https://cloud.langfuse.com');
     if (publicKey && secretKey && baseUrl) {
-      const { CallbackHandler } = await import('langfuse-langchain');
-      context.callbacks.push(new CallbackHandler({ publicKey, secretKey, baseUrl }));
+      context.telemetry = true;
     }
 
     return next(context);

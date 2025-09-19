@@ -39,6 +39,7 @@ export class NvidiaModelExtension implements Extension<NvidiaModelExtensionConfi
           title: this.i18n.t('texts.extensions.common.temperature'),
           minimum: 0,
           maximum: 2,
+          default: 1,
           format: 'slider',
           description: this.i18n.t('texts.extensions.common.temperatureHint'),
         },
@@ -67,9 +68,16 @@ export class NvidiaModelExtension implements Extension<NvidiaModelExtensionConfi
         },
         effort: {
           type: 'string',
-          title: this.i18n.t('texts.extensions.common.effort'),
+          title: this.i18n.t('texts.extensions.common.reasoningEffort'),
           required: false,
-          enum: ['', 'low', 'medium', 'high'],
+          enum: ['', 'minimal', 'low', 'medium', 'high'],
+        },
+        summary: {
+          type: 'string',
+          title: this.i18n.t('texts.extensions.common.reasoningSummary'),
+          required: false,
+          default: 'detailed',
+          enum: ['detailed', 'auto'],
         },
       },
     };
@@ -115,13 +123,17 @@ export class NvidiaModelExtension implements Extension<NvidiaModelExtensionConfi
         presencePenalty: config.presencePenalty,
         frequencyPenalty: config.frequencyPenalty,
         seed: config.seed,
+        temperature: config.temperature,
         streaming,
         providerOptions: {
           openai: {
-            reasoningEffort: config.effort,
+            reasoningEffort: config.effort ? config.effort : undefined,
+            reasoningSummary: config.summary || 'detailed',
           },
         },
       } as Partial<CallSettings>,
+      modelName: config.modelName,
+      providerName: 'nvidia',
     };
   }
 }
@@ -135,4 +147,5 @@ type NvidiaModelExtensionConfiguration = ExtensionConfiguration & {
   presencePenalty: number;
   frequencyPenalty: number;
   effort?: 'minimal' | 'low' | 'medium' | 'high';
+  summary?: 'detailed' | 'auto';
 };

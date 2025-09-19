@@ -1,6 +1,6 @@
 # c4 GenAI Suite
 
-An AI chatbot application with Model Context Provider (MCP) integration, powered by Langchain and compatibility for all major Large Language Models (LLMs) and Embedding Models.
+An AI chatbot application with Model Context Provider (MCP) integration, powered by ai-sdk and compatibility for all major Large Language Models (LLMs) and Embedding Models.
 
 Administrators can create assistants with different capabilities by adding extensions, such as RAG (Retrieval-Augmented Generation) services or MCP servers. The application is built using a modern tech stack, including React, NestJS, and Python FastAPI for the REI-S service.
 

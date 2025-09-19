@@ -1,16 +1,13 @@
 import { modelExtensionTestSuite } from './model-test.base';
 import { OpenAIModelExtension } from './open-ai';
 
-const instance = {
-  invoke: jest.fn().mockReturnThis(),
-};
+jest.mock('@ai-sdk/openai', () => ({
+  createOpenAI: jest.fn(() => ({
+    responses: jest.fn(() => () => 'mocked model'),
+  })),
+}));
+jest.mock('ai', () => ({
+  generateText: jest.fn(() => () => 'test output'),
+}));
 
-jest.mock('@langchain/openai', () => {
-  return {
-    ChatOpenAI: jest.fn().mockImplementation(() => {
-      return instance;
-    }),
-  };
-});
-
-describe('OpenAIModelExtension', () => modelExtensionTestSuite(OpenAIModelExtension, instance));
+describe('OpenAIModelExtension', () => modelExtensionTestSuite(OpenAIModelExtension));

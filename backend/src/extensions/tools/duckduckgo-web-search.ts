@@ -1,6 +1,6 @@
-import { DuckDuckGoSearch } from '@langchain/community/tools/duckduckgo_search';
+import { search } from 'duck-duck-scrape';
 import z from 'zod';
-import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext, NamedStructuredTool } from 'src/domain/chat';
+import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext, NamedStructuredTool, Source } from 'src/domain/chat';
 import { Extension, ExtensionConfiguration, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions';
 import { User } from 'src/domain/users';
 import { I18nService } from '../../localization/i18n.service';
@@ -31,7 +31,7 @@ export class DuckduckgoWebSearchExtension implements Extension<DuckduckgoWebSear
   getMiddlewares(_user: User, extension: ExtensionEntity<DuckduckgoWebSearchExtensionConfiguration>): Promise<ChatMiddleware[]> {
     const middleware = {
       invoke: async (context: ChatContext, getContext: GetContext, next: ChatNextDelegate): Promise<any> => {
-        context.tools.push(new InternalTool(extension.values, extension.externalId));
+        context.tools.push(new InternalTool(extension.values, extension.externalId, context));
         return next(context);
       },
     };
@@ -44,29 +44,57 @@ class InternalTool extends NamedStructuredTool {
   readonly name: string;
   readonly description: string;
   readonly displayName = 'DuckDuckGo';
-  readonly duckduckgoSearch: DuckDuckGoSearch;
-
-  get lc_id() {
-    return [...this.lc_namespace, this.name];
-  }
+  readonly maxResults: number;
 
   readonly schema = z.object({
     query: z.string().describe('The search query.'),
   });
 
-  constructor(configuration: DuckduckgoWebSearchExtensionConfiguration, extensionExternalId: string) {
+  constructor(
+    configuration: DuckduckgoWebSearchExtensionConfiguration,
+    extensionExternalId: string,
+    private readonly context: ChatContext,
+  ) {
     super();
 
     this.name = extensionExternalId;
     this.description = 'Performs a web search using DuckDuckGo.';
-
-    this.duckduckgoSearch = new DuckDuckGoSearch({
-      maxResults: configuration.maxResults || 5,
-    });
+    this.maxResults = configuration.maxResults || 5;
   }
 
   protected async _call(arg: z.infer<typeof this.schema>): Promise<string> {
-    return (await this.duckduckgoSearch.invoke(arg.query)) as string;
+    const { query } = arg;
+
+    console.log(`DuckDuckGo Web Search for query: ${query}`);
+
+    const items = (await search(query)).results.slice(0, this.maxResults);
+
+    console.log(items);
+
+    const toolResult = [];
+    const sources: Source[] = [];
+    for (const item of items) {
+      const { title, url, description } = item;
+
+      toolResult.push({ title, link: url, snippet: description });
+
+      const source: Source = {
+        title: title ?? 'Search result',
+        chunk: {
+          content: description ?? 'no content',
+          score: 0,
+        },
+        document: {
+          uri: url,
+          mimeType: 'text/html',
+          link: url,
+        },
+      };
+      sources.push(source);
+    }
+
+    this.context.history?.addSources(this.name, sources);
+    return JSON.stringify(toolResult);
   }
 }
 

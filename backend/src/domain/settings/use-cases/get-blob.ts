@@ -14,13 +14,13 @@ export class GetBlobResponse {
 export class GetBlobHandler implements IQueryHandler<GetBlob, GetBlobResponse> {
   constructor(
     @InjectRepository(BlobEntity)
-    private readonly blogs: BlobRepository,
+    private readonly blobs: BlobRepository,
   ) {}
 
   async execute(request: GetBlob): Promise<GetBlobResponse> {
     const { id } = request;
 
-    const entity = await this.blogs.findOneBy({ id });
+    const entity = await this.blobs.findOneBy({ id });
 
     if (!entity) {
       return new GetBlobResponse();

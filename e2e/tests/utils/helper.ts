@@ -407,7 +407,6 @@ export async function addAzureModelToConfiguration(
   await page.getByLabel('Instance Name').fill('cccc-testing');
   await page.getByLabel('Seed').fill('42');
   await page.getByLabel('Temperature').fill('0');
-  await selectOption(page, 'API Version', '2023-05-15');
   await page.getByRole('button', { name: 'Test' }).click();
   const loader = page.locator('.mantine-Button-loader');
   await loader.waitFor({ state: 'visible' });
@@ -447,11 +446,7 @@ export async function addSystemPromptToConfiguration(
 
   await page.getByLabel('Create Extension').getByRole('tab', { name: 'Other' }).click();
 
-  await page
-    .locator('*')
-    .filter({ hasText: /^Prompt/ })
-    .nth(1)
-    .click();
+  await page.getByRole('heading', { name: 'Prompt', exact: true }).click();
   await page.getByLabel('Text').fill(prompt.text);
 
   if (prompt.configurable) {

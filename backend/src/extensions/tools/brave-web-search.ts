@@ -1,6 +1,5 @@
-import { BraveSearch } from '@langchain/community/tools/brave_search';
 import { z } from 'zod';
-import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext, NamedStructuredTool } from 'src/domain/chat';
+import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext, NamedStructuredTool, Source } from 'src/domain/chat';
 import { Extension, ExtensionConfiguration, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions';
 import { User } from 'src/domain/users';
 import { I18nService } from '../../localization/i18n.service';
@@ -31,7 +30,7 @@ export class BraveWebSearchExtension implements Extension<BraveWebSearchExtensio
   getMiddlewares(_user: User, extension: ExtensionEntity<BraveWebSearchExtensionConfiguration>): Promise<ChatMiddleware[]> {
     const middleware = {
       invoke: async (context: ChatContext, getContext: GetContext, next: ChatNextDelegate): Promise<any> => {
-        context.tools.push(new InternalTool(extension.values, extension.externalId));
+        context.tools.push(new InternalTool(extension.values, extension.externalId, context));
         return next(context);
       },
     };
@@ -45,33 +44,107 @@ class InternalTool extends NamedStructuredTool {
   readonly description: string;
   readonly displayName = 'Brave Search';
   readonly apiKey: string;
-  readonly braveSearch: BraveSearch;
-
-  get lc_id() {
-    return [...this.lc_namespace, this.name];
-  }
 
   readonly schema = z.object({
     query: z.string().describe('The search query.'),
   });
 
-  constructor(configuration: BraveWebSearchExtensionConfiguration, extensionExternalId: string) {
+  constructor(
+    configuration: BraveWebSearchExtensionConfiguration,
+    extensionExternalId: string,
+    private readonly context: ChatContext,
+  ) {
     super();
 
     this.name = extensionExternalId;
     this.apiKey = configuration.apiKey;
     this.description = 'Performs a web search using Brave Search.';
-
-    this.braveSearch = new BraveSearch({
-      apiKey: this.apiKey,
-    });
   }
 
   protected async _call(arg: z.infer<typeof this.schema>): Promise<string> {
-    return (await this.braveSearch.invoke(arg.query)) as string;
+    const { query } = arg;
+
+    const headers = {
+      'X-Subscription-Token': this.apiKey,
+      Accept: 'application/json',
+    };
+    const encodedQuery = encodeURIComponent(query);
+    const searchUrl = new URL(`https://api.search.brave.com/res/v1/web/search?q=${encodedQuery}`);
+
+    const response = await fetch(searchUrl, { headers });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch data from Brave Search: ${response.status} ${response.statusText}`);
+    }
+
+    const parsedResponse = (await response.json()) as SearchResponse;
+    const results = parsedResponse.web?.results;
+    const items = Array.isArray(results) ? results : [];
+
+    const toolResult = [];
+    const sources: Source[] = [];
+    for (const item of items) {
+      const { title, url, description, content_type } = item;
+
+      toolResult.push({ title, link: url, snippet: description });
+
+      const source: Source = {
+        title: title ?? 'Search result',
+        chunk: {
+          content: description ?? 'no content',
+          score: 0,
+        },
+        document: {
+          uri: url,
+          mimeType: content_type ?? 'text/html',
+          link: url,
+        },
+      };
+      sources.push(source);
+    }
+
+    this.context.history?.addSources(this.name, sources);
+    return JSON.stringify(toolResult);
   }
 }
 
 export type BraveWebSearchExtensionConfiguration = ExtensionConfiguration & {
   apiKey: string;
+};
+
+// see also https://api-dashboard.search.brave.com/app/documentation/web-search/responses
+type SearchResponse = {
+  type: 'search';
+  // discussions?:	Discussions
+  // faq?: FAQ
+  // infobox?: GraphInfobox
+  // locations?: Locations
+  // mixed?: MixedResponse
+  // news?: News
+  // query?: Query
+  // videos?: Videos
+  web?: Search;
+  // summarizer?: Summarizer
+  // rich?: RichCallbackInfo
+};
+
+type Search = {
+  type: 'search';
+  results: SearchResult[];
+  family_friendly: boolean;
+};
+
+type Result = {
+  title: string;
+  url: string;
+  description?: string;
+  language: string;
+  page_age?: string;
+  page_fetched?: string;
+};
+
+type SearchResult = Result & {
+  type: 'search_result';
+  content_type?: string;
+  extra_snippets?: string[];
 };

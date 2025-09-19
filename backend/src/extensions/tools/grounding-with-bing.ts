@@ -95,10 +95,6 @@ class InternalTool extends NamedStructuredTool {
   readonly model: string;
   private readonly logger = new Logger(InternalTool.name);
 
-  get lc_id() {
-    return [...this.lc_namespace, this.name];
-  }
-
   readonly schema = z.object({
     query: z.string().describe('The search query.'),
   });

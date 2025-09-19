@@ -11,7 +11,6 @@ import { Extension } from 'src/domain/extensions';
 import { ContextExtension } from './examples/show-context';
 import { UserArgsExtension } from './examples/user-args';
 import { AzureOpenAIModelExtension } from './models/azure-open-ai';
-import { AzureOpenAIReasoningModelExtension } from './models/azure-open-ai-reasoning';
 import { BedrockModelExtension } from './models/bedrock-ai';
 import { GoogleGenAIModelExtension } from './models/google-genai';
 import { MistralModelExtension } from './models/mistral';
@@ -19,10 +18,7 @@ import { NvidiaModelExtension } from './models/nvidia';
 import { OllamaModelExtension } from './models/ollama';
 import { OpenAIModelExtension } from './models/open-ai';
 import { OpenAICompatibleModelExtension } from './models/open-ai-compatible';
-import { VertexAIModelExtension } from './models/vertex-al';
 import { CustomPromptExtension } from './other/custom';
-import { HubPromptExtension } from './other/hub';
-import { LangfuseExtension } from './other/langfuse';
 import { SpeechToTextExtension } from './other/speech-to-text';
 import { SummaryPromptExtension } from './other/summary';
 import { AzureAISearchExtension } from './tools/azure-ai-search';
@@ -110,7 +106,6 @@ export class ExtensionLibraryModule {
         AzureDallEExtension,
         AzureGPTImage1Extension,
         AzureOpenAIModelExtension,
-        AzureOpenAIReasoningModelExtension,
         BedrockModelExtension,
         BingWebSearchExtension,
         BraveWebSearchExtension,
@@ -125,8 +120,6 @@ export class ExtensionLibraryModule {
         GoogleGenAIModelExtension,
         GPTImage1Extension,
         GroundingWithBingSearchExtension,
-        HubPromptExtension,
-        LangfuseExtension,
         MCPToolsExtension,
         MistralModelExtension,
         NvidiaModelExtension,
@@ -137,7 +130,6 @@ export class ExtensionLibraryModule {
         SpeechToTextExtension,
         SummaryPromptExtension,
         UserArgsExtension,
-        VertexAIModelExtension,
         WholeFilesExtension,
       ],
     };

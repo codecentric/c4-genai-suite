@@ -141,10 +141,6 @@ class InternalTool extends NamedStructuredTool {
   readonly displayName = 'Complete Files';
   private readonly logger = new Logger(`${WholeFilesExtension.name}$${InternalTool.name}`);
 
-  get lc_id() {
-    return [...this.lc_namespace, this.name];
-  }
-
   readonly schema = z.object({});
 
   constructor(
