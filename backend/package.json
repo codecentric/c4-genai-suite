@@ -65,7 +65,7 @@
     "class-validator": "^0.14.1",
     "cookie-parser": "^1.4.7",
     "date-fns": "^4.1.0",
-    "dotenv": "^16.6.1",
+    "dotenv": "^17.2.2",
     "duck-duck-scrape": "^2.2.7",
     "expr-eval": "^2.0.2",
     "express-session": "^1.18.2",
