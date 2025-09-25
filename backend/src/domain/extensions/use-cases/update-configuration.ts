@@ -1,8 +1,14 @@
 import { NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In } from 'typeorm';
-import { ConfigurationEntity, ConfigurationRepository, UserGroupEntity, UserGroupRepository } from 'src/domain/database';
+import { In, Not } from 'typeorm';
+import {
+  ConfigurationEntity,
+  ConfigurationRepository,
+  ConfigurationStatus,
+  UserGroupEntity,
+  UserGroupRepository,
+} from 'src/domain/database';
 import { assignDefined } from 'src/lib';
 import { ConfigurationModel } from '../interfaces';
 import { buildConfiguration } from './utils';
@@ -57,7 +63,7 @@ export class UpdateConfigurationHandler implements ICommandHandler<UpdateConfigu
     } = values;
 
     const entity = await this.configurations.findOne({
-      where: { id },
+      where: { id, status: Not(ConfigurationStatus.DELETED) },
       relations: {
         userGroups: true,
       },
@@ -76,7 +82,7 @@ export class UpdateConfigurationHandler implements ICommandHandler<UpdateConfigu
       agentName,
       chatFooter,
       chatSuggestions,
-      enabled,
+      status: enabled ? ConfigurationStatus.ENABLED : ConfigurationStatus.DISABLED,
       executorEndpoint,
       executorHeaders,
       name,

@@ -1,8 +1,9 @@
-import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { DataSource, DeleteResult, IsNull, QueryFailedError } from 'typeorm';
-import { ConfigurationEntity, ConversationEntity } from 'src/domain/database';
-import { I18nService } from '../../../localization/i18n.service';
+import { InjectRepository } from '@nestjs/typeorm';
+import { DeleteResult } from 'typeorm';
+import { ConfigurationEntity, ConfigurationRepository, ConfigurationStatus } from 'src/domain/database';
+import { assignDefined } from 'src/lib';
 
 export class DeleteConfiguration {
   constructor(public readonly id: number) {}
@@ -11,33 +12,38 @@ export class DeleteConfiguration {
 @CommandHandler(DeleteConfiguration)
 export class DeleteConfigurationHandler implements ICommandHandler<DeleteConfiguration, any> {
   constructor(
-    private dataSource: DataSource,
-    private readonly i18n: I18nService,
+    @InjectRepository(ConfigurationEntity)
+    private readonly configurations: ConfigurationRepository,
   ) {}
 
   async execute(command: DeleteConfiguration): Promise<any> {
     let result: DeleteResult;
+    const { id } = command;
 
-    const queryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
+    // So, we first try to just delete the configuration.
     try {
-      await queryRunner.manager.delete(ConversationEntity, { configurationId: command.id, llm: IsNull(), name: IsNull() });
-      result = await queryRunner.manager.delete(ConfigurationEntity, { id: command.id });
-      await queryRunner.commitTransaction();
-    } catch (error) {
-      await queryRunner.rollbackTransaction();
-      if (error instanceof QueryFailedError) {
-        throw new BadRequestException(this.i18n.t('texts.chat.errorConfigurationUsed'));
-      } else {
-        throw error;
-      }
-    } finally {
-      await queryRunner.release();
-    }
+      result = await this.configurations.delete({ id: id });
 
-    if (!result.affected) {
-      throw new NotFoundException();
+      if (!result.affected) {
+        throw new NotFoundException();
+      }
+    } catch (_error) {
+      // If it does not work, because there are still messages referring to them, we mark the configuration as deleted.
+      // That will only have the effect that the configuration will not be shown in any user facing menu,
+      // but is still available for the existing messages to show needed information.
+      const entity = await this.configurations.findOne({
+        where: { id },
+      });
+
+      if (!entity) {
+        throw new NotFoundException();
+      }
+
+      assignDefined(entity, {
+        status: ConfigurationStatus.DELETED,
+      });
+
+      await this.configurations.save(entity);
     }
   }
 }

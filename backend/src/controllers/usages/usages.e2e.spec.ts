@@ -9,6 +9,7 @@ import { GroupBy } from 'src/domain/chat/statistics';
 import { AppModule } from '../../app.module';
 import {
   ConfigurationEntity,
+  ConfigurationStatus,
   ConversationEntity,
   MessageEntity,
   trackUsage,
@@ -205,7 +206,7 @@ async function createConfigurationEntity(configurationRepository: Repository<Con
   const configurationEntity = new ConfigurationEntity();
   configurationEntity.id = 1;
   configurationEntity.name = 'Assistant-E2E';
-  configurationEntity.enabled = true;
+  configurationEntity.status = ConfigurationStatus.ENABLED;
 
   return configurationRepository.save(configurationEntity);
 }
