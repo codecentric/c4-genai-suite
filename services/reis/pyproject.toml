@@ -30,7 +30,7 @@ langchain-aws = "^0.2.33"
 langchain-nvidia-ai-endpoints = "^0.3.18"
 
 [tool.poetry.group.dev.dependencies]
-ruff = "0.13.1"
+ruff = "0.13.2"
 mypy = "1.18.2"
 pre-commit = "4.3.0"
 pytest = "8.4.2"
