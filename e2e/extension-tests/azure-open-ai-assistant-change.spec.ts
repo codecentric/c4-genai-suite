@@ -5,6 +5,8 @@ import {
   addSystemPromptToConfiguration,
   cleanup,
   createConfiguration,
+  deleteConfiguration,
+  disableConfiguration,
   enterAdminArea,
   enterUserArea,
   login,
@@ -60,6 +62,27 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
       expect(secondResponse).toBeDefined();
       const secondResponseAssistantText = await page.waitForSelector(`:has-text("${secondAssistant.name}")`);
       expect(secondResponseAssistantText).toBeDefined();
+    });
+
+    await test.step('should disable second assistant', async () => {
+      await enterAdminArea(page);
+      await disableConfiguration(page, secondAssistant);
+      await enterUserArea(page);
+      const secondResponse = await page.waitForSelector(`:has-text("${secondAssistant.name} [disabled]")`);
+      expect(secondResponse).toBeDefined();
+    });
+
+    await test.step('should delete second assistant', async () => {
+      await enterAdminArea(page);
+      await deleteConfiguration(page, secondAssistant);
+      await enterUserArea(page);
+      const secondResponse = await page.waitForSelector(`:has-text("Friendly AI [assistant deleted]")`);
+      expect(secondResponse).toBeDefined();
+
+      await selectConfiguration(page, firstAssistant);
+      await sendMessage(page, firstAssistant, { message: 'Who are you' });
+      const firstResponse = await page.waitForSelector(`:has-text("Bob")`);
+      expect(firstResponse).toBeDefined();
     });
   });
 }

@@ -19,6 +19,12 @@ import { UserGroupEntity } from './user-group';
 
 export type ConfigurationRepository = Repository<ConfigurationEntity>;
 
+export enum ConfigurationStatus {
+  ENABLED = 'enabled',
+  DISABLED = 'disabled',
+  DELETED = 'deleted',
+}
+
 @Entity({ name: 'configurations', schema })
 export class ConfigurationEntity {
   @PrimaryGeneratedColumn()
@@ -30,8 +36,12 @@ export class ConfigurationEntity {
   @Column({ default: '' })
   description!: string;
 
-  @Column()
-  enabled!: boolean;
+  @Column({
+    type: 'enum',
+    enum: ConfigurationStatus,
+    default: ConfigurationStatus.ENABLED,
+  })
+  status!: ConfigurationStatus;
 
   @Column('text', { nullable: true })
   agentName?: string;

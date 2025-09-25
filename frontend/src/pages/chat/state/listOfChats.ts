@@ -7,7 +7,7 @@ import { useTransientContext, useTransientNavigate } from 'src/hooks';
 import { usePersistentState } from 'src/hooks/stored';
 import { buildError } from 'src/lib';
 import { useStateOfChat } from 'src/pages/chat/state/chat';
-import { useStateOfAssistants } from 'src/pages/chat/state/listOfAssistants';
+import { useStateOfEnabledAssistants } from 'src/pages/chat/state/listOfAssistants';
 import { texts } from 'src/texts';
 import { useListOfChatsStore } from './zustand/listOfChatsStore';
 
@@ -115,7 +115,7 @@ export const useMutateNewChat = () => {
   const api = useApi();
   const context = useTransientContext();
   const navigate = useTransientNavigate();
-  const assistants = useStateOfAssistants();
+  const assistants = useStateOfEnabledAssistants();
   const [persistentAssistantId] = usePersistentState<number | null>('selectedAssistantId', null);
 
   return useMutation({

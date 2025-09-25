@@ -280,7 +280,7 @@
     }
   },
   "chat": {
-    "errorConfigurationUsed": "Assistant is used by at least one conversation.",
+    "errorLastConfigurationdDeleted": "There must be at least one enabled assistant if there are conversations.",
     "errorContentFilter": "The question was rejected by the system due to its content and is therefore not answered.",
     "errorContextLengthExceeded": "The context of the current chat is too long for the used LLM. Either there is too much text in this chat or you uploaded a too large file with the \"Complete File\" extension.",
     "errorStringAboveMaxLength": "The request to the LLM is too long. Either there is too much text in this chat or you uploaded a too large file with the \"Complete File\" extension.",

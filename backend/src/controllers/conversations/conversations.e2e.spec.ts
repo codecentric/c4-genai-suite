@@ -7,6 +7,7 @@ import { AppModule } from '../../app.module';
 import {
   BucketEntity,
   ConfigurationEntity,
+  ConfigurationStatus,
   ConversationEntity,
   FileEntity,
   FileUploadStatus,
@@ -115,7 +116,7 @@ async function seedTestData(dataSource: DataSource) {
 function createConfiguration(configurationRepository: Repository<ConfigurationEntity>): Promise<ConfigurationEntity> {
   const configurationEntity = new ConfigurationEntity();
   configurationEntity.name = 'Test Configuration';
-  configurationEntity.enabled = true;
+  configurationEntity.status = ConfigurationStatus.ENABLED;
 
   return configurationRepository.save(configurationEntity);
 }

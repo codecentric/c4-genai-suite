@@ -82,6 +82,25 @@ export async function createConfiguration(
   await save(page, expect.detached);
 }
 
+export async function disableConfiguration(page: Page, configuration: { name: string; description: string }) {
+  await page.getByRole('link', { name: 'Assistants' }).click();
+  await page.locator('li').filter({ hasText: configuration.name }).getByTestId('more-actions').click();
+
+  await page.click('button:has-text("Edit")');
+  await page.locator('label').filter({ hasText: 'Enabled' }).locator('span').nth(2).click();
+  await page.getByRole('button', { name: 'Save' }).click();
+}
+
+export async function deleteConfiguration(page: Page, configuration: { name: string; description: string }) {
+  await page.getByRole('link', { name: 'Assistants' }).click();
+  await page.locator('li').filter({ hasText: configuration.name }).getByTestId('more-actions').click();
+
+  await page.click('button:has-text("Delete")');
+  const confirmButton = page.locator('button:has-text("Confirm")');
+  await page.click('button:has-text("Confirm")');
+  await confirmButton.waitFor({ state: 'detached' });
+}
+
 async function deleteListItems(page: Page, filter: { label: string }) {
   // wait until the list is rendered (otherwise count might be falsely 0)
   await page.waitForLoadState('networkidle');

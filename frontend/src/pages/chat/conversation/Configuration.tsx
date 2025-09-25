@@ -3,7 +3,7 @@ import { IconChevronDown, IconSettings } from '@tabler/icons-react';
 import { useState } from 'react';
 import { usePersistentState } from 'src/hooks';
 import { ConfigurationUserValuesModal } from 'src/pages/chat/conversation/ConfigurationUserValuesModal';
-import { useStateOfAssistants, useStateOfSelectedAssistant } from 'src/pages/chat/state/listOfAssistants';
+import { useStateOfEnabledAssistants, useStateOfSelectedAssistant } from 'src/pages/chat/state/listOfAssistants';
 import { isMobile } from 'src/pages/utils';
 import { useStateMutateChat, useStateOfChat } from '../state/chat';
 
@@ -14,7 +14,7 @@ interface ConfigurationProps {
 export const Configuration = ({ canEditConfiguration }: ConfigurationProps) => {
   const chat = useStateOfChat();
   const updateChat = useStateMutateChat(chat.id);
-  const assistants = useStateOfAssistants();
+  const assistants = useStateOfEnabledAssistants();
   const assistant = useStateOfSelectedAssistant();
 
   const [showModal, setShowModal] = useState(false);

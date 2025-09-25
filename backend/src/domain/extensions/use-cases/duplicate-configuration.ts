@@ -1,8 +1,15 @@
 import { NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Not } from 'typeorm';
 import { assignDefined } from '../../../lib';
-import { ConfigurationEntity, ConfigurationRepository, ExtensionEntity, ExtensionRepository } from '../../database';
+import {
+  ConfigurationEntity,
+  ConfigurationRepository,
+  ConfigurationStatus,
+  ExtensionEntity,
+  ExtensionRepository,
+} from '../../database';
 import { ConfigurationModel } from '../interfaces';
 import { buildConfiguration } from './utils';
 
@@ -26,7 +33,7 @@ export class DuplicateConfigurationHandler implements ICommandHandler<DuplicateC
   async execute(command: DuplicateConfiguration): Promise<any> {
     const { id } = command;
     const configuration = await this.configurations.findOne({
-      where: { id },
+      where: { id, status: Not(ConfigurationStatus.DELETED) },
       relations: {
         extensions: true,
         userGroups: true,
@@ -43,7 +50,7 @@ export class DuplicateConfigurationHandler implements ICommandHandler<DuplicateC
       agentName: configuration.agentName,
       chatFooter: configuration.chatFooter,
       chatSuggestions: configuration.chatSuggestions,
-      enabled: configuration.enabled,
+      status: configuration.status,
       executorEndpoint: configuration.executorEndpoint,
       executorHeaders: configuration.executorHeaders,
       name: getSuffix(configuration.name),

@@ -3,7 +3,7 @@ import { useClipboard, useDebouncedValue } from '@mantine/hooks';
 import { toast } from 'react-toastify';
 import { Alert, Markdown } from 'src/components';
 import { useProfile } from 'src/hooks';
-import { useStateOfAssistants } from 'src/pages/chat/state/listOfAssistants';
+import { useStateOfAllAssistants, useStateOfEnabledAssistants } from 'src/pages/chat/state/listOfAssistants';
 import { texts } from 'src/texts';
 import { useStateOfIsAiWriting } from '../../state/chat';
 import { ChatItemDebug } from '../ChatItemDebug';
@@ -24,7 +24,8 @@ export const AIChatItem = ({ agentName, message, isLast, selectDocument }: ChatI
   const user = useProfile();
   const isWriting = useStateOfIsAiWriting();
   const clipboard = useClipboard();
-  const assistants = useStateOfAssistants();
+  const assistants = useStateOfAllAssistants();
+  const assistantsWithExtensions = useStateOfEnabledAssistants();
 
   const copyTextToClipboard = () => {
     clipboard.copy(textContent);
@@ -32,10 +33,12 @@ export const AIChatItem = ({ agentName, message, isLast, selectDocument }: ChatI
   };
 
   const messageAssistant = assistants.find((x) => x.id === message.configurationId);
-  const assistantLLmLogo = messageAssistant?.extensions?.find((x) => x.type === 'llm')?.logo;
+  const messageAssistantWithExtensions = assistantsWithExtensions.find((x) => x.id === message.configurationId);
+  const assistantLLmLogo = messageAssistantWithExtensions?.extensions?.find((x) => x.type === 'llm')?.logo;
 
   const [debouncedIsWriting] = useDebouncedValue(isWriting, 500);
   const newReply = isWriting || debouncedIsWriting;
+  const assistantStatus = !messageAssistant ? ' [assistant deleted]' : !messageAssistant.enabled ? ' [disabled]' : '';
 
   return (
     <div className={'scroll-y-m-4 group box-border max-w-full'} data-testid="chat-item">
@@ -47,6 +50,7 @@ export const AIChatItem = ({ agentName, message, isLast, selectDocument }: ChatI
             |<strong>{messageAssistant.name}</strong>
           </>
         )}
+        {assistantStatus && <small className="text-gray-500">{assistantStatus}</small>}
       </div>
       {message.error && <Alert text={message.error} className="mt-1" />}
       <ChatItemTools tools={message.toolsInUse || {}} />

@@ -1,6 +1,6 @@
 import { BadRequestException } from '@nestjs/common';
 import { z } from 'zod';
-import { ConfigurationEntity, ExtensionEntity } from 'src/domain/database';
+import { ConfigurationEntity, ConfigurationStatus, ExtensionEntity } from 'src/domain/database';
 import {
   ConfigurationModel,
   ConfiguredExtension,
@@ -157,7 +157,7 @@ export async function buildConfiguration(
   withExtensions: boolean = false,
   onlyEnabledExtensions: boolean = false,
 ): Promise<ConfigurationModel> {
-  const { userGroupsIds, extensions: configuredExtensions, ...other } = source;
+  const { userGroupsIds, extensions: configuredExtensions, status, ...other } = source;
 
   const extensions =
     withExtensions && extensionExplorer && configuredExtensions
@@ -171,5 +171,10 @@ export async function buildConfiguration(
         )
       : [];
 
-  return { ...other, userGroupsIds: userGroupsIds || [], extensions: extensions.filter((x) => !!x) };
+  return {
+    ...other,
+    enabled: status === ConfigurationStatus.ENABLED,
+    userGroupsIds: userGroupsIds || [],
+    extensions: extensions.filter((x) => !!x),
+  };
 }

@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { BucketEntity, ConfigurationEntity, ExtensionEntity, UserGroupEntity } from 'src/domain/database';
+import { BucketEntity, ConfigurationEntity, ConversationEntity, ExtensionEntity, UserGroupEntity } from 'src/domain/database';
 import { ConfigurationUserEntity } from '../database/entities/configuration-user';
 import { ExplorerService } from './services';
 import {
@@ -28,7 +28,14 @@ import { UpdateConfigurationUserValuesHandler } from './use-cases/update-configu
   imports: [
     ConfigModule,
     CqrsModule,
-    TypeOrmModule.forFeature([BucketEntity, ConfigurationEntity, ConfigurationUserEntity, ExtensionEntity, UserGroupEntity]),
+    TypeOrmModule.forFeature([
+      BucketEntity,
+      ConfigurationEntity,
+      ConfigurationUserEntity,
+      ConversationEntity,
+      ExtensionEntity,
+      UserGroupEntity,
+    ]),
   ],
   providers: [
     CreateConfigurationHandler,
