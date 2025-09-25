@@ -280,7 +280,7 @@
     }
   },
   "chat": {
-    "errorConfigurationUsed": "Der Assistent wird von mindestens einer Konversation verwendet.",
+    "errorLastConfigurationdDeleted": "Es muss mindestens einen aktivierten Assistenten geben, wenn Konversationen existieren.",
     "errorContentFilter": "Die Frage wurde vom System aufgrund ihres Inhalts abgewiesen und wird daher nicht beantwortet.",
     "errorContextLengthExceeded": "Der Kontext des aktuellen Chats ist zu groß für das genutzte LLM. Entweder gibt es zu viel Text in dieser Konversation oder es wurde eine zu große Datei mit der \"Vollständige Dateien\"-Extension hochgeladen.",
     "errorStringAboveMaxLength": "Die Anfrage an das LLM is zu lang. Entweder gibt es zu viel Text in dieser Konversation oder es wurde eine zu große Datei mit der \"Vollständige Dateien\"-Extension hochgeladen.",
