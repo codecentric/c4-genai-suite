@@ -1,3 +1,4 @@
+import { Button } from '@mantine/core';
 import { useFormContext } from 'react-hook-form';
 import { texts } from 'src/texts';
 
@@ -19,8 +20,8 @@ export function GenerateApiKeyButton({ disabled }: { disabled?: boolean }) {
   };
 
   return (
-    <button type="button" aria-label={texts.users.generateAPIKey} className="btn" onClick={generateKey} disabled={disabled}>
+    <Button onClick={generateKey} disabled={disabled}>
       {texts.common.generate}
-    </button>
+    </Button>
   );
 }
