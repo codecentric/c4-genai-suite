@@ -3,7 +3,12 @@ import { forwardRef, Inject, NotFoundException } from '@nestjs/common';
 import { Logger } from '@nestjs/common';
 import { IQueryHandler, QueryBus, QueryHandler } from '@nestjs/cqrs';
 import { Observable, ReplaySubject } from 'rxjs';
-import { GetExtensions, GetExtensionsResponse } from 'src/domain/extensions';
+import {
+  ConfigurationUserValuesModel,
+  ExtensionConfiguration,
+  GetExtensions,
+  GetExtensionsResponse,
+} from 'src/domain/extensions';
 import { GetConfiguration, GetConfigurationResponse } from 'src/domain/extensions/use-cases';
 import { User } from 'src/domain/users/interfaces';
 import { I18nService } from '../../../localization/i18n.service';
@@ -31,11 +36,16 @@ export class SendMessage {
     public readonly input: string,
     public readonly files?: Pick<UploadedFile, 'id' | 'fileName'>[],
     public readonly editMessageId?: number,
+    public readonly systemMessages?: string[],
+    public readonly configurationOverrides?: ConfigurationUserValuesModel['values'],
   ) {}
 }
 
 export class SendMessageResponse {
-  constructor(public readonly stream: Observable<StreamEvent>) {}
+  constructor(
+    public readonly stream: Observable<StreamEvent>,
+    public readonly abort: AbortController,
+  ) {}
 }
 
 @QueryHandler(SendMessage)
@@ -53,7 +63,7 @@ export class SendMessageHandler implements IQueryHandler<SendMessage, SendMessag
   ) {}
 
   async execute(query: SendMessage): Promise<SendMessageResponse> {
-    const { conversationId, input, user, files, editMessageId } = query;
+    const { conversationId, input, user, files, editMessageId, systemMessages, configurationOverrides } = query;
 
     // Get the conversation here, because we need the extension configuration.
     const { conversation }: GetConversationResponse = await this.queryBus.execute(new GetConversation(conversationId, user));
@@ -71,9 +81,15 @@ export class SendMessageHandler implements IQueryHandler<SendMessage, SendMessag
       throw new NotFoundException(`Configuration with id '${conversation.configurationId}' not found`);
     }
 
+    const { configuration: configurationUserValues }: GetConfigurationUserValuesResponse = await this.queryBus.execute(
+      new GetConfigurationUserValues(configuration.id, user.id),
+    );
+    const configurationUserOverrides = configurationUserValues?.values;
+
+    const abort = new AbortController();
     const observable = new Observable<StreamEvent>((observer) => {
       const context: ChatContext = {
-        abort: new AbortController(),
+        abort,
         cache: this.cache,
         context: conversation.context || {},
         conversationId: conversation.id,
@@ -84,7 +100,7 @@ export class SendMessageHandler implements IQueryHandler<SendMessage, SendMessag
         llm: conversation.llm,
         llms: {},
         result: new ReplaySubject(),
-        systemMessages: [],
+        systemMessages: systemMessages ?? [],
         tools: [],
         ui: undefined!,
         user,
@@ -99,7 +115,13 @@ export class SendMessageHandler implements IQueryHandler<SendMessage, SendMessag
         const getContext = () => this.store.getStore() as ChatContext;
 
         try {
-          const next = await this.buildPipeline(context, conversation, getContext);
+          const next = await this.buildPipeline(
+            context,
+            conversation,
+            getContext,
+            configurationUserOverrides ?? {},
+            configurationOverrides ?? {},
+          );
           await next(context);
         } catch (err) {
           if (err instanceof Error) {
@@ -122,25 +144,26 @@ export class SendMessageHandler implements IQueryHandler<SendMessage, SendMessag
       };
     });
 
-    return new SendMessageResponse(observable);
+    return new SendMessageResponse(observable, abort);
   }
 
-  private async buildPipeline(context: ChatContext, conversation: Conversation, getContext: GetContext) {
+  private async buildPipeline(
+    context: ChatContext,
+    conversation: Conversation,
+    getContext: GetContext,
+    ...configurationOverrides: { [id: string]: ExtensionConfiguration }[]
+  ) {
     const middlewares = [...this.middlewares];
 
     const { extensions }: GetExtensionsResponse = await this.queryBus.execute(
       new GetExtensions(context.configuration.id, false, false),
     );
 
-    const { configuration: configurationUser }: GetConfigurationUserValuesResponse = await this.queryBus.execute(
-      new GetConfigurationUserValues(context.configuration.id, context.user.id),
-    );
-
     for (const extension of extensions) {
       const extensionMiddlewares = await extension.getMiddlewares(
         context.user,
         conversation.extensionUserArguments?.[extension.id],
-        configurationUser?.values?.[extension.id] ?? {},
+        ...configurationOverrides.map((x) => x?.[extension.id]),
       );
 
       for (const middleware of extensionMiddlewares) {
