@@ -1,17 +1,6 @@
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  ManyToMany,
-  OneToMany,
-  PrimaryColumn,
-  RelationId,
-  Repository,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Column, CreateDateColumn, Entity, ManyToMany, PrimaryColumn, RelationId, Repository, UpdateDateColumn } from 'typeorm';
 import { schema } from '../typeorm.helper';
 import { ConfigurationEntity } from './configuration';
-import { FileEntity } from './file';
 import { UserEntity } from './user';
 
 export type UserGroupRepository = Repository<UserGroupEntity>;
@@ -36,8 +25,8 @@ export class UserGroupEntity {
   @Column({ nullable: true })
   monthlyUserTokens?: number;
 
-  @OneToMany(() => UserEntity, (user) => user.userGroup, { onDelete: 'RESTRICT' })
-  users!: FileEntity[];
+  @ManyToMany(() => UserEntity, (user) => user.userGroups)
+  users!: UserEntity[];
 
   @ManyToMany(() => ConfigurationEntity, (configuration) => configuration.userGroups)
   configurations!: ConfigurationEntity[];
