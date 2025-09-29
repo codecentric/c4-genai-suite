@@ -9,7 +9,7 @@ import { NavigationBar } from 'src/components/NavigationBar';
 import { PdfViewer } from 'src/components/PdfViewer';
 import { useSidebarState, useTheme } from 'src/hooks';
 import { useConversationFiles } from 'src/hooks/api/files';
-import { useListOfAssistantsInit } from 'src/pages/chat/state/listOfAssistants';
+import { useListOfAllAssistantsInit, useListOfEnabledAssistantsInit } from 'src/pages/chat/state/listOfAssistants';
 import { texts } from 'src/texts';
 import { isMobile } from '../utils';
 import { ConversationItems } from './ConversationItems';
@@ -62,7 +62,8 @@ export function ChatPage() {
   const { theme } = useTheme();
 
   const isMobileView = isMobile();
-  useListOfAssistantsInit();
+  useListOfEnabledAssistantsInit();
+  useListOfAllAssistantsInit();
   useListOfChatsInit();
 
   const { selectedDocument, setSelectedDocument } = useStateOfSelectedDocument();

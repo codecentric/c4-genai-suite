@@ -4,7 +4,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import * as request from 'supertest';
 import { DataSource, Repository } from 'typeorm';
 import { AppModule } from '../../app.module';
-import { ConfigurationEntity, ConversationEntity, MessageEntity, UserEntity } from '../../domain/database';
+import { ConfigurationEntity, ConfigurationStatus, ConversationEntity, MessageEntity, UserEntity } from '../../domain/database';
 import { initAppWithDataBaseAndValidUser } from '../../utils/testUtils';
 
 jest.mock('../../domain/files/use-cases/generated/apis', () => {
@@ -248,7 +248,7 @@ function createConfigurationEntity(repository: Repository<ConfigurationEntity>):
   const entity = new ConfigurationEntity();
   entity.id = 1;
   entity.name = 'test';
-  entity.enabled = true;
+  entity.status = ConfigurationStatus.ENABLED;
   return repository.save(entity);
 }
 

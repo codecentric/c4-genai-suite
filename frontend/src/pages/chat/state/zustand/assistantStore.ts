@@ -6,7 +6,12 @@ type ListOfAssistantsState = {
   setAssistants: (assistants: ConfigurationDto[]) => void;
 };
 
-export const useListOfAssistantsStore = create<ListOfAssistantsState>()((set) => ({
+export const useListOfEnabledAssistantsStore = create<ListOfAssistantsState>()((set) => ({
+  assistants: [],
+  setAssistants: (assistants) => set({ assistants }),
+}));
+
+export const useListOfAllAssistantsStore = create<ListOfAssistantsState>()((set) => ({
   assistants: [],
   setAssistants: (assistants) => set({ assistants }),
 }));

@@ -1,7 +1,13 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In } from 'typeorm';
-import { ConfigurationEntity, ConfigurationRepository, UserGroupEntity, UserGroupRepository } from 'src/domain/database';
+import {
+  ConfigurationEntity,
+  ConfigurationRepository,
+  ConfigurationStatus,
+  UserGroupEntity,
+  UserGroupRepository,
+} from 'src/domain/database';
 import { assignDefined } from 'src/lib';
 import { ConfigurationModel } from '../interfaces';
 import { buildConfiguration } from './utils';
@@ -63,7 +69,7 @@ export class CreateConfigurationHandler implements ICommandHandler<CreateConfigu
       agentName,
       chatFooter,
       chatSuggestions,
-      enabled,
+      status: enabled ? ConfigurationStatus.ENABLED : ConfigurationStatus.DISABLED,
       executorEndpoint,
       executorHeaders,
       name,
