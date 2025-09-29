@@ -48,7 +48,7 @@ export class DuplicateConfigurationHandler implements ICommandHandler<DuplicateC
       executorHeaders: configuration.executorHeaders,
       name: getSuffix(configuration.name),
       description: configuration.description,
-      userGroupsIds: configuration.userGroupsIds,
+      userGroupIds: configuration.userGroupIds,
     });
 
     entity.userGroups = configuration.userGroups;

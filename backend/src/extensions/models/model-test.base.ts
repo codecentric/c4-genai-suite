@@ -22,7 +22,7 @@ export function modelExtensionTestSuite(modelExtension: ExtensionConstructor) {
       id: '123',
       name: 'John Doe',
       email: 'johndoe@example.com',
-      userGroupId: 'group123',
+      userGroupIds: ['group123'],
     };
 
     const context = {
