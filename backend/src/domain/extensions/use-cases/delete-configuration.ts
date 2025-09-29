@@ -61,7 +61,14 @@ export class DeleteConfigurationHandler implements ICommandHandler<DeleteConfigu
       if (toBeDeleted.conversations) {
         for (const conversation of toBeDeleted.conversations) {
           conversation.configuration = replacement;
-          await queryRunner.manager.save(ConversationEntity, conversation);
+          await queryRunner.manager.update(
+            ConversationEntity,
+            { id: conversation.id },
+            {
+              configurationId: replacement.id,
+              updatedAt: () => '"updatedAt"',
+            },
+          );
         }
       }
       assignDefined(toBeDeleted, {
