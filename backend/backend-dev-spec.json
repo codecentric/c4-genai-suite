@@ -1205,7 +1205,8 @@
             "in": "path",
             "description": "The ID of the file.",
             "schema": { "type": "number" }
-          }
+          },
+          { "name": "conversationId", "required": false, "in": "query", "schema": { "type": "number" } }
         ],
         "responses": { "204": { "description": "" } },
         "summary": "",

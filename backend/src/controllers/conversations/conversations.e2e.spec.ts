@@ -14,6 +14,7 @@ import {
   MessageEntity,
   UserEntity,
 } from '../../domain/database';
+import { ConversationFileEntity } from '../../domain/database/entities/conversation-file';
 import { schema } from '../../domain/database/typeorm.helper';
 import { buildClient } from '../../domain/files/use-cases/utils';
 import { initAppWithDataBaseAndValidUser } from '../../utils/testUtils';
@@ -100,6 +101,7 @@ async function seedTestData(dataSource: DataSource) {
   const conversationRepository = dataSource.getRepository(ConversationEntity);
   const messageRepository = dataSource.getRepository(MessageEntity);
   const fileRepository = dataSource.getRepository(FileEntity);
+  const conversationFileRepository = dataSource.getRepository(ConversationFileEntity);
   const bucketRepository = dataSource.getRepository(BucketEntity);
 
   const userEntity = await createUser(userRepository);
@@ -107,7 +109,8 @@ async function seedTestData(dataSource: DataSource) {
 
   const conversation = await createConversationEntity(conversationRepository, configurationEntity, userEntity);
   const bucketEntity = await createBucket(bucketRepository);
-  await createFiles(fileRepository, conversation.id, bucketEntity);
+  const file = await createFiles(fileRepository, conversation.id, bucketEntity);
+  await createConversationFiles(conversationFileRepository, conversation.id, file.id);
   await createMessages(messageRepository, conversation.id, configurationEntity.id);
 
   return conversation;
@@ -174,7 +177,6 @@ function createFiles(
   bucketEntity: BucketEntity,
 ): Promise<FileEntity> {
   const fileEntity = new FileEntity();
-  fileEntity.conversationId = conversationId;
   fileEntity.mimeType = 'application/pdf';
   fileEntity.fileName = 'test.pdf';
   fileEntity.fileSize = 1024;
@@ -182,6 +184,18 @@ function createFiles(
   fileEntity.bucket = bucketEntity;
 
   return fileRepository.save(fileEntity);
+}
+
+function createConversationFiles(
+  conversationFileRepository: Repository<ConversationFileEntity>,
+  conversationId: number,
+  fileId: number,
+): Promise<ConversationFileEntity> {
+  const conversationFileEntity = new ConversationFileEntity();
+  conversationFileEntity.conversationId = conversationId;
+  conversationFileEntity.fileId = fileId;
+
+  return conversationFileRepository.save(conversationFileEntity);
 }
 
 function createBucket(bucketRepository: Repository<BucketEntity>): Promise<BucketEntity> {

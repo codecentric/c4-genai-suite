@@ -147,8 +147,8 @@
       "descriptionHint": "Describes the tool and the data in the index.",
       "bucketHint": "The bucket to use.",
       "takeHint": "The number of results to return.",
-      "filesInChat": "Files in Chat",
-      "filesInChatHint": "Upload files into a conversation. Files will be available only in the conversation where they were uploaded. 'Take' value will be ignored",
+      "showSources": "Show sources",
+      "showSourcesHint": "Show sources of the files",
       "errorFileTooLarge": "The file is larger than allowed for this file type.",
       "errorNotAllowedFileType": "File type not allowed.",
       "errorNotSupportedFileType": "File type not supported.",
@@ -204,7 +204,9 @@
       "maxFiles": "Max. Files",
       "maxFilesHint": "Maximum number of files to upload in a conversation",
       "showSources": "Show sources",
-      "showSourcesHint": "Show sources of the files"
+      "showSourcesHint": "Show sources of the files",
+      "vectorize": "Index contents",
+      "vectorizeHint": "Enables a semantic search on the contents of the files"
     },
     "filesVision": {
       "title": "Files Vision",

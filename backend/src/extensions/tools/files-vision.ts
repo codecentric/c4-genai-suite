@@ -8,7 +8,7 @@ import { User } from 'src/domain/users';
 import { GetFiles, GetFilesResponse, matchExtension } from '../../domain/files';
 import { I18nService } from '../../localization/i18n.service';
 
-type FilesVisionExtensionConfiguration = { fileNameExtensions: string[]; maxFiles: [] };
+export type FilesVisionExtensionConfiguration = { fileNameExtensions: string[]; maxFiles: number };
 
 @Extension()
 export class FilesVisionExtension implements Extension<FilesVisionExtensionConfiguration> {
@@ -111,10 +111,9 @@ export class FilesVisionExtension implements Extension<FilesVisionExtensionConfi
               const matchingFiles: GetFilesResponse = await this.queryBus.execute(
                 new GetFiles({
                   user,
-                  bucketIdOrType: 'conversation',
+                  bucketIdOrType: 'all',
                   page: 0,
                   pageSize: context.files?.length ?? 1,
-                  conversationId: context.conversationId,
                   files: imageFiles,
                   withContent: true,
                 }),

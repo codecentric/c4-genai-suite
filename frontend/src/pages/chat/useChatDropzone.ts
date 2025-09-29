@@ -26,7 +26,7 @@ export const useChatDropzone = () => {
     onSettled: () => refetch(),
   });
   const uploadMutations = useTypedMutationStates(upload, ['upload-files-in-chat']);
-  const { data: chatFiles = [], refetch, remove: removeLocalFile } = useConversationFiles(chatId);
+  const { data: chatFiles = [], refetch, remove } = useConversationFiles(chatId);
   const uploadingFiles = uploadMutations
     .filter((m) => m.status === 'pending')
     .map((m) => m.variables?.file)
@@ -70,18 +70,23 @@ export const useChatDropzone = () => {
   const handleUploadFile = (files: File[]) => {
     if (!files.length || uploadLimitReached) return;
 
+    // Track which files have already been assigned to avoid duplicates
+    const assignedFiles = new Set<File>();
+
     const extensionFilesToUpload = userBucket?.extensions.map((extension) => {
       // filter for matching file type, if all file types are selected only match if there is no other extension with matching file type
       const filesForExtension = files.filter(
         (file) =>
-          extension.fileNameExtensions.some((fileNameExtension) => matchExtension(file.name, fileNameExtension)) ||
-          (!extension.fileNameExtensions.length &&
-            !userBucket?.extensions.find(
-              (other) =>
-                other.extensionId !== extension.extensionId &&
-                other.fileNameExtensions.some((fileNameExtension) => matchExtension(file.name, fileNameExtension)),
-            )),
+          !assignedFiles.has(file) && // Only consider files that haven't been assigned yet
+          (extension.fileNameExtensions.some((fileNameExtension) => matchExtension(file.name, fileNameExtension)) ||
+            (!extension.fileNameExtensions.length &&
+              !userBucket?.extensions.find(
+                (other) =>
+                  other.extensionId !== extension.extensionId &&
+                  other.fileNameExtensions.some((fileNameExtension) => matchExtension(file.name, fileNameExtension)),
+              ))),
       );
+
       const maxFiles = extension.maxFiles ?? Number.MAX_SAFE_INTEGER;
       const extUploadingFiles = filterFilesByFileNameExtensions(uploadingFiles, extension.fileNameExtensions);
       const extConversationFiles = filterFilesByFileNameExtensions(chatFiles, extension.fileNameExtensions);
@@ -89,10 +94,13 @@ export const useChatDropzone = () => {
 
       const filesForExtensionToUpload = filesForExtension.slice(0, remainingSlots);
 
+      // Mark these files as assigned
+      filesForExtensionToUpload.forEach((file) => assignedFiles.add(file));
+
       return {
         extensionId: extension.extensionId,
         filesToUpload: filesForExtensionToUpload,
-        tooManyFiles: filesForExtensionToUpload < filesForExtension,
+        tooManyFiles: filesForExtensionToUpload.length < filesForExtension.length,
       };
     });
 
@@ -105,6 +113,7 @@ export const useChatDropzone = () => {
       });
     });
   };
+
   return {
     handleUploadFile,
     allowedFileNameExtensions,
@@ -117,6 +126,6 @@ export const useChatDropzone = () => {
     userBucket,
     uploadingFiles,
     fullFileSlots,
-    removeLocalFile,
+    remove,
   };
 };
