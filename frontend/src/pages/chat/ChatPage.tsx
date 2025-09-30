@@ -69,6 +69,8 @@ export function ChatPage() {
   const { selectedDocument, setSelectedDocument } = useStateOfSelectedDocument();
   const { selectedSource, setSelectedSource } = useStateOfSelectedSource();
 
+  console.log(selectedSource);
+  console.log(selectedSource?.document);
   const isSourcePdfFile = selectedSource?.document?.mimeType === 'application/pdf';
   const isSourceAvailable = selectedSource?.document?.downloadAvailable ?? false;
 

@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any
 
 from langchain_core.documents import Document
@@ -104,7 +105,7 @@ class VoiceTranscriptionProvider(AbstractFormatProvider):
     def build_ffmpeg_error_message(e: ffmpeg.Error) -> str:
         return f"Error handling audio file for voice transcription\n\nffmpeg stderr:\n{e.stderr}"
 
-    def probe_audio_codec(self, input_video_file: str) -> MediaMetadata:
+    def probe_audio_codec(self, input_video_file: str | Path) -> MediaMetadata:
         try:
             metadata = ffmpeg.probe(input_video_file, loglevel="warning")
         except ffmpeg.Error as e:
@@ -124,7 +125,7 @@ class VoiceTranscriptionProvider(AbstractFormatProvider):
 
     def split_into_compatible_format(
         self,
-        input_path: str,
+        input_path: str | Path,
         segment_duration_seconds: int | None = None,
         output_bitrate: str = "128k",
         force_reencode: bool = False,

@@ -6,6 +6,7 @@ import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext, NamedStructu
 import { BucketEntity, BucketRepository, FileEntity, FileRepository } from 'src/domain/database';
 import { Extension, ExtensionConfiguration, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions';
 import { Bucket, GetDocumentContent, GetDocumentContentResponse, SearchFiles, SearchFilesResponse } from 'src/domain/files';
+import { GetDocumentPdf, GetDocumentPdfResponse } from 'src/domain/files/use-cases/get-document-pdf';
 import { User } from 'src/domain/users';
 import { I18nService } from '../../localization/i18n.service';
 
@@ -166,6 +167,21 @@ export class FilesExtension<T extends FilesExtensionConfiguration = FilesExtensi
     const bucketId = configuration.bucket;
     const response: GetDocumentContentResponse = await this.queryBus.execute(new GetDocumentContent(bucketId, chunkUris));
     return response.documentContent.filter((x) => x != null);
+  }
+
+  async getDocument(configuration: FilesExtensionConfiguration, documentUri: string) {
+    const bucketId = configuration.bucket;
+    const response: GetDocumentPdfResponse = await this.queryBus.execute(new GetDocumentPdf(bucketId, documentUri));
+
+    const buffer = await response.documentPdf?.bytes();
+    if (!buffer) {
+      // TODO
+      throw new NotFoundException('todo');
+    }
+
+    const file = new File([buffer], '', { type: 'application/pdf' });
+
+    return Promise.resolve(file);
   }
 }
 

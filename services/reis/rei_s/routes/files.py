@@ -5,9 +5,10 @@ import uuid
 import aiofiles
 from urllib.parse import unquote
 
-from fastapi import APIRouter, Depends, Request, Header
+from fastapi import APIRouter, Depends, Request, Header, Response, HTTPException
 from fastapi.params import Query
 
+from fastapi.responses import FileResponse
 from pydantic import AfterValidator
 from rei_s.services import store_service
 from rei_s.config import Config, get_config
@@ -86,11 +87,15 @@ def get_files(
 
     debug = store_service.get_file_sources_markdown(store_docs)
 
-    sources = store_service.get_file_sources(store_docs)
+    sources = store_service.get_file_sources(config, store_docs)
     return FileResult(files=docs, debug=debug, sources=sources)
 
 
-@router.get("/documents/content", tags=["files"], operation_id="getDocumentsContent")
+@router.get(
+    "/documents/content",
+    tags=["files"],
+    operation_id="getDocumentsContent",
+)
 def get_documents_content(
     config: Annotated[Config, Depends(get_config)],
     chunk_ids: Annotated[List[str], Query(description="The IDs of the chunks to retrieve")],
@@ -104,6 +109,33 @@ def get_documents_content(
     content = store_service.get_documents_content(config, chunk_ids, index_name)
 
     return content
+
+
+@router.get(
+    "/documents/pdf",
+    tags=["files"],
+    operation_id="getDocumentPdf",
+    response_class=FileResponse,
+    responses={
+        200: {"content": {"application/octet-stream": {"schema": {"type": "string", "format": "binary"}}}},
+        404: {
+            "description": "File Not Found",
+        },
+    },
+)
+def get_document_pdf(
+    config: Annotated[Config, Depends(get_config)],
+    doc_id: Annotated[str, Query(description="The ID of the document")],
+) -> Response:
+    """
+    Get the document's pdf by its ID.
+    """
+    content = store_service.get_document_pdf(config, doc_id)
+
+    if content is None:
+        raise HTTPException(status_code=404, detail="PDF not found")
+
+    return FileResponse(content.path, media_type="application/octet-stream")
 
 
 @router.post(

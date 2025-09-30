@@ -288,6 +288,55 @@
         }
       }
     },
+    "/documents/pdf": {
+      "get": {
+        "tags": [
+          "files"
+        ],
+        "summary": "Get Document Pdf",
+        "description": "Get the document's pdf by its ID.",
+        "operationId": "getDocumentPdf",
+        "parameters": [
+          {
+            "name": "doc_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The ID of the document",
+              "title": "Doc Id"
+            },
+            "description": "The ID of the document"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "File Not Found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/files/process": {
       "post": {
         "tags": [
@@ -497,6 +546,11 @@
             ],
             "title": "Link",
             "description": "A link to the source of the document"
+          },
+          "downloadAvailable": {
+            "type": "boolean",
+            "title": "Downloadavailable",
+            "description": "Indicates if the document is available"
           }
         },
         "type": "object",
@@ -504,7 +558,8 @@
           "uri",
           "name",
           "mimeType",
-          "link"
+          "link",
+          "downloadAvailable"
         ],
         "title": "DocumentDto"
       },
