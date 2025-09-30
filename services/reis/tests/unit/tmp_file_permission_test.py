@@ -6,7 +6,7 @@ from fastapi.testclient import TestClient
 from langchain_community.embeddings import FakeEmbeddings
 from pytest_mock import MockerFixture
 from rei_s.config import update_tempdir
-from rei_s.services.stores.devnull_store import DevNullStoreAdapter
+from rei_s.services.vectorstores.devnull_store import DevNullStoreAdapter
 from rei_s.utils import get_uploaded_file_path
 from tests.unit.utils import env_value
 

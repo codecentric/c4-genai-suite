@@ -8,8 +8,8 @@ import pytest
 from pytest_mock import MockerFixture
 from responses import RequestsMock
 from rei_s.config import Config, get_config
-from rei_s.services.store_adapter import StoreFilter
-from rei_s.services.stores.azure_ai_search import AzureAISearchStoreAdapter
+from rei_s.services.vectorstore_adapter import VectorStoreFilter
+from rei_s.services.vectorstores.azure_ai_search import AzureAISearchStoreAdapter
 from tests.conftest import get_test_config
 from ..data.response_get_index import index_get
 
@@ -160,16 +160,16 @@ def test_get_files_deleted(client: TestClient, responses: RequestsMock) -> None:
     "test_input,expected",
     [
         (None, None),
-        (StoreFilter(bucket="1"), "bucket eq '1'"),
-        (StoreFilter(bucket="42", doc_ids=["3", "2"]), "bucket eq '42' and search.in(doc_id, '3, 2')"),
-        (StoreFilter(doc_ids=["3", "2"]), "search.in(doc_id, '3, 2')"),
+        (VectorStoreFilter(bucket="1"), "bucket eq '1'"),
+        (VectorStoreFilter(bucket="42", doc_ids=["3", "2"]), "bucket eq '42' and search.in(doc_id, '3, 2')"),
+        (VectorStoreFilter(doc_ids=["3", "2"]), "search.in(doc_id, '3, 2')"),
     ],
 )
-def test_filter_conversion(test_input: StoreFilter, expected: str) -> None:
+def test_filter_conversion(test_input: VectorStoreFilter, expected: str) -> None:
     assert AzureAISearchStoreAdapter.convert_filter(test_input) == expected
 
 
 def test_filter_conversion_raises() -> None:
     with pytest.raises(Exception) as exc_info:
-        AzureAISearchStoreAdapter.convert_filter(StoreFilter(bucket="42", doc_ids=[]))
+        AzureAISearchStoreAdapter.convert_filter(VectorStoreFilter(bucket="42", doc_ids=[]))
     assert exc_info.value.args[0] == "The result would not match any entry"
