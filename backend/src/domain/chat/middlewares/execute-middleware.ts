@@ -5,7 +5,7 @@ import { MetricsService } from '../../../metrics/metrics.service';
 import { ChatContext, ChatError, ChatMiddleware, LanguageModelContext, NamedStructuredTool } from '../interfaces';
 
 // this is the general structure of how AI SDK wraps errors
-type GenericAIError = { data: { error: unknown } };
+type GenericAIError = { error: unknown };
 
 @Injectable()
 export class ExecuteMiddleware implements ChatMiddleware {
@@ -123,7 +123,7 @@ export class ExecuteMiddleware implements ChatMiddleware {
 
     if (error) {
       // unwrap and throw the causing error to be handled by the ExceptionMiddleware
-      throw error.data.error;
+      throw error.error;
     }
   }
 
