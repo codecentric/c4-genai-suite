@@ -5,7 +5,7 @@ from langchain_community.embeddings import FakeEmbeddings
 from langchain_core.documents import Document
 
 from pytest_mock import MockerFixture
-from rei_s.services.stores.devnull_store import DevNullStoreAdapter
+from rei_s.services.vectorstores.devnull_store import DevNullStoreAdapter
 
 
 @pytest.fixture

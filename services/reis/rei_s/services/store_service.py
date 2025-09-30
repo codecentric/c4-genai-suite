@@ -6,12 +6,14 @@ from fastapi import HTTPException
 from langchain_core.documents import Document
 
 from rei_s import logger
+from rei_s.services.filestore_adapter import FileStoreAdapter
 from rei_s.services.formats.utils import ProcessingError
 from rei_s.services.multiprocess_utils import process_file_in_process
 from rei_s.services.embeddings_provider import get_embeddings
 from rei_s.config import Config
-from rei_s.services.store_adapter import StoreAdapter, StoreFilter
-from rei_s.services.store_provider import get_store
+from rei_s.services.vectorstore_adapter import VectorStoreAdapter, VectorStoreFilter
+from rei_s.services import filestore_provider
+from rei_s.services import vectorstore_provider
 from rei_s.types.dtos import SourceDto, ChunkDto, DocumentDto
 from rei_s.types.source_file import SourceFile
 from rei_s.services.formats.abstract_format_provider import AbstractFormatProvider
@@ -27,14 +29,22 @@ def batched(iterable: List[Document], n: int) -> Generator[List[Document], None,
 def get_vector_store(
     config: Config,
     index_name: str | None,
-) -> StoreAdapter:
+) -> VectorStoreAdapter:
     embeddings = get_embeddings(config)
-    vector_store = get_store(config=config, embeddings=embeddings, index_name=index_name)
+    vector_store = vectorstore_provider.get_vectorstore(config=config, embeddings=embeddings, index_name=index_name)
 
     if vector_store is None:
-        raise RuntimeError("Store service has not been configured")
+        raise RuntimeError("Vector store service has not been configured")
 
     return vector_store
+
+
+def get_file_store(
+    config: Config,
+) -> FileStoreAdapter | None:
+    file_store = filestore_provider.get_filestore(config=config)
+
+    return file_store
 
 
 def get_file_name_extensions(config: Config) -> list[str]:
@@ -142,6 +152,10 @@ def generate_batches(
 
 
 def add_file(config: Config, file: SourceFile, bucket: str, doc_id: str, index_name: str | None = None) -> None:
+    file_store = get_file_store(config=config)
+    if file_store:
+        file_store.add_document(file)
+
     vector_store = get_vector_store(config=config, index_name=index_name)
     for batch, index, num_batches in generate_batches(config, file, bucket, doc_id):
         logger.info(f"add {len(batch)} chunks for doc_id {doc_id}: ({index + 1}/{num_batches})")
@@ -158,7 +172,7 @@ def search(
     index_name: str | None = None,
 ) -> List[Document]:
     vector_store = get_vector_store(config=config, index_name=index_name)
-    store_filter = StoreFilter(bucket=bucket, doc_ids=doc_ids)
+    store_filter = VectorStoreFilter(bucket=bucket, doc_ids=doc_ids)
 
     logger.info("start similarity search")
 
@@ -195,6 +209,14 @@ def get_documents_content(config: Config, ids: List[str], index_name: str | None
         content.append(doc.page_content)
 
     return content
+
+
+def get_document_pdf(config: Config, id_: str) -> SourceFile | None:
+    file_store = get_file_store(config=config)
+    if file_store is None:
+        return None
+
+    return file_store.get_document(id_)
 
 
 def delete_file(config: Config, doc_id: str, index_name: str | None = None) -> None:

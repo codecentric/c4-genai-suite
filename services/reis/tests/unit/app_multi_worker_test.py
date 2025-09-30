@@ -4,7 +4,7 @@ from langchain_community.embeddings import FakeEmbeddings
 
 from pytest_mock import MockerFixture
 from rei_s.config import Config, get_config
-from rei_s.services.stores.devnull_store import DevNullStoreAdapter
+from rei_s.services.vectorstores.devnull_store import DevNullStoreAdapter
 from tests.conftest import get_test_config
 
 
