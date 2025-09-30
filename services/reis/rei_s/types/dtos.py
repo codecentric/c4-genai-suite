@@ -16,6 +16,7 @@ class DocumentDto(BaseModel):
     name: str = Field(description="The name of the document, e.g. the file name")
     mime_type: str = Field(description="The mime type of the document")
     link: Optional[str] = Field(description="A link to the source of the document")
+    download_available: bool = Field(description="Indicates if the document is available")
     model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
 
 
@@ -33,6 +34,11 @@ SourceKey = Tuple[Optional[str], Optional[str], Optional[str], Optional[str], Op
 class ResultDocument(BaseModel):
     content: str = Field(description="the text content of the chunk")
     vector: list[float] | None = Field(description="the vector of the chunk", default=None)
+    metadata: dict[str, Any] = Field(description="the metadata of the chunk")
+
+
+class ResultPdf(BaseModel):
+    content: bytes = Field(description="the buffer containing the pdf")
     metadata: dict[str, Any] = Field(description="the metadata of the chunk")
 
 

@@ -154,7 +154,10 @@ def generate_batches(
 def add_file(config: Config, file: SourceFile, bucket: str, doc_id: str, index_name: str | None = None) -> None:
     file_store = get_file_store(config=config)
     if file_store:
+        logger.info(f"save file for doc_id {doc_id}: {file.size}")
         file_store.add_document(file)
+        # TODO: convert to pdf and add that one
+        #  we probably need to modify `generate_batches`
 
     vector_store = get_vector_store(config=config, index_name=index_name)
     for batch, index, num_batches in generate_batches(config, file, bucket, doc_id):
@@ -200,6 +203,8 @@ def get_documents_content(config: Config, ids: List[str], index_name: str | None
     vector_store = get_vector_store(config=config, index_name=index_name)
     docs = vector_store.get_documents(ids)
 
+    logger.info(f"get {len(ids)} chunks")
+
     if docs and docs[0].metadata.get("format") == "pdf":
         docs.sort(key=lambda doc: doc.metadata.get("page", float("inf")))
 
@@ -211,12 +216,13 @@ def get_documents_content(config: Config, ids: List[str], index_name: str | None
     return content
 
 
-def get_document_pdf(config: Config, id_: str) -> SourceFile | None:
+def get_document_pdf(config: Config, doc_id: str) -> SourceFile | None:
     file_store = get_file_store(config=config)
+    logger.info(f"get file: {doc_id}")
     if file_store is None:
         return None
 
-    return file_store.get_document(id_)
+    return file_store.get_document(doc_id)
 
 
 def delete_file(config: Config, doc_id: str, index_name: str | None = None) -> None:
@@ -260,11 +266,18 @@ def parse_int_array(s: Any) -> List[int] | None:
         return None
 
 
-def get_file_sources(results: List[Document]) -> List[SourceDto]:
+def get_file_sources(config: Config, results: List[Document]) -> List[SourceDto]:
     if not results:
         return []
 
     length = len(results)
+
+    file_store = get_file_store(config=config)
+    if file_store:
+        doc_ids = {doc.metadata["doc_id"] for doc in results if "doc_id" in doc.metadata}
+        exists = {doc_id: file_store.exists(doc_id) for doc_id in doc_ids}
+    else:
+        exists = {}
 
     return [
         SourceDto(
@@ -280,6 +293,7 @@ def get_file_sources(results: List[Document]) -> List[SourceDto]:
                 name=doc.metadata.get("source", "Unknown Filename"),
                 mime_type=doc.metadata.get("mime_type", ""),
                 link=doc.metadata.get("link"),
+                download_available=exists.get(doc.metadata.get("doc_id", ""), False),
             ),
             metadata={key: value for key, value in doc.metadata.items() if key not in {"page", "id", "doc_id"}},
         )

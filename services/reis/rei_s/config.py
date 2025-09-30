@@ -82,11 +82,13 @@ class Config(BaseSettings, frozen=True):  # type: ignore
     store_pgvector_url: str | None = None
     store_pgvector_index_name: str = "index"
 
-    file_store_type: Literal["s3", "postgres"] | None = None
+    file_store_type: Literal["s3", "postgres", "filesystem"] | None = None
     # needed for S3 filestore
     filestore_s3_endpoint: str | None = None
     # needed for postgres filestore
     filestore_postgres_url: str | None = None
+    # needed for filesystem filestore
+    filestore_filesystem_basepath: str | None = None
 
     @model_validator(mode="after")
     def store_dependend_requirements(self) -> Self:

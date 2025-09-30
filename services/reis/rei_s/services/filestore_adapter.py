@@ -15,3 +15,7 @@ class FileStoreAdapter(ABC):
     @abstractmethod
     def get_document(self, doc_id: str) -> SourceFile:
         raise NotImplementedError
+
+    @abstractmethod
+    def exists(self, doc_id: str) -> bool:
+        raise NotImplementedError

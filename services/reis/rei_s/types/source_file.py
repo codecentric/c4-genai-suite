@@ -1,5 +1,6 @@
 from contextlib import contextmanager
 import os
+from pathlib import Path
 from tempfile import NamedTemporaryFile
 from typing import Generator
 import uuid
@@ -10,7 +11,7 @@ from rei_s.utils import get_uploaded_file_path
 
 class SourceFile(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    path: str
+    path: str | Path
     mime_type: str
     file_name: str
 

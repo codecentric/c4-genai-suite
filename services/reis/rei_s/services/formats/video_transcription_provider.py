@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Any
 from langchain_core.documents import Document
 import ffmpeg
@@ -39,7 +40,7 @@ class VideoTranscriptionProvider(VoiceTranscriptionProvider):
             f"ffmpeg stderr:\n{e.stderr}"
         )
 
-    def extract_audio_to_file(self, input_video_path: str, output_bitrate: str = "128k") -> SourceFile:
+    def extract_audio_to_file(self, input_video_path: str | Path, output_bitrate: str = "128k") -> SourceFile:
         metadata = self.probe_audio_codec(input_video_path)
         audio_codec = metadata.audio_codec
 
