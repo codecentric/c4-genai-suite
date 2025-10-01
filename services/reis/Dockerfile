@@ -35,7 +35,7 @@ RUN find /reis/.venv -name "*.pyc" -delete && \
 FROM python:3.13-alpine3.22 AS production
 
 # we need this library for extracting audio streams from videos
-RUN apk add --no-cache ffmpeg=6.1.2-r2
+RUN apk add --no-cache ffmpeg=6.1.2-r2 texlive=20240210.69778-r10 texmf-dist-latexrecommended=2024.0-r7 texmf-dist-fontsrecommended=2024.0-r7
 
 ENV VIRTUAL_ENV=/reis/.venv \
 PATH="/reis/.venv/bin:$PATH"
