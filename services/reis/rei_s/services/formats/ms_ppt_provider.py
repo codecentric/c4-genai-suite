@@ -3,12 +3,10 @@ from typing import Any
 from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import UnstructuredPowerPointLoader
-import pypandoc
 
 from rei_s.services.formats.abstract_format_provider import AbstractFormatProvider
-from rei_s.services.formats.utils import validate_chunk_overlap, validate_chunk_size
-from rei_s.types.source_file import SourceFile
-from rei_s.utils import get_new_file_path
+from rei_s.services.formats.utils import generate_preview_pdf_from_text, validate_chunk_overlap, validate_chunk_size
+from rei_s.types.source_file import SourceFile, temp_file
 
 
 class MsPptProvider(AbstractFormatProvider):
@@ -28,16 +26,23 @@ class MsPptProvider(AbstractFormatProvider):
         chunk_overlap = validate_chunk_overlap(chunk_overlap, self.default_chunk_overlap)
         return RecursiveCharacterTextSplitter(chunk_size=chunk_size, chunk_overlap=chunk_overlap)
 
+    def parse_file(self, file: SourceFile) -> list[Document]:
+        loader = UnstructuredPowerPointLoader(file.path)
+        docs = loader.load()
+        return docs
+
     def process_file(
         self, file: SourceFile, chunk_size: int | None = None, chunk_overlap: int | None = None
     ) -> list[Document]:
-        loader = UnstructuredPowerPointLoader(file.path)
-        docs = loader.load()
-
+        docs = self.parse_file(file)
         chunks = self.splitter(chunk_size, chunk_overlap).split_documents(docs)
         return chunks
 
     def convert_file_to_pdf(self, file: SourceFile) -> SourceFile:
-        path = get_new_file_path(extension="pdf")
-        pypandoc.convert_file(file.path, "pdf", format="pptx", outputfile=path)
-        return SourceFile(id=file.id, path=path, mime_type="application/pdf", file_name=file.file_name)
+        docs = self.parse_file(file)
+
+        plain = "\n".join([doc.page_content for doc in docs])
+
+        with temp_file(plain.encode()) as plain_file:
+            plain_file.id = file.id
+            return generate_preview_pdf_from_text(plain_file, "plain")

@@ -76,12 +76,23 @@ class PdfProvider(AbstractFormatProvider):
             documents = loader.load()
             parser_info = f"PyPDF {pypdf.__version__}"
 
+        uninteresting_metadata = [
+            "producer",
+            "creator",
+            "creationdate",
+            "moddate",
+            "ptex.fullbanner",
+        ]
+
         for doc in documents:
             doc.metadata["pdf_parser"] = parser_info
             if "page" in doc.metadata:
                 # this loader starts to count at 0
                 # since convention for pdfs (and books, ...) is to start at 1, we need to increase it here
                 doc.metadata["page"] += 1
+            for key in uninteresting_metadata:
+                if key in doc.metadata:
+                    del doc.metadata[key]
 
         chunks = self.splitter(chunk_size, chunk_overlap).split_documents(documents)
 

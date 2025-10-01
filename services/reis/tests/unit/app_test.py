@@ -5,7 +5,8 @@ from langchain_community.embeddings import FakeEmbeddings
 from langchain_core.documents import Document
 
 from pytest_mock import MockerFixture
-from rei_s.services.vectorstores.devnull_store import DevNullStoreAdapter
+from rei_s.services.filestores.devnull import DevNullFileStoreAdapter
+from rei_s.services.vectorstores.devnull_store import DevNullVectorStoreAdapter
 
 
 @pytest.fixture
@@ -34,7 +35,7 @@ def test_get_documents_content(mocker: MockerFixture, client: TestClient) -> Non
         page_content="test string 2",
         metadata={"source": "testfile2.pdf", "format": "pdf", "mime_type": "application/pdf"},
     )
-    mocked_store = DevNullStoreAdapter()
+    mocked_store = DevNullVectorStoreAdapter()
 
     mocker.patch.object(mocked_store, "get_documents", autospec=True, return_value=[mocked_document1, mocked_document2])
     mocker.patch("rei_s.services.store_service.get_documents_content", return_value=["test string", "test string 2"])
@@ -56,7 +57,7 @@ def test_get_files(mocker: MockerFixture, client: TestClient) -> None:
         page_content="test string 2",
         metadata={"source": "testfile2.pdf", "format": "pdf", "mime_type": "application/pdf"},
     )
-    mocked_store = DevNullStoreAdapter()
+    mocked_store = DevNullVectorStoreAdapter()
     mocker.patch.object(
         mocked_store, "similarity_search", autospec=True, return_value=[mocked_document1, mocked_document2]
     )
@@ -84,7 +85,7 @@ def test_get_files_sources(mocker: MockerFixture, client: TestClient) -> None:
         page_content="test string 3",
         metadata={"source": "testfile3.pdf", "format": "pdf", "mime_type": "application/pdf"},
     )
-    mocked_store = DevNullStoreAdapter()
+    mocked_store = DevNullVectorStoreAdapter()
     mocker.patch.object(
         mocked_store,
         "similarity_search",
@@ -124,7 +125,7 @@ def test_get_files_sources_page_concat(mocker: MockerFixture, client: TestClient
         page_content="test string 3",
         metadata={"source": "testfile_b.pdf", "format": "pdf", "mime_type": "application/pdf", "page": "42"},
     )
-    mocked_store = DevNullStoreAdapter()
+    mocked_store = DevNullVectorStoreAdapter()
     mocker.patch.object(
         mocked_store,
         "similarity_search",
@@ -164,7 +165,7 @@ def test_get_files_sources_no_page(mocker: MockerFixture, client: TestClient) ->
         page_content="test string 3",
         metadata={"source": "testfile_b.pdf", "format": "pdf", "mime_type": "application/pdf", "page": "another value"},
     )
-    mocked_store = DevNullStoreAdapter()
+    mocked_store = DevNullVectorStoreAdapter()
     mocker.patch.object(
         mocked_store,
         "similarity_search",
@@ -188,7 +189,7 @@ def test_get_files_sources_no_page(mocker: MockerFixture, client: TestClient) ->
 
 
 def test_get_files_no_files(mocker: MockerFixture, client: TestClient) -> None:
-    mocked_store = DevNullStoreAdapter()
+    mocked_store = DevNullVectorStoreAdapter()
     mocker.patch.object(mocked_store, "similarity_search", autospec=True, return_value=[])
     mocker.patch("rei_s.services.store_service.get_vector_store", return_value=mocked_store)
 
@@ -206,11 +207,17 @@ def test_add_files_fail(client: TestClient) -> None:
     assert response.status_code == 422
 
 
-def test_add_files(mocker: MockerFixture, client: TestClient) -> None:
+def test_add_files_without_filestore(mocker: MockerFixture, client: TestClient) -> None:
     # mock embeddings to avoid calls to azure
     mocker.patch("rei_s.services.embeddings_provider.get_embeddings", return_value=FakeEmbeddings(size=1352))
     # mock store to avoid calls to the db
-    mocker.patch("rei_s.services.store_service.get_vector_store", return_value=DevNullStoreAdapter())
+    mocker.patch("rei_s.services.store_service.get_vector_store", return_value=DevNullVectorStoreAdapter())
+    # mock file store to ensure it is not used
+    mocker.patch(
+        "rei_s.services.store_service.get_file_store",
+        return_value=DevNullFileStoreAdapter(),
+        side_effect=Exception("filestore accessed, but should not"),
+    )
 
     with open("tests/data/birthdays.pdf", "rb") as f:
         response = client.post(
@@ -226,6 +233,34 @@ def test_add_files(mocker: MockerFixture, client: TestClient) -> None:
     assert response.status_code == 200
 
 
+def test_add_files_with_filestore(mocker: MockerFixture, client: TestClient) -> None:
+    # mock embeddings to avoid calls to azure
+    mocker.patch("rei_s.services.embeddings_provider.get_embeddings", return_value=FakeEmbeddings(size=1352))
+    vector_store_mock = mocker.Mock(spec=DevNullVectorStoreAdapter)
+    mocker.patch("rei_s.services.store_service.get_vector_store", return_value=vector_store_mock)
+    file_store_mock = mocker.Mock(spec=DevNullFileStoreAdapter)
+    mocker.patch("rei_s.services.store_service.get_file_store", return_value=file_store_mock)
+
+    with open("tests/data/birthdays.yaml", "rb") as f:
+        response = client.post(
+            "/files",
+            data=f,  # type: ignore[arg-type]
+            headers={
+                "bucket": "15",
+                "id": "1",
+                "fileName": "test.yaml",
+                "fileMimeType": "application/yaml",
+            },
+        )
+    assert response.status_code == 200
+
+    vector_store_mock.add_documents.assert_called_once()
+    file_store_mock.add_document.assert_called_once()
+
+    args, _kwargs = vector_store_mock.add_documents.call_args
+    assert "Dagobert Duck" in args[0].page_content
+
+
 def test_process_files(mocker: MockerFixture, client: TestClient) -> None:
     # mock embeddings to assure that they are not generated
     mocker.patch(
@@ -236,7 +271,7 @@ def test_process_files(mocker: MockerFixture, client: TestClient) -> None:
     # mock store to assure that nothing is saved
     mocker.patch(
         "rei_s.services.store_service.get_vector_store",
-        return_value=DevNullStoreAdapter(),
+        return_value=DevNullVectorStoreAdapter(),
         side_effect=Exception("vectorstore accessed, but should not"),
     )
 
@@ -258,7 +293,7 @@ def test_process_files(mocker: MockerFixture, client: TestClient) -> None:
 
 def test_add_damaged_file(mocker: MockerFixture, client: TestClient) -> None:
     mocker.patch("rei_s.services.embeddings_provider.get_embeddings", return_value=FakeEmbeddings(size=1352))
-    mocker.patch("rei_s.services.store_service.get_vector_store", return_value=DevNullStoreAdapter())
+    mocker.patch("rei_s.services.store_service.get_vector_store", return_value=DevNullVectorStoreAdapter())
 
     with open("tests/data/birthdays.pptx", "rb") as f:
         response = client.post(
@@ -277,7 +312,7 @@ def test_add_damaged_file(mocker: MockerFixture, client: TestClient) -> None:
 
 def test_add_damaged_large_file(mocker: MockerFixture, client: TestClient) -> None:
     mocker.patch("rei_s.services.embeddings_provider.get_embeddings", return_value=FakeEmbeddings(size=1352))
-    mocker.patch("rei_s.services.store_service.get_vector_store", return_value=DevNullStoreAdapter())
+    mocker.patch("rei_s.services.store_service.get_vector_store", return_value=DevNullVectorStoreAdapter())
 
     with open("tests/data_stress/gg.pdf", "rb") as f:
         response = client.post(
@@ -296,7 +331,7 @@ def test_add_damaged_large_file(mocker: MockerFixture, client: TestClient) -> No
 
 def test_add_unsupported_file(mocker: MockerFixture, client: TestClient) -> None:
     mocker.patch("rei_s.services.embeddings_provider.get_embeddings", return_value=FakeEmbeddings(size=1352))
-    mocker.patch("rei_s.services.store_service.get_vector_store", return_value=DevNullStoreAdapter())
+    mocker.patch("rei_s.services.store_service.get_vector_store", return_value=DevNullVectorStoreAdapter())
 
     with open("tests/data/birthdays.pdf", "rb") as f:
         response = client.post(

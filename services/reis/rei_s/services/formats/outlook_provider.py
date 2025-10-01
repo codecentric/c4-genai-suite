@@ -4,12 +4,10 @@ from typing import Any
 from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import UnstructuredEmailLoader
-import pypandoc
 
 from rei_s.services.formats.abstract_format_provider import AbstractFormatProvider
 from rei_s.types.source_file import SourceFile, temp_file
-from rei_s.services.formats.utils import validate_chunk_overlap, validate_chunk_size
-from rei_s.utils import get_new_file_path
+from rei_s.services.formats.utils import validate_chunk_overlap, validate_chunk_size, generate_preview_pdf_from_text
 
 
 class OutlookProvider(AbstractFormatProvider):
@@ -56,8 +54,7 @@ class OutlookProvider(AbstractFormatProvider):
         docs = loader.load()
 
         plain = "\n".join([doc.page_content for doc in docs])
-        path = get_new_file_path(extension="pdf")
 
         with temp_file(plain.encode()) as plain_file:
-            pypandoc.convert_file(plain_file.path, "pdf", format="plain", outputfile=path)
-        return SourceFile(id=file.id, path=path, mime_type="application/pdf", file_name=file.file_name)
+            plain_file.id = file.id
+            return generate_preview_pdf_from_text(plain_file, "plain")

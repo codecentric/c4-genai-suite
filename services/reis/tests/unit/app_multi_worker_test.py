@@ -4,7 +4,7 @@ from langchain_community.embeddings import FakeEmbeddings
 
 from pytest_mock import MockerFixture
 from rei_s.config import Config, get_config
-from rei_s.services.vectorstores.devnull_store import DevNullStoreAdapter
+from rei_s.services.vectorstores.devnull_store import DevNullVectorStoreAdapter
 from tests.conftest import get_test_config
 
 
@@ -25,7 +25,7 @@ def test_add_files_multiple_workers(mocker: MockerFixture, app: FastAPI) -> None
     # mock embeddings to avoid calls to azure
     mocker.patch("rei_s.services.embeddings_provider.get_embeddings", return_value=FakeEmbeddings(size=1352))
     # mock store to avoid calls to the db
-    mocker.patch("rei_s.services.store_service.get_vector_store", return_value=DevNullStoreAdapter())
+    mocker.patch("rei_s.services.store_service.get_vector_store", return_value=DevNullVectorStoreAdapter())
 
     # for the multiple worker to work, we need to use the client as a context
     with TestClient(app) as client:
@@ -55,7 +55,7 @@ def test_process_files_multiple_workers(mocker: MockerFixture, app: FastAPI) -> 
     # mock store to assure that nothing is saved
     mocker.patch(
         "rei_s.services.store_service.get_vector_store",
-        return_value=DevNullStoreAdapter(),
+        return_value=DevNullVectorStoreAdapter(),
         side_effect=Exception("vectorstore accessed, but should not"),
     )
 
