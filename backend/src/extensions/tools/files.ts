@@ -175,8 +175,7 @@ export class FilesExtension<T extends FilesExtensionConfiguration = FilesExtensi
 
     const buffer = await response.documentPdf?.bytes();
     if (!buffer) {
-      // TODO
-      throw new NotFoundException('todo');
+      throw new NotFoundException('Document can not be retrieved.');
     }
 
     const file = new File([buffer], '', { type: 'application/pdf' });
