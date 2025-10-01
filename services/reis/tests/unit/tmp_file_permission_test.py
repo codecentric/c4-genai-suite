@@ -6,7 +6,7 @@ from fastapi.testclient import TestClient
 from langchain_community.embeddings import FakeEmbeddings
 from pytest_mock import MockerFixture
 from rei_s.config import update_tempdir
-from rei_s.services.vectorstores.devnull_store import DevNullStoreAdapter
+from rei_s.services.vectorstores.devnull_store import DevNullVectorStoreAdapter
 from rei_s.utils import get_new_file_path
 from tests.unit.utils import env_value
 
@@ -27,7 +27,7 @@ def test_add_files_write(mocker: MockerFixture, app: FastAPI, use_tmp_dir: None)
     # mock embeddings to avoid calls to azure
     mocker.patch("rei_s.services.embeddings_provider.get_embeddings", return_value=FakeEmbeddings(size=1352))
     # mock store to avoid calls to the db
-    mocker.patch("rei_s.services.store_service.get_vector_store", return_value=DevNullStoreAdapter())
+    mocker.patch("rei_s.services.store_service.get_vector_store", return_value=DevNullVectorStoreAdapter())
 
     with TestClient(app) as client:
         with open("tests/data/birthdays.pptx", "rb") as f:
@@ -48,7 +48,7 @@ def test_add_files_read_only(mocker: MockerFixture, app: FastAPI, use_unknown_tm
     # mock embeddings to avoid calls to azure
     mocker.patch("rei_s.services.embeddings_provider.get_embeddings", return_value=FakeEmbeddings(size=1352))
     # mock store to avoid calls to the db
-    mocker.patch("rei_s.services.store_service.get_vector_store", return_value=DevNullStoreAdapter())
+    mocker.patch("rei_s.services.store_service.get_vector_store", return_value=DevNullVectorStoreAdapter())
 
     with TestClient(app, raise_server_exceptions=False) as client:
         with open("tests/data/birthdays.pptx", "rb") as f:

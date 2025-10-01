@@ -6,11 +6,13 @@ from rei_s.config import Config
 from rei_s.services.vectorstore_adapter import VectorStoreAdapter, VectorStoreFilter
 
 
-class DevNullStoreAdapter(VectorStoreAdapter):
+class DevNullVectorStoreAdapter(VectorStoreAdapter):
     vector_store: None
 
     @classmethod
-    def create(cls, config: Config, embeddings: Embeddings, index_name: str | None = None) -> "DevNullStoreAdapter":
+    def create(
+        cls, config: Config, embeddings: Embeddings, index_name: str | None = None
+    ) -> "DevNullVectorStoreAdapter":
         return cls()
 
     def add_documents(self, documents: list[Document]) -> None:
