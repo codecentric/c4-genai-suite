@@ -305,6 +305,11 @@ def delete_file(config: Config, doc_id: str, index_name: str | None = None) -> N
     logger.info(f"delete chunks with doc_id '{doc_id}'")
     vector_store.delete(doc_id)
 
+    file_store = get_file_store(config=config)
+    if file_store:
+        logger.info(f"delete pdf for doc_id '{doc_id}'")
+        file_store.delete(doc_id)
+
 
 def get_file_sources_markdown(results: List[Document]) -> str:
     # TODO: differentiate between pdf and other (if this is really wanted)

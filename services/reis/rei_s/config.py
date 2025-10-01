@@ -82,13 +82,17 @@ class Config(BaseSettings, frozen=True):  # type: ignore
     store_pgvector_url: str | None = None
     store_pgvector_index_name: str = "index"
 
-    file_store_type: Literal["s3", "postgres", "filesystem"] | None = None
+    file_store_type: Literal["s3", "filesystem"] | None = None
     # needed for S3 filestore
-    filestore_s3_endpoint: str | None = None
+    file_store_s3_endpoint_url: str | None = None
+    file_store_s3_access_key_id: str | None = None
+    file_store_s3_secret_access_key: str | None = None
+    file_store_s3_bucket_name: str | None = None
+    file_store_s3_region_name: str | None = None
     # needed for postgres filestore
-    filestore_postgres_url: str | None = None
+    file_store_postgres_url: str | None = None
     # needed for filesystem filestore
-    filestore_filesystem_basepath: str | None = None
+    file_store_filesystem_basepath: str | None = None
 
     @model_validator(mode="after")
     def store_dependend_requirements(self) -> Self:
@@ -104,6 +108,25 @@ class Config(BaseSettings, frozen=True):  # type: ignore
                 "STORE_AZURE_AI_SEARCH_SERVICE_API_KEY": self.store_azure_ai_search_service_api_key,
             }
             check_needed(needed_for_azure_ai_search, "STORE_TYPE", "azure-ai-search")
+
+        return self
+
+    @model_validator(mode="after")
+    def file_store_dependend_requirements(self) -> Self:
+        if self.file_store_type == "s3":
+            needed_for_s3 = {
+                "FILE_STORE_S3_ENDPOINT_URL": self.file_store_s3_endpoint_url,
+                "FILE_STORE_S3_ACCESS_KEY_ID": self.file_store_s3_access_key_id,
+                "FILE_STORE_S3_SECRET_ACCESS_KEY": self.file_store_s3_secret_access_key,
+                "FILE_STORE_S3_BUCKET_NAME": self.file_store_s3_bucket_name,
+            }
+            check_needed(needed_for_s3, "FILE_STORE_TYPE", "s3")
+
+        if self.file_store_type == "filesystem":
+            needed_for_filesystem = {
+                "FILE_STORE_FILESYSTEM_BASEPATH": self.file_store_filesystem_basepath,
+            }
+            check_needed(needed_for_filesystem, "FILE_STORE_TYPE", "filesystemsearch")
 
         return self
 

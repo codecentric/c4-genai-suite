@@ -81,9 +81,18 @@ Note that activation of this feature will lead to every file to be converted to
 a pdf before being parsed and chunked. This is necessary to supply the metadata
 of the chunks with the correct page number.
 
+### S3:
+
 ```bash
-FILE_STORE_TYPE=
+FILE_STORE_TYPE=s3
+# other FILE_STORE_S3_* variables from .env.example
 ```
+
+### filesystem:
+
+This option will save the files at a specified location in the file system.
+
+This is not advised to use in production, but provided for easy setup for experiments and development.
 
 ## Example configuration in c4
 

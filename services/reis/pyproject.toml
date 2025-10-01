@@ -29,6 +29,7 @@ langchain-ollama = "^0.3.10"
 langchain-aws = "^0.2.35"
 langchain-nvidia-ai-endpoints = "^0.3.18"
 pypandoc-binary = "^1.15"
+boto3 = "^1.40.42"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "0.14.0"
@@ -42,6 +43,7 @@ pytest-github-report = "0.0.1"
 pytest-error-for-skips = "2.0.2"
 faker = "37.11.0"
 responses = "0.25.8"
+boto3-stubs = {extras = ["s3"], version = "^1.40.42"}
 
 [tool.poetry.scripts]
 download-tokenizers = "rei_s.prepare:download"

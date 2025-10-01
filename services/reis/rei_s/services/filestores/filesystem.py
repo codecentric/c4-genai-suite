@@ -37,9 +37,9 @@ class FSFileStoreAdapter(FileStoreAdapter):
     def create(cls, config: Config) -> "FSFileStoreAdapter":
         ret = FSFileStoreAdapter()
 
-        if config.filestore_filesystem_basepath is None:
+        if config.file_store_filesystem_basepath is None:
             raise ValueError("The env variable `filestore_filesystem_basepath` is missing.")
 
-        ret.path = Path(config.filestore_filesystem_basepath)
+        ret.path = Path(config.file_store_filesystem_basepath)
         os.makedirs(ret.path, exist_ok=True)
         return ret
