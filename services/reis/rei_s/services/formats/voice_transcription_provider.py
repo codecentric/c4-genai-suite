@@ -8,12 +8,14 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders.parsers.audio import AzureOpenAIWhisperParser
 import openai
 import ffmpeg
+import pypandoc
 
 from rei_s import logger
 from rei_s.config import Config
 from rei_s.services.formats.abstract_format_provider import AbstractFormatProvider
 from rei_s.services.formats.utils import ProcessingError, validate_chunk_overlap, validate_chunk_size
-from rei_s.types.source_file import SourceFile
+from rei_s.types.source_file import SourceFile, temp_file
+from rei_s.utils import get_new_file_path
 
 
 @dataclass
@@ -179,9 +181,7 @@ class VoiceTranscriptionProvider(AbstractFormatProvider):
 
         return segments_files, segment_timestamps, audio_codec
 
-    def process_file(
-        self, file: SourceFile, chunk_size: int | None = None, chunk_overlap: int | None = None
-    ) -> list[Document]:
+    def parse_file(self, file: SourceFile) -> list[Document]:
         if self.parser is None:
             raise ValueError(f"calling disabled format provider: `{self.__class__.name}`")
 
@@ -211,5 +211,22 @@ class VoiceTranscriptionProvider(AbstractFormatProvider):
 
             results.extend(docs)
 
+        return results
+
+    def process_file(
+        self, file: SourceFile, chunk_size: int | None = None, chunk_overlap: int | None = None
+    ) -> list[Document]:
+        results = self.parse_file(file)
+
         chunks = self.splitter(chunk_size, chunk_overlap).split_documents(results)
         return chunks
+
+    def convert_file_to_pdf(self, file: SourceFile) -> SourceFile:
+        docs = self.parse_file(file)
+
+        plain = "\n".join([doc.page_content for doc in docs])
+        path = get_new_file_path(extension="pdf")
+
+        with temp_file(plain.encode()) as plain_file:
+            pypandoc.convert_file(plain_file.path, "pdf", format="plain", outputfile=path)
+        return SourceFile(id=file.id, path=path, mime_type="application/pdf", file_name=file.file_name)

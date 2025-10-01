@@ -6,7 +6,7 @@ from typing import Generator
 import uuid
 
 from pydantic import BaseModel, Field
-from rei_s.utils import get_uploaded_file_path
+from rei_s.utils import get_new_file_path
 
 
 class SourceFile(BaseModel):
@@ -34,7 +34,7 @@ class SourceFile(BaseModel):
         if extension:
             file_name += extension
 
-        path = get_uploaded_file_path(file_name)
+        path = get_new_file_path(file_name)
 
         if buffer:
             with open(path, "wb") as f:
@@ -44,6 +44,9 @@ class SourceFile(BaseModel):
 
     def delete(self) -> None:
         os.remove(self.path)
+
+    def ext(self) -> str:
+        return Path(self.file_name).suffix[1:]
 
 
 @contextmanager

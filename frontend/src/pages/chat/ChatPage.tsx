@@ -69,9 +69,6 @@ export function ChatPage() {
   const { selectedDocument, setSelectedDocument } = useStateOfSelectedDocument();
   const { selectedSource, setSelectedSource } = useStateOfSelectedSource();
 
-  console.log(selectedSource);
-  console.log(selectedSource?.document);
-  const isSourcePdfFile = selectedSource?.document?.mimeType === 'application/pdf';
   const isSourceAvailable = selectedSource?.document?.downloadAvailable ?? false;
 
   const selectedAssistantId = useStateOfSelectedAssistantId();
@@ -196,7 +193,7 @@ export function ChatPage() {
                 <Tabs defaultValue="sources-chunk-preview">
                   <Tabs.List>
                     <Tabs.Tab value="sources-chunk-preview">{texts.chat.sources.content}</Tabs.Tab>
-                    <Tabs.Tab value="source-document-viewer" hidden={!(isSourcePdfFile && isSourceAvailable)}>
+                    <Tabs.Tab value="source-document-viewer" hidden={!isSourceAvailable}>
                       {texts.chat.sources.viewer}
                     </Tabs.Tab>
                   </Tabs.List>
@@ -204,7 +201,7 @@ export function ChatPage() {
                   <Tabs.Panel value="sources-chunk-preview">
                     <SourcesChunkPreview onClose={() => setSelectedDocument(undefined)} document={selectedDocument} />
                   </Tabs.Panel>
-                  {isSourcePdfFile && isSourceAvailable && (
+                  {isSourceAvailable && (
                     <Tabs.Panel value="source-document-viewer">
                       <PdfViewer
                         selectedDocument={selectedDocument}

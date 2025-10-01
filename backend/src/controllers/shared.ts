@@ -157,7 +157,7 @@ export class DocumentDto {
   link?: string | null;
 
   @ApiProperty({
-    description: 'Can the document be downloaded via the `getDocument` endpoint.',
+    description: 'Can the document be downloaded in pdf format via the `getDocument` endpoint.',
     required: false,
     type: 'boolean',
   })

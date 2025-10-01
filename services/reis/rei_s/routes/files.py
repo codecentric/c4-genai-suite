@@ -21,7 +21,7 @@ from rei_s.types.dtos import (
 )
 from rei_s.types.source_file import SourceFile
 from rei_s import logger
-from rei_s.utils import get_uploaded_file_path
+from rei_s.utils import get_new_file_path
 from rei_s.metrics.metrics import files_added_to_queue
 
 
@@ -176,7 +176,7 @@ async def post_files(
     if file_mime_type is None:
         raise ValueError("content_type is not defined")
 
-    dest_path = get_uploaded_file_path(file_id)
+    dest_path = get_new_file_path(file_id)
     async with aiofiles.open(dest_path, "wb") as temp_file:
         async for chunk in request.stream():
             await temp_file.write(chunk)
@@ -231,7 +231,7 @@ async def post_files_only_processing(
 
     file_id = str(uuid.uuid4())
 
-    dest_path = get_uploaded_file_path(file_id)
+    dest_path = get_new_file_path(file_id)
     async with aiofiles.open(dest_path, "wb") as temp_file:
         async for chunk in request.stream():
             await temp_file.write(chunk)

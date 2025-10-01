@@ -2,6 +2,7 @@ from concurrent.futures import ThreadPoolExecutor
 import os
 import tempfile
 from typing import Any
+import uuid
 
 from fastapi import FastAPI
 from fastapi.concurrency import asynccontextmanager
@@ -11,7 +12,13 @@ from rei_s.config import get_config
 from rei_s.prometheus_server import PrometheusHttpServer
 
 
-def get_uploaded_file_path(file_id: str) -> str:
+def get_new_file_path(file_id: str | None = None, extension: str | None = None) -> str:
+    if not file_id:
+        file_id = str(uuid.uuid4())
+
+    if extension:
+        file_id = file_id + "." + extension
+
     joined_path = os.path.join(tempfile.gettempdir(), file_id)
     normalized_path = os.path.normpath(joined_path)
     if not normalized_path.startswith(tempfile.gettempdir()):

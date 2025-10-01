@@ -68,6 +68,23 @@ STORE_TYPE=pgvector
 STORE_PGVECTOR_URL=postgres+psycopg://admin:secret@localhost:5432/cccc
 ```
 
+## File stores
+
+Optionally, REIS can save a pdf preview of the uploaded file in a file store.
+
+This feature is activated by supplying a FILE_STORE_TYPE env variable.
+
+If it is activated, c4 will be able to show a pdf version of the uploaded file,
+if a user clicks on a source.
+
+Note that activation of this feature will lead to every file to be converted to
+a pdf before being parsed and chunked. This is necessary to supply the metadata
+of the chunks with the correct page number.
+
+```bash
+FILE_STORE_TYPE=
+```
+
 ## Example configuration in c4
 
 In c4, the configuration is a multi step process.

@@ -28,6 +28,7 @@ fastmcp = "^2.12.4"
 langchain-ollama = "^0.3.10"
 langchain-aws = "^0.2.35"
 langchain-nvidia-ai-endpoints = "^0.3.18"
+pypandoc-binary = "^1.15"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "0.14.0"
