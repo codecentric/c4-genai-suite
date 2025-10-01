@@ -26,7 +26,7 @@ aiofiles = "^24.1.0"
 prometheus-fastapi-instrumentator = "^7.0.0"
 fastmcp = "^2.12.4"
 langchain-ollama = "^0.3.8"
-langchain-aws = "^0.2.33"
+langchain-aws = "^0.2.34"
 langchain-nvidia-ai-endpoints = "^0.3.18"
 
 [tool.poetry.group.dev.dependencies]
