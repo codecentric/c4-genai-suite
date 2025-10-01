@@ -312,8 +312,6 @@ def delete_file(config: Config, doc_id: str, index_name: str | None = None) -> N
 
 
 def get_file_sources_markdown(results: List[Document]) -> str:
-    # TODO: differentiate between pdf and other (if this is really wanted)
-
     # this might happen for empty buckets
     if len(results) == 0:
         return ""
