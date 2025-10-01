@@ -1,13 +1,16 @@
 from pathlib import Path
 from typing import Any
+
 from langchain_core.documents import Document
 import ffmpeg
+import pypandoc
 
 from rei_s import logger
 from rei_s.config import Config
 from rei_s.services.formats.utils import ProcessingError
 from rei_s.services.formats.voice_transcription_provider import VoiceTranscriptionProvider
-from rei_s.types.source_file import SourceFile
+from rei_s.types.source_file import SourceFile, temp_file
+from rei_s.utils import get_new_file_path
 
 
 class VideoTranscriptionProvider(VoiceTranscriptionProvider):
@@ -66,6 +69,14 @@ class VideoTranscriptionProvider(VoiceTranscriptionProvider):
 
         return audio_only_file
 
+    def parse_file(
+        self, file: SourceFile, chunk_size: int | None = None, chunk_overlap: int | None = None
+    ) -> list[Document]:
+        audio_file = self.extract_audio_to_file(file.path)
+        docs = super().parse_file(audio_file)
+        audio_file.delete()
+        return docs
+
     def process_file(
         self, file: SourceFile, chunk_size: int | None = None, chunk_overlap: int | None = None
     ) -> list[Document]:
@@ -73,3 +84,13 @@ class VideoTranscriptionProvider(VoiceTranscriptionProvider):
         chunks = super().process_file(audio_file, chunk_size, chunk_overlap)
         audio_file.delete()
         return chunks
+
+    def convert_file_to_pdf(self, file: SourceFile) -> SourceFile:
+        docs = self.parse_file(file)
+
+        plain = "\n".join([doc.page_content for doc in docs])
+        path = get_new_file_path(extension="pdf")
+
+        with temp_file(plain.encode()) as plain_file:
+            pypandoc.convert_file(plain_file.path, "pdf", format="plain", outputfile=path)
+        return SourceFile(id=file.id, path=path, mime_type="application/pdf", file_name=file.file_name)

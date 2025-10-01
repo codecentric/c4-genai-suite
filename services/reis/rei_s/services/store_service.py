@@ -7,8 +7,9 @@ from langchain_core.documents import Document
 
 from rei_s import logger
 from rei_s.services.filestore_adapter import FileStoreAdapter
+from rei_s.services.formats.pdf_provider import PdfProvider
 from rei_s.services.formats.utils import ProcessingError
-from rei_s.services.multiprocess_utils import process_file_in_process
+from rei_s.services.multiprocess_utils import convert_file_in_process, process_file_in_process
 from rei_s.services.embeddings_provider import get_embeddings
 from rei_s.config import Config
 from rei_s.services.vectorstore_adapter import VectorStoreAdapter, VectorStoreFilter
@@ -58,10 +59,10 @@ def get_file_name_extensions(config: Config) -> list[str]:
 
 def process_file(config: Config, file: SourceFile, chunk_size: int | None = None) -> List[Document]:
     logger.info(f"Processing file: {file.id}")
+    format_ = find_format_provider(config, file)
+    chunks = process_file_into_chunks(config, file, format_, doc_id=file.id, chunk_size=chunk_size)
     chunks_with_metadata = [
-        chunk
-        for batch, _, _ in generate_batches(config, file, doc_id=file.id, chunk_size=chunk_size)
-        for chunk in batch
+        chunk for batch, _, _ in generate_batches(config, file, chunks, format_, doc_id=file.id) for chunk in batch
     ]
     files_processed_counter.inc()
     logger.info(f"Completed file: {file.id}")
@@ -105,62 +106,136 @@ def process_file_synchronously(
         return chunks
 
 
+def convert_file_synchronously(format_: AbstractFormatProvider, file: SourceFile, threshold: int = 10**5) -> SourceFile:
+    # this function tries to optimize for performance,
+    # since the process step is the single CPU intensive part
+    # * small files are processed in the same thread to avoid overhead of starting a new process,
+    #   pickling, copying and unpickling the file
+    # * large files will start a new process to avoid the GIL
+    #   this will also lead python to release the RAM used for the processing back to the operating system
+
+    if not format_.multiprocessable or file.size < threshold:
+        return format_.convert_file_to_pdf(file)
+    else:
+        ctx = mp.get_context("spawn")
+        queue = ctx.Queue()
+        process = ctx.Process(target=convert_file_in_process, args=(format_, file, queue))
+
+        process.start()
+        file_or_exception = queue.get()
+        process.join()
+
+        if isinstance(file_or_exception, Exception):
+            raise file_or_exception
+        else:
+            pdf: SourceFile = file_or_exception
+
+        return pdf
+
+
 def generate_batches(
     config: Config,
     file: SourceFile,
+    chunks: list[Document],
+    format_: AbstractFormatProvider,
     bucket: str | None = None,
     doc_id: str | None = None,
-    chunk_size: int | None = None,
 ) -> Generator[tuple[List[Document], int, int], None, None]:
+    if len(chunks) > 0:
+        batch_size = config.batch_size if config.batch_size else len(chunks)
+        num_batches = ceil(len(chunks) / batch_size)
+        for index, chunk_batch in enumerate(batched(chunks, batch_size)):
+            with_metadata = [
+                Document(
+                    page_content=x.page_content,
+                    metadata={
+                        **x.metadata,
+                        "format": format_.name,
+                        "mime_type": file.mime_type,
+                        "doc_id": doc_id,
+                        "bucket": bucket,
+                        "source": file.file_name,
+                    },
+                )
+                for x in chunk_batch
+            ]
+
+            yield with_metadata, index, num_batches
+
+    return
+
+
+def find_format_provider(config: Config, file: SourceFile) -> AbstractFormatProvider:
     for format_ in get_format_providers(config):
         if format_.supports(file):
-            try:
-                chunks = process_file_synchronously(format_, file, chunk_size, config.filesize_threshold)
-            except ProcessingError as e:
-                logger.warning(f"Failed processing file `{doc_id}`: {e.message}")
-                raise HTTPException(status_code=e.status, detail=f"Processing failed: {e.message}") from e
-            except Exception as e:
-                # catchall, since the format_providers
-                # yield individual errors from special exception classes to ValueError
-                logger.warning(f"Failed processing file `{doc_id}`: {e!r}")
-                raise HTTPException(status_code=400, detail="Processing failed") from e
-
-            if len(chunks) > 0:
-                batch_size = config.batch_size if config.batch_size else len(chunks)
-                num_batches = ceil(len(chunks) / batch_size)
-                for index, chunk_batch in enumerate(batched(chunks, batch_size)):
-                    with_metadata = [
-                        Document(
-                            page_content=x.page_content,
-                            metadata={
-                                **x.metadata,
-                                "format": format_.name,
-                                "mime_type": file.mime_type,
-                                "doc_id": doc_id,
-                                "bucket": bucket,
-                                "source": file.file_name,
-                            },
-                        )
-                        for x in chunk_batch
-                    ]
-
-                    yield with_metadata, index, num_batches
-
-            return
-
+            return format_
     raise HTTPException(status_code=415, detail="File format not supported.")
+
+
+def process_file_into_chunks(
+    config: Config,
+    file: SourceFile,
+    format_: AbstractFormatProvider,
+    doc_id: str | None = None,
+    chunk_size: int | None = None,
+) -> list[Document]:
+    try:
+        chunks = process_file_synchronously(format_, file, chunk_size, config.filesize_threshold)
+    except ProcessingError as e:
+        logger.warning(f"Failed processing file `{doc_id}`: {e.message}")
+        raise HTTPException(status_code=e.status, detail=f"Processing failed: {e.message}") from e
+    except Exception as e:
+        # catchall, since the format_providers
+        # yield individual errors from special exception classes to ValueError
+        logger.warning(f"Failed processing file `{doc_id}`: {e!r}")
+        raise HTTPException(status_code=400, detail="Processing failed") from e
+    return chunks
+
+
+def convert_file_to_pdf(
+    config: Config,
+    file: SourceFile,
+    format_: AbstractFormatProvider,
+    doc_id: str | None = None,
+) -> SourceFile:
+    try:
+        pdf = convert_file_synchronously(format_, file, config.filesize_threshold)
+    except ProcessingError as e:
+        logger.warning(f"Failed converting file `{doc_id}`: {e.message}")
+        raise HTTPException(status_code=e.status, detail=f"Conversion failed: {e.message}") from e
+    except Exception as e:
+        # catchall, since the format_providers
+        # yield individual errors from special exception classes to ValueError
+        logger.warning(f"Failed converting file `{doc_id}`: {e!r}")
+        raise HTTPException(status_code=400, detail="Conversion failed") from e
+    return pdf
 
 
 def add_file(config: Config, file: SourceFile, bucket: str, doc_id: str, index_name: str | None = None) -> None:
     file_store = get_file_store(config=config)
+
+    format_ = find_format_provider(config, file)
+    logger.info(f"start adding doc_id {doc_id} with format {format_}")
+
+    file_store = get_file_store(config=config)
     if file_store:
-        logger.info(f"save file for doc_id {doc_id}: {file.size}")
-        file_store.add_document(file)
-        # TODO: convert to pdf and add that one
-        #  we probably need to modify `generate_batches`
+        pdf = convert_file_to_pdf(config, file, format_, doc_id)
+        try:
+            logger.info(f"converted doc_id {doc_id} to pdf")
+            chunks = process_file_into_chunks(config, pdf, PdfProvider(), doc_id)
+            logger.info(f"chunked pdf version of doc_id {doc_id} into {len(chunks)} chunks")
+            file_store.add_document(pdf)
+            logger.info(f"saved pdf for doc_id {doc_id}")
+        except Exception as e:
+            raise e
+        finally:
+            pdf.delete()
+    else:
+        chunks = process_file_into_chunks(config, file, format_, doc_id)
+        logger.info(f"chunked doc_id {doc_id} into {len(chunks)} chunks")
 
     vector_store = get_vector_store(config=config, index_name=index_name)
-    for batch, index, num_batches in generate_batches(config, file, bucket, doc_id):
+    for batch, index, num_batches in generate_batches(config, file, chunks, format_, bucket, doc_id):
         logger.info(f"add {len(batch)} chunks for doc_id {doc_id}: ({index + 1}/{num_batches})")
         vector_store.add_documents(batch)
         logger.info(f"ready with {len(batch)} chunks for doc_id {doc_id}: ({index + 1}/{num_batches})")

@@ -51,7 +51,7 @@ export interface DocumentDto {
      */
     link?: string;
     /**
-     * Can the document be downloaded via the `getDocument` endpoint.
+     * Can the document be downloaded in pdf format via the `getDocument` endpoint.
      * @type {boolean}
      * @memberof DocumentDto
      */

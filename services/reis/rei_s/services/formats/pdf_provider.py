@@ -1,4 +1,5 @@
 from io import BytesIO
+import shutil
 from typing import Any, BinaryIO
 
 from langchain_core.documents import Document
@@ -12,6 +13,7 @@ from rei_s import logger
 from rei_s.services.formats.abstract_format_provider import AbstractFormatProvider
 from rei_s.services.formats.utils import BytesLoader, validate_chunk_overlap, validate_chunk_size
 from rei_s.types.source_file import SourceFile
+from rei_s.utils import get_new_file_path
 
 
 # langchain PDFMinerLoader will fail for pdfs without "creationdate" metadata
@@ -88,3 +90,8 @@ class PdfProvider(AbstractFormatProvider):
             c.page_content = c.page_content.replace("\x00", "\ufffd")
 
         return chunks
+
+    def convert_file_to_pdf(self, file: SourceFile) -> SourceFile:
+        path = get_new_file_path(extension="pdf")
+        shutil.copy(file.path, path)
+        return SourceFile(id=file.id, path=path, mime_type="application/pdf", file_name=file.file_name)

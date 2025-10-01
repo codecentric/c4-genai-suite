@@ -4,7 +4,9 @@ from typing import Generator
 from langchain_core.documents.base import Blob
 from langchain_community.document_loaders.blob_loaders import BlobLoader
 
-from rei_s.types.source_file import SourceFile
+import pypandoc
+from rei_s.types.source_file import SourceFile, temp_file
+from rei_s.utils import get_new_file_path
 
 
 def check_file_name_extensions(file_name_extensions: list[str], file: SourceFile) -> bool:
@@ -42,3 +44,12 @@ class ProcessingError(Exception):
         super().__init__(message)
         self.status = status
         self.message = message
+
+
+def generate_preview_pdf_from_text(file: SourceFile, format_: str) -> SourceFile:
+    text = file.buffer.decode()
+    markdown_content = f"```{format_}\n{text}\n```"
+    path = get_new_file_path(extension="pdf")
+    with temp_file(markdown_content.encode()) as code_file:
+        pypandoc.convert_file(code_file.path, "pdf", format="md", outputfile=path)
+    return SourceFile(id=file.id, path=path, mime_type="application/pdf", file_name=file.file_name)
