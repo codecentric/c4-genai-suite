@@ -89,8 +89,6 @@ class Config(BaseSettings, frozen=True):  # type: ignore
     file_store_s3_secret_access_key: str | None = None
     file_store_s3_bucket_name: str | None = None
     file_store_s3_region_name: str | None = None
-    # needed for postgres filestore
-    file_store_postgres_url: str | None = None
     # needed for filesystem filestore
     file_store_filesystem_basepath: str | None = None
 

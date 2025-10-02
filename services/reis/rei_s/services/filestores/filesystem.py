@@ -5,32 +5,37 @@ from rei_s.services.filestore_adapter import FileStoreAdapter
 from rei_s.types.source_file import SourceFile
 
 
+def normalized_path(path: Path, base_name: str) -> Path:
+    base_name = Path(base_name).resolve().name
+    joined_path = path / base_name
+    normalized_path = joined_path.resolve()
+    if not str(normalized_path).startswith(str(path.resolve())):
+        raise Exception("Not allowed: path escapes base directory")
+    return normalized_path
+
+
 class FSFileStoreAdapter(FileStoreAdapter):
     path: Path
 
     def add_document(self, document: SourceFile) -> None:
-        filename = os.path.basename(document.id)
-        path = self.path / filename
+        path = normalized_path(self.path, document.id)
         with open(path, "wb") as f:
             f.write(document.buffer)
 
     def delete(self, doc_id: str) -> None:
-        filename = os.path.basename(doc_id)
-        path = self.path / filename
+        path = normalized_path(self.path, doc_id)
         if not path.exists():
             raise FileNotFoundError()
         os.remove(path)
 
     def get_document(self, doc_id: str) -> SourceFile:
-        filename = os.path.basename(doc_id)
-        path = self.path / filename
+        path = normalized_path(self.path, doc_id)
         if not path.exists():
             raise FileNotFoundError()
         return SourceFile(id=doc_id, path=path, mime_type="application/pdf", file_name=f"{doc_id}.pdf")
 
     def exists(self, doc_id: str) -> bool:
-        filename = os.path.basename(doc_id)
-        path = self.path / filename
+        path = normalized_path(self.path, doc_id)
         return path.exists()
 
     @classmethod

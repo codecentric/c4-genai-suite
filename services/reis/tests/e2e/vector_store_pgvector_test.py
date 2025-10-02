@@ -19,7 +19,7 @@ from tests.conftest import get_test_config
 # We need a running postgres instance reachable via the url in the env variabels.
 # We will manipulate the `test` and `pg_test_index` collections.
 
-# Needed environment variables will be read from `.env.test` and the environment.
+# Needed environment variables will be read the environment (not from .env files).
 # If needed environment variables are missing, the test is skipped
 
 INDEX_NAME = "test"

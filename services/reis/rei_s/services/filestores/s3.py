@@ -1,3 +1,5 @@
+from threading import Lock
+
 import boto3
 from botocore.exceptions import ClientError
 from fastapi import HTTPException
@@ -8,23 +10,26 @@ from rei_s.services.filestore_adapter import FileStoreAdapter
 from rei_s.types.source_file import SourceFile
 
 
+lock = Lock()
+
+
 class S3FileStoreAdapter(FileStoreAdapter):
-    s3_client: S3Client
+    client: S3Client
     bucket_name: str
 
     def add_document(self, document: SourceFile) -> None:
         with open(document.path, "rb") as f:
-            self.s3_client.upload_fileobj(f, self.bucket_name, document.id)
+            self.client.upload_fileobj(f, self.bucket_name, document.id)
 
     def delete(self, doc_id: str) -> None:
         if not self.exists(doc_id):
             raise HTTPException(status_code=404, detail="File not found")
 
-        self.s3_client.delete_object(Bucket=self.bucket_name, Key=doc_id)
+        self.client.delete_object(Bucket=self.bucket_name, Key=doc_id)
 
     def get_document(self, doc_id: str) -> SourceFile:
         try:
-            response = self.s3_client.get_object(Bucket=self.bucket_name, Key=doc_id)
+            response = self.client.get_object(Bucket=self.bucket_name, Key=doc_id)
         except ClientError as e:
             if e.response["Error"]["Code"] == "NoSuchKey":
                 raise HTTPException(status_code=404, detail="File not found") from e
@@ -33,7 +38,7 @@ class S3FileStoreAdapter(FileStoreAdapter):
 
     def exists(self, doc_id: str) -> bool:
         try:
-            self.s3_client.head_object(Bucket=self.bucket_name, Key=doc_id)
+            self.client.head_object(Bucket=self.bucket_name, Key=doc_id)
         except ClientError as e:
             if e.response["Error"]["Code"] == "404":
                 return False
@@ -54,9 +59,16 @@ class S3FileStoreAdapter(FileStoreAdapter):
             region_name=config.file_store_s3_region_name,
         )
 
+        with lock:
+            try:
+                s3_client.create_bucket(Bucket=config.file_store_s3_bucket_name)
+            except ClientError as e:
+                if e.response["Error"]["Code"] == "BucketAlreadyOwnedByYou":
+                    pass
+
         instance = cls()
 
-        instance.s3_client = s3_client
+        instance.client = s3_client
         instance.bucket_name = config.file_store_s3_bucket_name
 
         return instance
