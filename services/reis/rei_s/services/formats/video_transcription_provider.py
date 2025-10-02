@@ -6,7 +6,7 @@ import ffmpeg
 
 from rei_s import logger
 from rei_s.config import Config
-from rei_s.services.formats.utils import ProcessingError, generate_pdf_from_md
+from rei_s.services.formats.utils import ProcessingError, generate_pdf_from_md_file
 from rei_s.services.formats.voice_transcription_provider import VoiceTranscriptionProvider
 from rei_s.types.source_file import SourceFile, temp_file
 
@@ -89,4 +89,4 @@ class VideoTranscriptionProvider(VoiceTranscriptionProvider):
         plain = "\n".join([doc.page_content for doc in docs])
 
         with temp_file(plain.encode()) as plain_file:
-            return generate_pdf_from_md(plain_file, "plain")
+            return generate_pdf_from_md_file(plain_file, "plain")

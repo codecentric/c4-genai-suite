@@ -299,7 +299,7 @@ def test_outlook_provider() -> None:
     assert len(docs) > 0
     assert docs[0].page_content == "This message is created by Aspose.Email"
     assert docs[0].metadata["subject"] == "creating an outlook message file"
-    assert docs[0].metadata["sent_from"] == ["from@domain.com"]
+    assert docs[0].metadata["sender"] == "from@domain.com"
 
     pdf = txt.convert_file_to_pdf(source_file)
     assert_pdf_contains_text(pdf, expected)

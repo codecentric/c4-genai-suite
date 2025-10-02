@@ -51,11 +51,15 @@ class ProcessingError(Exception):
         self.message = message
 
 
-def generate_pdf_from_md(file: SourceFile, format_: str | None = None) -> SourceFile:
+def generate_pdf_from_md_file(file: SourceFile, format_: str | None = None) -> SourceFile:
     markdown_text = file.buffer.decode()
     if format_:
         markdown_text = f"```{format_}\n{markdown_text}\n```"
 
+    return generate_pdf_from_md(markdown_text, file.id, file.file_name)
+
+
+def generate_pdf_from_md(markdown_text: str, doc_id: str, file_name: str) -> SourceFile:
     # Convert markdown to HTML
     html = markdown.markdown(markdown_text, extensions=["fenced_code", "codehilite", "tables", "sane_lists"])
     formatter = HtmlFormatter(style="vs", cssclass="codehilite")
@@ -65,7 +69,7 @@ def generate_pdf_from_md(file: SourceFile, format_: str | None = None) -> Source
     # Convert HTML to PDF
     path = get_new_file_path(extension="pdf")
     HTML(string=html_doc).write_pdf(path)
-    return SourceFile(id=file.id, path=path, mime_type="application/pdf", file_name=file.file_name)
+    return SourceFile(id=doc_id, path=path, mime_type="application/pdf", file_name=file_name)
 
 
 def convert_office_to_pdf(file: SourceFile) -> SourceFile:
