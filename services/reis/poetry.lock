@@ -1943,20 +1943,20 @@ ollama = ">=0.5.3,<1.0.0"
 
 [[package]]
 name = "langchain-openai"
-version = "0.3.33"
+version = "0.3.34"
 description = "An integration package connecting OpenAI and LangChain"
 optional = false
-python-versions = ">=3.9"
+python-versions = "<4.0.0,>=3.9.0"
 groups = ["main"]
 files = [
-    {file = "langchain_openai-0.3.33-py3-none-any.whl", hash = "sha256:2d52aab6d2af61da9bb9470616ce782128f4be59df965caee3dece30ae6b2bc4"},
-    {file = "langchain_openai-0.3.33.tar.gz", hash = "sha256:2dec058332ea9e8977cd91df6515b95952e187ac7484f349c3fe91d936a92375"},
+    {file = "langchain_openai-0.3.34-py3-none-any.whl", hash = "sha256:08d61d68a6d869c70d542171e149b9065668dedfc4fafcd4de8aeb5b933030a9"},
+    {file = "langchain_openai-0.3.34.tar.gz", hash = "sha256:57916d462be5b8fd19e5cb2f00d4e5cf0465266a292d583de2fc693a55ba190e"},
 ]
 
 [package.dependencies]
-langchain-core = ">=0.3.76,<1.0.0"
-openai = ">=1.104.2,<2.0.0"
-tiktoken = ">=0.7,<1"
+langchain-core = ">=0.3.77,<2.0.0"
+openai = ">=1.104.2,<3.0.0"
+tiktoken = ">=0.7.0,<1.0.0"
 
 [[package]]
 name = "langchain-postgres"
@@ -6220,4 +6220,4 @@ cffi = ["cffi (>=1.11)"]
 [metadata]
 lock-version = "2.1"
 python-versions = "<4.0,>=3.12.0"
-content-hash = "8a775360873ee1be665adcc10ce3dc8200303379bc06ae4103fa3cb813569167"
+content-hash = "84e07b548d0fd513b224384f967b9c724ae8aa10a8d0cb7b7c7c17912addc034"
