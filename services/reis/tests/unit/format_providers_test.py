@@ -5,6 +5,7 @@ from rei_s.services.formats import get_format_providers
 from rei_s.services.formats.code_provider import CodeProvider
 from rei_s.services.formats.html_provider import HtmlProvider
 from rei_s.services.formats.json_provider import JsonProvider
+from rei_s.services.formats.libre_office_provider import LibreOfficeProvider
 from rei_s.services.formats.markdown_provider import MarkdownProvider
 from rei_s.services.formats.ms_excel_provider import MsExcelProvider
 from rei_s.services.formats.ms_ppt_provider import MsPptProvider
@@ -46,6 +47,25 @@ def test_html_provider() -> None:
         pdf = html.convert_file_to_pdf(source_file)
         assert_pdf_contains_text(pdf, expected)
         assert pdf.id == source_file.id
+
+
+def test_odt_provider() -> None:
+    expected = "Darkwing Duck was born on 9/17/1966."
+    source_file = SourceFile(
+        path="tests/data/birthdays.odt",
+        mime_type="application/vnd.oasis.opendocument.text",
+        file_name="text.odt",
+    )
+
+    odt = LibreOfficeProvider()
+    assert odt.supports(source_file)
+    docs = odt.process_file(source_file)
+    assert len(docs) > 0
+    assert docs[0].page_content == expected
+
+    pdf = odt.convert_file_to_pdf(source_file)
+    assert_pdf_contains_text(pdf, expected)
+    assert pdf.id == source_file.id
 
 
 def test_xlsx_provider() -> None:

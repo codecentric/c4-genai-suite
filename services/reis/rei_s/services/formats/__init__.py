@@ -13,6 +13,7 @@ from rei_s.services.formats import json_provider as json_provider
 from rei_s.services.formats import xml_provider as xml_provider
 from rei_s.services.formats import yaml_provider as yaml_provider
 from rei_s.services.formats import plain_provider as plain_provider
+from rei_s.services.formats import libre_office_provider as libre_office_provider
 from rei_s.services.formats import ms_excel_provider as ms_excel_provider
 from rei_s.services.formats import ms_word_provider as ms_word_provider
 from rei_s.services.formats import ms_ppt_provider as ms_ppt_provider

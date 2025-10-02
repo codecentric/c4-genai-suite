@@ -1,3 +1,6 @@
+import os
+import subprocess
+import tempfile
 from typing import Any
 
 from langchain_core.documents import Document
@@ -5,8 +8,8 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import UnstructuredPowerPointLoader
 
 from rei_s.services.formats.abstract_format_provider import AbstractFormatProvider
-from rei_s.services.formats.utils import generate_preview_pdf_from_text, validate_chunk_overlap, validate_chunk_size
-from rei_s.types.source_file import SourceFile, temp_file
+from rei_s.services.formats.utils import validate_chunk_overlap, validate_chunk_size
+from rei_s.types.source_file import SourceFile
 
 
 class MsPptProvider(AbstractFormatProvider):
@@ -39,10 +42,17 @@ class MsPptProvider(AbstractFormatProvider):
         return chunks
 
     def convert_file_to_pdf(self, file: SourceFile) -> SourceFile:
-        docs = self.parse_file(file)
+        output_dir = tempfile.gettempdir()
 
-        plain = "\n".join([doc.page_content for doc in docs])
+        cmd = ["libreoffice", "--headless", "--convert-to", "pdf", file.path, "--outdir", output_dir]
 
-        with temp_file(plain.encode()) as plain_file:
-            plain_file.id = file.id
-            return generate_preview_pdf_from_text(plain_file, "plain")
+        result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
+
+        if result.returncode:
+            raise ValueError(f"Can not convert pptx {file.id} to pdf")
+
+        base = os.path.basename(file.path)
+        pdf_name = os.path.splitext(base)[0] + ".pdf"
+        pdf_path = os.path.join(output_dir, pdf_name)
+
+        return SourceFile(id=file.id, path=pdf_path, mime_type="application/pdf", file_name=file.file_name)
