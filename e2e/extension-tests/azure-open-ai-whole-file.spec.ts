@@ -213,6 +213,12 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
       expect(source_panel).toBeDefined();
     });
 
+    await test.step('should show pdf representation of file referenced in source', async () => {
+      await page.getByRole('button', { name: 'Source Viewer' }).click();
+      await expect(page.locator('pdf-viewport')).toBeVisible();
+      await expect(page.locator('pdf-viewport').getByText('Daniel Düsentrieb')).toBeVisible();
+    });
+
     await test.step('should duplicate a conversation that includes a file uploaded with files in chat extension', async () => {
       await duplicateLastCreatedConversation(page);
       const originalConversation = page.locator('role=navigation').first();
