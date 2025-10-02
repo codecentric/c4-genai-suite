@@ -84,7 +84,6 @@ jobs:
           cache: 'poetry'
           cache-dependency-path: services/reis/poetry.lock
       - run: poetry install --with dev
-      - run: poetry run download-tokenizers
       - name: Test
         env:
           pytest_github_report: true
