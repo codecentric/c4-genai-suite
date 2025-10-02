@@ -154,5 +154,20 @@ tests:
           path: data.EMBEDDINGS_NVIDIA_BASE_URL
           value: "https://our-nim.xyz"
 
-
-
+  - it: sets s3 file store if file store type is s3
+    set:
+      reis.fileStore.type: s3
+      reis.fileStore.s3.endpointUrl: https://my-s3.example.com
+      reis.fileStore.s3.bucketName: unittest-bucketName
+      reis.fileStore.s3.regionName: unittest/regionName
+      reis.fileStore.s3.accessKeyId: unittest/accessKeyId
+    asserts:
+      - equal:
+          path: data.FILE_STORE_S3_BUCKET_NAME
+          value: "unittest-bucketName"
+      - equal:
+          path: data.FILE_STORE_S3_REGION_NAME
+          value: "unittest/regionName"
+      - equal:
+          path: data.FILE_STORE_S3_ENDPOINT_URL
+          value: "https://my-s3.example.com"

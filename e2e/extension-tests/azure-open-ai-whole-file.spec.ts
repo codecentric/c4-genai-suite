@@ -214,7 +214,7 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
     });
 
     await test.step('should show pdf representation of file referenced in source', async () => {
-      await page.getByRole('button', { name: 'Source Viewer' }).click();
+      await page.getByText('Source Viewer').click();
       await expect(page.locator('pdf-viewport')).toBeVisible();
       await expect(page.locator('pdf-viewport').getByText('Daniel Düsentrieb')).toBeVisible();
     });
