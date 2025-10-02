@@ -37,11 +37,6 @@ class ResultDocument(BaseModel):
     metadata: dict[str, Any] = Field(description="the metadata of the chunk")
 
 
-class ResultPdf(BaseModel):
-    content: bytes = Field(description="the buffer containing the pdf")
-    metadata: dict[str, Any] = Field(description="the metadata of the chunk")
-
-
 class FileType(BaseModel):
     file_name_extension: str = Field(description="The file name extension.")
 

@@ -53,8 +53,11 @@ class ProcessingError(Exception):
 
 def generate_pdf_from_md_file(file: SourceFile, format_: str | None = None) -> SourceFile:
     markdown_text = file.buffer.decode()
-    if format_:
+    if format_ in {"plain", "md", "markdown"}:
+        markdown_text = markdown_text
+    elif format_:
         markdown_text = f"```{format_}\n{markdown_text}\n```"
+    # TODO: should we prettify json, xml and yaml?
 
     return generate_pdf_from_md(markdown_text, file.id, file.file_name)
 

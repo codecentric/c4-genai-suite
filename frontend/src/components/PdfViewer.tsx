@@ -35,7 +35,6 @@ export function PdfViewer({ selectedDocument, selectedSource: _selectedSource, o
   const [pageNumber, setPageNumber] = useState<number>(1);
   const [displayPdfViewer, setDisplayPdfViewer] = useState<boolean>(true);
 
-  console.log(selectedDocument);
   const { data, isFetched, isError, isPending } = useDocument(
     // This is the reason to disable @typescript-eslint/no-non-null-asserted-optional-chain
     selectedDocument?.conversationId!,

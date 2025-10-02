@@ -12,14 +12,14 @@ from rei_s.config import get_config
 from rei_s.prometheus_server import PrometheusHttpServer
 
 
-def get_new_file_path(file_id: str | None = None, extension: str | None = None) -> str:
-    if not file_id:
-        file_id = str(uuid.uuid4())
+def get_new_file_path(base_name: str | None = None, extension: str | None = None) -> str:
+    if not base_name:
+        base_name = str(uuid.uuid4())
 
     if extension:
-        file_id = file_id + "." + extension
+        base_name = base_name + "." + extension
 
-    joined_path = os.path.join(tempfile.gettempdir(), file_id)
+    joined_path = os.path.join(tempfile.gettempdir(), base_name)
     normalized_path = os.path.normpath(joined_path)
     if not normalized_path.startswith(tempfile.gettempdir()):
         raise ValueError("Invalid file path")
