@@ -75,6 +75,7 @@ export const de: typeof en = {
     userGroups: 'Benutzergruppen',
     yes: 'Ja',
     errorLoading: 'Fehler bei Laden.',
+    errorSourcePdfViewer: 'Das Dokument wurde in der Zwischenzeit gelöscht und kann daher nicht mehr angezeigt werden.',
     tryAgain: 'Neu versuchen',
     selectOption: 'Option auswählen',
     selectOptions: 'Optionen auswählen',

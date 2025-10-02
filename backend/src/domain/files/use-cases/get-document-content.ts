@@ -25,8 +25,6 @@ export class GetDocumentContentHandler implements IQueryHandler<GetDocumentConte
   async execute(query: GetDocumentContent): Promise<GetDocumentContentResponse> {
     const { bucketId, chunkIds } = query;
 
-    console.log(`getting chunks for bucket ${bucketId} and chunkIds ${chunkIds.join(',')}`);
-
     if (!chunkIds || chunkIds.length === 0) {
       throw new BadRequestException('Chunk IDs are required');
     }
@@ -35,7 +33,7 @@ export class GetDocumentContentHandler implements IQueryHandler<GetDocumentConte
       id: bucketId,
     });
     if (!bucket) {
-      throw new NotFoundException(`Cannot find a bucket with id ${bucketId} for this user`);
+      throw new NotFoundException(`Cannot find a bucket with id ${bucketId}`);
     }
 
     const api = buildClient(bucket);

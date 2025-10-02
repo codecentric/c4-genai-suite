@@ -56,6 +56,7 @@ function load() {
       enabled: translate('common.enabled'),
       endpoint: translate('common.endpoint'),
       errorLoading: translate('common.errorLoading'),
+      errorSourcePdfViewer: translate('common.errorSourcePdfViewer'),
       indexName: translate('common.indexName'),
       error: translate('common.error'),
       generate: translate('common.generate'),

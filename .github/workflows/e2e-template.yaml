@@ -47,6 +47,15 @@ jobs:
             -e POSTGRES_PASSWORD="secret" \
             -e POSTGRES_DB="cccc" \
             pgvector/pgvector:pg16
+      - name: start minio
+        run: |
+          docker run \
+            -d \
+            --network test-network \
+            --name minio \
+            -e MINIO_ROOT_USER="admin" \
+            -e MINIO_ROOT_PASSWORD="secretsecret" \
+            minio/minio:latest server /data
       - uses: actions/download-artifact@v5
         with:
           name: backend
@@ -84,13 +93,18 @@ jobs:
             -e STORE_AZURE_AI_SEARCH_SERVICE_ENDPOINT="${{ vars.STORE_AZURE_AI_SEARCH_SERVICE_ENDPOINT }}" \
             -e STORE_AZURE_AI_SEARCH_SERVICE_API_KEY="${{ secrets.STORE_AZURE_AI_SEARCH_SERVICE_API_KEY }}" \
             -e STORE_AZURE_AI_SEARCH_SERVICE_INDEX_NAME="basis-reis-test" \
+            -e FILE_STORE_TYPE="s3" \
+            -e FILE_STORE_S3_ENDPOINT_URL="http://minio:9000" \
+            -e FILE_STORE_S3_ACCESS_KEY_ID="admin" \
+            -e FILE_STORE_S3_SECRET_ACCESS_KEY="secretsecret" \
+            -e FILE_STORE_S3_BUCKET_NAME="e2e-test-bucket" \
             -e EMBEDDINGS_TYPE="azure-openai" \
             -e EMBEDDINGS_AZURE_OPENAI_ENDPOINT="${{ vars.AZURE_OPENAI_ENDPOINT }}" \
             -e EMBEDDINGS_AZURE_OPENAI_API_KEY="${{ secrets.AZURE_OPENAI_API_KEY }}" \
             -e EMBEDDINGS_AZURE_OPENAI_DEPLOYMENT_NAME="text-embedding-ada-002" \
             -e EMBEDDINGS_AZURE_OPENAI_INSTANCE_NAME="cc-sweden-testing" \
             -e EMBEDDINGS_AZURE_OPENAI_MODEL_NAME="text-embedding-ada-002" \
-            -e EMBEDDINGS_AZURE_OPENAI_API_VERSION=""2023-05-15"" \
+            -e EMBEDDINGS_AZURE_OPENAI_API_VERSION="2023-05-15" \
             reis:commit-${{ github.sha }}
       - name: start mcp
         run: |

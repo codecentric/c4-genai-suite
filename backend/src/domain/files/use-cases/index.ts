@@ -11,3 +11,4 @@ export * from './test-bucket';
 export * from './update-bucket';
 export * from './upload-file';
 export * from './get-document-content';
+export * from './get-document-pdf';

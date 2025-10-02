@@ -34,8 +34,13 @@ RUN find /reis/.venv -name "*.pyc" -delete && \
 #
 FROM python:3.13-alpine3.22 AS production
 
-# we need this library for extracting audio streams from videos
-RUN apk add --no-cache ffmpeg=6.1.2-r2
+# we need this library for extracting audio streams from videos and handeling office formats
+RUN apk add --no-cache ffmpeg=6.1.2-r2 libreoffice-calc=25.2.5.2-r0 libreoffice-impress=25.2.5.2-r0 libreoffice-writer=25.2.5.2-r0
+# Install fonts for pdf generation
+RUN apk --no-cache add msttcorefonts-installer fontconfig font-droid-nonlatin font-droid ttf-dejavu ttf-freefont ttf-liberation && \
+  update-ms-fonts && \
+  fc-cache -f && \
+  rm -rf /var/cache/apk/*
 
 ENV VIRTUAL_ENV=/reis/.venv \
 PATH="/reis/.venv/bin:$PATH"
@@ -44,11 +49,6 @@ COPY --from=builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
 
 COPY rei_s ./rei_s
 COPY logging.conf logging.conf
-
-# download necessary files for unstructured
-ENV TIKTOKEN_CACHE_DIR="/tiktoken_cache" \
-NLTK_DATA="/nltk_data"
-RUN mkdir -p ${NLTK_DATA} && python3 rei_s/prepare.py
 
 EXPOSE 3201
 

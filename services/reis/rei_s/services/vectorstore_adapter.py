@@ -5,12 +5,12 @@ from langchain_core.documents import Document
 from pydantic import BaseModel
 
 
-class StoreFilter(BaseModel):
+class VectorStoreFilter(BaseModel):
     bucket: str | None = None
     doc_ids: List[str] | None = None
 
 
-class StoreAdapter(ABC):
+class VectorStoreAdapter(ABC):
     @abstractmethod
     def add_documents(self, documents: list[Document]) -> None:
         raise NotImplementedError
@@ -20,7 +20,9 @@ class StoreAdapter(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def similarity_search(self, query: str, k: int = 4, search_filter: StoreFilter | None = None) -> List[Document]:
+    def similarity_search(
+        self, query: str, k: int = 4, search_filter: VectorStoreFilter | None = None
+    ) -> List[Document]:
         raise NotImplementedError
 
     @abstractmethod

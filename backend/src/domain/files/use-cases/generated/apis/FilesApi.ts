@@ -36,6 +36,10 @@ export interface DeleteFileRequest {
     indexName?: string | null;
 }
 
+export interface GetDocumentPdfRequest {
+    docId: string;
+}
+
 export interface GetDocumentsContentRequest {
     chunkIds: Array<string>;
     indexName?: string | null;
@@ -108,6 +112,45 @@ export class FilesApi extends runtime.BaseAPI {
      */
     async deleteFile(fileId: string, indexName?: string | null, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<any> {
         const response = await this.deleteFileRaw({ fileId: fileId, indexName: indexName }, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Get the document\'s pdf by its ID.
+     * Get Document Pdf
+     */
+    async getDocumentPdfRaw(requestParameters: GetDocumentPdfRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Blob>> {
+        if (requestParameters['docId'] == null) {
+            throw new runtime.RequiredError(
+                'docId',
+                'Required parameter "docId" was null or undefined when calling getDocumentPdf().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters['docId'] != null) {
+            queryParameters['doc_id'] = requestParameters['docId'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/documents/pdf`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.BlobApiResponse(response);
+    }
+
+    /**
+     * Get the document\'s pdf by its ID.
+     * Get Document Pdf
+     */
+    async getDocumentPdf(docId: string, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Blob> {
+        const response = await this.getDocumentPdfRaw({ docId: docId }, initOverrides);
         return await response.value();
     }
 

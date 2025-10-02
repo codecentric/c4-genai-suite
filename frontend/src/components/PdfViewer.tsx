@@ -1,6 +1,6 @@
 /* eslint-disable  @typescript-eslint/no-non-null-asserted-optional-chain */
 
-import { ActionIcon, Button, Card, Group, Loader } from '@mantine/core';
+import { ActionIcon, Card, Group, Loader } from '@mantine/core';
 import { IconX } from '@tabler/icons-react';
 import { ReactNode, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -35,7 +35,7 @@ export function PdfViewer({ selectedDocument, selectedSource: _selectedSource, o
   const [pageNumber, setPageNumber] = useState<number>(1);
   const [displayPdfViewer, setDisplayPdfViewer] = useState<boolean>(true);
 
-  const { data, isFetched, isError, isPending, refetch } = useDocument(
+  const { data, isFetched, isError, isPending } = useDocument(
     // This is the reason to disable @typescript-eslint/no-non-null-asserted-optional-chain
     selectedDocument?.conversationId!,
     selectedDocument?.messageId!,
@@ -80,13 +80,7 @@ export function PdfViewer({ selectedDocument, selectedSource: _selectedSource, o
   );
 
   if (isError) {
-    return container(
-      <Alert text={t('common.errorLoading')} className="mt-4">
-        <Button color="red" size="compact-xs" variant="light" mt="sm" onClick={() => refetch()}>
-          {t('common.tryAgain')}
-        </Button>
-      </Alert>,
-    );
+    return container(<Alert text={t('common.errorSourcePdfViewer')} className="mt-4"></Alert>);
   }
 
   if (isPending) {

@@ -1,5 +1,6 @@
 from functools import lru_cache
 import os
+import re
 import tempfile
 from typing import Annotated, Literal, Mapping, Self
 
@@ -9,8 +10,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # global settings only evaluated at program start
 # This is the global variable, which determines, where python will create tempfiles.
-# Since we have no direct control, where `unstructured` creates its temporary files,
-# we manipulate Python's tempfile, which is used by `unstructured`.
+# Since we have no direct control, where dependencies might create their temporary files,
+# we manipulate Python's tempfile.
 # Also our direct use of temp files uses the `tempfile` module, such that they are handled as well.
 # If `TMP_FILES_ROOT` is not set, the default is used (`/tmp` in most cases).
 # see also: https://python.readthedocs.io/en/latest/library/tempfile.html#tempfile.tempdir
@@ -31,6 +32,26 @@ def check_needed(needed: Mapping[str, str | SecretStr | None], switch_name: str,
         raise ValueError(
             f'With {switch_name} == "{switch_value}": {", ".join(missing)} is/are required but was/were not given.'
         )
+
+
+def check_valid_s3_bucket_name(bucket_name: str | None) -> None:
+    if bucket_name is None:
+        raise ValueError("s3 bucket name is mandatory")
+
+    if not (3 <= len(bucket_name) <= 63):
+        raise ValueError("s3 bucket name needs to to have 3 to 63 characters")
+
+    if not re.match(r"^[a-z0-9]([a-z0-9\.-]*[a-z0-9])?$", bucket_name):
+        raise ValueError(
+            "s3 bucket name must only contain lowercase letters, numbers, dots, and hyphens "
+            "and start with and start with a letter or number"
+        )
+
+    if ".." in bucket_name or ".-" in bucket_name or "-." in bucket_name:
+        raise ValueError("Bucket name cannot have dots adjacent to hyphens or double dots")
+
+    if re.match(r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$", bucket_name):
+        raise ValueError("Bucket name cannot be formatted like an IP address")
 
 
 # will be fixed in next mypy release
@@ -82,6 +103,16 @@ class Config(BaseSettings, frozen=True):  # type: ignore
     store_pgvector_url: str | None = None
     store_pgvector_index_name: str = "index"
 
+    file_store_type: Literal["s3", "filesystem"] | None = None
+    # needed for S3 filestore
+    file_store_s3_endpoint_url: str | None = None
+    file_store_s3_access_key_id: str | None = None
+    file_store_s3_secret_access_key: str | None = None
+    file_store_s3_bucket_name: str | None = None
+    file_store_s3_region_name: str | None = None
+    # needed for filesystem filestore
+    file_store_filesystem_basepath: str | None = None
+
     @model_validator(mode="after")
     def store_dependend_requirements(self) -> Self:
         if self.store_type == "pgvector":
@@ -96,6 +127,26 @@ class Config(BaseSettings, frozen=True):  # type: ignore
                 "STORE_AZURE_AI_SEARCH_SERVICE_API_KEY": self.store_azure_ai_search_service_api_key,
             }
             check_needed(needed_for_azure_ai_search, "STORE_TYPE", "azure-ai-search")
+
+        return self
+
+    @model_validator(mode="after")
+    def file_store_dependend_requirements(self) -> Self:
+        if self.file_store_type == "s3":
+            needed_for_s3 = {
+                "FILE_STORE_S3_ENDPOINT_URL": self.file_store_s3_endpoint_url,
+                "FILE_STORE_S3_ACCESS_KEY_ID": self.file_store_s3_access_key_id,
+                "FILE_STORE_S3_SECRET_ACCESS_KEY": self.file_store_s3_secret_access_key,
+                "FILE_STORE_S3_BUCKET_NAME": self.file_store_s3_bucket_name,
+            }
+            check_needed(needed_for_s3, "FILE_STORE_TYPE", "s3")
+            check_valid_s3_bucket_name(self.file_store_s3_bucket_name)
+
+        if self.file_store_type == "filesystem":
+            needed_for_filesystem = {
+                "FILE_STORE_FILESYSTEM_BASEPATH": self.file_store_filesystem_basepath,
+            }
+            check_needed(needed_for_filesystem, "FILE_STORE_TYPE", "filesystemsearch")
 
         return self
 

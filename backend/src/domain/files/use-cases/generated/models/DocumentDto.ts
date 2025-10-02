@@ -43,6 +43,12 @@ export interface DocumentDto {
      * @memberof DocumentDto
      */
     link: string | null;
+    /**
+     * Indicates if the document is available
+     * @type {boolean}
+     * @memberof DocumentDto
+     */
+    downloadAvailable: boolean;
 }
 
 /**
@@ -53,6 +59,7 @@ export function instanceOfDocumentDto(value: object): value is DocumentDto {
     if (!('name' in value) || value['name'] === undefined) return false;
     if (!('mimeType' in value) || value['mimeType'] === undefined) return false;
     if (!('link' in value) || value['link'] === undefined) return false;
+    if (!('downloadAvailable' in value) || value['downloadAvailable'] === undefined) return false;
     return true;
 }
 
@@ -70,6 +77,7 @@ export function DocumentDtoFromJSONTyped(json: any, ignoreDiscriminator: boolean
         'name': json['name'],
         'mimeType': json['mimeType'],
         'link': json['link'],
+        'downloadAvailable': json['downloadAvailable'],
     };
 }
 
@@ -83,6 +91,7 @@ export function DocumentDtoToJSON(value?: DocumentDto | null): any {
         'name': value['name'],
         'mimeType': value['mimeType'],
         'link': value['link'],
+        'downloadAvailable': value['downloadAvailable'],
     };
 }
 

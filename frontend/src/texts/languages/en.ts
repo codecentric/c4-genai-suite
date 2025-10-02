@@ -25,6 +25,7 @@ export const en = {
     enabled: 'Enabled',
     endpoint: 'Endpoint',
     errorLoading: 'Error loading',
+    errorSourcePdfViewer: 'The document has been deleted and can therefore no longer be displayed.',
     indexName: 'Index name',
     error: 'Failed to make update.',
     generate: 'Generate',

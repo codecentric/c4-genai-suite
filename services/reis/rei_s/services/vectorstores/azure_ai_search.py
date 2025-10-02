@@ -12,13 +12,13 @@ from azure.search.documents.indexes.models import (
 )
 
 from rei_s.config import Config
-from rei_s.services.store_adapter import StoreAdapter, StoreFilter
+from rei_s.services.vectorstore_adapter import VectorStoreAdapter, VectorStoreFilter
 
 
 lock = Lock()
 
 
-class AzureAISearchStoreAdapter(StoreAdapter):
+class AzureAISearchStoreAdapter(VectorStoreAdapter):
     vector_store: AzureSearch
 
     @classmethod
@@ -114,7 +114,7 @@ class AzureAISearchStoreAdapter(StoreAdapter):
         self.vector_store.delete(ids)
 
     @staticmethod
-    def convert_filter(search_filter: StoreFilter | None) -> str | None:
+    def convert_filter(search_filter: VectorStoreFilter | None) -> str | None:
         if search_filter is None:
             filter_expression = None
         else:
@@ -129,7 +129,9 @@ class AzureAISearchStoreAdapter(StoreAdapter):
 
         return filter_expression
 
-    def similarity_search(self, query: str, k: int = 4, search_filter: StoreFilter | None = None) -> List[Document]:
+    def similarity_search(
+        self, query: str, k: int = 4, search_filter: VectorStoreFilter | None = None
+    ) -> List[Document]:
         # We catch the special case of an empty file list. While None means that all files may be searched
         # an empty file list means that no files may be searched, such that the result will always be empty.
         # So we do not have to bother Azure.
