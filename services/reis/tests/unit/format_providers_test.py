@@ -20,18 +20,22 @@ from tests.conftest import get_test_config
 
 
 def test_markdown_provider() -> None:
-    content = b"# Hello World!"
-    expected = content.decode()
-    with temp_file(buffer=content, file_name="text.md") as source_file:
-        md = MarkdownProvider()
-        assert md.supports(source_file)
-        docs = md.process_file(source_file)
-        assert len(docs) > 0
-        assert docs[0].page_content == expected
+    expected = "# Birthdays\n\n## Dagobert Duck"
+    source_file = SourceFile(
+        path="tests/data/birthdays.md",
+        mime_type="text/markdown",
+        file_name="text.md",
+    )
 
-        pdf = md.convert_file_to_pdf(source_file)
-        assert_pdf_contains_text(pdf, "Hello World!")
-        assert pdf.id == source_file.id
+    md = MarkdownProvider()
+    assert md.supports(source_file)
+    docs = md.process_file(source_file)
+    assert len(docs) > 0
+    assert docs[0].page_content.startswith(expected)
+
+    pdf = md.convert_file_to_pdf(source_file)
+    assert_pdf_contains_text(pdf, "Dagobert Duck")
+    assert pdf.id == source_file.id
 
 
 def test_html_provider() -> None:
@@ -69,7 +73,16 @@ def test_odt_provider() -> None:
 
 
 def test_xlsx_provider() -> None:
-    expected = "Name Birthday Mickey Mouse 3/14/1592 Donald Duck 2/7/1828"
+    expected = """Birthday
+
+Name
+Mickey Mouse 3/14/1592
+2/7/1828
+Donald Duck
+
+BirthdaySheet
+
+Page 1"""
     source_file = SourceFile(
         path="tests/data/birthdays.xlsx",
         mime_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -81,8 +94,7 @@ def test_xlsx_provider() -> None:
     docs = xlsx.process_file(source_file)
     assert len(docs) > 0
     assert docs[0].page_content == expected
-    assert docs[0].metadata["page_name"] == "BirthdaySheet"
-    assert docs[0].metadata["page_number"] == 1
+    assert docs[0].metadata["page"] == 1
 
     pdf = xlsx.convert_file_to_pdf(source_file)
     assert_pdf_contains_text(pdf, expected)

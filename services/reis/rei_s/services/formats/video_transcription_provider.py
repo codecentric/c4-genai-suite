@@ -3,14 +3,12 @@ from typing import Any
 
 from langchain_core.documents import Document
 import ffmpeg
-import pypandoc
 
 from rei_s import logger
 from rei_s.config import Config
-from rei_s.services.formats.utils import ProcessingError
+from rei_s.services.formats.utils import ProcessingError, generate_pdf_from_md
 from rei_s.services.formats.voice_transcription_provider import VoiceTranscriptionProvider
 from rei_s.types.source_file import SourceFile, temp_file
-from rei_s.utils import get_new_file_path
 
 
 class VideoTranscriptionProvider(VoiceTranscriptionProvider):
@@ -89,8 +87,6 @@ class VideoTranscriptionProvider(VoiceTranscriptionProvider):
         docs = self.parse_file(file)
 
         plain = "\n".join([doc.page_content for doc in docs])
-        path = get_new_file_path(extension="pdf")
 
         with temp_file(plain.encode()) as plain_file:
-            pypandoc.convert_file(plain_file.path, "pdf", format="plain", outputfile=path)
-        return SourceFile(id=file.id, path=path, mime_type="application/pdf", file_name=file.file_name)
+            return generate_pdf_from_md(plain_file, "plain")

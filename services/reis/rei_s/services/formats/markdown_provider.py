@@ -2,12 +2,10 @@ from typing import Any
 
 from langchain_core.documents import Document
 from langchain_text_splitters import MarkdownTextSplitter
-import pypandoc
 
 from rei_s.services.formats.abstract_format_provider import AbstractFormatProvider
-from rei_s.services.formats.utils import validate_chunk_overlap, validate_chunk_size
+from rei_s.services.formats.utils import generate_pdf_from_md, validate_chunk_overlap, validate_chunk_size
 from rei_s.types.source_file import SourceFile
-from rei_s.utils import get_new_file_path
 
 
 class MarkdownProvider(AbstractFormatProvider):
@@ -34,6 +32,4 @@ class MarkdownProvider(AbstractFormatProvider):
         return chunks
 
     def convert_file_to_pdf(self, file: SourceFile) -> SourceFile:
-        path = get_new_file_path(extension="pdf")
-        pypandoc.convert_file(file.path, "pdf", format="markdown_github", outputfile=path)
-        return SourceFile(id=file.id, path=path, mime_type="application/pdf", file_name=file.file_name)
+        return generate_pdf_from_md(file)

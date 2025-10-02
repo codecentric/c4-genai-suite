@@ -9,8 +9,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # global settings only evaluated at program start
 # This is the global variable, which determines, where python will create tempfiles.
-# Since we have no direct control, where `unstructured` creates its temporary files,
-# we manipulate Python's tempfile, which is used by `unstructured`.
+# Since we have no direct control, where dependencies might create their temporary files,
+# we manipulate Python's tempfile.
 # Also our direct use of temp files uses the `tempfile` module, such that they are handled as well.
 # If `TMP_FILES_ROOT` is not set, the default is used (`/tmp` in most cases).
 # see also: https://python.readthedocs.io/en/latest/library/tempfile.html#tempfile.tempdir

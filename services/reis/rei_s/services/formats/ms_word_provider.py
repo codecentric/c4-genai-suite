@@ -2,13 +2,11 @@ from typing import Any
 
 from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_community.document_loaders import UnstructuredWordDocumentLoader
-import pypandoc
 
 from rei_s.services.formats.abstract_format_provider import AbstractFormatProvider
-from rei_s.services.formats.utils import validate_chunk_overlap, validate_chunk_size
+from rei_s.services.formats.pdf_provider import PdfProvider
+from rei_s.services.formats.utils import convert_office_to_pdf, validate_chunk_overlap, validate_chunk_size
 from rei_s.types.source_file import SourceFile
-from rei_s.utils import get_new_file_path
 
 
 class MsWordProvider(AbstractFormatProvider):
@@ -31,13 +29,8 @@ class MsWordProvider(AbstractFormatProvider):
     def process_file(
         self, file: SourceFile, chunk_size: int | None = None, chunk_overlap: int | None = None
     ) -> list[Document]:
-        loader = UnstructuredWordDocumentLoader(file.path)
-        docs = loader.load()
-
-        chunks = self.splitter(chunk_size, chunk_overlap).split_documents(docs)
-        return chunks
+        pdf = self.convert_file_to_pdf(file)
+        return PdfProvider().process_file(pdf, chunk_size, chunk_overlap)
 
     def convert_file_to_pdf(self, file: SourceFile) -> SourceFile:
-        path = get_new_file_path(extension="pdf")
-        pypandoc.convert_file(file.path, "pdf", format="docx", outputfile=path)
-        return SourceFile(id=file.id, path=path, mime_type="application/pdf", file_name=file.file_name)
+        return convert_office_to_pdf(file)

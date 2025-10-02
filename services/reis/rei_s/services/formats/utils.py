@@ -1,11 +1,16 @@
 from io import BytesIO
+import os
+import subprocess
+import tempfile
 from typing import Generator
 
 from langchain_core.documents.base import Blob
 from langchain_community.document_loaders.blob_loaders import BlobLoader
+import markdown
+from pygments.formatters import HtmlFormatter
+from weasyprint import HTML
 
-import pypandoc
-from rei_s.types.source_file import SourceFile, temp_file
+from rei_s.types.source_file import SourceFile
 from rei_s.utils import get_new_file_path
 
 
@@ -46,10 +51,35 @@ class ProcessingError(Exception):
         self.message = message
 
 
-def generate_preview_pdf_from_text(file: SourceFile, format_: str) -> SourceFile:
-    text = file.buffer.decode()
-    markdown_content = f"```{format_}\n{text}\n```"
+def generate_pdf_from_md(file: SourceFile, format_: str | None = None) -> SourceFile:
+    markdown_text = file.buffer.decode()
+    if format_:
+        markdown_text = f"```{format_}\n{markdown_text}\n```"
+
+    # Convert markdown to HTML
+    html = markdown.markdown(markdown_text, extensions=["fenced_code", "codehilite", "tables", "sane_lists"])
+    formatter = HtmlFormatter(style="vs", cssclass="codehilite")
+    pygments_css = formatter.get_style_defs(".codehilite")
+    html_doc = f"<html><head><style>{pygments_css}</style></head><body>{html}</body></html>"
+
+    # Convert HTML to PDF
     path = get_new_file_path(extension="pdf")
-    with temp_file(markdown_content.encode()) as code_file:
-        pypandoc.convert_file(code_file.path, "pdf", format="md", outputfile=path)
+    HTML(string=html_doc).write_pdf(path)
     return SourceFile(id=file.id, path=path, mime_type="application/pdf", file_name=file.file_name)
+
+
+def convert_office_to_pdf(file: SourceFile) -> SourceFile:
+    output_dir = tempfile.gettempdir()
+
+    cmd = ["libreoffice", "--headless", "--convert-to", "pdf", file.path, "--outdir", output_dir]
+
+    result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
+
+    if result.returncode:
+        raise ValueError(f"Can not convert pptx {file.id} to pdf")
+
+    base = os.path.basename(file.path)
+    pdf_name = os.path.splitext(base)[0] + ".pdf"
+    pdf_path = os.path.join(output_dir, pdf_name)
+
+    return SourceFile(id=file.id, path=pdf_path, mime_type="application/pdf", file_name=file.file_name)

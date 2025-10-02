@@ -1,14 +1,11 @@
-import os
-import subprocess
-import tempfile
 from typing import Any
 
 from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_community.document_loaders import UnstructuredPowerPointLoader
 
 from rei_s.services.formats.abstract_format_provider import AbstractFormatProvider
-from rei_s.services.formats.utils import validate_chunk_overlap, validate_chunk_size
+from rei_s.services.formats.pdf_provider import PdfProvider
+from rei_s.services.formats.utils import convert_office_to_pdf, validate_chunk_overlap, validate_chunk_size
 from rei_s.types.source_file import SourceFile
 
 
@@ -29,30 +26,11 @@ class MsPptProvider(AbstractFormatProvider):
         chunk_overlap = validate_chunk_overlap(chunk_overlap, self.default_chunk_overlap)
         return RecursiveCharacterTextSplitter(chunk_size=chunk_size, chunk_overlap=chunk_overlap)
 
-    def parse_file(self, file: SourceFile) -> list[Document]:
-        loader = UnstructuredPowerPointLoader(file.path)
-        docs = loader.load()
-        return docs
-
     def process_file(
         self, file: SourceFile, chunk_size: int | None = None, chunk_overlap: int | None = None
     ) -> list[Document]:
-        docs = self.parse_file(file)
-        chunks = self.splitter(chunk_size, chunk_overlap).split_documents(docs)
-        return chunks
+        pdf = self.convert_file_to_pdf(file)
+        return PdfProvider().process_file(pdf, chunk_size, chunk_overlap)
 
     def convert_file_to_pdf(self, file: SourceFile) -> SourceFile:
-        output_dir = tempfile.gettempdir()
-
-        cmd = ["libreoffice", "--headless", "--convert-to", "pdf", file.path, "--outdir", output_dir]
-
-        result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
-
-        if result.returncode:
-            raise ValueError(f"Can not convert pptx {file.id} to pdf")
-
-        base = os.path.basename(file.path)
-        pdf_name = os.path.splitext(base)[0] + ".pdf"
-        pdf_path = os.path.join(output_dir, pdf_name)
-
-        return SourceFile(id=file.id, path=pdf_path, mime_type="application/pdf", file_name=file.file_name)
+        return convert_office_to_pdf(file)

@@ -7,7 +7,7 @@ from langchain_community.document_loaders import UnstructuredEmailLoader
 
 from rei_s.services.formats.abstract_format_provider import AbstractFormatProvider
 from rei_s.types.source_file import SourceFile, temp_file
-from rei_s.services.formats.utils import validate_chunk_overlap, validate_chunk_size, generate_preview_pdf_from_text
+from rei_s.services.formats.utils import generate_pdf_from_md, validate_chunk_overlap, validate_chunk_size
 
 
 class OutlookProvider(AbstractFormatProvider):
@@ -57,4 +57,4 @@ class OutlookProvider(AbstractFormatProvider):
 
         with temp_file(plain.encode()) as plain_file:
             plain_file.id = file.id
-            return generate_preview_pdf_from_text(plain_file, "plain")
+            return generate_pdf_from_md(plain_file, "plain")
