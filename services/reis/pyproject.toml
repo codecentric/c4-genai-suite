@@ -18,7 +18,7 @@ psycopg = {extras = ["binary"], version = "^3.2.10"}
 fastapi = {extras = ["standard"], version = "0.118.0"}
 azure-search-documents = "11.5.3"
 azure-identity = "1.25.1"
-unstructured = {extras = ["docx", "md", "pptx", "xlsx"], version = "0.18.15"}
+unstructured = {extras = [], version = "0.18.15"}
 pdfminer-six = "^20250506"
 pypdf = "^6.1.1"
 ffmpeg-python = "^0.2.0"
@@ -28,9 +28,11 @@ fastmcp = "^2.12.4"
 langchain-ollama = "^0.3.10"
 langchain-aws = "^0.2.35"
 langchain-nvidia-ai-endpoints = "^0.3.18"
-pypandoc-binary = "^1.15"
 boto3 = "^1.40.42"
 boto3-stubs = {extras = ["s3"], version = "^1.40.42"}
+weasyprint = "^66.0"
+markdown = "^3.9"
+pygments = "^2.19.2"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "0.14.0"

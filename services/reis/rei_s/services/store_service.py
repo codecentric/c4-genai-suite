@@ -215,7 +215,7 @@ def add_file(config: Config, file: SourceFile, bucket: str, doc_id: str, index_n
     file_store = get_file_store(config=config)
 
     format_ = find_format_provider(config, file)
-    logger.info(f"start adding doc_id {doc_id} with format {format_}")
+    logger.info(f"start adding doc_id {doc_id} with format {format_.name}")
 
     file_store = get_file_store(config=config)
     if file_store:

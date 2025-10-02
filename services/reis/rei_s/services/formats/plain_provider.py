@@ -4,7 +4,7 @@ from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 from rei_s.services.formats.abstract_format_provider import AbstractFormatProvider
-from rei_s.services.formats.utils import validate_chunk_overlap, validate_chunk_size, generate_preview_pdf_from_text
+from rei_s.services.formats.utils import validate_chunk_overlap, validate_chunk_size, generate_pdf_from_md
 from rei_s.types.source_file import SourceFile
 
 
@@ -34,4 +34,4 @@ class PlainProvider(AbstractFormatProvider):
         return chunks
 
     def convert_file_to_pdf(self, file: SourceFile) -> SourceFile:
-        return generate_preview_pdf_from_text(file, "plain")
+        return generate_pdf_from_md(file, "plain")

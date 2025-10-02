@@ -213,11 +213,7 @@ def test_add_files_without_filestore(mocker: MockerFixture, client: TestClient) 
     # mock store to avoid calls to the db
     mocker.patch("rei_s.services.store_service.get_vector_store", return_value=DevNullVectorStoreAdapter())
     # mock file store to ensure it is not used
-    mocker.patch(
-        "rei_s.services.store_service.get_file_store",
-        return_value=DevNullFileStoreAdapter(),
-        side_effect=Exception("filestore accessed, but should not"),
-    )
+    mocker.patch("rei_s.services.store_service.get_file_store", return_value=None)
 
     with open("tests/data/birthdays.pdf", "rb") as f:
         response = client.post(
@@ -258,7 +254,9 @@ def test_add_files_with_filestore(mocker: MockerFixture, client: TestClient) -> 
     file_store_mock.add_document.assert_called_once()
 
     args, _kwargs = vector_store_mock.add_documents.call_args
-    assert "Dagobert Duck" in args[0].page_content
+    assert "Dagobert Duck" in args[0][0].page_content
+    args, _kwargs = file_store_mock.add_document.call_args
+    assert args[0].file_name == "test.yaml"
 
 
 def test_process_files(mocker: MockerFixture, client: TestClient) -> None:
@@ -321,7 +319,7 @@ def test_add_damaged_large_file(mocker: MockerFixture, client: TestClient) -> No
             headers={
                 "id": "1",
                 "bucket": "15",
-                "fileName": "test.docx",
+                "fileName": "test.yaml",
                 "fileMimeType": "",
             },
         )
