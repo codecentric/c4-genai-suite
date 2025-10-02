@@ -97,7 +97,7 @@ jobs:
             -e FILE_STORE_S3_ENDPOINT_URL="http://minio:9000" \
             -e FILE_STORE_S3_ACCESS_KEY_ID="admin" \
             -e FILE_STORE_S3_SECRET_ACCESS_KEY="secretsecret" \
-            -e FILE_STORE_S3_BUCKET_NAME="e2e_test_bucket" \
+            -e FILE_STORE_S3_BUCKET_NAME="e2e-test-bucket" \
             -e EMBEDDINGS_TYPE="azure-openai" \
             -e EMBEDDINGS_AZURE_OPENAI_ENDPOINT="${{ vars.AZURE_OPENAI_ENDPOINT }}" \
             -e EMBEDDINGS_AZURE_OPENAI_API_KEY="${{ secrets.AZURE_OPENAI_API_KEY }}" \
