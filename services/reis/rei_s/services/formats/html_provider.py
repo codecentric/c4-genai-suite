@@ -4,7 +4,7 @@ from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 from rei_s.services.formats.abstract_format_provider import AbstractFormatProvider
-from rei_s.services.formats.utils import generate_pdf_from_md, validate_chunk_overlap, validate_chunk_size
+from rei_s.services.formats.utils import generate_pdf_from_md_file, validate_chunk_overlap, validate_chunk_size
 from rei_s.types.source_file import SourceFile
 
 
@@ -38,4 +38,4 @@ class HtmlProvider(AbstractFormatProvider):
         return chunks
 
     def convert_file_to_pdf(self, file: SourceFile) -> SourceFile:
-        return generate_pdf_from_md(file, "html")
+        return generate_pdf_from_md_file(file, "html")

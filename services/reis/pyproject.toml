@@ -18,10 +18,10 @@ psycopg = {extras = ["binary"], version = "^3.2.10"}
 fastapi = {extras = ["standard"], version = "0.118.0"}
 azure-search-documents = "11.5.3"
 azure-identity = "1.25.1"
-unstructured = {extras = [], version = "0.18.15"}
 pdfminer-six = "^20250506"
 pypdf = "^6.1.1"
 ffmpeg-python = "^0.2.0"
+python-oxmsg = "^0.0.2"
 aiofiles = "^24.1.0"
 prometheus-fastapi-instrumentator = "^7.0.0"
 fastmcp = "^2.12.4"
@@ -48,7 +48,6 @@ faker = "37.11.0"
 responses = "0.25.8"
 
 [tool.poetry.scripts]
-download-tokenizers = "rei_s.prepare:download"
 generate-api-spec = "rei_s.generate_open_api:generate"
 
 [build-system]

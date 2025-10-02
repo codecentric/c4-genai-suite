@@ -50,11 +50,6 @@ COPY --from=builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
 COPY rei_s ./rei_s
 COPY logging.conf logging.conf
 
-# download necessary files for unstructured
-ENV TIKTOKEN_CACHE_DIR="/tiktoken_cache" \
-NLTK_DATA="/nltk_data"
-RUN mkdir -p ${NLTK_DATA} && python3 rei_s/prepare.py
-
 EXPOSE 3201
 
 HEALTHCHECK CMD python3 -c "import urllib.request, sys; sys.exit(0) if urllib.request.urlopen('http://localhost:3201/health').status == 200 else sys.exit(1)" || exit 1

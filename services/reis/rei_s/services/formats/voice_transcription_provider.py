@@ -16,7 +16,7 @@ from rei_s.services.formats.utils import (
     ProcessingError,
     validate_chunk_overlap,
     validate_chunk_size,
-    generate_pdf_from_md,
+    generate_pdf_from_md_file,
 )
 from rei_s.types.source_file import SourceFile, temp_file
 
@@ -230,4 +230,4 @@ class VoiceTranscriptionProvider(AbstractFormatProvider):
         plain = "\n".join([doc.page_content for doc in docs])
 
         with temp_file(plain.encode()) as plain_file:
-            return generate_pdf_from_md(plain_file, "plain")
+            return generate_pdf_from_md_file(plain_file, "plain")
