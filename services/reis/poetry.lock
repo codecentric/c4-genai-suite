@@ -1927,18 +1927,18 @@ langchain-core = ">=0.3.51,<0.4"
 
 [[package]]
 name = "langchain-ollama"
-version = "0.3.8"
+version = "0.3.10"
 description = "An integration package connecting Ollama and LangChain"
 optional = false
-python-versions = ">=3.9"
+python-versions = "<4.0.0,>=3.9.0"
 groups = ["main"]
 files = [
-    {file = "langchain_ollama-0.3.8-py3-none-any.whl", hash = "sha256:79898316d5663c6b08bc758c82b4e136f826cad2be84b4a26be11f1b0ebf686a"},
-    {file = "langchain_ollama-0.3.8.tar.gz", hash = "sha256:ba22537bd4dac4424cb8063bb2930fc31c6704db94728b30b75b4db71ccb214e"},
+    {file = "langchain_ollama-0.3.10-py3-none-any.whl", hash = "sha256:7550792872e8f86d362568e9ceb0f8085428bc59946c7b44e726358ba4b280f9"},
+    {file = "langchain_ollama-0.3.10.tar.gz", hash = "sha256:5d942d331c44351bae5c5c5965603ceb20b0ee4d70082290f4b15bc638559756"},
 ]
 
 [package.dependencies]
-langchain-core = ">=0.3.76,<1.0.0"
+langchain-core = ">=0.3.76,<2.0.0"
 ollama = ">=0.5.3,<1.0.0"
 
 [[package]]
@@ -6220,4 +6220,4 @@ cffi = ["cffi (>=1.11)"]
 [metadata]
 lock-version = "2.1"
 python-versions = "<4.0,>=3.12.0"
-content-hash = "39cad2b1209b08b5ad8a5150f46b675e2cdb93e8070446f4e328ddf237af3302"
+content-hash = "4c5ce65273eec6a78b2f9068929d0027e011d9da6714017d70aae0079e0a561d"
