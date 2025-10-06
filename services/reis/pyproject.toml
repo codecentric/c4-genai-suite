@@ -12,7 +12,7 @@ pydantic = "2.11.9"
 pydantic-settings = "^2.11.0"
 langchain-core = "0.3.78"
 langchain-community = "0.3.30"
-langchain-openai = "0.3.34"
+langchain-openai = "0.3.35"
 langchain-postgres = "0.0.15"
 psycopg = {extras = ["binary"], version = "^3.2.10"}
 fastapi = {extras = ["standard"], version = "0.118.0"}
