@@ -9,6 +9,7 @@ import { Document, Page, pdfjs } from 'react-pdf';
 import { toast } from 'react-toastify';
 import { SourceDto } from 'src/api/generated/models/SourceDto';
 import { useDocument } from 'src/hooks/api/files';
+import { isString } from 'src/lib';
 import { DocumentSource } from 'src/pages/chat/SourcesChunkPreview';
 import { Alert } from './Alert';
 import PdfControlBar from './PdfControlBar';
@@ -25,7 +26,22 @@ const VIEWPORT_STYLING_RULES = {
   minWidth: '25%',
 };
 
-export function PdfViewer({ selectedDocument, selectedSource: _selectedSource, onClose }: PdfViewerProps) {
+function getFirstPageFromSource(source: SourceDto | undefined): number {
+  if (source && source.metadata) {
+    const metadata = source.metadata;
+    if (isString(metadata.pages)) {
+      // pages is a string like "1-2, 4"
+      const pages = metadata.pages.split(',').flatMap((pageRange: string) => pageRange.split('-').map((p) => parseInt(p, 10)));
+      if (pages.length > 0) {
+        const firstPage = pages[0];
+        return firstPage;
+      }
+    }
+  }
+  return 1;
+}
+
+export function PdfViewer({ selectedDocument, selectedSource, onClose }: PdfViewerProps) {
   const { t } = useTranslation();
 
   const [pdfFileUrl, setPdfFileUrl] = useState<string | null>(null);
@@ -49,6 +65,7 @@ export function PdfViewer({ selectedDocument, selectedSource: _selectedSource, o
         if (documentData.type && documentData.type === 'application/pdf') {
           const documentUrl = URL.createObjectURL(documentData);
           setPdfFileUrl(documentUrl);
+          setPageNumber(getFirstPageFromSource(selectedSource));
         } else {
           toast('Something went wrong while loading the PDF source document. Please try again.');
         }
@@ -56,7 +73,7 @@ export function PdfViewer({ selectedDocument, selectedSource: _selectedSource, o
         console.error(error);
       }
     }
-  }, [data, isFetched, isError]);
+  }, [data, isFetched, isError, selectedSource]);
 
   function onDocumentLoadSuccess({ numPages }: { numPages: number }) {
     setNumPages(numPages);
