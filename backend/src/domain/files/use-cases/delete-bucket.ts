@@ -36,6 +36,7 @@ export class DeleteBucketHandler implements ICommandHandler<DeleteBucket, Delete
       } catch (error) {
         if ((error as ResponseError)?.response.status === 404) {
           // if the file is not found, we can ignore the error trying to delete it
+          continue;
         }
         throw error;
       }

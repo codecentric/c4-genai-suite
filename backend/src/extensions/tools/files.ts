@@ -169,9 +169,9 @@ export class FilesExtension<T extends FilesExtensionConfiguration = FilesExtensi
     return response.documentContent.filter((x) => x != null);
   }
 
-  async getDocument(configuration: FilesExtensionConfiguration, documentUri: string) {
+  async getDocument(configuration: FilesExtensionConfiguration, documentUri: string, user: User) {
     const bucketId = configuration.bucket;
-    const response: GetDocumentPdfResponse = await this.queryBus.execute(new GetDocumentPdf(bucketId, documentUri));
+    const response: GetDocumentPdfResponse = await this.queryBus.execute(new GetDocumentPdf(user, bucketId, documentUri));
 
     const buffer = await response.documentPdf?.bytes();
     if (!buffer) {
