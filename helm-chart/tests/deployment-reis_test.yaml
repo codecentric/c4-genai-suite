@@ -270,6 +270,33 @@ tests:
           count: 1
           any: true
 
+  - it: mounts s3 access key secret as environment variable in the container
+    template: deployment-reis.yaml
+    set:
+      reis.fileStore.type: s3
+      reis.fileStore.s3.existingAccessKeySecret: my-s3-secret
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: FILE_STORE_S3_ACCESS_KEY_ID
+            valueFrom:
+              secretKeyRef:
+                name: my-s3-secret
+                key: s3AccessKeyId
+          count: 1
+          any: true
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: FILE_STORE_S3_SECRET_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                name: my-s3-secret
+                key: s3SecretAccessKey
+          count: 1
+          any: true
+
   - it: defines a named port called `web` for container port 3201
     template: deployment-reis.yaml
     asserts:
