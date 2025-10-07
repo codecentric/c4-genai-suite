@@ -1,15 +1,13 @@
 import { createOpenAICompatible } from '@ai-sdk/openai-compatible';
-import { Logger } from '@nestjs/common';
 import { CallSettings, generateText } from 'ai';
 import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from 'src/domain/chat';
 import { Extension, ExtensionConfiguration, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions';
 import { User } from 'src/domain/users';
+import { fetchWithDebugLogging } from 'src/lib/log-requests';
 import { I18nService } from '../../localization/i18n.service';
 
 @Extension()
 export class NvidiaModelExtension implements Extension<NvidiaModelExtensionConfiguration> {
-  private readonly logger = new Logger(NvidiaModelExtension.name);
-
   constructor(private readonly i18n: I18nService) {}
 
   get spec(): ExtensionSpec {
@@ -113,46 +111,12 @@ export class NvidiaModelExtension implements Extension<NvidiaModelExtensionConfi
   }
 
   private createModel(config: NvidiaModelExtensionConfiguration, streaming = false) {
-    const extractResponseBody = async (response: Response): Promise<unknown> => {
-      const contentType = response.headers.get('content-type') || '';
-      if (contentType.includes('application/json')) {
-        return await response.json();
-      } else {
-        return await response.text();
-      }
-    };
-    const removeCredentials = (headers: HeadersInit): Record<string, string> => {
-      const pattern = /(authorization|api-?key|token|secret|cookie)/i;
-
-      const sanitizedHeaders: Record<string, string> = {};
-      new Headers(headers).forEach((value, key) => {
-        const lk = key.toLowerCase();
-        if (pattern.test(lk)) {
-          return;
-        }
-        sanitizedHeaders[key] = value;
-      });
-      return sanitizedHeaders;
-    };
     const openAi = createOpenAICompatible({
       name: 'nvidia',
       apiKey: config.apiKey,
       baseURL: config.baseUrl,
       includeUsage: true,
-      fetch: async (url: string | Request | URL, options: RequestInit | undefined) => {
-        const response = await fetch(url, options);
-        if (process.env.DEBUG_NVIDIA) {
-          const clonedResponse = response.clone();
-          this.logger.log('Nvidia Request', {
-            url,
-            requestHeaders: removeCredentials(options?.headers ?? {}),
-            requestBody: JSON.parse(options?.body as string) as unknown,
-            responseHeaders: [...clonedResponse.headers.entries()],
-            responseBody: await extractResponseBody(clonedResponse),
-          });
-        }
-        return response;
-      },
+      fetch: fetchWithDebugLogging(NvidiaModelExtension.name),
     });
 
     return {
