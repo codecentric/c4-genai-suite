@@ -3,6 +3,7 @@ import { CallSettings, generateText } from 'ai';
 import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from 'src/domain/chat';
 import { Extension, ExtensionConfiguration, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions';
 import { User } from 'src/domain/users';
+import { fetchWithDebugLogging } from 'src/lib/log-requests';
 import { I18nService } from '../../localization/i18n.service';
 
 @Extension()
@@ -110,15 +111,16 @@ export class NvidiaModelExtension implements Extension<NvidiaModelExtensionConfi
   }
 
   private createModel(config: NvidiaModelExtensionConfiguration, streaming = false) {
-    const open = createOpenAICompatible({
+    const openAi = createOpenAICompatible({
       name: 'nvidia',
       apiKey: config.apiKey,
       baseURL: config.baseUrl,
       includeUsage: true,
+      fetch: fetchWithDebugLogging(NvidiaModelExtension.name),
     });
 
     return {
-      model: open(config.modelName),
+      model: openAi(config.modelName),
       options: {
         presencePenalty: config.presencePenalty,
         frequencyPenalty: config.frequencyPenalty,

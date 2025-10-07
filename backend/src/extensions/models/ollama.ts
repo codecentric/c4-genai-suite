@@ -3,6 +3,7 @@ import { createOllama } from 'ollama-ai-provider-v2';
 import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from 'src/domain/chat';
 import { Extension, ExtensionConfiguration, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions';
 import { User } from 'src/domain/users';
+import { fetchWithDebugLogging } from 'src/lib/log-requests';
 import { I18nService } from '../../localization/i18n.service';
 
 @Extension()
@@ -63,6 +64,7 @@ export class OllamaModelExtension implements Extension<OllamaModelExtensionConfi
     const open = createOllama({
       name: 'ollama',
       baseURL: endpoint,
+      fetch: fetchWithDebugLogging(OllamaModelExtension.name),
     });
 
     return {

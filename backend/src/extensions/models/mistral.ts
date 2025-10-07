@@ -3,6 +3,7 @@ import { CallSettings, generateText } from 'ai';
 import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from 'src/domain/chat';
 import { Extension, ExtensionConfiguration, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions';
 import { User } from 'src/domain/users';
+import { fetchWithDebugLogging } from 'src/lib/log-requests';
 import { I18nService } from '../../localization/i18n.service';
 
 @Extension()
@@ -74,6 +75,7 @@ export class MistralModelExtension implements Extension<MistralModelExtensionCon
 
     const open = createMistral({
       apiKey: apiKey,
+      fetch: fetchWithDebugLogging(MistralModelExtension.name),
     });
 
     return {
