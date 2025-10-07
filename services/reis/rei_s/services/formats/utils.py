@@ -1,8 +1,10 @@
 from io import BytesIO
 import os
+from pathlib import Path
 import subprocess
 import tempfile
 from typing import Generator
+from uuid import uuid4
 
 from langchain_core.documents.base import Blob
 from langchain_community.document_loaders.blob_loaders import BlobLoader
@@ -76,14 +78,14 @@ def generate_pdf_from_md(markdown_text: str, doc_id: str, file_name: str) -> Sou
 
 
 def convert_office_to_pdf(file: SourceFile) -> SourceFile:
-    output_dir = tempfile.gettempdir()
+    output_dir = Path(tempfile.gettempdir()) / uuid4().hex
+    output_dir.mkdir(parents=True, exist_ok=True)
 
     cmd = ["libreoffice", "--headless", "--convert-to", "pdf", file.path, "--outdir", output_dir]
-
-    result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
-
-    if result.returncode:
-        raise ValueError(f"Can not convert pptx {file.id} to pdf")
+    try:
+        subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
+    except subprocess.CalledProcessError as e:
+        raise ValueError(f"Can not convert {file.id} to pdf, exit code {e.returncode}: {e!r}") from e
 
     base = os.path.basename(file.path)
     pdf_name = os.path.splitext(base)[0] + ".pdf"
