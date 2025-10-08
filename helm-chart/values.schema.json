@@ -897,7 +897,7 @@
                                 },
                                 "existingAccessKeySecret": {
                                     "type": "string",
-                                    "description": "Name of the Kubernetes Secret containing the Bedrock Secret Access Key. The secret must have the keys `s3AccessKeyId` and `s3SecretAccessKey`.",
+                                    "description": "Name of the Kubernetes Secret containing the s3 compatible secret access key. The secret must have the keys `s3AccessKeyId` and `s3SecretAccessKey`.",
                                     "default": "\"\""
                                 }
                             }

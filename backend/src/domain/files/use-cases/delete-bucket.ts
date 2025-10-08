@@ -1,4 +1,4 @@
-import { NotFoundException } from '@nestjs/common';
+import { Logger, NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BucketEntity, BucketRepository } from 'src/domain/database';
@@ -13,6 +13,8 @@ export class DeleteBucketResponse {}
 
 @CommandHandler(DeleteBucket)
 export class DeleteBucketHandler implements ICommandHandler<DeleteBucket, DeleteBucketResponse> {
+  private readonly logger = new Logger(DeleteBucketHandler.name);
+
   constructor(
     @InjectRepository(BucketEntity)
     private readonly buckets: BucketRepository,
@@ -36,6 +38,7 @@ export class DeleteBucketHandler implements ICommandHandler<DeleteBucket, Delete
       } catch (error) {
         if ((error as ResponseError)?.response.status === 404) {
           // if the file is not found, we can ignore the error trying to delete it
+          this.logger.warn(`File ${file.id} not found in remote storage, assuming it was already deleted.`);
           continue;
         }
         throw error;

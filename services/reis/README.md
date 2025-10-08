@@ -10,7 +10,6 @@ For development, install `python` and `poetry`. Then the REI-S can be started wi
 
 ```bash
 poetry install --with dev
-poetry run download-tokenizers
 poetry run fastapi dev rei_s/app.py --port 3201
 ```
 
@@ -80,6 +79,12 @@ if a user clicks on a source.
 Note that activation of this feature will lead to every file to be converted to
 a pdf before being parsed and chunked. This is necessary to supply the metadata
 of the chunks with the correct page number.
+
+Also, if this feature is active, LibreOffice needs to be available on the system.
+In our the docker image, this is the case.
+
+On MacOS it might be necessary to install further system dependecies for pdf generation
+with `brew install glib cairo pango gdk-pixbuf harfbuzz libxml2 libxslt gobject-introspection fontconfig freetype pkg-config libffi`
 
 ### S3:
 

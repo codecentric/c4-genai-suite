@@ -73,16 +73,30 @@ def test_odt_provider() -> None:
 
 
 def test_xlsx_provider() -> None:
-    expected = """Birthday
-
-Name
-Mickey Mouse 3/14/1592
-2/7/1828
+    expected_p1 = """Name
+Mickey Mouse
 Donald Duck
+
+Birthday
+3/14/1592
+2/7/1828
 
 BirthdaySheet
 
 Page 1"""
+    expected_p2 = """Name 1
+Mickey Mouse
+
+Name 2
+Mini Mouse
+
+Anniversary
+
+01/01/11
+
+AnniversarySheet
+
+Page 2"""
     source_file = SourceFile(
         path="tests/data/birthdays.xlsx",
         mime_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -93,11 +107,14 @@ Page 1"""
     assert xlsx.supports(source_file)
     docs = xlsx.process_file(source_file)
     assert len(docs) > 0
-    assert docs[0].page_content == expected
+    assert docs[0].page_content == expected_p1
     assert docs[0].metadata["page"] == 1
+    assert docs[1].page_content == expected_p2
+    assert docs[1].metadata["page"] == 2
 
     pdf = xlsx.convert_file_to_pdf(source_file)
-    assert_pdf_contains_text(pdf, expected)
+    assert_pdf_contains_text(pdf, expected_p1)
+    assert_pdf_contains_text(pdf, expected_p2)
     assert pdf.id == source_file.id
 
 

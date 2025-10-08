@@ -355,7 +355,7 @@ reis:
       accessKeyId: ""
       ## @param reis.fileStore.s3.secretAccessKey [string] The s3 compatible secret access key.
       secretAccessKey: ""
-      ## @param reis.fileStore.s3.existingAccessKeySecret [string] Name of the Kubernetes Secret containing the Bedrock Secret Access Key. The secret must have the keys `s3AccessKeyId` and `s3SecretAccessKey`.
+      ## @param reis.fileStore.s3.existingAccessKeySecret [string] Name of the Kubernetes Secret containing the s3 compatible secret access key. The secret must have the keys `s3AccessKeyId` and `s3SecretAccessKey`.
       existingAccessKeySecret: ""
   ## @param reis.workers Number of concurrent threads to process the uploaded files
   workers: 2
