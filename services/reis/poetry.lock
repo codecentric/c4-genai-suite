@@ -1627,14 +1627,14 @@ tzdata = "*"
 
 [[package]]
 name = "fastapi"
-version = "0.118.0"
+version = "0.118.2"
 description = "FastAPI framework, high performance, easy to learn, fast to code, ready for production"
 optional = false
 python-versions = ">=3.8"
 groups = ["main"]
 files = [
-    {file = "fastapi-0.118.0-py3-none-any.whl", hash = "sha256:705137a61e2ef71019d2445b123aa8845bd97273c395b744d5a7dfe559056855"},
-    {file = "fastapi-0.118.0.tar.gz", hash = "sha256:5e81654d98c4d2f53790a7d32d25a7353b30c81441be7d0958a26b5d761fa1c8"},
+    {file = "fastapi-0.118.2-py3-none-any.whl", hash = "sha256:d1f842612e6a305f95abe784b7f8d3215477742e7c67a16fccd20bd79db68150"},
+    {file = "fastapi-0.118.2.tar.gz", hash = "sha256:d5388dbe76d97cb6ccd2c93b4dd981608062ebf6335280edfa9a11af82443e18"},
 ]
 
 [package.dependencies]
@@ -6348,4 +6348,4 @@ cffi = ["cffi (>=1.11)"]
 [metadata]
 lock-version = "2.1"
 python-versions = "<4.0,>=3.12.0"
-content-hash = "fb156ad532a7aaad9589b1108559efd0a69c0e5eb4081ad79bbce48ff6220a1d"
+content-hash = "acf0242043670b42187a5381d6f6f912a003ad696179fdc34948aad35be45682"

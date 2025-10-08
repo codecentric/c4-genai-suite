@@ -15,7 +15,7 @@ langchain-community = "0.3.30"
 langchain-openai = "0.3.35"
 langchain-postgres = "0.0.15"
 psycopg = {extras = ["binary"], version = "^3.2.10"}
-fastapi = {extras = ["standard"], version = "0.118.0"}
+fastapi = {extras = ["standard"], version = "0.118.2"}
 azure-search-documents = "11.5.3"
 azure-identity = "1.25.1"
 pdfminer-six = "^20250506"
