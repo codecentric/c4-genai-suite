@@ -76,7 +76,7 @@ jobs:
       - uses: actions/checkout@v5
         with:
           lfs: true
-      - run: sudo apt install -y libreoffice ffmpeg
+      - run: sudo apt-get update && sudo apt install -y libreoffice ffmpeg
       - run: pipx install poetry
       - uses: actions/setup-python@v6
         with:
