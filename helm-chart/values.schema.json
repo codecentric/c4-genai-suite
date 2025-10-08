@@ -859,6 +859,51 @@
                         }
                     }
                 },
+                "fileStore": {
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "type": "string",
+                            "description": "The file store to use, one of: s3",
+                            "default": "\"\""
+                        },
+                        "s3": {
+                            "type": "object",
+                            "properties": {
+                                "endpointUrl": {
+                                    "type": "string",
+                                    "description": "The s3 compatible endpoint.",
+                                    "default": "\"\""
+                                },
+                                "bucketName": {
+                                    "type": "string",
+                                    "description": "The s3 compatible bucket name.",
+                                    "default": "\"\""
+                                },
+                                "regionName": {
+                                    "type": "string",
+                                    "description": "The AWS region.",
+                                    "default": "\"\""
+                                },
+                                "accessKeyId": {
+                                    "type": "string",
+                                    "description": "The s3 compatible access key Id.",
+                                    "default": "\"\""
+                                },
+                                "secretAccessKey": {
+                                    "type": "string",
+                                    "description": "The s3 compatible secret access key.",
+                                    "default": "\"\""
+                                },
+                                "existingAccessKeySecret": {
+                                    "type": "string",
+                                    "description": "Name of the Kubernetes Secret containing the s3 compatible secret access key. The secret must have the keys `s3AccessKeyId` and `s3SecretAccessKey`.",
+                                    "default": "\"\""
+                                }
+                            }
+                        }
+                    }
+                },
                 "workers": {
                     "type": "number",
                     "description": "Number of concurrent threads to process the uploaded files",

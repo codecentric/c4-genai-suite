@@ -16,7 +16,7 @@ from tests.conftest import get_test_config
 
 # Here we test the Azure AI search end to end by calling to a test deployment.
 
-# Needed environment variables will be read from `.env.test` and the environment.
+# Needed environment variables will be read the environment (not from .env files).
 # If needed environment variables are missing, the test is skipped
 
 random_ext = "-" + "".join(random.choices(string.ascii_lowercase + string.digits, k=8))

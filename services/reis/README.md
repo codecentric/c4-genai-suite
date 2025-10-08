@@ -10,7 +10,6 @@ For development, install `python` and `poetry`. Then the REI-S can be started wi
 
 ```bash
 poetry install --with dev
-poetry run download-tokenizers
 poetry run fastapi dev rei_s/app.py --port 3201
 ```
 
@@ -67,6 +66,38 @@ STORE_TYPE=azure-ai-search
 STORE_TYPE=pgvector
 STORE_PGVECTOR_URL=postgres+psycopg://admin:secret@localhost:5432/cccc
 ```
+
+## File stores
+
+Optionally, REIS can save a pdf preview of the uploaded file in a file store.
+
+This feature is activated by supplying a FILE_STORE_TYPE env variable.
+
+If it is activated, c4 will be able to show a pdf version of the uploaded file,
+if a user clicks on a source.
+
+Note that activation of this feature will lead to every file to be converted to
+a pdf before being parsed and chunked. This is necessary to supply the metadata
+of the chunks with the correct page number.
+
+Also, if this feature is active, LibreOffice needs to be available on the system.
+In our the docker image, this is the case.
+
+On MacOS it might be necessary to install further system dependecies for pdf generation
+with `brew install glib cairo pango gdk-pixbuf harfbuzz libxml2 libxslt gobject-introspection fontconfig freetype pkg-config libffi`
+
+### S3:
+
+```bash
+FILE_STORE_TYPE=s3
+# other FILE_STORE_S3_* variables from .env.example
+```
+
+### filesystem:
+
+This option will save the files at a specified location in the file system.
+
+This is not advised to use in production, but provided for easy setup for experiments and development.
 
 ## Example configuration in c4
 

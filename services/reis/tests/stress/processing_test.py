@@ -17,7 +17,7 @@ file_set = [
     # these include a large excel sheet
     glob("tests/data_stress/*.*"),
     # many files
-    glob("tests/data/birthdays.pdf") * 100,
+    ["tests/data/birthdays.pdf"] * 70 + ["tests/data/birthdays.docx"] * 30,
 ]
 
 

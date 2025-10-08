@@ -15,6 +15,8 @@ allow_licenses:
   - 'LGPL-2.1-only'
   - 'Unlicense'
   - 'CC0-1.0'
+  - 'OFL-1.1'
 allow-dependencies-licenses:
   - 'pkg:pypi/structlog' # This package is a false-positive because of a Contributor License Agreement, which is not a software license.
   - 'pkg:pypi/azure-identity' # This package is a false-positive because of a Contributor License Agreement, which is not a software license.
+  - 'pkg:pypi/pyphen' # This package is a false-positive because it is GPL or LGPL or MPL (not "and").

@@ -40,6 +40,12 @@ data:
   {{- else }}
   {{ fail "Invalid vector database type. Must be one of azure-ai-search, pgvector." }}
   {{- end }}
+  FILE_STORE_TYPE: {{ .Values.reis.fileStore.type | quote }}
+  {{- if eq .Values.reis.fileStore.type "s3" }}
+  FILE_STORE_S3_ENDPOINT_URL: {{ .Values.reis.fileStore.s3.endpointUrl | quote }}
+  FILE_STORE_S3_BUCKET_NAME: {{ .Values.reis.fileStore.s3.bucketName | quote }}
+  FILE_STORE_S3_REGION_NAME: {{ .Values.reis.fileStore.s3.regionName | quote }}
+  {{- end }}
   STT_TYPE: {{ .Values.reis.speechToText.type | quote }}
   {{- if eq .Values.reis.speechToText.type "azure-openai-whisper"}}
   STT_AZURE_OPENAI_WHISPER_API_VERSION: {{ .Values.reis.speechToText.azureOpenAiWhisper.apiVersion | quote }}

@@ -1,10 +1,11 @@
 from typing import Any
+
 from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_community.document_loaders import UnstructuredExcelLoader
 
 from rei_s.services.formats.abstract_format_provider import AbstractFormatProvider
-from rei_s.services.formats.utils import validate_chunk_overlap, validate_chunk_size
+from rei_s.services.formats.pdf_provider import PdfProvider
+from rei_s.services.formats.utils import convert_office_to_pdf, validate_chunk_overlap, validate_chunk_size
 from rei_s.types.source_file import SourceFile
 
 
@@ -28,20 +29,8 @@ class MsExcelProvider(AbstractFormatProvider):
     def process_file(
         self, file: SourceFile, chunk_size: int | None = None, chunk_overlap: int | None = None
     ) -> list[Document]:
-        loader = UnstructuredExcelLoader(file.path, mode="elements")
-        docs = loader.load()
+        pdf = self.convert_file_to_pdf(file)
+        return PdfProvider().process_file(pdf, chunk_size, chunk_overlap)
 
-        misleading_metadata = [
-            "text_as_html",  # this property is too large to save it in the db, also useless for us
-            "filename",  # will be the temporary filename
-            "file_directory",  # will be the temporary path
-            "last_modified",  # will be time of upload
-            "element_id",  # not useful
-        ]
-        for doc in docs:
-            for key in misleading_metadata:
-                if key in doc.metadata:
-                    del doc.metadata[key]
-
-        chunks = self.splitter(chunk_size, chunk_overlap).split_documents(docs)
-        return chunks
+    def convert_file_to_pdf(self, file: SourceFile) -> SourceFile:
+        return convert_office_to_pdf(file)

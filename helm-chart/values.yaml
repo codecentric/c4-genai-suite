@@ -341,6 +341,22 @@ reis:
       existingConnectionStringSecret: ""
       ## @param reis.vectorDatabase.pgVector.indexName [string] Name of the collection used for the PGVector store (this is a logical distinction in the same table).
       indexName: ""
+  fileStore:
+    ## @param reis.fileStore.type [string] The file store to use, one of: s3
+    type: ""
+    s3:
+      ## @param reis.fileStore.s3.endpointUrl [string] The s3 compatible endpoint.
+      endpointUrl: ""
+      ## @param reis.fileStore.s3.bucketName [string] The s3 compatible bucket name.
+      bucketName: ""
+      ## @param reis.fileStore.s3.regionName [string] The AWS region.
+      regionName: ""
+      ## @param reis.fileStore.s3.accessKeyId [string] The s3 compatible access key Id.
+      accessKeyId: ""
+      ## @param reis.fileStore.s3.secretAccessKey [string] The s3 compatible secret access key.
+      secretAccessKey: ""
+      ## @param reis.fileStore.s3.existingAccessKeySecret [string] Name of the Kubernetes Secret containing the s3 compatible secret access key. The secret must have the keys `s3AccessKeyId` and `s3SecretAccessKey`.
+      existingAccessKeySecret: ""
   ## @param reis.workers Number of concurrent threads to process the uploaded files
   workers: 2
   ## @param reis.batchSize Number of chunks uploaded to the vectorstore at once

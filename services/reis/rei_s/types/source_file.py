@@ -1,18 +1,22 @@
 from contextlib import contextmanager
 import os
+from pathlib import Path
 from tempfile import NamedTemporaryFile
 from typing import Generator
 import uuid
 
 from pydantic import BaseModel, Field
-from rei_s.utils import get_uploaded_file_path
+from rei_s.utils import get_new_file_path
 
 
 class SourceFile(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    path: str
+    path: str | Path
     mime_type: str
     file_name: str
+
+    # flag to signal that the parent directory should be deleted when deleting the file
+    delete_dir: bool = False
 
     @property
     def size(self) -> int:
@@ -33,7 +37,7 @@ class SourceFile(BaseModel):
         if extension:
             file_name += extension
 
-        path = get_uploaded_file_path(file_name)
+        path = get_new_file_path(file_name)
 
         if buffer:
             with open(path, "wb") as f:
@@ -43,6 +47,11 @@ class SourceFile(BaseModel):
 
     def delete(self) -> None:
         os.remove(self.path)
+        if self.delete_dir:
+            os.rmdir(os.path.dirname(self.path))
+
+    def ext(self) -> str:
+        return Path(self.file_name).suffix[1:]
 
 
 @contextmanager

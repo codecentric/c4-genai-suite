@@ -356,7 +356,7 @@ export class MCPToolsExtension implements Extension<Configuration> {
     return spec;
   }
 
-  async getDocument(configuration: Configuration, documentUri: string) {
+  async getDocument(configuration: Configuration, documentUri: string, _user: User) {
     const { client } = (await this.getTools(configuration)) ?? [];
     const req: ReadResourceRequest = {
       method: 'resources/read',

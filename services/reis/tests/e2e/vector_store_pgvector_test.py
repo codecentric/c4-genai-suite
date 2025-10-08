@@ -11,15 +11,15 @@ from sqlalchemy import create_engine
 import sqlalchemy
 
 from rei_s.config import Config, get_config
-from rei_s.services.store_adapter import StoreFilter
-from rei_s.services.stores.pgvector import PGVectorStoreAdapter
+from rei_s.services.vectorstore_adapter import VectorStoreFilter
+from rei_s.services.vectorstores.pgvector import PGVectorStoreAdapter
 from tests.conftest import get_test_config
 
 # Here we test the pgvector store.
 # We need a running postgres instance reachable via the url in the env variabels.
 # We will manipulate the `test` and `pg_test_index` collections.
 
-# Needed environment variables will be read from `.env.test` and the environment.
+# Needed environment variables will be read the environment (not from .env files).
 # If needed environment variables are missing, the test is skipped
 
 INDEX_NAME = "test"
@@ -231,11 +231,11 @@ def test_get_files_filtered_by_file_ids(file_uploader: FileUploaderFixture, clie
     "test_input,expected",
     [
         (None, None),
-        (StoreFilter(bucket="1"), {"bucket": {"$eq": "1"}}),
-        (StoreFilter(bucket="42", doc_ids=["3", "2"]), {"bucket": {"$eq": "42"}, "doc_id": {"$in": ["3", "2"]}}),
-        (StoreFilter(doc_ids=["3", "2"]), {"doc_id": {"$in": ["3", "2"]}}),
-        (StoreFilter(bucket="2", doc_ids=[]), {"bucket": {"$eq": "2"}, "doc_id": {"$in": []}}),
+        (VectorStoreFilter(bucket="1"), {"bucket": {"$eq": "1"}}),
+        (VectorStoreFilter(bucket="42", doc_ids=["3", "2"]), {"bucket": {"$eq": "42"}, "doc_id": {"$in": ["3", "2"]}}),
+        (VectorStoreFilter(doc_ids=["3", "2"]), {"doc_id": {"$in": ["3", "2"]}}),
+        (VectorStoreFilter(bucket="2", doc_ids=[]), {"bucket": {"$eq": "2"}, "doc_id": {"$in": []}}),
     ],
 )
-def test_filter_conversion(test_input: StoreFilter, expected: dict[str, Any]) -> None:
+def test_filter_conversion(test_input: VectorStoreFilter, expected: dict[str, Any]) -> None:
     assert PGVectorStoreAdapter.convert_filter(test_input) == expected

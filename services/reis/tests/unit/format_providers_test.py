@@ -1,11 +1,11 @@
 from itertools import combinations
 
-
 from rei_s.config import Config
 from rei_s.services.formats import get_format_providers
 from rei_s.services.formats.code_provider import CodeProvider
 from rei_s.services.formats.html_provider import HtmlProvider
 from rei_s.services.formats.json_provider import JsonProvider
+from rei_s.services.formats.libre_office_provider import LibreOfficeProvider
 from rei_s.services.formats.markdown_provider import MarkdownProvider
 from rei_s.services.formats.ms_excel_provider import MsExcelProvider
 from rei_s.services.formats.ms_ppt_provider import MsPptProvider
@@ -20,26 +20,83 @@ from tests.conftest import get_test_config
 
 
 def test_markdown_provider() -> None:
-    content = b"# Hello World!"
-    with temp_file(buffer=content, file_name="text.md") as source_file:
-        md = MarkdownProvider()
-        assert md.supports(source_file)
-        docs = md.process_file(source_file)
-        assert len(docs) > 0
-        assert docs[0].page_content == "# Hello World!"
+    expected = "# Birthdays\n\n## Dagobert Duck"
+    source_file = SourceFile(
+        path="tests/data/birthdays.md",
+        mime_type="text/markdown",
+        file_name="text.md",
+    )
+
+    md = MarkdownProvider()
+    assert md.supports(source_file)
+    docs = md.process_file(source_file)
+    assert len(docs) > 0
+    assert docs[0].page_content.startswith(expected)
+
+    pdf = md.convert_file_to_pdf(source_file)
+    assert_pdf_contains_text(pdf, "Dagobert Duck")
+    assert pdf.id == source_file.id
 
 
 def test_html_provider() -> None:
     content = b"<h1>Hello World!</h1>"
+    expected = content.decode()
     with temp_file(buffer=content, mime_type="text/html", file_name="text.html") as source_file:
         html = HtmlProvider()
         assert html.supports(source_file)
         docs = html.process_file(source_file)
         assert len(docs) > 0
-        assert docs[0].page_content == "<h1>Hello World!</h1>"
+        assert docs[0].page_content == expected
+
+        pdf = html.convert_file_to_pdf(source_file)
+        assert_pdf_contains_text(pdf, expected)
+        assert pdf.id == source_file.id
+
+
+def test_odt_provider() -> None:
+    expected = "Darkwing Duck was born on 9/17/1966."
+    source_file = SourceFile(
+        path="tests/data/birthdays.odt",
+        mime_type="application/vnd.oasis.opendocument.text",
+        file_name="text.odt",
+    )
+
+    odt = LibreOfficeProvider()
+    assert odt.supports(source_file)
+    docs = odt.process_file(source_file)
+    assert len(docs) > 0
+    assert docs[0].page_content == expected
+
+    pdf = odt.convert_file_to_pdf(source_file)
+    assert_pdf_contains_text(pdf, expected)
+    assert pdf.id == source_file.id
 
 
 def test_xlsx_provider() -> None:
+    expected_p1 = """Name
+Mickey Mouse
+Donald Duck
+
+Birthday
+3/14/1592
+2/7/1828
+
+BirthdaySheet
+
+Page 1"""
+    expected_p2 = """Name 1
+Mickey Mouse
+
+Name 2
+Mini Mouse
+
+Anniversary
+
+01/01/11
+
+AnniversarySheet
+
+Page 2"""
     source_file = SourceFile(
         path="tests/data/birthdays.xlsx",
         mime_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -50,12 +107,19 @@ def test_xlsx_provider() -> None:
     assert xlsx.supports(source_file)
     docs = xlsx.process_file(source_file)
     assert len(docs) > 0
-    assert docs[0].page_content == "Name Birthday Mickey Mouse 3/14/1592 Donald Duck 2/7/1828"
-    assert docs[0].metadata["page_name"] == "BirthdaySheet"
-    assert docs[0].metadata["page_number"] == 1
+    assert docs[0].page_content == expected_p1
+    assert docs[0].metadata["page"] == 1
+    assert docs[1].page_content == expected_p2
+    assert docs[1].metadata["page"] == 2
+
+    pdf = xlsx.convert_file_to_pdf(source_file)
+    assert_pdf_contains_text(pdf, expected_p1)
+    assert_pdf_contains_text(pdf, expected_p2)
+    assert pdf.id == source_file.id
 
 
 def test_docx_provider() -> None:
+    expected = "Darkwing Duck was born on 9/17/1966."
     source_file = SourceFile(
         path="tests/data/birthdays.docx",
         mime_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
@@ -66,10 +130,17 @@ def test_docx_provider() -> None:
     assert docx.supports(source_file)
     docs = docx.process_file(source_file)
     assert len(docs) > 0
-    assert docs[0].page_content == "Darkwing Duck was born on 9/17/1966."
+    assert docs[0].page_content == expected
+
+    pdf = docx.convert_file_to_pdf(source_file)
+    assert_pdf_contains_text(pdf, expected)
+    assert pdf.id == source_file.id
 
 
 def test_pptx_provider() -> None:
+    expected = """Birthdays
+
+Gladstone Gander: 5/14/2001"""
     source_file = SourceFile(
         path="tests/data/birthdays.pptx",
         mime_type="application/vnd.openxmlformats-officedocument.presentationml.presentation",
@@ -80,24 +151,15 @@ def test_pptx_provider() -> None:
     assert pptx.supports(source_file)
     docs = pptx.process_file(source_file)
     assert len(docs) > 0
-    assert (
-        docs[0].page_content
-        == """Birthdays
+    assert docs[0].page_content == expected
 
-Gladstone Gander: 5/14/2001"""
-    )
+    pdf = pptx.convert_file_to_pdf(source_file)
+    assert_pdf_contains_text(pdf, "Gladstone Gander")
+    assert pdf.id == source_file.id
 
 
 def test_pdf_provider() -> None:
-    source_file = SourceFile(path="tests/data/birthdays.pdf", mime_type="application/pdf", file_name="text.pdf")
-
-    pdf = PdfProvider()
-    assert pdf.supports(source_file)
-    docs = pdf.process_file(source_file)
-    assert len(docs) == 2
-    assert (
-        docs[0].page_content
-        == """Name
+    expected_p1 = """Name
 Darkwing Duck
 Daisy Duck
 
@@ -109,11 +171,7 @@ Birthday
 BirthdaySheet
 
 Page 1"""
-    )
-    assert docs[0].metadata["page"] == 1
-    assert (
-        docs[1].page_content
-        == """BirthdaySheet
+    expected_p2 = """BirthdaySheet
 
 Daniel Düsentrieb
 Quack
@@ -122,22 +180,40 @@ Quack
 01/02/3456
 
 Page 2"""
-    )
+    source_file = SourceFile(path="tests/data/birthdays.pdf", mime_type="application/pdf", file_name="text.pdf")
+
+    pdf = PdfProvider()
+    assert pdf.supports(source_file)
+    docs = pdf.process_file(source_file)
+    assert len(docs) == 2
+    assert docs[0].page_content == expected_p1
+    assert docs[0].metadata["page"] == 1
+    assert docs[1].page_content == expected_p2
     assert docs[1].metadata["page"] == 2
+
+    converted_pdf_file = pdf.convert_file_to_pdf(source_file)
+    assert_pdf_contains_text(converted_pdf_file, expected_p1)
+    assert converted_pdf_file.id == source_file.id
 
 
 def test_code_provider() -> None:
     content = b'print("Hello World!)'
+    expected = content.decode()
     with temp_file(buffer=content, mime_type="text/x-python", file_name="script.py") as source_file:
         code = CodeProvider()
         assert code.supports(source_file)
         docs = code.process_file(source_file)
         assert len(docs) > 0
-        assert docs[0].page_content == 'print("Hello World!)'
+        assert docs[0].page_content == expected
+
+        pdf = code.convert_file_to_pdf(source_file)
+        assert_pdf_contains_text(pdf, expected)
+        assert pdf.id == source_file.id
 
 
 def test_json_provider() -> None:
     source_file = SourceFile(path="tests/data/birthdays.json", mime_type="application/json", file_name="birthdays.json")
+    expected = '{"additional_info": {"creator": "Walt Disney"}}'
 
     txt = JsonProvider(chunk_size=100)
     assert txt.supports(source_file)
@@ -147,54 +223,48 @@ def test_json_provider() -> None:
         docs[0].page_content
         == '{"ducks": [{"name": "Dagobert Duck", "birthdate": "1867-03-19"}, {"name": "Donald Duck", "birthdate": "1934-06-09"}]}'  # noqa: E501
     )
-    assert docs[1].page_content == '{"additional_info": {"creator": "Walt Disney"}}'
+    assert docs[1].page_content == expected
+
+    pdf = txt.convert_file_to_pdf(source_file)
+    assert_pdf_contains_text(pdf, "Dagobert Duck")
+    assert pdf.id == source_file.id
 
 
 def test_xml_provider() -> None:
     source_file = SourceFile(path="tests/data/birthdays.xml", mime_type="application/xml", file_name="birthdays.xml")
-
-    txt = XmlProvider(chunk_size=150, chunk_overlap=0)
-    assert txt.supports(source_file)
-    docs = txt.process_file(source_file)
-    assert len(docs) > 0
-    assert (
-        docs[0].page_content
-        == """<?xml version="1.0" encoding="UTF-8"?>
+    expected_p1 = """<?xml version="1.0" encoding="UTF-8"?>
 <ducks>
   <duck>
     <name>Dagobert Duck</name>
     <birthdate>1867-09-15</birthdate>"""
-    )
-    assert (
-        docs[1].page_content
-        == """</duck>
+    expected_p2 = """</duck>
   <duck>
     <name>Donald Duck</name>
     <birthdate>1934-06-09</birthdate>
   </duck>
 </ducks>"""
-    )
+
+    txt = XmlProvider(chunk_size=150, chunk_overlap=0)
+    assert txt.supports(source_file)
+    docs = txt.process_file(source_file)
+    assert len(docs) > 0
+    assert docs[0].page_content == expected_p1
+    assert docs[1].page_content == expected_p2
+
+    pdf = txt.convert_file_to_pdf(source_file)
+    assert_pdf_contains_text(pdf, "<name>Dagobert Duck</name>")
+    assert pdf.id == source_file.id
 
 
 def test_yaml_provider() -> None:
     source_file = SourceFile(path="tests/data/birthdays.yaml", mime_type="application/yaml", file_name="birthdays.yaml")
-
-    txt = YamlProvider(chunk_size=200, chunk_overlap=0)
-    assert txt.supports(source_file)
-    docs = txt.process_file(source_file)
-    assert len(docs) > 0
-    assert (
-        docs[0].page_content
-        == """---
+    expected_p1 = """---
 ducks:
   - name: Dagobert Duck
     birthdate: 1867-12-24
   - name: Donald Duck
     birthdate: 1934-08-17"""
-    )
-    assert (
-        docs[1].page_content
-        == """additional_info:
+    expected_p2 = """additional_info:
   creator: Walt Disney
   first_appearance:
     Scrooge: 1947
@@ -203,23 +273,40 @@ ducks:
     - DuckTales
     - Comics
     - Animated shorts"""
-    )
+
+    txt = YamlProvider(chunk_size=200, chunk_overlap=0)
+    assert txt.supports(source_file)
+    docs = txt.process_file(source_file)
+    assert len(docs) > 0
+    assert docs[0].page_content == expected_p1
+    assert docs[1].page_content == expected_p2
+
+    pdf = txt.convert_file_to_pdf(source_file)
+    assert_pdf_contains_text(pdf, "Dagobert Duck")
+    assert pdf.id == source_file.id
 
 
 def test_plain_provider() -> None:
     content = b"Hello World!"
+    expected_p1 = "Hello"
+    expected_p2 = "World!"
     with temp_file(buffer=content, mime_type="text/plain", file_name="text.txt") as source_file:
         txt = PlainProvider(10, 0)
         assert txt.supports(source_file)
         docs = txt.process_file(source_file)
         assert len(docs) > 0
-        assert docs[0].page_content == "Hello"
-        assert docs[1].page_content == "World!"
+        assert docs[0].page_content == expected_p1
+        assert docs[1].page_content == expected_p2
+
+        pdf = txt.convert_file_to_pdf(source_file)
+        assert_pdf_contains_text(pdf, expected_p1)
+        assert pdf.id == source_file.id
 
 
 def test_outlook_provider() -> None:
     # file downloaded from https://docs.fileformat.com/email/msg/
     source_file = SourceFile(path="tests/data/email.msg", mime_type="application/vnd.ms-outlook", file_name="email.msg")
+    expected = "This message is created by Aspose.Email"
 
     txt = OutlookProvider(chunk_size=200, chunk_overlap=0)
 
@@ -229,7 +316,11 @@ def test_outlook_provider() -> None:
     assert len(docs) > 0
     assert docs[0].page_content == "This message is created by Aspose.Email"
     assert docs[0].metadata["subject"] == "creating an outlook message file"
-    assert docs[0].metadata["sent_from"] == ["from@domain.com"]
+    assert docs[0].metadata["sender"] == "from@domain.com"
+
+    pdf = txt.convert_file_to_pdf(source_file)
+    assert_pdf_contains_text(pdf, expected)
+    assert pdf.id == source_file.id
 
 
 # this function needs to be kept up-to-date with dummy-configurations
@@ -257,3 +348,10 @@ def test_format_providers_unique() -> None:
         for extension in extensions:
             f_extension = SourceFile(path="", mime_type="", file_name=f"x.{extension}")
             assert not i.supports(f_extension) or not j.supports(f_extension)
+
+
+def assert_pdf_contains_text(file: SourceFile, text: str) -> None:
+    pdf = PdfProvider()
+    docs = pdf.process_file(file, chunk_overlap=0)
+    content = "\n".join(doc.page_content for doc in docs)
+    assert text in content

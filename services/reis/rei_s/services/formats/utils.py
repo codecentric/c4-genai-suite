@@ -1,10 +1,21 @@
 from io import BytesIO
+import os
+from pathlib import Path
+import shutil
+import subprocess
+import tempfile
 from typing import Generator
+from uuid import uuid4
 
 from langchain_core.documents.base import Blob
 from langchain_community.document_loaders.blob_loaders import BlobLoader
+import markdown
+from pygments.formatters import HtmlFormatter
+from weasyprint import HTML
 
+from rei_s import logger
 from rei_s.types.source_file import SourceFile
+from rei_s.utils import get_new_file_path
 
 
 def check_file_name_extensions(file_name_extensions: list[str], file: SourceFile) -> bool:
@@ -42,3 +53,61 @@ class ProcessingError(Exception):
         super().__init__(message)
         self.status = status
         self.message = message
+
+
+def generate_pdf_from_md_file(file: SourceFile, format_: str | None = None) -> SourceFile:
+    markdown_text = file.buffer.decode()
+    if format_ in {"plain", "md", "markdown"}:
+        markdown_text = markdown_text
+    elif format_:
+        markdown_text = f"```{format_}\n{markdown_text}\n```"
+    # TODO: should we prettify json, xml and yaml?
+
+    return generate_pdf_from_md(markdown_text, file.id, file.file_name)
+
+
+def generate_pdf_from_md(markdown_text: str, doc_id: str, file_name: str) -> SourceFile:
+    # Convert markdown to HTML
+    html = markdown.markdown(markdown_text, extensions=["fenced_code", "codehilite", "tables", "sane_lists"])
+    formatter = HtmlFormatter(style="vs", cssclass="codehilite")
+    pygments_css = formatter.get_style_defs(".codehilite")
+    html_doc = f"<html><head><style>{pygments_css}</style></head><body>{html}</body></html>"
+
+    # Convert HTML to PDF
+    path = get_new_file_path(extension="pdf")
+    HTML(string=html_doc).write_pdf(path)
+    return SourceFile(id=doc_id, path=path, mime_type="application/pdf", file_name=file_name)
+
+
+def convert_office_to_pdf(file: SourceFile) -> SourceFile:
+    output_dir = Path(tempfile.gettempdir()) / uuid4().hex
+    output_dir.mkdir(parents=True, exist_ok=True)
+    libreoffice_home = Path(tempfile.gettempdir()) / uuid4().hex
+    libreoffice_home.mkdir(parents=True, exist_ok=True)
+
+    cmd = [
+        "soffice",
+        "--headless",
+        f"-env:UserInstallation=file://{libreoffice_home}",
+        "--convert-to",
+        "pdf",
+        str(file.path),
+        "--outdir",
+        str(output_dir),
+    ]
+    logger.info(f"Converting with args: {' '.join(cmd)}")
+
+    try:
+        subprocess.run(cmd, capture_output=True, check=True, env={"HOME": tempfile.gettempdir()})
+    except subprocess.CalledProcessError as e:
+        raise ValueError(
+            f"Can not convert {file.id} to pdf, exit code {e.returncode}: {e.stdout} {e.stderr} {e!r}"
+        ) from e
+    finally:
+        shutil.rmtree(libreoffice_home, ignore_errors=True)
+
+    base = os.path.basename(file.path)
+    pdf_name = os.path.splitext(base)[0] + ".pdf"
+    pdf_path = os.path.join(output_dir, pdf_name)
+
+    return SourceFile(id=file.id, path=pdf_path, mime_type="application/pdf", file_name=file.file_name, delete_dir=True)
