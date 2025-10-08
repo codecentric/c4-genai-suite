@@ -1,6 +1,7 @@
 from io import BytesIO
 import os
 from pathlib import Path
+import shutil
 import subprocess
 import tempfile
 from typing import Generator
@@ -12,6 +13,7 @@ import markdown
 from pygments.formatters import HtmlFormatter
 from weasyprint import HTML
 
+from rei_s import logger
 from rei_s.types.source_file import SourceFile
 from rei_s.utils import get_new_file_path
 
@@ -80,15 +82,32 @@ def generate_pdf_from_md(markdown_text: str, doc_id: str, file_name: str) -> Sou
 def convert_office_to_pdf(file: SourceFile) -> SourceFile:
     output_dir = Path(tempfile.gettempdir()) / uuid4().hex
     output_dir.mkdir(parents=True, exist_ok=True)
+    libreoffice_home = Path(tempfile.gettempdir()) / uuid4().hex
+    libreoffice_home.mkdir(parents=True, exist_ok=True)
 
-    cmd = ["libreoffice", "--headless", "--convert-to", "pdf", file.path, "--outdir", output_dir]
+    cmd = [
+        "soffice",
+        "--headless",
+        f"-env:UserInstallation=file://{libreoffice_home}",
+        "--convert-to",
+        "pdf",
+        str(file.path),
+        "--outdir",
+        str(output_dir),
+    ]
+    logger.info(f"Converting with args: {' '.join(cmd)}")
+
     try:
-        subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
+        subprocess.run(cmd, capture_output=True, check=True, env={"HOME": tempfile.gettempdir()})
     except subprocess.CalledProcessError as e:
-        raise ValueError(f"Can not convert {file.id} to pdf, exit code {e.returncode}: {e!r}") from e
+        raise ValueError(
+            f"Can not convert {file.id} to pdf, exit code {e.returncode}: {e.stdout} {e.stderr} {e!r}"
+        ) from e
+    finally:
+        shutil.rmtree(libreoffice_home, ignore_errors=True)
 
     base = os.path.basename(file.path)
     pdf_name = os.path.splitext(base)[0] + ".pdf"
     pdf_path = os.path.join(output_dir, pdf_name)
 
-    return SourceFile(id=file.id, path=pdf_path, mime_type="application/pdf", file_name=file.file_name)
+    return SourceFile(id=file.id, path=pdf_path, mime_type="application/pdf", file_name=file.file_name, delete_dir=True)

@@ -15,6 +15,9 @@ class SourceFile(BaseModel):
     mime_type: str
     file_name: str
 
+    # flag to signal that the parent directory should be deleted when deleting the file
+    delete_dir: bool = False
+
     @property
     def size(self) -> int:
         return os.path.getsize(self.path)
@@ -44,6 +47,8 @@ class SourceFile(BaseModel):
 
     def delete(self) -> None:
         os.remove(self.path)
+        if self.delete_dir:
+            os.rmdir(os.path.dirname(self.path))
 
     def ext(self) -> str:
         return Path(self.file_name).suffix[1:]
