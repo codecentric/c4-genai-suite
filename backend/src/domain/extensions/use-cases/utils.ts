@@ -162,12 +162,14 @@ export async function buildConfiguration(
   const extensions =
     withExtensions && extensionExplorer && configuredExtensions
       ? await Promise.all(
-          configuredExtensions.map((extensionEntity) => {
-            const extensionConfiguration = extensionExplorer.getExtension(extensionEntity.name);
-            if (extensionConfiguration && (!onlyEnabledExtensions || extensionEntity.enabled)) {
-              return buildExtension(extensionEntity, extensionConfiguration);
-            }
-          }, [] as ConfiguredExtension[]),
+          configuredExtensions
+            .map((extensionEntity) => {
+              const extensionConfiguration = extensionExplorer.getExtension(extensionEntity.name);
+              if (extensionConfiguration && (!onlyEnabledExtensions || extensionEntity.enabled)) {
+                return buildExtension(extensionEntity, extensionConfiguration);
+              }
+            }, [] as ConfiguredExtension[])
+            .filter((x) => x !== undefined),
         )
       : [];
 
