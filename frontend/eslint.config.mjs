@@ -69,7 +69,7 @@ export default defineConfig([globalIgnores([
 
         parserOptions: {
             project: "tsconfig.json",
-            tsconfigRootDir: ".",
+            tsconfigRootDir: __dirname,
 
             ecmaFeatures: {
                 jsx: true,
@@ -87,7 +87,7 @@ export default defineConfig([globalIgnores([
         "no-unused-vars": "off", // replaced by @typescript-eslint/no-unused-vars
         "@typescript-eslint/no-unused-vars": [
            "error",
-           { 
+           {
               "varsIgnorePattern": "^_.*",
               "argsIgnorePattern": "^_.*",
               "caughtErrorsIgnorePattern": "^_",
