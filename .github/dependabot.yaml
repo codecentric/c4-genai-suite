@@ -38,6 +38,10 @@ updates:
         patterns:
           - "ai"
           - "@ai-sdk/*"
+      mantine:
+        patterns:
+          - "mantine-"
+          - "@mantine/*"
       nestjs:
         patterns:
           - "nest-"
