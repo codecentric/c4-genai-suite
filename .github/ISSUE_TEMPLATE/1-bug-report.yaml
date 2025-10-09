@@ -10,10 +10,10 @@ body:
   - type: checkboxes
     attributes:
       label: "Is there an existing issue for this?"
-      description: "Please search [here](../issues?q=is%3Aissue) to see if an issue already exists for the bug you encountered"
+      description: "Please search [here](https://github.com/codecentric/c4-genai-suite/issues) to see if an issue already exists for the bug you encountered"
       options:
       - label: "I have searched the existing issues"
-        required: true      
+        required: true
   - type: textarea
     id: what-happened
     attributes:
@@ -31,7 +31,7 @@ body:
       placeholder: |
         1. `npm install`
         2. `npm start:dev`
-        3. See error...         
+        3. See error...
   - type: textarea
     id: logs
     attributes:
@@ -42,7 +42,7 @@ body:
     id: terms
     attributes:
       label: Code of Conduct
-      description: By submitting this issue, you agree to follow our [Code of Conduct](https://example.com). 
+      description: By submitting this issue, you agree to follow our [Code of Conduct](https://github.com/codecentric/c4-genai-suite?tab=coc-ov-file#contributor-covenant-code-of-conduct).
       options:
         - label: I agree to follow this project's Code of Conduct
           required: true
