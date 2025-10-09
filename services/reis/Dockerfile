@@ -1,4 +1,4 @@
-FROM python:3.13-alpine3.22 AS builder
+FROM python:3.14-alpine3.22 AS builder
 
 WORKDIR /reis
 
@@ -32,7 +32,7 @@ RUN find /reis/.venv -name "*.pyc" -delete && \
 #
 # RUNTIME
 #
-FROM python:3.13-alpine3.22 AS production
+FROM python:3.14-alpine3.22 AS production
 
 # we need this library for extracting audio streams from videos and handeling office formats
 RUN apk add --no-cache \
