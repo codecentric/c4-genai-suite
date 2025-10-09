@@ -43,6 +43,10 @@ updates:
           - "nest-"
           - "nestjs-"
           - "@nestjs/*"
+      eslint:
+        patterns:
+          - "eslint"
+          - "@typescript-eslint/*"
 
   - package-ecosystem: "pip"
     directories:
