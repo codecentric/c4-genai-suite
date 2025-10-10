@@ -295,6 +295,8 @@ function load() {
       updateBucket: translate('files.updateBucket'),
       updateBucketFailed: translate('files.updateBucketFailed'),
       uploadFailed: translate('files.uploadFailed'),
+      uploadFormatUnsupported: translate('files.uploadFormatUnsupported'),
+      uploadTooManyFiles: translate('files.uploadTooManyFiles'),
       uploadImageFailedNotYetSupported: (fileName: string) => translate('files.uploadImageFailedNotYetSupported', { fileName }),
       uploadImageFailedUseThePaperclip: (fileName: string) => translate('files.uploadImageFailedUseThePaperclip', { fileName }),
       uploading: translate('files.uploading'),

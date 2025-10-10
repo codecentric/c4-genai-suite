@@ -270,6 +270,9 @@ export const de: typeof en = {
     updateBucket: 'Bucket aktualisieren',
     updateBucketFailed: 'Aktualisierung fehlgeschlagen.',
     uploadFailed: 'Hochladen der Datei fehlgeschlagen.',
+    uploadFormatUnsupported: 'Format wird nicht unterstützt.',
+    uploadTooManyFiles:
+      'Zu viele Dateien hochgeladen. Nach dem Löschen einiger Dateien kann das Hochladen erneut versucht werden.',
     uploadImageFailedNotYetSupported:
       'Datei {{fileName}} konnte nicht hochgeladen werden. Das Hochladen von Bildern in den Benutzerdateien-Bucket wird derzeit nicht unterstützt.',
     uploadImageFailedUseThePaperclip:

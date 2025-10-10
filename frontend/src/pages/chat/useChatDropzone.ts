@@ -72,6 +72,7 @@ export const useChatDropzone = () => {
 
     // Track which files have already been assigned to avoid duplicates
     const assignedFiles = new Set<File>();
+    const supportedFiles = new Set<File>();
 
     const extensionFilesToUpload = userBucket?.extensions.map((extension) => {
       // filter for matching file type, if all file types are selected only match if there is no other extension with matching file type
@@ -94,8 +95,9 @@ export const useChatDropzone = () => {
 
       const filesForExtensionToUpload = filesForExtension.slice(0, remainingSlots);
 
-      // Mark these files as assigned
+      // Mark these files as assigned respectively supported
       filesForExtensionToUpload.forEach((file) => assignedFiles.add(file));
+      filesForExtension.forEach((file) => supportedFiles.add(file));
 
       return {
         extensionId: extension.extensionId,
@@ -111,6 +113,18 @@ export const useChatDropzone = () => {
           extensionId,
         });
       });
+    });
+
+    // report if some files could not be uploaded
+    const unsupportedFiles = files.filter((file) => !supportedFiles.has(file));
+    const unassignedFiles = supportedFiles.difference(assignedFiles);
+
+    // generate an error toast for each rejected file
+    unsupportedFiles.forEach((file) => {
+      toast.error(`${texts.files.uploadFailed} '${file.name}': ${texts.files.uploadFormatUnsupported}`);
+    });
+    unassignedFiles.forEach((file) => {
+      toast.error(`${texts.files.uploadFailed} '${file.name}': ${texts.files.uploadTooManyFiles}`);
     });
   };
 
