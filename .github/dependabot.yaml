@@ -53,3 +53,7 @@ updates:
       - "/services/reis"
     schedule:
       interval: "daily"
+    groups:
+      ai-sdk:
+        patterns:
+          - "langchain-"
