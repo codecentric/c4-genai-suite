@@ -2,7 +2,6 @@ import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreatePrompt, CreatePromptResponse } from 'src/domain/prompt/use-cases/create-prompt';
-import { CreatePrompt, CreatePromptResponse } from 'src/domain/prompt/use-cases/create-prompt';
 import { LocalAuthGuard } from '../../domain/auth';
 import { CreatePromptCategoryDto, CreatePromptDto, PromptCategoryDto, PromptDto } from './dtos';
 
@@ -47,7 +46,7 @@ export class PromptController {
       description: response.prompt.description,
       content: response.prompt.content,
       visibility: response.prompt.visibility,
-      categories: response.prompt.categories?.map(cat => cat.label) || [],
+      categories: response.prompt.categories?.map((cat) => cat.label) || [],
       rating: response.prompt.rating,
     };
 
