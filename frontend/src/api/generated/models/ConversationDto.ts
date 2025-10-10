@@ -45,6 +45,12 @@ export interface ConversationDto {
      */
     rating?: ConversationDtoRatingEnum;
     /**
+     * The time of the last update.
+     * @type {Date}
+     * @memberof ConversationDto
+     */
+    updatedAt: Date;
+    /**
      * The creation time.
      * @type {Date}
      * @memberof ConversationDto
@@ -82,6 +88,7 @@ export type ConversationDtoRatingEnum = typeof ConversationDtoRatingEnum[keyof t
 export function instanceOfConversationDto(value: object): value is ConversationDto {
     if (!('id' in value) || value['id'] === undefined) return false;
     if (!('configurationId' in value) || value['configurationId'] === undefined) return false;
+    if (!('updatedAt' in value) || value['updatedAt'] === undefined) return false;
     if (!('createdAt' in value) || value['createdAt'] === undefined) return false;
     return true;
 }
@@ -100,6 +107,7 @@ export function ConversationDtoFromJSONTyped(json: any, ignoreDiscriminator: boo
         'name': json['name'] == null ? undefined : json['name'],
         'configurationId': json['configurationId'],
         'rating': json['rating'] == null ? undefined : json['rating'],
+        'updatedAt': (new Date(json['updatedAt'])),
         'createdAt': (new Date(json['createdAt'])),
         'context': json['context'] == null ? undefined : json['context'],
         'extensionUserArguments': json['extensionUserArguments'] == null ? undefined : json['extensionUserArguments'],
@@ -116,6 +124,7 @@ export function ConversationDtoToJSON(value?: ConversationDto | null): any {
         'name': value['name'],
         'configurationId': value['configurationId'],
         'rating': value['rating'],
+        'updatedAt': ((value['updatedAt']).toISOString().substring(0,10)),
         'createdAt': ((value['createdAt']).toISOString().substring(0,10)),
         'context': value['context'],
         'extensionUserArguments': value['extensionUserArguments'],

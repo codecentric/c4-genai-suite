@@ -28,6 +28,7 @@ export interface Conversation {
 
   readonly rating?: ConversationRating;
 
+  readonly updatedAt: Date;
   readonly createdAt: Date;
 
   // The chosen llm.

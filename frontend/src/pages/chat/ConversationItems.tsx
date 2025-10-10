@@ -11,6 +11,8 @@ function groupConversations(chats: ConversationDto[]): ConversationGroup[] {
     return [];
   }
 
+  chats = [...chats].sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
+
   const now = new Date();
   const withinWeek = startOfDay(addDays(now, -7));
   const withinMonth = startOfDay(addDays(now, -30));
@@ -19,7 +21,7 @@ function groupConversations(chats: ConversationDto[]): ConversationGroup[] {
   const conversationGroups = Array.from(
     chats
       .reduce((prev, curr) => {
-        const date = curr.createdAt;
+        const date = curr.updatedAt;
 
         let group: { label: string; date: Date };
         if (isSameDay(now, date)) {

@@ -1707,11 +1707,12 @@
             "description": "The optional rating for the whole conversation.",
             "enum": ["good", "bad", "unrated"]
           },
+          "updatedAt": { "type": "string", "description": "The time of the last update.", "format": "date" },
           "createdAt": { "type": "string", "description": "The creation time.", "format": "date" },
           "context": { "type": "object", "description": "The context values." },
           "extensionUserArguments": { "type": "object", "description": "The argument values." }
         },
-        "required": ["id", "configurationId", "createdAt"]
+        "required": ["id", "configurationId", "updatedAt", "createdAt"]
       },
       "ConversationsDto": {
         "type": "object",
