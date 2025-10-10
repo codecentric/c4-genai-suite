@@ -45,7 +45,7 @@ export const execute = (command, output = 'forward', onClose = null) => {
   const nvmPrefix =
     'export NVM_DIR="$HOME/.nvm"; ' +
     '[ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh"; ' +
-    'nvm use > /dev/null; ';
+    'command -v nvm > /dev/null 2>&1 && nvm use > /dev/null; ';
 
   // Enable debugging via vscode terminal
   const insideVscode =
