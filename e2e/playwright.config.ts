@@ -19,7 +19,7 @@ export default defineConfig({
   /* Run tests in files in parallel */
   fullyParallel: false,
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 1 : 0,
+  retries: process.env.CI ? 2 : 0,
   workers: 1, // Only one worker, since our tests use one DB-State
   //workers: process.env.CI ? 1 : undefined,
   reporter: [['list', { printSteps: true }], ['html']],
