@@ -250,7 +250,7 @@ export const useStateOfChat = () => {
   const currentChatId = useChatStore((s) => s.currentChatId);
   const chatDataMap = useChatStore((s) => s.chatDataMap);
   const chatData = chatDataMap.get(currentChatId);
-  return chatData?.chat || { id: 0, configurationId: -1, createdAt: new Date() };
+  return chatData?.chat || { id: 0, configurationId: -1, rating: null, updatedAt: new Date(), createdAt: new Date() };
 };
 
 export const useStateOfSelectedChatId = () => useChatStore((s) => s.currentChatId);
