@@ -276,6 +276,14 @@ export class ConversationDto {
   rating?: ConversationRating;
 
   @ApiProperty({
+    description: 'The time of the last update.',
+    required: true,
+    type: String,
+    format: 'date',
+  })
+  updatedAt!: Date;
+
+  @ApiProperty({
     description: 'The creation time.',
     required: true,
     type: String,
@@ -302,6 +310,7 @@ export class ConversationDto {
   static fromDomain(this: void, source: Conversation) {
     const result = new ConversationDto();
     result.id = source.id;
+    result.updatedAt = source.updatedAt;
     result.createdAt = source.createdAt;
     result.configurationId = source.configurationId;
     result.name = source.name;
