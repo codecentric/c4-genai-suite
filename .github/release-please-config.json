@@ -1,0 +1,15 @@
+{
+  "packages": {
+    ".": {
+      "release-type": "node",
+      "include-component-in-tag": false,
+      "extra-files": ["helm-chart/Chart.yaml"]
+    }
+  },
+
+  "last-release-sha": "b661fdb7ed75f99884936816d6e4838fdd2c9090",
+  "include-v-in-tag": true,
+  "separate-pull-requests": false,
+  "pull-request-title-pattern": "chore($component): release ${version}",
+  "group-pull-request-title-pattern": "chore: release ${version}"
+}

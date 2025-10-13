@@ -1,9 +1,0 @@
-changelog:
-  exclude:
-    authors:
-      - dependabot
-      - dependabot[bot]
-  categories:
-    - title: Changes since the last version
-      labels:
-        - "*"
