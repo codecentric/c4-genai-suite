@@ -1,0 +1,21 @@
+name: Prepare Release
+
+permissions:
+  contents: write
+  pull-requests: write
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: googleapis/release-please-action@v4
+        with:
+          # we need a PAT, since we need to trigger other actions (to fulfill the required checks)
+          token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
+          config-file: .github/release-please-config.json
+          manifest-file: .github/release-please-manifest.json
