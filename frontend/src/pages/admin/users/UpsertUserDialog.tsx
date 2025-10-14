@@ -1,5 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Button, Portal } from '@mantine/core';
+import { IconTrash } from '@tabler/icons-react';
 import { useMemo } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import * as Yup from 'yup';
@@ -151,9 +152,9 @@ function UpsertUserDialog(props: UpsertUserDialogProps) {
                       onPerform={() => userDelete.mutate(props.target.id)}
                     >
                       {({ onClick }) => (
-                        <button type="button" className="btn btn-error" onClick={onClick}>
+                        <Button type="button" onClick={onClick} color="red" leftSection={<IconTrash size={14} />}>
                           {texts.common.remove}
-                        </button>
+                        </Button>
                       )}
                     </ConfirmDialog>
                   </Forms.Row>
