@@ -8,7 +8,7 @@ export class DefaultPromptMiddleware implements ChatMiddleware {
 
   async invoke(context: ChatContext, getContext: GetContext, next: ChatNextDelegate): Promise<any> {
     if (context.systemMessages.length === 0) {
-      context.systemMessages.push(`You are a helpful assistant. Today is ${new Date().toISOString()}.`);
+      context.systemMessages.push("You are a helpful assistant. Today's date is {{date}}.");
     }
     await next(context);
   }
