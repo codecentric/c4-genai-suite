@@ -216,7 +216,7 @@ export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEm
           <div className="box-border rounded-2xl border border-gray-200 p-4 pb-3 leading-none shadow-2xl shadow-gray-100 focus-within:border-gray-400">
             <TextareaAutosize
               className={`w-full resize-none bg-transparent pb-4 outline-none`}
-              maxRows={5}
+              maxRows={15}
               minRows={1}
               value={input}
               autoFocus
