@@ -29,7 +29,7 @@ langchain-ollama = "^0.3.10"
 langchain-aws = "^0.2.35"
 langchain-nvidia-ai-endpoints = "^0.3.18"
 boto3 = "^1.40.53"
-boto3-stubs = {extras = ["s3"], version = "^1.40.51"}
+boto3-stubs = {extras = ["s3"], version = "^1.40.53"}
 weasyprint = "^66.0"
 markdown = "^3.9"
 pygments = "^2.19.2"
