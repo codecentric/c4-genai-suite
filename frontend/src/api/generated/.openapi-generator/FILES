@@ -3,11 +3,15 @@ apis/AuthApi.ts
 apis/ConversationApi.ts
 apis/ExtensionsApi.ts
 apis/FilesApi.ts
+apis/ResponsesApi.ts
 apis/SettingsApi.ts
 apis/UsagesApi.ts
 apis/UsersApi.ts
 apis/index.ts
 index.ts
+models/ApiResponsesControllerCreateResponse200Response.ts
+models/ApiResponsesControllerCreateResponse200ResponseInfoValue.ts
+models/ApiResponsesControllerCreateResponse503Response.ts
 models/AuthProviderDto.ts
 models/AuthSettingsDto.ts
 models/BucketAvailabilityDto.ts
@@ -26,6 +30,9 @@ models/ConversationsDto.ts
 models/CreateConversationDto.ts
 models/CreateExtensionDto.ts
 models/DocumentDto.ts
+models/EasyInputMessage.ts
+models/EasyInputMessageContent.ts
+models/EasyInputMessageContentOneOfInner.ts
 models/ExtensionArgumentArraySpecDto.ts
 models/ExtensionArgumentArraySpecDtoItems.ts
 models/ExtensionArgumentBooleanSpecDto.ts
@@ -56,6 +63,11 @@ models/ProfileDto.ts
 models/RateMessageDto.ts
 models/RatingDto.ts
 models/RatingsDto.ts
+models/ResponseCreateDto.ts
+models/ResponseCreateDtoInput.ts
+models/ResponseInputFile.ts
+models/ResponseInputImage.ts
+models/ResponseInputText.ts
 models/SendMessageDto.ts
 models/SettingsDto.ts
 models/SiteLinkDto.ts

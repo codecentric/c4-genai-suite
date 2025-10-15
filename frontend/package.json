@@ -15,7 +15,7 @@
     "lint:fix": "eslint . --fix",
     "find-unused-resources": "knip",
     "preview": "vite preview",
-    "generate-api": "npx rimraf ./src/api/generated && npx @openapitools/openapi-generator-cli generate -g typescript-fetch --additional-properties=useSingleRequestParameter=false,ensureUniqueParams=false -i ../backend/backend-dev-spec.json -o ./src/api/generated && node gen-helper.mjs"
+    "generate-api": "npx rimraf ./src/api/generated && npx @openapitools/openapi-generator-cli generate && node gen-helper.mjs"
   },
   "dependencies": {
     "@floating-ui/react-dom": "^2.1.1",

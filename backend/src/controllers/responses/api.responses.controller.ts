@@ -15,7 +15,7 @@ import {
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiExcludeController } from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
 import { HealthCheck } from '@nestjs/terminus';
 import { Request } from 'express';
 import * as mime from 'mime-types';
@@ -31,7 +31,7 @@ import { WholeFilesExtensionConfiguration } from '../../extensions/tools/whole-f
 import { FilePurpose, ResponseCreateDto, ResponseDto } from './dtos';
 
 @Controller('public/assistants/:assistantId')
-@ApiExcludeController()
+@ApiTags('responses')
 @UseGuards(LocalAuthGuard)
 export class ApiResponsesController {
   private logger = new Logger(this.constructor.name);

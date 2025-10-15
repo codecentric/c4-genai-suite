@@ -1,6 +1,9 @@
 //@ts-nocheck
 /* tslint:disable */
 /* eslint-disable */
+export * from './ApiResponsesControllerCreateResponse200Response';
+export * from './ApiResponsesControllerCreateResponse200ResponseInfoValue';
+export * from './ApiResponsesControllerCreateResponse503Response';
 export * from './AuthProviderDto';
 export * from './AuthSettingsDto';
 export * from './BucketAvailabilityDto';
@@ -19,6 +22,9 @@ export * from './ConversationsDto';
 export * from './CreateConversationDto';
 export * from './CreateExtensionDto';
 export * from './DocumentDto';
+export * from './EasyInputMessage';
+export * from './EasyInputMessageContent';
+export * from './EasyInputMessageContentOneOfInner';
 export * from './ExtensionArgumentArraySpecDto';
 export * from './ExtensionArgumentArraySpecDtoItems';
 export * from './ExtensionArgumentBooleanSpecDto';
@@ -49,6 +55,11 @@ export * from './ProfileDto';
 export * from './RateMessageDto';
 export * from './RatingDto';
 export * from './RatingsDto';
+export * from './ResponseCreateDto';
+export * from './ResponseCreateDtoInput';
+export * from './ResponseInputFile';
+export * from './ResponseInputImage';
+export * from './ResponseInputText';
 export * from './SendMessageDto';
 export * from './SettingsDto';
 export * from './SiteLinkDto';
