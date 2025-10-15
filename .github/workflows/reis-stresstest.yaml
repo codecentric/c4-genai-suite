@@ -1,18 +1,56 @@
 name: REI-S Stresstest
 
+permissions:
+  contents: read
+  packages: read
+
 on:
   workflow_call:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - .github/workflows/reis-stresstest.yaml
 
 defaults:
   run:
     working-directory: services/reis
 
 jobs:
+
+  build-reis-if-needed:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v5
+        id: download_reis
+        continue-on-error: true
+        with:
+          name: reis
+          path: /tmp/
+      - if: ${{ steps.download_reis.outcome == 'failure' }}
+        uses: actions/checkout@v5
+      - if: ${{ steps.download_reis.outcome == 'failure' }}
+        uses: docker/setup-buildx-action@v3
+      - if: ${{ steps.download_reis.outcome == 'failure' }}
+        uses: docker/build-push-action@v6
+        with:
+          context: services/reis/
+          file: services/reis/Dockerfile
+          tags: reis:commit-${{ github.sha }}
+          outputs: type=docker,dest=/tmp/reis.tar
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            VERSION=${{ github.ref_type == 'tag' && github.ref_name || github.sha }}
+      - if: ${{ steps.download_reis.outcome == 'failure' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: reis
+          path: /tmp/reis.tar
+          retention-days: 2
+
   test-stress:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: read
+    needs: build-reis-if-needed
     steps:
       - uses: actions/checkout@v5
         with:
@@ -60,3 +98,7 @@ jobs:
         env:
           pytest_github_report: true
         run: poetry run pytest -rs --cov=rei_s --cov-report=xml --cov-report=term --stress --error-for-skips tests/stress
+      - name: get logs
+        if: ${{ !cancelled() }}
+        run: |
+          docker logs reis

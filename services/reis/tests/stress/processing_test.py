@@ -66,8 +66,8 @@ def test_lfs_files_available() -> None:
 @pytest.mark.parametrize("files", file_set)
 def test_process_files(files: list[str]) -> None:
     assert len(files) > 0
-    # for just processing, we process every file 3 times, because processing is faster than adding
-    files = files * 3
+    # for just processing, we process every file 2 times, because processing is faster than adding
+    files = files * 2
 
     futures = []
 

@@ -95,10 +95,10 @@ def convert_office_to_pdf(file: SourceFile) -> SourceFile:
         "--outdir",
         str(output_dir),
     ]
-    logger.info(f"Converting with args: {' '.join(cmd)}")
+    logger.info(f"Converting {file.id} with args: {' '.join(cmd)}")
 
     try:
-        subprocess.run(cmd, capture_output=True, check=True, env={"HOME": tempfile.gettempdir()})
+        subprocess.run(cmd, capture_output=True, check=True, env={"HOME": str(libreoffice_home)})
     except subprocess.CalledProcessError as e:
         raise ValueError(
             f"Can not convert {file.id} to pdf, exit code {e.returncode}: {e.stdout} {e.stderr} {e!r}"
