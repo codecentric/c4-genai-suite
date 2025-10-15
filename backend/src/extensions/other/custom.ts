@@ -20,6 +20,7 @@ export class CustomPromptExtension implements Extension<CustomPromptExtensionCon
           title: this.i18n.t('texts.extensions.common.text'),
           format: 'textarea',
           required: false,
+          description: this.i18n.t('texts.extensions.customPrompt.templateDescription'),
         },
       },
     };

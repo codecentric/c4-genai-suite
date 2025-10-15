@@ -19,8 +19,8 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
   test.skip('should configure Azure OpenAI-Open AI LLM for chats [skipped due to missing API_KEY in env]', () => {});
 } else {
   test('chat', async ({ page }) => {
-    const firstAssistant = { name: `E2E-Test-${Date.now()}`, description: 'first' };
-    const secondAssistant = { name: `E2E-Test-${Date.now()}-B`, description: 'second' };
+    const firstAssistant = { name: `E2E-Test-${Date.now()}`, description: 'Bob' };
+    const secondAssistant = { name: `E2E-Test-${Date.now()}-B`, description: 'Alice' };
 
     await test.step('should login', async () => {
       await login(page);
@@ -30,10 +30,14 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
       await enterAdminArea(page);
       await createConfiguration(page, firstAssistant);
       await addAzureModelToConfiguration(page, firstAssistant, { deployment: 'gpt-4o-mini' });
-      await addSystemPromptToConfiguration(page, firstAssistant, { text: 'Always tell that your name is Bob' });
+      await addSystemPromptToConfiguration(page, firstAssistant, {
+        text: 'Always tell that your name is {{assistant_description}}',
+      });
       await createConfiguration(page, secondAssistant);
       await addAzureModelToConfiguration(page, secondAssistant, { deployment: 'gpt-4o-mini' });
-      await addSystemPromptToConfiguration(page, secondAssistant, { text: 'Always tell that your name is Alice' });
+      await addSystemPromptToConfiguration(page, secondAssistant, {
+        text: 'Always tell that your name is {{assistant_description}}',
+      });
     });
 
     await test.step('should return message for first assistant', async () => {

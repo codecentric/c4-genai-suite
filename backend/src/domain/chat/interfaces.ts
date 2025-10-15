@@ -206,7 +206,7 @@ export interface ChatContext {
   readonly cache: ChatCache;
 
   // The system messages.
-  readonly systemMessages: string[];
+  systemMessages: string[];
 
   // The deployment.
   readonly configuration: ConfigurationModel;
