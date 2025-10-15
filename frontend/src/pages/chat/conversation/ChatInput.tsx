@@ -189,8 +189,8 @@ export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEm
           {chatFiles.map((file) => (
             <FileItemComponent key={file.id} file={file} onRemove={remove} />
           ))}
-          {uploadingFiles.map((file) => (
-            <FileItemComponent key={file.name} file={{ fileName: file.name }} loading={true} />
+          {uploadingFiles.map((file, n) => (
+            <FileItemComponent key={`${n}-${file.name}`} file={{ fileName: file.name }} loading={true} />
           ))}
         </div>
 

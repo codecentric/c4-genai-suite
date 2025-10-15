@@ -266,6 +266,8 @@ export const en = {
     updateBucket: 'Update bucket',
     updateBucketFailed: 'Failed to update bucket.',
     uploadFailed: 'Failed to upload file.',
+    uploadFormatUnsupported: 'Format is not supported.',
+    uploadTooManyFiles: 'Too many files uploaded. Delete some before trying again.',
     uploadImageFailedNotYetSupported:
       'Failed to upload file {{fileName}}. Uploading images to the user files bucket is not yet supported.',
     uploadImageFailedUseThePaperclip:
