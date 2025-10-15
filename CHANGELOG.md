@@ -1,5 +1,17 @@
 # Changelog
 
+## [9.5.0](https://github.com/codecentric/c4-genai-suite/compare/v9.4.2...v9.5.0) (2025-10-15)
+
+
+### Features
+
+* system prompt can now be a template ([#579](https://github.com/codecentric/c4-genai-suite/issues/579)) ([d55cc10](https://github.com/codecentric/c4-genai-suite/commit/d55cc10120503b23e8dab602d76eb5ae926afae9))
+
+
+### Bug Fixes
+
+* fix drag and drop format acceptance and add error messages for unsupported formats and too many files ([#560](https://github.com/codecentric/c4-genai-suite/issues/560)) ([78fbe78](https://github.com/codecentric/c4-genai-suite/commit/78fbe78d7180871b50d232b5201f4e6386177619))
+
 ## [9.4.2](https://github.com/codecentric/c4-genai-suite/compare/v9.4.1...v9.4.2) (2025-10-14)
 
 
