@@ -1,7 +1,10 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Button, Portal } from '@mantine/core';
+import { useClipboard } from '@mantine/hooks';
+import { IconClipboard } from '@tabler/icons-react';
 import { useMemo } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
+import { toast } from 'react-toastify';
 import * as Yup from 'yup';
 import { UpsertUserDto, useApi, UserDto, UserGroupDto } from 'src/api';
 import { ConfirmDialog, FormAlert, Forms, Modal } from 'src/components';
@@ -57,6 +60,8 @@ export const CreateUserDialog = (props: Omit<CreateUserProps, 'type'>): JSX.Elem
 function UpsertUserDialog(props: UpsertUserDialogProps) {
   const isCreating = props.type === 'create';
   const { onClose, userGroups } = props;
+
+  const clipboard = useClipboard();
 
   const api = useApi();
 
@@ -132,11 +137,23 @@ function UpsertUserDialog(props: UpsertUserDialogProps) {
               <Forms.Password name="passwordConfirm" label={texts.common.passwordConfirm} />
 
               <Forms.Row name="apiKey" label={texts.common.apiKey} hints={!userIsAdmin && texts.users.apiKeyHint}>
-                <div className="flex gap-2">
+                <div className="flex items-center gap-2">
+                  {form?.getValues('apiKey') && (
+                    <div
+                      className="btn btn-square"
+                      onClick={() => {
+                        const value = form.getValues('apiKey');
+                        if (!value) return;
+                        clipboard.copy(value);
+                        toast(texts.common.copied, { type: 'info' });
+                      }}
+                    >
+                      <IconClipboard />
+                    </div>
+                  )}
                   <div className="grow">
                     <Forms.Text vertical name="apiKey" disabled={true} />
                   </div>
-
                   <GenerateApiKeyButton disabled={!userIsAdmin} />
                 </div>
               </Forms.Row>
