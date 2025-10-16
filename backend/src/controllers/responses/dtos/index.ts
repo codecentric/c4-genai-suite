@@ -1,4 +1,4 @@
-import { ApiProperty, ApiPropertyOptional, getSchemaPath } from '@nestjs/swagger';
+import { ApiExtraModels, ApiProperty, ApiPropertyOptional, getSchemaPath } from '@nestjs/swagger';
 
 export class ResponseInputFile {
   @ApiProperty({ enum: ['input_file'] })
@@ -43,6 +43,7 @@ export type ResponseInputContent = ResponseInputText | ResponseInputImage | Resp
 
 export type ResponseInputMessageContentList = Array<ResponseInputContent>;
 
+@ApiExtraModels(ResponseInputText, ResponseInputImage, ResponseInputFile)
 export class EasyInputMessage {
   @ApiProperty({
     oneOf: [
@@ -72,6 +73,7 @@ export type ResponseInputItem = EasyInputMessage;
 
 export type ResponseInput = Array<ResponseInputItem>;
 
+@ApiExtraModels(EasyInputMessage, ResponseInputText, ResponseInputImage, ResponseInputFile)
 export class ResponseCreateDto {
   @ApiProperty({ type: 'string' })
   model!: string;
