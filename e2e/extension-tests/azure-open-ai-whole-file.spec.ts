@@ -174,6 +174,7 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
     });
 
     await test.step('should navigate to duplicated conversation with complete file extension', async () => {
+      await enterUserArea(page);
       const duplicatedConversationLocator = page.getByRole('navigation').filter({
         hasText: `${originalConversationWithCompleteFiles} (2)`,
       });
