@@ -38,6 +38,8 @@ export class BedrockModelExtension implements Extension<BedrockConverseExtension
             'anthropic.claude-3-5-sonnet-20240620-v1:0',
             'eu.anthropic.claude-3-7-sonnet-20250219-v1:0',
             'eu.anthropic.claude-sonnet-4-20250514-v1:0',
+            'eu.anthropic.claude-sonnet-4-5-20250929-v1:0',
+            'eu.anthropic.claude-haiku-4-5-20251001-v1:0',
             'eu.amazon.nova-pro-v1:0',
           ],
           showInList: true,
@@ -56,15 +58,6 @@ export class BedrockModelExtension implements Extension<BedrockConverseExtension
           format: 'slider',
           default: 0.5,
           description: this.i18n.t('texts.extensions.common.temperatureHint'),
-        },
-        topP: {
-          type: 'number',
-          title: this.i18n.t('texts.extensions.common.topP'),
-          minimum: 0,
-          maximum: 1,
-          default: 0.95,
-          format: 'slider',
-          description: this.i18n.t('texts.extensions.bedrock.topPHint'),
         },
       },
     };
@@ -97,7 +90,7 @@ export class BedrockModelExtension implements Extension<BedrockConverseExtension
   }
 
   private createModel(configuration: BedrockConverseExtensionConfiguration) {
-    const { model, region, accessKeyId, secretAccessKey, temperature, topP } = configuration;
+    const { model, region, accessKeyId, secretAccessKey, temperature } = configuration;
 
     const open = createAmazonBedrock({
       region,
@@ -109,7 +102,6 @@ export class BedrockModelExtension implements Extension<BedrockConverseExtension
     return {
       model: open(model),
       options: {
-        topP,
         temperature,
       } as Partial<CallSettings>,
       modelName: model,
