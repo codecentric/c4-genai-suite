@@ -15,7 +15,7 @@ import {
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiExtension, ApiTags } from '@nestjs/swagger';
 import { HealthCheck } from '@nestjs/terminus';
 import { Request } from 'express';
 import * as mime from 'mime-types';
@@ -32,6 +32,7 @@ import { FilePurpose, ResponseCreateDto, ResponseDto } from './dtos';
 
 @Controller('public/assistants/:assistantId')
 @ApiTags('responses')
+@ApiExtension('x-external', true)
 @UseGuards(LocalAuthGuard)
 export class ApiResponsesController {
   private logger = new Logger(this.constructor.name);
@@ -253,6 +254,7 @@ export class ApiResponsesController {
 
   @Post('/responses')
   @HealthCheck()
+  @ApiExtension('x-external', true)
   async createResponse(
     @Body() request: ResponseCreateDto,
     @Param('assistantId', ParseIntPipe) assistantId: number,
@@ -328,6 +330,7 @@ export class ApiResponsesController {
 
   @Post('/files')
   @HttpCode(HttpStatus.OK)
+  @ApiExtension('x-external', true)
   @UseInterceptors(FileInterceptor('file'))
   async uploadFile(
     @Param('assistantId', ParseIntPipe) assistantId: number,
