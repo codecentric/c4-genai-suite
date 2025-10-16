@@ -150,3 +150,11 @@ jobs:
             e2e/test-results/
             e2e/playwright-report/
           retention-days: 2
+      - name: get logs reis
+        if: ${{ !cancelled() }}
+        run: |
+          docker logs reis
+      - name: get logs backend
+        if: ${{ !cancelled() }}
+        run: |
+          docker logs backend
