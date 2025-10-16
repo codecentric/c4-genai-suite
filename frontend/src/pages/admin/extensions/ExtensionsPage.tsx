@@ -164,7 +164,8 @@ export function ExtensionsPage() {
                 <div className="flex items-center gap-x-4">
                   <h2 className="text-3xl">{thisConfiguration.name}</h2>
                 </div>
-                <div className="text-gray-400">{thisConfiguration.description}</div>
+                <div className="text-gray-600">{thisConfiguration.description}</div>
+                <div className="text-gray-400">id: {thisConfiguration.id}</div>
               </div>
 
               <div className="flex gap-2">
