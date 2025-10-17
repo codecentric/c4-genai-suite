@@ -7,6 +7,8 @@ from typing import Annotated, Literal, Mapping, Self
 from pydantic import Field, SecretStr, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from rei_s import logger
+
 
 # global settings only evaluated at program start
 # This is the global variable, which determines, where python will create tempfiles.
@@ -34,24 +36,35 @@ def check_needed(needed: Mapping[str, str | SecretStr | None], switch_name: str,
         )
 
 
+def check_valid_postgres_connection_string(postgres_connection_string: SecretStr | None) -> None:
+    if postgres_connection_string is None:
+        raise ValueError("STORE_PGVECTOR_URL is mandatory")
+    val = postgres_connection_string.get_secret_value()
+    if not re.match(r"^(?:postgres(?:ql)?\+psycopg)://", val):
+        raise ValueError(
+            "The STORE_PGVECTOR_URL must start with `postgresql+psycopg://`. "
+            "It is important that the dialect `psycopg` is specified in the connection string."
+        )
+
+
 def check_valid_s3_bucket_name(bucket_name: str | None) -> None:
     if bucket_name is None:
-        raise ValueError("s3 bucket name is mandatory")
+        raise ValueError("FILE_STORE_S3_BUCKET_NAME is mandatory")
 
     if not (3 <= len(bucket_name) <= 63):
-        raise ValueError("s3 bucket name needs to to have 3 to 63 characters")
+        raise ValueError("FILE_STORE_S3_BUCKET_NAME needs to to have 3 to 63 characters")
 
     if not re.match(r"^[a-z0-9]([a-z0-9\.-]*[a-z0-9])?$", bucket_name):
         raise ValueError(
-            "s3 bucket name must only contain lowercase letters, numbers, dots, and hyphens "
+            "FILE_STORE_S3_BUCKET_NAME must only contain lowercase letters, numbers, dots, and hyphens "
             "and start with and start with a letter or number"
         )
 
     if ".." in bucket_name or ".-" in bucket_name or "-." in bucket_name:
-        raise ValueError("Bucket name cannot have dots adjacent to hyphens or double dots")
+        raise ValueError("FILE_STORE_S3_BUCKET_NAME cannot have dots adjacent to hyphens or double dots")
 
     if re.match(r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$", bucket_name):
-        raise ValueError("Bucket name cannot be formatted like an IP address")
+        raise ValueError("FILE_STORE_S3_BUCKET_NAME cannot be formatted like an IP address")
 
 
 # will be fixed in next mypy release
@@ -100,14 +113,14 @@ class Config(BaseSettings, frozen=True):  # type: ignore
     store_azure_ai_search_service_api_key: SecretStr | None = None
     store_azure_ai_search_service_index_name: str = "index"
     # needed for pgvector vectorstore
-    store_pgvector_url: str | None = None
+    store_pgvector_url: SecretStr | None = None
     store_pgvector_index_name: str = "index"
 
     file_store_type: Literal["s3", "filesystem"] | None = None
     # needed for S3 filestore
     file_store_s3_endpoint_url: str | None = None
     file_store_s3_access_key_id: str | None = None
-    file_store_s3_secret_access_key: str | None = None
+    file_store_s3_secret_access_key: SecretStr | None = None
     file_store_s3_bucket_name: str | None = None
     file_store_s3_region_name: str | None = None
     # needed for filesystem filestore
@@ -119,6 +132,7 @@ class Config(BaseSettings, frozen=True):  # type: ignore
             needed_for_pgvector = {
                 "STORE_PGVECTOR_URL": self.store_pgvector_url,
             }
+            check_valid_postgres_connection_string(self.store_pgvector_url)
             check_needed(needed_for_pgvector, "STORE_TYPE", "pgvector")
 
         if self.store_type == "azure-ai-search":
@@ -213,4 +227,6 @@ class Config(BaseSettings, frozen=True):  # type: ignore
 def get_config() -> Config:
     # We need to ignore the missing argument errors, because we want Config to raise in case
     # a mandatory argument was not passed via an env variable.
-    return Config()  # type: ignore[call-arg]
+    config = Config()  # type: ignore[call-arg]
+    logger.info(f"starting REIS with following configuration:\n{str(config).replace(' ', '\n')}")
+    return config
