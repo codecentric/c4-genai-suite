@@ -19,7 +19,7 @@
     "test": "NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\" jest --runInBand --forceExit",
     "test:cov": "NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\" jest --runInBand --coverage --forceExit",
     "test:debug": "node --experimental-vm-modules --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "generate-openapi-dev": "npm run build && node dist/openapi.js -- localFile && npx openapi-filter -i --flags x-external -- backend-dev-spec.json backend-external-spec.json && npx openapi-filter --flags x-external -- backend-dev-spec.json backend-dev-spec.json && npx prettier --write backend-*-spec.json",
+    "generate-openapi-dev": "npm run build && node dist/openapi.js -- localFile && npx openapi-filter -i --valid --flags x-external -- backend-dev-spec.json backend-external-spec.json && npx openapi-filter --flags x-external -- backend-dev-spec.json backend-dev-spec.json && npx prettier --write backend-*-spec.json",
     "generate-base": "npx @openapitools/openapi-generator-cli generate -g typescript-fetch --additional-properties=useSingleRequestParameter=false,ensureUniqueParams=false",
     "generate-tools": "npx rimraf ./src/extensions/tools/generated && npm run generate-base -- -i ./src/openapi/tools-spec.json -o ./src/extensions/tools/generated",
     "generate-reis": "npx rimraf ./src/domain/files/use-cases/generated && npm run generate-base -- -i ../services/reis/reis-dev-spec.json -o ./src/domain/files/use-cases/generated",
