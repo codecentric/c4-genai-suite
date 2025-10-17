@@ -35,7 +35,7 @@ export function ChatSuggestionsInput<T extends ChatSuggestionsFormValues>({ form
           {description}
         </Text>
       )}
-      <SimpleGrid cols={2}>
+      <SimpleGrid cols={1}>
         {values.chatSuggestions?.map((_, index) => (
           <ChatSuggestionInputCard
             key={index}

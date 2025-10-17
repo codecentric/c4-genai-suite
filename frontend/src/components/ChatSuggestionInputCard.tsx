@@ -23,6 +23,9 @@ export const ChatSuggestionInputCard = ({
       label={texts.common.text}
       placeholder={texts.common.text}
       resize="vertical"
+      autosize
+      minRows={3}
+      maxRows={15}
       {...suggestionProps}
     />
     <ActionIcon
