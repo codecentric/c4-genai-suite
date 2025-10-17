@@ -139,7 +139,7 @@ jobs:
           node-version: 24.x
           cache: 'npm'
           cache-dependency-path: e2e/package-lock.json
-      - run: npm ci
+      - run: npm ci --ignore-scripts  # install deps without installing playwright
       - run: npx playwright install ${{ inputs.browser }} --with-deps
       - run: npx playwright test --project=${{ inputs.browser }}
       - uses: actions/upload-artifact@v4
