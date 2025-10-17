@@ -35,7 +35,7 @@ class PGVectorStoreAdapter(VectorStoreAdapter):
         with lock:
             pg_vector_store = PGVector(
                 embeddings,
-                connection=config.store_pgvector_url,
+                connection=config.store_pgvector_url.get_secret_value(),
                 collection_name=collection_name,
                 use_jsonb=True,
             )
