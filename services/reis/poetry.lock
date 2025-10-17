@@ -2687,24 +2687,24 @@ tiktoken = ">=0.7.0,<1.0.0"
 
 [[package]]
 name = "langchain-postgres"
-version = "0.0.15"
+version = "0.0.16"
 description = "An integration package connecting Postgres and LangChain"
 optional = false
 python-versions = ">=3.9"
 groups = ["main"]
 files = [
-    {file = "langchain_postgres-0.0.15-py3-none-any.whl", hash = "sha256:dc3d083f6e2ac08fe918f658b63886586be62c057cab0ad30c1c6b38023d99b7"},
-    {file = "langchain_postgres-0.0.15.tar.gz", hash = "sha256:d6be01ab3a802881e7dcd16439a4efda5a8eba15c368e04fe9a96134ad90854e"},
+    {file = "langchain_postgres-0.0.16-py3-none-any.whl", hash = "sha256:a7375cf9fc9b6965efc207dbcc959424e96b8ffe75d5ced6055676d2613f8d37"},
+    {file = "langchain_postgres-0.0.16.tar.gz", hash = "sha256:d09aa4ea77ee8600a9ff64de9c185fb558aa388c816c7be04dd4559c878530b7"},
 ]
 
 [package.dependencies]
 asyncpg = ">=0.30.0"
-langchain-core = ">=0.2.13,<0.4.0"
+langchain-core = ">=0.2.13,<2.0"
 numpy = ">=1.21,<3"
 pgvector = ">=0.2.5,<0.4"
-psycopg = ">=3,<4"
+psycopg = {version = ">=3,<4", extras = ["binary"]}
 psycopg-pool = ">=3.2.1,<4"
-sqlalchemy = ">=2,<3"
+sqlalchemy = {version = ">=2,<3", extras = ["asyncio"]}
 
 [[package]]
 name = "langchain-text-splitters"
@@ -5616,7 +5616,7 @@ files = [
 ]
 
 [package.dependencies]
-greenlet = {version = ">=1", markers = "python_version < \"3.14\" and (platform_machine == \"aarch64\" or platform_machine == \"ppc64le\" or platform_machine == \"x86_64\" or platform_machine == \"amd64\" or platform_machine == \"AMD64\" or platform_machine == \"win32\" or platform_machine == \"WIN32\")"}
+greenlet = {version = ">=1", optional = true, markers = "python_version < \"3.14\" and (platform_machine == \"aarch64\" or platform_machine == \"ppc64le\" or platform_machine == \"x86_64\" or platform_machine == \"amd64\" or platform_machine == \"AMD64\" or platform_machine == \"win32\" or platform_machine == \"WIN32\") or extra == \"asyncio\""}
 typing-extensions = ">=4.6.0"
 
 [package.extras]
@@ -6705,4 +6705,4 @@ cffi = ["cffi (>=1.17,<2.0) ; platform_python_implementation != \"PyPy\" and pyt
 [metadata]
 lock-version = "2.1"
 python-versions = "<4.0,>=3.12.0"
-content-hash = "ca3c4772e5a1e11fe446e9a56073edaedb34923e0fb48d05f61ae2d1de32744e"
+content-hash = "3f753027e83c5b1fb27d6f2046c4db4ad0417e02d6f3e161c5ed3794e4e6fd07"
