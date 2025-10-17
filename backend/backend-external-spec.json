@@ -1,4 +1,9 @@
 {
+  "openapi": "3.0.0",
+  "info": {
+    "title": "c4 GenAI Suite",
+    "version": "1.0"
+  },
   "paths": {
     "/api/public/assistants/{assistantId}/responses": {
       "post": {
