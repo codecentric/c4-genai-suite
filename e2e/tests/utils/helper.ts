@@ -456,7 +456,7 @@ export async function configureAssistantByUser(page: Page, config: { values: { l
 export async function addSystemPromptToConfiguration(
   page: Page,
   configuration: { name: string },
-  prompt: { text: string; configurable?: boolean },
+  prompt: { title?: string; text: string; configurable?: boolean },
 ) {
   await page.getByRole('link', { name: 'Assistants' }).click();
   await page.getByRole('link').filter({ hasText: configuration.name }).click();
@@ -466,6 +466,7 @@ export async function addSystemPromptToConfiguration(
   await page.getByLabel('Create Extension').getByRole('tab', { name: 'Other' }).click();
 
   await page.getByRole('heading', { name: 'Prompt', exact: true }).click();
+  await page.getByLabel('Title').fill(prompt.title ?? 'systemprompt');
   await page.getByLabel('Text').fill(prompt.text);
 
   if (prompt.configurable) {
