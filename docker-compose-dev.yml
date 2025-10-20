@@ -154,14 +154,10 @@ services:
         }
 
   minio:
-    image: minio/minio:latest
     hostname: minio
-    environment:
-      - MINIO_ROOT_USER=admin
-      - MINIO_ROOT_PASSWORD=secretsecret
-    volumes:
-      - minio-data:/data
-    command: server /data --console-address ":9001"
+    extends:
+      file: ./dev/minio/docker-compose.yml
+      service: minio
 
 volumes:
   extension-volume:

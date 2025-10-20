@@ -1,0 +1,12 @@
+version: '3.9'
+
+services:
+  minio:
+    image: minio/minio:latest
+    container_name: c4-dev-minio
+    ports:
+      - 9000:9000
+    environment:
+      - MINIO_ROOT_USER=admin
+      - MINIO_ROOT_PASSWORD=secretsecret
+    command: server /data
