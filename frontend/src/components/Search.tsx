@@ -44,8 +44,8 @@ export const Search = (props: SearchProps) => {
   });
 
   const doClear = useEventCallback(() => {
-    if (hasChanged(value, undefined) && onSearch) {
-      onSearch(undefined);
+    if (hasChanged(value, '') && onSearch) {
+      onSearch('');
     }
   });
 
