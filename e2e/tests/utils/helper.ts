@@ -1,5 +1,6 @@
 import { randomInt } from 'crypto';
 import path from 'path';
+import AxeBuilder from '@axe-core/playwright';
 import { expect, Locator, Page } from '@playwright/test';
 import { config } from './config';
 
@@ -771,4 +772,9 @@ export function globalUserBucketName(): string {
 
 export function globalConversationBucketName(): string {
   return 'E2E-Conversation-Bucket';
+}
+
+export async function expectAccessibility(page: Page, exceptions: any[] = []) {
+  const accessibilityScanResults = await new AxeBuilder({ page }).analyze();
+  expect(accessibilityScanResults.violations).toEqual(exceptions);
 }
