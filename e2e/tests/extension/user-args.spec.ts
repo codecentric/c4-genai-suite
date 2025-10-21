@@ -8,6 +8,7 @@ import {
   disableUserArgsInConfiguration,
   enterAdminArea,
   enterUserArea,
+  expectAccessibility,
   login,
   newChat,
   resetFilter,
@@ -88,6 +89,8 @@ test('user args', async ({ page, mockServerUrl }) => {
       `:has-text("Date Range: (from: ${filter.dateFrom}, until: ${filter.dateUntil})")`,
     );
     expect(dateRangeSelector).toBeDefined();
+
+    await expectAccessibility(page);
   });
 
   await test.step('send prompt', async () => {

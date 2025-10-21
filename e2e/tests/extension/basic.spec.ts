@@ -10,6 +10,7 @@ import {
   editBucket,
   enterAdminArea,
   enterUserArea,
+  expectAccessibility,
   expectElementInYRange,
   globalUserBucketName,
   login,
@@ -71,6 +72,8 @@ test('chat with file search', async ({ page, mockServerUrl }) => {
     const image = page.getByRole('img', { name: 'Image' }).first();
     expect(await image.getAttribute('src')).toBe(imageUrl);
     await expect(image).toBeVisible();
+
+    await expectAccessibility(page);
   });
 
   await test.step('should edit message', async () => {
@@ -84,6 +87,7 @@ test('chat with file search', async ({ page, mockServerUrl }) => {
     await chatItem.hover();
     await editButton.click();
     await chatItem.getByRole('textbox').fill('What is the capital of Germany?');
+    await expectAccessibility(page);
     await chatItem.getByRole('button', { name: 'Send' }).click();
 
     await page.waitForSelector(`:has-text("Berlin")`);
@@ -153,6 +157,7 @@ test('chat with file search', async ({ page, mockServerUrl }) => {
     await expect(sourcesSection).toBeVisible();
     const sourcesEntry = sourcesSection.locator(`ul > li >> text=keyword_ä_ö_ß.MD`);
     await expect(sourcesEntry).toHaveCount(1);
+    await expectAccessibility(page);
   });
 
   await test.step('should start new Chat and already uploaded file should not be checked', async () => {
@@ -211,6 +216,7 @@ test('chat with file search', async ({ page, mockServerUrl }) => {
   await test.step('should preview the used sources', async () => {
     await page.getByTestId('sources-section').locator('a').click();
     await page.waitForSelector(`blockquote:has-text("c4-test")`);
+    await expectAccessibility(page);
   });
 
   await test.step('should close the source preview panel', async () => {
