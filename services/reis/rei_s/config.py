@@ -1,4 +1,5 @@
 from functools import lru_cache
+import json
 import os
 import re
 import tempfile
@@ -52,7 +53,7 @@ def check_valid_s3_bucket_name(bucket_name: str | None) -> None:
         raise ValueError("FILE_STORE_S3_BUCKET_NAME is mandatory")
 
     if not (3 <= len(bucket_name) <= 63):
-        raise ValueError("FILE_STORE_S3_BUCKET_NAME needs to to have 3 to 63 characters")
+        raise ValueError("FILE_STORE_S3_BUCKET_NAME needs to have 3 to 63 characters")
 
     if not re.match(r"^[a-z0-9]([a-z0-9\.-]*[a-z0-9])?$", bucket_name):
         raise ValueError(
@@ -228,5 +229,5 @@ def get_config() -> Config:
     # We need to ignore the missing argument errors, because we want Config to raise in case
     # a mandatory argument was not passed via an env variable.
     config = Config()  # type: ignore[call-arg]
-    logger.info(f"starting REIS with following configuration:\n{str(config).replace(' ', '\n')}")
+    logger.info(f"starting REIS with following configuration:\n{json.dumps(config.model_dump(mode='json'), indent=2)}")
     return config
