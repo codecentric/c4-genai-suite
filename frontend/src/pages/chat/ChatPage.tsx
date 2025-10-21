@@ -107,7 +107,9 @@ export function ChatPage() {
 
   return (
     <div className="flex h-screen flex-col">
-      <NavigationBar theme={theme} />
+      <header>
+        <NavigationBar theme={theme} />
+      </header>
       <PanelGroup direction="horizontal">
         {sidebarLeft && (
           <>
@@ -121,33 +123,35 @@ export function ChatPage() {
               }}
               {...panelSizes.left}
             >
-              <div className="p-2">
-                <Button
-                  className="justify-start"
-                  variant="subtle"
-                  p="xs"
-                  onClick={openNewChatIfNeeded}
-                  fullWidth
-                  justify="space-between"
-                  rightSection={<IconEdit className="w-4" />}
-                >
-                  {texts.chat.newChat}
-                </Button>
-              </div>
+              <nav aria-label={texts.common.conversations} className="flex h-full flex-col">
+                <div className="p-2">
+                  <Button
+                    className="justify-start"
+                    variant="subtle"
+                    p="xs"
+                    onClick={openNewChatIfNeeded}
+                    fullWidth
+                    justify="space-between"
+                    rightSection={<IconEdit className="w-4" />}
+                  >
+                    {texts.chat.newChat}
+                  </Button>
+                </div>
 
-              <div className="grow overflow-y-auto p-2">
-                <ConversationItems />
-              </div>
-              <div className="p-2" onClick={(e) => e.stopPropagation()}>
-                <ProfileButton section="chat" onClearConversations={removeAllChats.mutate} />
-              </div>
+                <div className="grow overflow-y-auto p-2">
+                  <ConversationItems />
+                </div>
+                <div className="p-2" onClick={(e) => e.stopPropagation()}>
+                  <ProfileButton section="chat" onClearConversations={removeAllChats.mutate} />
+                </div>
+              </nav>
             </Panel>
             {!isMobileView && <CustomResizeHandle />}
           </>
         )}
 
         <Panel id="center" order={1} {...panelSizes.content}>
-          <div className="chat-main relative min-h-0 grow overflow-hidden">
+          <main className="chat-main relative min-h-0 grow overflow-hidden">
             {isMobileView && (rightPanelVisible || sidebarLeft) ? (
               <div
                 className="h-screen w-screen bg-gray-300"
@@ -183,39 +187,41 @@ export function ChatPage() {
                 }
               />
             )}
-          </div>
+          </main>
         </Panel>
         {rightPanelVisible && (
           <>
             {!isMobileView && <CustomResizeHandle />}
             <Panel style={{ overflow: 'auto' }} id="right" order={2} {...panelSizes.right} className="bg-gray-100">
-              {selectedDocument ? (
-                <Tabs defaultValue="sources-chunk-preview">
-                  <Tabs.List>
-                    <Tabs.Tab value="sources-chunk-preview">{texts.chat.sources.content}</Tabs.Tab>
-                    <Tabs.Tab value="source-document-viewer" hidden={!isSourceAvailable}>
-                      {texts.chat.sources.viewer}
-                    </Tabs.Tab>
-                  </Tabs.List>
+              <aside aria-label={selectedDocument ? texts.chat.sources.content : texts.common.files}>
+                {selectedDocument ? (
+                  <Tabs defaultValue="sources-chunk-preview">
+                    <Tabs.List>
+                      <Tabs.Tab value="sources-chunk-preview">{texts.chat.sources.content}</Tabs.Tab>
+                      <Tabs.Tab value="source-document-viewer" hidden={!isSourceAvailable}>
+                        {texts.chat.sources.viewer}
+                      </Tabs.Tab>
+                    </Tabs.List>
 
-                  <Tabs.Panel value="sources-chunk-preview">
-                    <SourcesChunkPreview onClose={() => setSelectedDocument(undefined)} document={selectedDocument} />
-                  </Tabs.Panel>
-                  {isSourceAvailable && (
-                    <Tabs.Panel value="source-document-viewer">
-                      <PdfViewer
-                        selectedDocument={selectedDocument}
-                        selectedSource={selectedSource}
-                        onClose={() => setSelectedDocument(undefined)}
-                      />
+                    <Tabs.Panel value="sources-chunk-preview">
+                      <SourcesChunkPreview onClose={() => setSelectedDocument(undefined)} document={selectedDocument} />
                     </Tabs.Panel>
-                  )}
-                </Tabs>
-              ) : (
-                userBucket && (
-                  <Files configurationId={selectedAssistantId} userBucket={userBucket} conversationId={selectedChatId} />
-                )
-              )}
+                    {isSourceAvailable && (
+                      <Tabs.Panel value="source-document-viewer">
+                        <PdfViewer
+                          selectedDocument={selectedDocument}
+                          selectedSource={selectedSource}
+                          onClose={() => setSelectedDocument(undefined)}
+                        />
+                      </Tabs.Panel>
+                    )}
+                  </Tabs>
+                ) : (
+                  userBucket && (
+                    <Files configurationId={selectedAssistantId} userBucket={userBucket} conversationId={selectedChatId} />
+                  )
+                )}
+              </aside>
             </Panel>
           </>
         )}
