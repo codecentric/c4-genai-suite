@@ -27,7 +27,14 @@ describe('Markdown component', () => {
       </InAppDocsProvider>,
     );
 
-    expect(screen.getByText(theme.name)).toBeInTheDocument();
+    // Should have a visible text element
+    const elements = screen.getAllByText(theme.name);
+    expect(elements.length).toEqual(2); // sr-only h1 + visible element
+
+    // Should have an sr-only h1 for accessibility
+    const heading = screen.getByRole('heading', { level: 1, name: theme.name });
+    expect(heading).toBeInTheDocument();
+    expect(heading).toHaveClass('sr-only');
 
     const logo = screen.queryByRole('img');
     expect(logo).not.toBeInTheDocument();

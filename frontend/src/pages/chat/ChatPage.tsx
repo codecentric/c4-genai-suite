@@ -107,7 +107,9 @@ export function ChatPage() {
 
   return (
     <div className="flex h-screen flex-col">
-      <NavigationBar theme={theme} />
+      <header>
+        <NavigationBar theme={theme} />
+      </header>
       <Group orientation="horizontal">
         {sidebarLeft && (
           <>
@@ -120,26 +122,28 @@ export function ChatPage() {
               }}
               {...panelSizes.left}
             >
-              <div className="p-2">
-                <Button
-                  className="justify-start"
-                  variant="subtle"
-                  p="xs"
-                  onClick={openNewChatIfNeeded}
-                  fullWidth
-                  justify="space-between"
-                  rightSection={<IconEdit className="w-4" />}
-                >
-                  {texts.chat.newChat}
-                </Button>
-              </div>
+              <nav aria-label={texts.common.conversations} className="flex h-full flex-col">
+                <div className="p-2">
+                  <Button
+                    className="justify-start"
+                    variant="subtle"
+                    p="xs"
+                    onClick={openNewChatIfNeeded}
+                    fullWidth
+                    justify="space-between"
+                    rightSection={<IconEdit className="w-4" />}
+                  >
+                    {texts.chat.newChat}
+                  </Button>
+                </div>
 
-              <div className="grow overflow-y-auto p-2">
-                <ConversationItems />
-              </div>
-              <div className="p-2" onClick={(e) => e.stopPropagation()}>
-                <ProfileButton section="chat" onClearConversations={removeAllChats.mutate} />
-              </div>
+                <div className="grow overflow-y-auto p-2">
+                  <ConversationItems />
+                </div>
+                <div className="p-2" onClick={(e) => e.stopPropagation()}>
+                  <ProfileButton section="chat" onClearConversations={removeAllChats.mutate} />
+                </div>
+              </nav>
             </Panel>
             {!isMobileView && <CustomResizeHandle />}
           </>
@@ -182,7 +186,7 @@ export function ChatPage() {
                 }
               />
             )}
-          </div>
+          </main>
         </Panel>
         {rightPanelVisible && (
           <>
@@ -197,24 +201,25 @@ export function ChatPage() {
                     </Tabs.Tab>
                   </Tabs.List>
 
-                  <Tabs.Panel value="sources-chunk-preview">
-                    <SourcesChunkPreview onClose={() => setSelectedDocument(undefined)} document={selectedDocument} />
-                  </Tabs.Panel>
-                  {isSourceAvailable && (
-                    <Tabs.Panel value="source-document-viewer">
-                      <PdfViewer
-                        selectedDocument={selectedDocument}
-                        selectedSource={selectedSource}
-                        onClose={() => setSelectedDocument(undefined)}
-                      />
+                    <Tabs.Panel value="sources-chunk-preview">
+                      <SourcesChunkPreview onClose={() => setSelectedDocument(undefined)} document={selectedDocument} />
                     </Tabs.Panel>
-                  )}
-                </Tabs>
-              ) : (
-                userBucket && (
-                  <Files configurationId={selectedAssistantId} userBucket={userBucket} conversationId={selectedChatId} />
-                )
-              )}
+                    {isSourceAvailable && (
+                      <Tabs.Panel value="source-document-viewer">
+                        <PdfViewer
+                          selectedDocument={selectedDocument}
+                          selectedSource={selectedSource}
+                          onClose={() => setSelectedDocument(undefined)}
+                        />
+                      </Tabs.Panel>
+                    )}
+                  </Tabs>
+                ) : (
+                  userBucket && (
+                    <Files configurationId={selectedAssistantId} userBucket={userBucket} conversationId={selectedChatId} />
+                  )
+                )}
+              </aside>
             </Panel>
           </>
         )}
