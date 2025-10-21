@@ -8,6 +8,7 @@ import {
   disableUserArgsInConfiguration,
   enterAdminArea,
   enterUserArea,
+  expectAccessibility,
   login,
   newChat,
   resetFilter,
@@ -90,6 +91,8 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
         `:has-text("Date Range: (from: ${filter.dateFrom}, until: ${filter.dateUntil})")`,
       );
       expect(dateRangeSelector).toBeDefined();
+
+      await expectAccessibility(page);
     });
 
     await test.step('send prompt', async () => {
