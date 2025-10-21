@@ -106,7 +106,7 @@ export function ConversationPage(props: ConversationPageProps) {
                 )}
                 onClick={() => scrollToBottom()}
               >
-                <ActionIcon>
+                <ActionIcon aria-label={texts.common.scrollToBottom}>
                   <IconArrowDown className="w-4" />
                 </ActionIcon>
               </div>

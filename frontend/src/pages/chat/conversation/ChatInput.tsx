@@ -1,9 +1,9 @@
 import { ActionIcon, Button, Portal } from '@mantine/core';
-import { IconFilter, IconPaperclip } from '@tabler/icons-react';
+import { IconArrowUp, IconFilter, IconPaperclip } from '@tabler/icons-react';
 import React, { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
 import { ConfigurationDto, FileDto } from 'src/api';
-import { Icon, Markdown } from 'src/components';
+import { Markdown } from 'src/components';
 import { ExtensionContext, JSONObject, useEventCallback, useExtensionContext, usePersistentState, useTheme } from 'src/hooks';
 import { useSpeechRecognitionToggle } from 'src/hooks/useSpeechRecognitionToggle';
 import { FileItemComponent } from 'src/pages/chat/conversation/FileItem';
@@ -284,8 +284,9 @@ export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEm
                   size="lg"
                   disabled={!input || isDisabled || uploadMutations.some((m) => m.status === 'pending') || listening}
                   data-testid="chat-submit-button"
+                  aria-label={texts.common.send}
                 >
-                  <Icon icon="arrow-up" />
+                  <IconArrowUp />
                 </ActionIcon>
               </div>
             </div>

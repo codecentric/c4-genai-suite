@@ -22,6 +22,7 @@ export function CollapseButton(props: CollapseButtonProps) {
     <button
       className={cn(className, 'group/button p-3', { 'pr-0 pl-1': isMobile() })}
       {...other}
+      aria-label={tooltip}
       data-tooltip-id="default"
       data-tooltip-content={tooltip}
       data-tooltip-place={side === 'left' ? 'right' : 'left'}
