@@ -134,7 +134,7 @@ jobs:
             -e FRONTEND_PORT=3080 -e PORT=3080 -e BACKEND_PORT=3000  \
             --network test-network \
             ghcr.io/codecentric/c4-genai-suite/dev-helper/caddy-gateway-proxy:latest
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v6
         with:
           node-version: 24.x
           cache: 'npm'
