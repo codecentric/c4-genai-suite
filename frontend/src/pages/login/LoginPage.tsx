@@ -13,9 +13,9 @@ export function LoginPage() {
 
   return (
     <div className="text-primary flex h-screen overflow-hidden font-medium">
-      <div className="bg-primary-content flex w-96 flex-none flex-col items-center justify-center p-8">
+      <main className="bg-primary-content flex w-96 flex-none flex-col items-center justify-center p-8">
         <Sidebar theme={theme} authSettings={authSettings} error={isError} />
-      </div>
+      </main>
       {theme.backgroundLogoUrl && <BackgroundImage logoUrl={theme.backgroundLogoUrl} />}
     </div>
   );
@@ -24,15 +24,15 @@ export function LoginPage() {
 function Sidebar(props: { theme: Theme; authSettings?: AuthSettingsDto; error: true | false }) {
   return (
     <>
-      <div className="flex h-1/4 w-full items-start justify-start p-4">
+      <header className="flex h-1/4 w-full items-start justify-start p-4">
         {props.theme.logoUrl && <Logo size={{ height: '2rem' }} url={props.theme.logoUrl} />}
-      </div>
-      <div className="mb-4 flex grow flex-col items-center justify-center p-4">
+      </header>
+      <section className="mb-4 flex grow flex-col items-center justify-center p-4">
         <LoginProviders welcomeText={props.theme.welcomeText} authSettings={props.authSettings} error={props.error} />
-      </div>
-      <div className="flex h-1/4 w-full items-end justify-start space-x-4 p-4 text-xs">
+      </section>
+      <nav className="flex h-1/4 w-full items-end justify-start space-x-4 p-4 text-xs" aria-label="Legal links">
         <LegalFooter siteLinks={props.theme.siteLinks} />
-      </div>
+      </nav>
     </>
   );
 }
@@ -40,9 +40,9 @@ function Sidebar(props: { theme: Theme; authSettings?: AuthSettingsDto; error: t
 function LoginProviders(props: { welcomeText?: string; authSettings: AuthSettingsDto | undefined; error: true | false }) {
   return (
     <>
-      <h2 className="mb-4 w-full justify-start text-4xl font-medium">
+      <h1 className="mb-4 w-full justify-start text-4xl font-medium">
         {renderTextWithBreaks(props.welcomeText || texts.login.welcome)}
-      </h2>
+      </h1>
 
       <div className="mb-4 w-full">
         {props.authSettings?.providers.map((p) => (
