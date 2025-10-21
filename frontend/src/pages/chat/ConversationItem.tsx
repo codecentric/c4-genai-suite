@@ -59,7 +59,6 @@ export const ConversationItem = memo(({ chat }: ChatProps) => {
       justify="space-between"
       variant={isSelected ? 'filled' : 'subtle'}
       classNames={{ root: 'relative group transition-all' }}
-      role="navigation"
       onDoubleClick={() => isSelected && setShowRenameInput(true)}
     >
       {chat.name}
@@ -69,10 +68,16 @@ export const ConversationItem = memo(({ chat }: ChatProps) => {
       >
         <Menu width={200} opened={menuOpen} onChange={setMenuOpen}>
           <Menu.Target>
-            <IconDots
-              style={{ width: rem(18), height: rem(18) }}
-              data-testid={isSelected ? 'active-conversation-item-more-actions' : 'conversation-item-more-actions'}
-            />
+            <Button
+              variant="subtle"
+              size="compact-xs"
+              p={4}
+              aria-label={texts.common.menu || 'Menu'}
+              aria-haspopup="true"
+              aria-expanded={menuOpen}
+            >
+              <IconDots style={{ width: rem(18), height: rem(18) }} data-testid={isSelected ? 'active-conversation-item-more-actions' : 'conversation-item-more-actions'} />
+            </Button>
           </Menu.Target>
           <Menu.Dropdown>
             <Menu.Item

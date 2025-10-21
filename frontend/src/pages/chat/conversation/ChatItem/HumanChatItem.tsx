@@ -56,10 +56,24 @@ export const HumanChatItem = ({ message, editMessage }: ChatItemProps) => {
         <>
           <div className="max-w-full rounded-xl bg-gray-100 px-4 py-3 whitespace-pre-wrap">{textContent}</div>
           <div className={'flex items-center justify-end opacity-0 group-hover:opacity-100'}>
-            <ActionIcon color="gray" c="black" size={'lg'} variant="white" onClick={copyTextToClipboard}>
+            <ActionIcon
+              color="gray"
+              c="black"
+              size={'lg'}
+              variant="white"
+              onClick={copyTextToClipboard}
+              aria-label={texts.common.copy}
+            >
               <IconClipboard className="w-4" />
             </ActionIcon>
-            <ActionIcon color="gray" c="black" size={'lg'} variant="white" onClick={() => setIsEditing(true)}>
+            <ActionIcon
+              color="gray"
+              c="black"
+              size={'lg'}
+              variant="white"
+              onClick={() => setIsEditing(true)}
+              aria-label={texts.common.edit}
+            >
               <IconPencil className="w-4" />
             </ActionIcon>
           </div>

@@ -41,6 +41,7 @@ function load() {
       chatUser: translate('common.chatUser'),
       confirm: translate('common.confirm'),
       copied: translate('common.copied'),
+      copy: translate('common.copy'),
       dangerZone: translate('common.dangerZone'),
       dashboard: translate('common.dashboard'),
       userBucketBadge: translate('common.userBucketBadge'),
@@ -86,6 +87,7 @@ function load() {
       rolesPlaceholder: translate('common.rolesPlaceholder'),
       save: translate('common.save'),
       saved: translate('common.saved'),
+      scrollToBottom: translate('common.scrollToBottom'),
       search: translate('common.search'),
       clearSearch: translate('common.clearSearch'),
       send: translate('common.send'),
@@ -122,6 +124,7 @@ function load() {
       welcomeText: translate('chat.welcomeText'),
       placeholder: (configuration: string) => translate('chat.placeholder', { configuration }),
       rateConversation: translate('chat.rateConversation'),
+      rateMessage: translate('chat.rateMessage'),
       rating: {
         incorrect: translate('chat.rating.incorrect'),
         instructions_not_followed: translate('chat.rating.instructions_not_followed'),
@@ -195,6 +198,7 @@ function load() {
       filterHeadline: translate('chat.filterHeadline'),
       filterApply: translate('chat.filterApply'),
       filterResetAll: translate('chat.filterResetAll'),
+      deleteFile: (fileName: string) => translate('chat.deleteFile', { fileName }),
       duplicateConversationSuccess: translate('chat.duplicateConversationSuccess'),
       duplicateConversationFailed: translate('chat.duplicateConversationFailed'),
       settings: {

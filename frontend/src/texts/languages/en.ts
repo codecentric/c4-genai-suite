@@ -10,6 +10,7 @@ export const en = {
     chatUser: 'Chat User',
     confirm: 'Confirm',
     copied: 'Text added to clipboard',
+    copy: 'Copy to clipboard',
     dangerZone: 'Danger Zone',
     dashboard: 'Dashboard',
     userBucketBadge: 'User',
@@ -56,6 +57,7 @@ export const en = {
     rolesPlaceholder: 'Optional roles',
     save: 'Save',
     saved: 'Saved successfully.',
+    scrollToBottom: 'Scroll to bottom',
     search: 'Search',
     clearSearch: 'Clear search',
     send: 'Send',
@@ -91,6 +93,7 @@ export const en = {
     welcomeText: 'How may I help you?',
     placeholder: 'Message {{configuration}}',
     rateConversation: 'Was this conversation helpful so far?',
+    rateMessage: 'Rate response',
     reasoning: 'Reasoning',
     rating: {
       incorrect: 'Not factually correct',
@@ -165,6 +168,7 @@ export const en = {
     filterHeadline: 'Select filter',
     filterApply: 'Apply filter',
     filterResetAll: 'Reset all',
+    deleteFile: 'Lösche {{filename}}',
     duplicateConversationSuccess: 'Conversation duplicated successfully',
     duplicateConversationFailed: 'Failed to duplicate conversation',
     settings: {
