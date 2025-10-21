@@ -162,4 +162,3 @@ services:
 volumes:
   extension-volume:
   ollama-data:
-  minio-data:
