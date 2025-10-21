@@ -17,9 +17,9 @@ export function LoginPage() {
 
   return (
     <div className="text-primary flex h-screen overflow-hidden font-medium">
-      <div className="bg-primary-content flex w-96 flex-none flex-col items-center justify-center p-8">
+      <main className="bg-primary-content flex w-96 flex-none flex-col items-center justify-center p-8">
         <Sidebar theme={theme} authSettings={authSettings} isAuthSettingsError={isAuthSettingsError} oauthError={oauthError} />
-      </div>
+      </main>
       {theme.backgroundLogoUrl && <BackgroundImage logoUrl={theme.backgroundLogoUrl} />}
     </div>
   );
@@ -33,7 +33,7 @@ function Sidebar(props: {
 }) {
   return (
     <>
-      <div className="flex h-1/4 w-full items-start justify-start p-4">
+      <header className="flex h-1/4 w-full items-start justify-start p-4">
         {props.theme.logoUrl && <Logo size={{ height: '2rem' }} url={props.theme.logoUrl} />}
       </div>
       <div className="mb-4 flex grow flex-col items-center justify-center p-4">
@@ -46,7 +46,7 @@ function Sidebar(props: {
       </div>
       <div className="flex h-1/4 w-full items-end justify-start space-x-4 p-4 text-xs">
         <LegalFooter siteLinks={props.theme.siteLinks} />
-      </div>
+      </nav>
     </>
   );
 }
@@ -59,9 +59,9 @@ function LoginProviders(props: {
 }) {
   return (
     <>
-      <h2 className="mb-4 w-full justify-start text-4xl font-medium">
+      <h1 className="mb-4 w-full justify-start text-4xl font-medium">
         {renderTextWithBreaks(props.welcomeText || texts.login.welcome)}
-      </h2>
+      </h1>
 
       {props.error && (
         <div>
