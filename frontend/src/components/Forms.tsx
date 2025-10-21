@@ -559,7 +559,7 @@ const InputTextarea = ({ className, name, ...other }: FormEditorProps<string>) =
       minRows={3}
       {...field}
       {...other}
-      className={cn('textarea textarea-bordered w-full', className, {
+      className={cn('w-full', className, {
         'textarea-error': isInvalid(fieldState, formState),
       })}
     />

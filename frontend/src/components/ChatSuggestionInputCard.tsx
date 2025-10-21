@@ -22,7 +22,6 @@ export const ChatSuggestionInputCard = ({
       style={{ colSpan: 2 }}
       label={texts.common.text}
       placeholder={texts.common.text}
-      resize="vertical"
       autosize
       minRows={3}
       maxRows={15}
