@@ -14,12 +14,12 @@ langchain-core = "0.3.79"
 langchain-community = "0.3.31"
 langchain-openai = "0.3.35"
 langchain-postgres = "0.0.16"
-psycopg = {extras = ["binary"], version = "^3.2.10"}
-fastapi = {extras = ["standard"], version = "0.119.0"}
+psycopg = {extras = ["binary"], version = "^3.2.11"}
+fastapi = {extras = ["standard"], version = "0.119.1"}
 azure-search-documents = "11.6.0"
 azure-identity = "1.25.1"
 pdfminer-six = "^20250506"
-pypdf = "^6.1.1"
+pypdf = "^6.1.2"
 ffmpeg-python = "^0.2.0"
 python-oxmsg = "^0.0.2"
 aiofiles = "^25.1.0"
@@ -28,8 +28,8 @@ fastmcp = "^2.12.5"
 langchain-ollama = "^0.3.10"
 langchain-aws = "^0.2.35"
 langchain-nvidia-ai-endpoints = "^0.3.18"
-boto3 = "^1.40.54"
-boto3-stubs = {extras = ["s3"], version = "^1.40.54"}
+boto3 = "^1.40.55"
+boto3-stubs = {extras = ["s3"], version = "^1.40.55"}
 weasyprint = "^66.0"
 markdown = "^3.9"
 pygments = "^2.19.2"
