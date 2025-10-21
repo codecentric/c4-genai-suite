@@ -28,7 +28,7 @@ export class ExtensionEntity {
   @Column({ type: 'simple-json', nullable: true })
   state?: ExtensionState;
 
-  @Column('simple-json')
+  @Column('jsonb')
   values!: Record<string, any>;
 
   @Column('simple-json', { nullable: true })
