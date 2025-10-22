@@ -559,6 +559,7 @@ const InputTextarea = ({ className, name, ...other }: FormEditorProps<string>) =
       minRows={3}
       {...field}
       {...other}
+      label={undefined}
       className={cn('w-full', className, {
         'textarea-error': isInvalid(fieldState, formState),
       })}
