@@ -7,8 +7,7 @@ import {
   addSystemPromptToConfiguration,
   addVisionFileExtensionToConfiguration,
   addWholeFileExtensionToConfiguration,
-  cleanup,
-  createBucket,
+  createBucketIfNotExist,
   createConfiguration,
   deactivateFileInChatExtensionToConfiguration,
   deleteFirstFileFromPaperclip,
@@ -34,7 +33,6 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
 
     await test.step('should login', async () => {
       await login(page);
-      await cleanup(page);
     });
 
     await test.step('add assistant', async () => {
@@ -53,7 +51,7 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
     });
 
     await test.step('should add whole file extension to Assistant', async () => {
-      await createBucket(page, {
+      await createBucketIfNotExist(page, {
         name: conversationFilesBucket,
         type: 'conversation',
         endpoint: config.REIS_ENDPOINT,
@@ -99,7 +97,7 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
       const lastMessageLocator = page.locator('[data-testid="chat-item"]').filter({ hasText: '.2001' });
       lastMessageOriginal = lastMessageLocator.last();
 
-      await page.locator('svg.tabler-icon-dots').click();
+      await page.getByTestId('active-conversation-item-more-actions').click();
 
       const dropdown = page.locator('.mantine-Menu-dropdown');
       await expect(dropdown).toBeVisible();

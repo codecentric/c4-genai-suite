@@ -68,7 +68,10 @@ export const ConversationItem = memo(({ chat }: ChatProps) => {
       >
         <Menu width={200} opened={menuOpen} onChange={setMenuOpen}>
           <Menu.Target>
-            <IconDots style={{ width: rem(18), height: rem(18) }} />
+            <IconDots
+              style={{ width: rem(18), height: rem(18) }}
+              data-testid={isSelected ? 'active-conversation-item-more-actions' : 'conversation-item-more-actions'}
+            />
           </Menu.Target>
           <Menu.Dropdown>
             <Menu.Item

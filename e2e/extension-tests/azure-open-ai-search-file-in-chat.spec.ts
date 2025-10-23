@@ -4,8 +4,7 @@ import {
   addAzureModelToConfiguration,
   addFilesInChatExtensionToConfiguration,
   addSystemPromptToConfiguration,
-  cleanup,
-  createBucket,
+  createBucketIfNotExist,
   createConfiguration,
   deleteFirstFileFromPaperclip,
   duplicateLastCreatedConversation,
@@ -31,7 +30,6 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
 
     await test.step('should login', async () => {
       await login(page);
-      await cleanup(page);
     });
 
     await test.step('add assistant', async () => {
@@ -41,7 +39,7 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
       await createConfiguration(page, configuration);
       await addAzureModelToConfiguration(page, configuration, { deployment: 'gpt-4o-mini' });
       await addSystemPromptToConfiguration(page, configuration, { text: 'Your are a helpful assistant.' });
-      await createBucket(page, {
+      await createBucketIfNotExist(page, {
         name: conversationFilesBucket,
         type: 'conversation',
         endpoint: config.REIS_ENDPOINT,

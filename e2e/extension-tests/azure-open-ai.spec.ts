@@ -4,8 +4,7 @@ import {
   addAzureModelToConfiguration,
   addBucketToConfiguration,
   addSystemPromptToConfiguration,
-  cleanup,
-  createBucket,
+  createBucketIfNotExist,
   createConfiguration,
   editBucket,
   enterAdminArea,
@@ -27,7 +26,6 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
 
     await test.step('should login', async () => {
       await login(page);
-      await cleanup(page);
     });
     await test.step('should not add Configuration without required fields', async () => {
       await enterAdminArea(page);
@@ -105,7 +103,7 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
 
     await test.step('should create bucket', async () => {
       await enterAdminArea(page);
-      await createBucket(page, {
+      await createBucketIfNotExist(page, {
         name: bucket.name,
         type: 'user',
         endpoint: config.REIS_ENDPOINT,

@@ -2,7 +2,6 @@ import test, { expect } from '@playwright/test';
 import { sseBodyABC, sseBodyBanana } from '../tests/utils/files/sse-responses';
 import {
   addAzureModelToConfiguration,
-  cleanup,
   createConfiguration,
   enterAdminArea,
   enterUserArea,
@@ -44,7 +43,6 @@ test('Chat viewport scrolling', async ({ page }) => {
 
   await test.step('should login', async () => {
     await login(page);
-    await cleanup(page);
   });
 
   await test.step('should add mock assistant', async () => {

@@ -3,7 +3,6 @@ import { config } from '../tests/utils/config';
 import {
   addAzureModelToConfiguration,
   addSystemPromptToConfiguration,
-  cleanup,
   createConfiguration,
   deleteConfiguration,
   disableConfiguration,
@@ -24,7 +23,6 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
 
     await test.step('should login', async () => {
       await login(page);
-      await cleanup(page);
     });
     await test.step('should add two assistants', async () => {
       await enterAdminArea(page);

@@ -145,11 +145,15 @@ export async function clearMessages(page: Page) {
   await confirm.waitFor({ state: 'detached' });
 }
 
-export async function createBucket(
+export async function createBucketIfNotExist(
   page: Page,
   bucket: { name: string; indexName?: string; endpoint: string; type: 'user' | 'conversation' | 'general' },
 ) {
   await page.getByRole('link', { name: 'Files' }).click();
+  if (await page.locator('li').filter({ hasText: bucket.name }).getByTestId('more-actions').count()) {
+    // Bucket already exists
+    return;
+  }
 
   await page
     .locator('*')
@@ -535,11 +539,16 @@ export async function navigateToThemeAdministration(page: Page) {
   await page.waitForURL(`${config.URL}/admin/theme`);
 }
 
-export async function createUser(page: Page, user: { email: string; name: string; password?: string }) {
+export async function createUserIfNotExists(page: Page, user: { email: string; name: string; password?: string }) {
   await navigateToUserAdministration(page);
 
   const adminCell = page.getByRole('cell', { name: 'Admin', exact: true });
   await adminCell.last().waitFor();
+
+  if (await page.getByRole('table').getByRole('row').filter({ hasText: user.name }).count()) {
+    // User already exists
+    return;
+  }
 
   const oldUsersCount = await page.getByRole('table').getByRole('row').count();
 
