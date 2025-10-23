@@ -85,18 +85,18 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
 
     await test.step('should duplicate a conversation that includes a file uploaded with files in chat extension', async () => {
       await duplicateLastCreatedConversation(page);
-      const originalConversation = page.locator('role=navigation').first();
+      const originalConversation = page.getByTestId('conversation-item').first();
       originalConversationWithChatWithFiles = await originalConversation.textContent();
       expect(originalConversationWithChatWithFiles).not.toBeNull();
 
       const duplicatedName = `${originalConversationWithChatWithFiles} (2)`;
-      const duplicatedConversation = page.locator('role=navigation', { hasText: duplicatedName });
+      const duplicatedConversation = page.getByTestId('conversation-item').filter({ hasText: duplicatedName });
 
       await expect(duplicatedConversation).toBeVisible();
     });
 
     await test.step('should navigate to duplicated conversation with chat with files extension', async () => {
-      const duplicatedConversationLocator = page.getByRole('navigation').filter({
+      const duplicatedConversationLocator = page.getByTestId('conversation-item').filter({
         hasText: `${originalConversationWithChatWithFiles} (2)`,
       });
 
@@ -124,7 +124,7 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
       expect(originalConversationWithChatWithFiles).not.toBeNull();
 
       const originalConversationLocator = page
-        .getByRole('navigation')
+        .getByTestId('conversation-item')
         .filter({ hasText: originalConversationWithChatWithFiles! })
         .first();
 
@@ -172,12 +172,12 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
     await test.step('should duplicate a conversation that includes a file uploaded with chat with files extension', async () => {
       await duplicateLastCreatedConversation(page);
 
-      const originalConversation = page.getByRole('navigation').first();
+      const originalConversation = page.getByTestId('conversation-item').first();
       originalConversationWithTwoFiles = await originalConversation.textContent();
       expect(originalConversationWithTwoFiles).not.toBeNull();
 
       const duplicatedName = `${originalConversationWithTwoFiles} (2)`;
-      const duplicatedConversation = page.getByRole('navigation').filter({ hasText: duplicatedName });
+      const duplicatedConversation = page.getByTestId('conversation-item').filter({ hasText: duplicatedName });
       await expect(duplicatedConversation).toBeVisible();
 
       const fileChips = page.getByTestId('file-chip');
@@ -194,7 +194,7 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
 
       await duplicateLastCreatedConversation(page);
 
-      const originalConversation = page.getByRole('navigation').first();
+      const originalConversation = page.getByTestId('conversation-item').first();
       const originalConversationTitle = await originalConversation.textContent();
       expect(originalConversationTitle).not.toBeNull();
 
@@ -202,7 +202,7 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
       await deleteFirstFileFromPaperclip(page);
 
       const duplicatedName = `${originalConversationTitle} (2)`;
-      const duplicatedConversation = page.getByRole('navigation').filter({ hasText: duplicatedName });
+      const duplicatedConversation = page.getByTestId('conversation-item').filter({ hasText: duplicatedName });
       await expect(duplicatedConversation).toBeVisible();
 
       await duplicatedConversation.click();

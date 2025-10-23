@@ -51,7 +51,7 @@ export const ConversationItem = memo(({ chat }: ChatProps) => {
   }
 
   return (
-    <div className="group flex w-full items-stretch overflow-hidden">
+    <div className="group flex w-full items-stretch overflow-hidden" data-testid="conversation-item">
       <Button
         size="sm"
         p="xs"

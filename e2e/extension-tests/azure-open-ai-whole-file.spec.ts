@@ -108,12 +108,12 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
 
       await page.locator('text=Conversation duplicated successfully').waitFor({ state: 'visible' });
 
-      const originalConversation = page.getByRole('navigation').first();
+      const originalConversation = page.getByTestId('conversation-item').first();
       originalConversationWithCompleteFiles = await originalConversation.textContent();
       expect(originalConversationWithCompleteFiles).not.toBeNull();
 
       const duplicatedName = `${originalConversationWithCompleteFiles} (2)`;
-      const duplicatedConversation = page.getByRole('navigation').filter({ hasText: duplicatedName });
+      const duplicatedConversation = page.getByTestId('conversation-item').filter({ hasText: duplicatedName });
       await expect(duplicatedConversation).toBeVisible();
     });
 
@@ -175,7 +175,7 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
 
     await test.step('should navigate to duplicated conversation with complete file extension', async () => {
       await enterUserArea(page);
-      const duplicatedConversationLocator = page.getByRole('navigation').filter({
+      const duplicatedConversationLocator = page.getByTestId('conversation-item').filter({
         hasText: `${originalConversationWithCompleteFiles} (2)`,
       });
 
