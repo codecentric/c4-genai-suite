@@ -119,6 +119,7 @@ export function Files({ conversationId, userBucket, configurationId }: FileProps
           <input
             {...getInputProps()}
             accept={allowedFileNameExtensions.length > 0 ? allowedFileNameExtensions.join(', ') : undefined}
+            aria-label={texts.common.dropZone}
           />
           {isDragActive ? <p>{texts.common.dropZoneDrop}</p> : <p>{texts.common.dropZone}</p>}
         </div>
@@ -130,7 +131,6 @@ export function Files({ conversationId, userBucket, configurationId }: FileProps
           <Button
             size="compact-sm"
             type="button"
-            color="gray"
             disabled={fileIdSelector.selectedIDs.length === loadedFiles.items.length}
             onClick={() => {
               loadedFiles.items.forEach((file) => !fileIdSelector.selectedIDs.includes(file.id) && fileIdSelector.selectId(file));
@@ -142,7 +142,6 @@ export function Files({ conversationId, userBucket, configurationId }: FileProps
             size="compact-sm"
             type="button"
             variant="subtle"
-            color="gray"
             disabled={fileIdSelector.selectedIDs.length === 0}
             onClick={() =>
               loadedFiles.items.forEach((file) => fileIdSelector.selectedIDs.includes(file.id) && fileIdSelector.deselectId(file))

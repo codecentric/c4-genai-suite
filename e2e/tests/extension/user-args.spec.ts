@@ -8,7 +8,7 @@ import {
   disableUserArgsInConfiguration,
   enterAdminArea,
   enterUserArea,
-  expectAccessibility,
+  expectA11yCompliant,
   login,
   newChat,
   resetFilter,
@@ -90,7 +90,7 @@ test('user args', async ({ page, mockServerUrl }) => {
     );
     expect(dateRangeSelector).toBeDefined();
 
-    await expectAccessibility(page);
+    await expectA11yCompliant(page);
   });
 
   await test.step('send prompt', async () => {

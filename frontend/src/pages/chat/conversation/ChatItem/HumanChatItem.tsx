@@ -42,7 +42,13 @@ export const HumanChatItem = ({ message, editMessage }: ChatItemProps) => {
 
       {isEditing ? (
         <div className="rounded-xl bg-gray-100 p-3">
-          <Textarea value={editedText} onChange={(e) => setEditedText(e.target.value)} onKeyDown={doKeyDown} autosize />
+          <Textarea
+            value={editedText}
+            onChange={(e) => setEditedText(e.target.value)}
+            onKeyDown={doKeyDown}
+            autosize
+            aria-label={texts.accessibility.editMessage}
+          />
           <div className="mt-2 flex items-center justify-end gap-2">
             <Button onClick={() => setIsEditing(false)} size="xs" variant="subtle">
               {texts.common.cancel}

@@ -333,7 +333,7 @@ export function FileSizeDynamicFields({ form, name: _name, label, suffix, classN
           <button type="button" className="cursor-pointer" data-testid="fileSizeLimitsDynamic.add" onClick={handleAddField}>
             <Icon icon="plus" />
           </button>
-          <input placeholder="general" disabled className={cn('input input-bordered w-full', className)} />
+          <input placeholder="general" disabled className={cn('input input-bordered w-full', className)} aria-label={texts.accessibility.fileTypeGeneral} />
           <div className="relative w-full">
             <input
               type="number"
@@ -343,6 +343,7 @@ export function FileSizeDynamicFields({ form, name: _name, label, suffix, classN
               onChange={(e) => handleGeneralChange(parseFloat(e.target.value) || 0)}
               className={cn('input input-bordered w-full pr-10', className)}
               data-testid="fileSizeLimitsGeneral.value"
+              aria-label={texts.accessibility.generalFileSizeLimit}
             />
             {suffix && (
               <span className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-sm text-gray-500">
@@ -371,6 +372,7 @@ export function FileSizeDynamicFields({ form, name: _name, label, suffix, classN
               onChange={(e) => handleFieldKeyChange(index, e.target.value)}
               className={cn('input input-bordered w-full', className)}
               data-testid={`fileSizeLimitsDynamic.${index}.key`}
+              aria-label={texts.accessibility.fileType(index + 1)}
             />
             <div className="relative w-full">
               <input
@@ -382,6 +384,7 @@ export function FileSizeDynamicFields({ form, name: _name, label, suffix, classN
                 onChange={(e) => handleFieldValueChange(index, parseFloat(e.target.value) || 0)}
                 className={cn('input input-bordered w-full pr-10', className)}
                 data-testid={`fileSizeLimitsDynamic.${index}.value`}
+                aria-label={texts.accessibility.fileSizeLimit(index + 1)}
               />
               {suffix && (
                 <span className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-sm text-gray-500">

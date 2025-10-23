@@ -774,7 +774,19 @@ export function globalConversationBucketName(): string {
   return 'E2E-Conversation-Bucket';
 }
 
-export async function expectAccessibility(page: Page, exceptions: any[] = []) {
+export function uniqueName(prefix: string): string {
+  return `${prefix}-${randomInt(100000)}`;
+}
+
+export function globalUserBucketName(): string {
+  return 'E2E-User-Bucket';
+}
+
+export function globalConversationBucketName(): string {
+  return 'E2E-Conversation-Bucket';
+}
+
+export async function expectA11yCompliant(page: Page, exceptions: any[] = []) {
   const accessibilityScanResults = await new AxeBuilder({ page }).analyze();
   expect(accessibilityScanResults.violations).toEqual(exceptions);
 }
