@@ -113,7 +113,7 @@ export function UpsertConfigurationDialog(props: UpsertConfigurationDialogProps)
             />
             <ChatSuggestionsInput form={form} description={texts.theme.suggestionsHints(MAX_SUGGESTIONS)} />
           </fieldset>
-          <Flex gap="sm" justify={'end'}>
+          <Flex gap="sm" pt="sm" justify={'end'}>
             <Button onClick={onClose} variant="subtle">
               {texts.common.cancel}
             </Button>

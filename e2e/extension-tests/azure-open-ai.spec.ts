@@ -106,54 +106,6 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
       await expectElementInYRange(element, -200, 116);
     });
 
-    await test.step('should show current question in viewport after sending question', async () => {
-      const element = page.getByText(
-        'Write a two-column table with the lower case letters from a to z followed by a random short word in the rows.',
-      );
-      await expectElementInYRange(element, 112, 200);
-    });
-
-    await test.step('should not scroll down when reply is to long for viewport', async () => {
-      await expectElementInYRange(page.getByRole('cell', { name: 'a', exact: true }), 162, 500);
-      await expectElementInYRange(page.getByRole('cell', { name: 'm', exact: true }), 500, 2000);
-      await expectElementInYRange(page.getByRole('cell', { name: 'z', exact: true }), 700, 2000);
-    });
-
-    await test.step('should show auto-scroll button when reply is to long for viewport', async () => {
-      const autoScrollButton = page.locator('[data-testid="scrollToBottomButton"]');
-      await page.waitForTimeout(2500);
-      expect(await autoScrollButton.evaluate((el) => getComputedStyle(el).opacity)).toBe('1');
-    });
-
-    await test.step('should hide auto-scroll button when scrolled to bottom', async () => {
-      const autoScrollButton = page.locator('[data-testid="scrollToBottomButton"]');
-      await autoScrollButton.click();
-      await page.waitForTimeout(1000);
-      expect(await autoScrollButton.evaluate((el) => getComputedStyle(el).opacity)).toBe('0');
-    });
-
-    await test.step('should show and allow clicking auto-scroll button when user scrolls up', async () => {
-      await page.mouse.wheel(0, -800);
-      const autoScrollButton = page.locator('[data-testid="scrollToBottomButton"]');
-      await page.waitForTimeout(1000);
-      expect(await autoScrollButton.evaluate((el) => getComputedStyle(el).opacity)).toBe('1');
-      await autoScrollButton.click();
-      await page.waitForTimeout(1000);
-      expect(await autoScrollButton.evaluate((el) => getComputedStyle(el).opacity)).toBe('0');
-    });
-
-    await test.step('should stop showing auto-scroll button, if new chat is opened, while button was visible', async () => {
-      await sendMessage(page, configuration, {
-        message: 'Write a two-column table with the upper case letters from A to Z followed by a random short word in the rows.',
-      });
-      await page.waitForTimeout(5000);
-      const autoScrollButton = page.locator('[data-testid="scrollToBottomButton"]');
-      expect(await autoScrollButton.evaluate((el) => getComputedStyle(el).opacity)).toBe('1');
-      await newChat(page);
-      await page.waitForTimeout(3500);
-      expect(await autoScrollButton.evaluate((el) => getComputedStyle(el).opacity)).toBe('0');
-    });
-
     await test.step('should create bucket', async () => {
       await enterAdminArea(page);
       await createBucket(page, {

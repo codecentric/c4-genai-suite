@@ -7,6 +7,7 @@ import {
   MultiSelect as MantineMultiSelect,
   Select as MantineSingleSelect,
   TagsInput,
+  Textarea,
 } from '@mantine/core';
 import { IconRefresh } from '@tabler/icons-react';
 import { HTMLProps, PropsWithChildren, ReactNode, useEffect, useState } from 'react';
@@ -559,11 +560,15 @@ const InputTextarea = ({ className, name, ...other }: FormEditorProps<string>) =
   const { field, fieldState, formState } = useController({ name });
 
   return (
-    <textarea
+    <Textarea
       id={name}
+      autosize
+      maxRows={15}
+      minRows={3}
       {...field}
       {...other}
-      className={cn('textarea textarea-bordered w-full', className, {
+      label={undefined}
+      className={cn('w-full', className, {
         'textarea-error': isInvalid(fieldState, formState),
       })}
     />

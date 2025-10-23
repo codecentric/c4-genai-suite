@@ -165,6 +165,7 @@ export async function createBucket(
   await page
     .getByRole('alert')
     .filter({ hasText: /^Bucket is valid./ })
+    .getByRole('button')
     .click();
   await save(page);
 }
@@ -226,6 +227,7 @@ export async function editBucket(
   await page
     .getByRole('alert')
     .filter({ hasText: /^Bucket is valid./ })
+    .getByRole('button')
     .click();
   await save(page);
 }
@@ -409,7 +411,7 @@ export async function wait(timeout: number) {
 export async function addAzureModelToConfiguration(
   page: Page,
   configuration: { name: string },
-  azure: { deployment: string; configurable?: string[] },
+  azure: { deployment: string; configurable?: string[]; apiKey?: string },
 ) {
   await page.getByRole('link', { name: 'Assistants' }).click();
   await page.getByRole('link').filter({ hasText: configuration.name }).click();
@@ -422,7 +424,7 @@ export async function addAzureModelToConfiguration(
     .nth(1)
     .click();
   await page.getByLabel('API Key').click();
-  await page.getByLabel('API Key').fill(config.AZURE_OPEN_AI_API_KEY);
+  await page.getByLabel('API Key').fill(azure.apiKey ?? config.AZURE_OPEN_AI_API_KEY);
   await page.getByLabel('Deployment Name').fill(azure.deployment);
   await page.getByLabel('Instance Name').fill('cccc-testing');
   await page.getByLabel('Seed').fill('42');
@@ -438,6 +440,7 @@ export async function addAzureModelToConfiguration(
   await page
     .getByRole('alert')
     .filter({ hasText: /^Extension is valid./ })
+    .getByRole('button')
     .click();
 
   await loader.waitFor({ state: 'detached' });
@@ -457,7 +460,7 @@ export async function configureAssistantByUser(page: Page, config: { values: { l
 export async function addSystemPromptToConfiguration(
   page: Page,
   configuration: { name: string },
-  prompt: { text: string; configurable?: boolean },
+  prompt: { title?: string; text: string; configurable?: boolean },
 ) {
   await page.getByRole('link', { name: 'Assistants' }).click();
   await page.getByRole('link').filter({ hasText: configuration.name }).click();
@@ -467,6 +470,7 @@ export async function addSystemPromptToConfiguration(
   await page.getByLabel('Create Extension').getByRole('tab', { name: 'Other' }).click();
 
   await page.getByRole('heading', { name: 'Prompt', exact: true }).click();
+  await page.getByLabel('Title').fill(prompt.title ?? 'systemprompt');
   await page.getByLabel('Text').fill(prompt.text);
 
   if (prompt.configurable) {
@@ -494,6 +498,7 @@ export async function addOllamaModelToConfiguration(page: Page, configuration: {
   await page
     .getByRole('alert')
     .filter({ hasText: /^Extension is valid./ })
+    .getByRole('button')
     .click();
 
   await save(page);
