@@ -4,6 +4,7 @@ from pathlib import Path
 import shutil
 import subprocess
 import tempfile
+import time
 from typing import Generator
 from uuid import uuid4
 
@@ -83,7 +84,6 @@ def convert_office_to_pdf(file: SourceFile) -> SourceFile:
     output_dir = Path(tempfile.gettempdir()) / uuid4().hex
     output_dir.mkdir(parents=True, exist_ok=True)
     libreoffice_home = Path(tempfile.gettempdir()) / uuid4().hex
-    libreoffice_home.mkdir(parents=True, exist_ok=True)
 
     cmd = [
         "soffice",
@@ -97,14 +97,25 @@ def convert_office_to_pdf(file: SourceFile) -> SourceFile:
     ]
     logger.info(f"Converting {file.id} with args: {' '.join(cmd)}")
 
-    try:
-        subprocess.run(cmd, capture_output=True, check=True, env={"HOME": str(libreoffice_home)})
-    except subprocess.CalledProcessError as e:
-        raise ValueError(
-            f"Can not convert {file.id} to pdf, exit code {e.returncode}: {e.stdout} {e.stderr} {e!r}"
-        ) from e
-    finally:
-        shutil.rmtree(libreoffice_home, ignore_errors=True)
+    # FIXME: this might fail due to a race (?) when starting multiple LibreOffice instances
+    #   we need to fix this properly later
+    retries = 3
+    for retry in range(retries):
+        libreoffice_home.mkdir(parents=True, exist_ok=True)
+        try:
+            subprocess.run(cmd, capture_output=True, check=True, env={"HOME": str(libreoffice_home)})
+        except subprocess.CalledProcessError as e:
+            logger.error(
+                f"Failed to convert {file.id} to pdf, retry {retry + 1}/{retries}, "
+                f"exit code {e.returncode}: {e.stdout} {e.stderr} {e!r}"
+            )
+            time.sleep(0.5)
+        else:
+            break
+        finally:
+            shutil.rmtree(libreoffice_home, ignore_errors=True)
+    else:
+        raise ValueError(f"Can not convert {file.id} to pdf, giving up")
 
     base = os.path.basename(file.path)
     pdf_name = os.path.splitext(base)[0] + ".pdf"
