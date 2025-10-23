@@ -1,21 +1,33 @@
+import { yupResolver } from '@hookform/resolvers/yup';
 import { Button, Portal } from '@mantine/core';
-import { useForm, zodResolver } from '@mantine/form';
 import { useMemo, useState } from 'react';
-import z from 'zod';
+import { FormProvider, useForm } from 'react-hook-form';
+import * as Yup from 'yup';
 import { UpsertUserDto, useApi, UserDto, UserGroupDto } from 'src/api';
 import { ConfirmDialog, FormAlert, Forms, Modal } from 'src/components';
-import { UserGroupTagsInput } from 'src/components/UserGroupTagsInput';
 import { useDeleteUser } from 'src/pages/admin/users/hooks/useDeleteUser';
 import { useUpsertUser } from 'src/pages/admin/users/hooks/useUpsertUser';
 import { texts } from 'src/texts';
 import { GenerateApiKeyButton } from './GenerateApiKeyButton';
 
-const schema = z.object({
-  name: z.string().min(1),
-  email: z.string().email().min(1),
-  userGroupIds: z.array(z.string()),
-  passwordConfirm: z.string().min(1),
+const SCHEME = Yup.object({
+  // Required name.
+  name: Yup.string().label(texts.common.name).required(),
+
+  // Required email.
+  email: Yup.string().label(texts.common.email).required().email(),
+
+  // Required user group.
+  userGroupId: Yup.string().label(texts.common.userGroup).required(),
+
+  // The password to confirm.
+  passwordConfirm: Yup.string()
+    .label(texts.common.passwordConfirm)
+    .oneOf([Yup.ref('password'), '', undefined], texts.common.passwordsDoNotMatch),
 });
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const RESOLVER = yupResolver<any>(SCHEME);
 
 type BaseUserProps = {
   type: 'update' | 'create';
@@ -66,105 +78,105 @@ function UpsertUserDialog(props: UpsertUserDialogProps) {
     return sorted.map((g) => ({ label: g.name, value: g.id }));
   }, [userGroups]);
 
-  const form = useForm<UpsertUserDto>({
-    mode: 'controlled',
-    initialValues: defaultValues,
-    validate: zodResolver(schema),
-  });
+  const form = useForm<UpsertUserDto>({ resolver: RESOLVER, defaultValues });
+  // const userIsAdmin = form.watch('userGroupIds') === 'admin';
+  // const hasApiKey = form.watch('apiKey') || (!isCreating && props.target.hasApiKey);
+
   const [userIsAdmin, setUserIsAdmin] = useState(false);
-  form.watch('userGroupIds', ({ value }) => {
-    setUserIsAdmin(value?.includes('admin') ?? false);
+  form.watch(({ userGroupIds }) => {
+    setUserIsAdmin(userGroupIds?.includes('admin') ?? false);
   });
   const [hasApiKey, setHasApiKey] = useState(false);
-  form.watch('apiKey', ({ value }) => {
-    setHasApiKey(Boolean(value) || (!isCreating && props.target.hasApiKey));
+  form.watch(({ apiKey }) => {
+    setHasApiKey(Boolean(apiKey) || (!isCreating && props.target.hasApiKey));
   });
   return (
     <Portal>
-      <form noValidate onSubmit={form.onSubmit((newUserInformation) => userUpsert.mutate(newUserInformation))}>
-        <Modal
-          onClose={onClose}
-          header={<div className="flex items-center gap-4">{isCreating ? texts.users.create : texts.users.update}</div>}
-          footer={
-            <fieldset disabled={isPending}>
-              <div className="flex flex-row justify-end gap-4">
-                <Button type="button" variant="subtle" onClick={onClose}>
-                  {texts.common.cancel}
-                </Button>
+      <FormProvider {...form}>
+        <form noValidate onSubmit={form.handleSubmit((newUserInformation) => userUpsert.mutate(newUserInformation))}>
+          <Modal
+            onClose={onClose}
+            header={<div className="flex items-center gap-4">{isCreating ? texts.users.create : texts.users.update}</div>}
+            footer={
+              <fieldset disabled={isPending}>
+                <div className="flex flex-row justify-end gap-4">
+                  <Button type="button" variant="subtle" onClick={onClose}>
+                    {texts.common.cancel}
+                  </Button>
 
-                {!userIsAdmin && hasApiKey ? (
-                  <ConfirmDialog
-                    title={texts.users.update}
-                    text={texts.users.warningNotAdminWithKey}
-                    onPerform={form.onSubmit((newUserInformation) => {
-                      const updatedUser = { ...newUserInformation, apiKey: null };
-                      userUpsert.mutate(updatedUser);
-                    })}
-                  >
-                    {({ onClick }) => (
-                      <button type="button" className="btn" onClick={onClick}>
-                        {texts.common.save}
-                      </button>
-                    )}
-                  </ConfirmDialog>
-                ) : (
-                  <Button type="submit">{texts.common.save}</Button>
-                )}
-              </div>
-            </fieldset>
-          }
-        >
-          <fieldset disabled={isPending}>
-            <FormAlert common={texts.users.updateFailed} error={userUpsert.error} />
-
-            <Forms.Text required name="name" label={texts.common.name} />
-
-            <Forms.Text required name="email" label={texts.common.email} />
-
-            <Forms.Select
-              required
-              data-testid="userGroupId1"
-              name="userGroupId"
-              options={userGroupsOptions}
-              label={texts.common.userGroup}
-            />
-            <UserGroupTagsInput form={form} />
-
-            <Forms.Password name="password" label={texts.common.password} />
-
-            <Forms.Password name="passwordConfirm" label={texts.common.passwordConfirm} />
-
-            <Forms.Row name="apiKey" label={texts.common.apiKey} hints={!userIsAdmin && texts.users.apiKeyHint}>
-              <div className="flex gap-2">
-                <div className="grow">
-                  <Forms.Text vertical name="apiKey" disabled={true} />
+                  {!userIsAdmin && hasApiKey ? (
+                    <ConfirmDialog
+                      title={texts.users.update}
+                      text={texts.users.warningNotAdminWithKey}
+                      onPerform={form.handleSubmit((newUserInformation) => {
+                        const updatedUser = { ...newUserInformation, apiKey: null };
+                        userUpsert.mutate(updatedUser);
+                      })}
+                    >
+                      {({ onClick }) => (
+                        <button type="button" className="btn" onClick={onClick}>
+                          {texts.common.save}
+                        </button>
+                      )}
+                    </ConfirmDialog>
+                  ) : (
+                    <Button type="submit">{texts.common.save}</Button>
+                  )}
                 </div>
+              </fieldset>
+            }
+          >
+            <fieldset disabled={isPending}>
+              <FormAlert common={texts.users.updateFailed} error={userUpsert.error} />
 
-                <GenerateApiKeyButton disabled={!userIsAdmin} />
-              </div>
-            </Forms.Row>
-            {!isCreating && userDelete && (
-              <>
-                <hr className="my-6" />
+              <Forms.Text required name="name" label={texts.common.name} />
 
-                <Forms.Row name="danger" label={texts.common.dangerZone}>
-                  <ConfirmDialog
-                    title={texts.users.removeConfirmTitle}
-                    text={texts.users.removeConfirmText}
-                    onPerform={() => userDelete.mutate(props.target.id)}
-                  >
-                    {({ onClick }) => (
-                      <button type="button" className="btn btn-error" onClick={onClick}>
-                        {texts.common.remove}
-                      </button>
-                    )}
-                  </ConfirmDialog>
-                </Forms.Row>
-              </>
-            )}
-          </fieldset>
-        </Modal>
-      </form>
+              <Forms.Text required name="email" label={texts.common.email} />
+
+              <Forms.Select
+                required
+                data-testid="userGroupId1"
+                name="userGroupId"
+                options={userGroupsOptions}
+                label={texts.common.userGroup}
+              />
+
+              <Forms.Password name="password" label={texts.common.password} />
+
+              <Forms.Password name="passwordConfirm" label={texts.common.passwordConfirm} />
+
+              <Forms.Row name="apiKey" label={texts.common.apiKey} hints={!userIsAdmin && texts.users.apiKeyHint}>
+                <div className="flex gap-2">
+                  <div className="grow">
+                    <Forms.Text vertical name="apiKey" disabled={true} />
+                  </div>
+
+                  <GenerateApiKeyButton disabled={!userIsAdmin} />
+                </div>
+              </Forms.Row>
+              {!isCreating && userDelete && (
+                <>
+                  <hr className="my-6" />
+
+                  <Forms.Row name="danger" label={texts.common.dangerZone}>
+                    <ConfirmDialog
+                      title={texts.users.removeConfirmTitle}
+                      text={texts.users.removeConfirmText}
+                      onPerform={() => userDelete.mutate(props.target.id)}
+                    >
+                      {({ onClick }) => (
+                        <button type="button" className="btn btn-error" onClick={onClick}>
+                          {texts.common.remove}
+                        </button>
+                      )}
+                    </ConfirmDialog>
+                  </Forms.Row>
+                </>
+              )}
+            </fieldset>
+          </Modal>
+        </form>
+      </FormProvider>
     </Portal>
   );
 }
