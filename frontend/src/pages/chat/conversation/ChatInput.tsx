@@ -224,6 +224,7 @@ export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEm
               onKeyDown={doKeyDown}
               placeholder={texts.chat.placeholder(configuration?.name ?? '')}
               ref={textareaRef}
+              aria-label={texts.accessibility.chatMessageInput}
             />
             <div className="flex w-full justify-between gap-2">
               <div className="flex items-center gap-2">

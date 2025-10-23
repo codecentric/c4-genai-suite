@@ -83,6 +83,18 @@ export const en = {
     configurableArguments: 'Configurable',
     rowsSelected: '{{rowCount}} Row(s) Selected',
   },
+  accessibility: {
+    chatMessageInput: 'Chat message input',
+    editMessage: 'Edit message',
+    pageNumber: 'Page number',
+    renameConversation: 'Rename conversation',
+    selectFile: 'Select {{fileName}}',
+    uploadLogoFile: 'Upload logo file',
+    fileTypeGeneral: 'File type (general)',
+    generalFileSizeLimit: 'General file size limit',
+    fileType: 'File type {{index}}',
+    fileSizeLimit: 'File size limit {{index}}',
+  },
   chat: {
     noAccessToConversation: "You don't have access to this conversation. You will be redirected shortly.",
     conversationNotFound: 'Conversation not found. You will be redirected shortly.',
@@ -155,7 +167,7 @@ export const en = {
     filterHeadline: 'Select filter',
     filterApply: 'Apply filter',
     filterResetAll: 'Reset all',
-    deleteFile: 'Lösche {{filename}}',
+    deleteFile: 'Delete {{filename}}',
     duplicateConversationSuccess: 'Conversation duplicated successfully',
     duplicateConversationFailed: 'Failed to duplicate conversation',
     settings: {

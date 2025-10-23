@@ -56,8 +56,8 @@ export function ConversationItems() {
     <div className="flex flex-col gap-4">
       {grouped.map((group) => (
         <div key={group.date} className="grid">
-          <h4 className="pb-1 pl-2 text-xs font-light">{group.date}</h4>
-          <div className="grid" role="navigation">
+          <h2 className="pb-1 pl-2 text-xs font-light">{group.date}</h2>
+          <div className="grid">
             {group.entries.map((chat) => (
               <ConversationItem key={chat.id} chat={chat} />
             ))}

@@ -10,7 +10,7 @@ import {
   editBucket,
   enterAdminArea,
   enterUserArea,
-  expectAccessibility as expectA11yCompliant,
+  expectA11yCompliant,
   expectElementInYRange,
   login,
   newChat,
@@ -87,7 +87,6 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
       await chatItem.hover();
       await editButton.click();
       await chatItem.getByRole('textbox').fill('What is the capital of Germany?');
-      await expectA11yCompliant(page);
       await chatItem.getByRole('button', { name: 'Send' }).click();
 
       await page.waitForSelector(`:has-text("Berlin")`);

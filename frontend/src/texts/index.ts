@@ -113,6 +113,18 @@ function load() {
       configurableArguments: translate('common.configurableArguments'),
       rowsSelected: (rowCount: number) => translate('common.rowsSelected', { rowCount }),
     },
+    accessibility: {
+      chatMessageInput: translate('accessibility.chatMessageInput'),
+      editMessage: translate('accessibility.editMessage'),
+      pageNumber: translate('accessibility.pageNumber'),
+      renameConversation: translate('accessibility.renameConversation'),
+      selectFile: (fileName: string) => translate('accessibility.selectFile', { fileName }),
+      uploadLogoFile: translate('accessibility.uploadLogoFile'),
+      fileTypeGeneral: translate('accessibility.fileTypeGeneral'),
+      generalFileSizeLimit: translate('accessibility.generalFileSizeLimit'),
+      fileType: (index: number) => translate('accessibility.fileType', { index }),
+      fileSizeLimit: (index: number) => translate('accessibility.fileSizeLimit', { index }),
+    },
     chat: {
       reasoning: translate('chat.reasoning'),
       conversationNotFound: translate('chat.conversationNotFound'),

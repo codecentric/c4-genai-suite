@@ -671,7 +671,7 @@ export async function changePassword(page: Page, currentPassword: string, newPas
   await page.getByRole('button', { name: 'Update Password' }).click({ timeout: 3000 });
 }
 
-export async function expectAccessibility(page: Page, exceptions: any[] = []) {
+export async function expectA11yCompliant(page: Page, exceptions: any[] = []) {
   const accessibilityScanResults = await new AxeBuilder({ page }).analyze();
   expect(accessibilityScanResults.violations).toEqual(exceptions);
 }

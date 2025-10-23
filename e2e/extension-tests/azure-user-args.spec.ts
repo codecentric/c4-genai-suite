@@ -8,7 +8,7 @@ import {
   disableUserArgsInConfiguration,
   enterAdminArea,
   enterUserArea,
-  expectAccessibility,
+  expectA11yCompliant,
   login,
   newChat,
   resetFilter,
@@ -92,7 +92,7 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
       );
       expect(dateRangeSelector).toBeDefined();
 
-      await expectAccessibility(page);
+      await expectA11yCompliant(page);
     });
 
     await test.step('send prompt', async () => {

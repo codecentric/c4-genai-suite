@@ -85,6 +85,18 @@ export const de: typeof en = {
     configurableArguments: 'Konfigurierbar',
     rowsSelected: '{{rowCount}} Zeile(n) ausgewählt',
   },
+  accessibility: {
+    chatMessageInput: 'Chatnachricht eingeben',
+    editMessage: 'Nachricht bearbeiten',
+    pageNumber: 'Seitenzahl',
+    renameConversation: 'Konversation umbenennen',
+    selectFile: '{{fileName}} auswählen',
+    uploadLogoFile: 'Logo-Datei hochladen',
+    fileTypeGeneral: 'Dateityp (allgemein)',
+    generalFileSizeLimit: 'Allgemeine Dateigrößenbeschränkung',
+    fileType: 'Dateityp {{index}}',
+    fileSizeLimit: 'Dateigrößenbeschränkung {{index}}',
+  },
   chat: {
     noAccessToConversation: 'Du hast keinen Zugriff auf diese Konversation. Du wirst in Kürze weitergeleitet.',
     conversationNotFound: 'Konversation nicht gefunden. Du wirst in Kürze weitergeleitet.',

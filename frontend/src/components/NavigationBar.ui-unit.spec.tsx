@@ -16,7 +16,16 @@ describe('Markdown component', () => {
     const logo = screen.getByRole<HTMLImageElement>('img');
     expect(logo).toBeInTheDocument();
     expect(logo.src).toContain(theme.logoUrl);
-    expect(screen.queryByText(theme.name)).not.toBeInTheDocument();
+
+    // Should have sr-only h1 for accessibility
+    const heading = screen.getByRole('heading', { level: 1, name: theme.name });
+    expect(heading).toBeInTheDocument();
+    expect(heading).toHaveClass('sr-only');
+
+    // Theme name should not be visible (only in sr-only element)
+    const elements = screen.getAllByText(theme.name);
+    const visibleElements = elements.filter((el) => !el.classList.contains('sr-only'));
+    expect(visibleElements.length).toEqual(0);
   });
 
   it('renders text without logo if logo is not present', () => {
