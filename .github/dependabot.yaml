@@ -47,6 +47,14 @@ updates:
         patterns:
           - "eslint"
           - "@typescript-eslint/*"
+      vite:
+        patterns:
+          - "vite"
+          - "@vitejs/*"
+      vitest:
+        patterns:
+          - "vitest"
+          - "@vitest/*"
 
   - package-ecosystem: "pip"
     directories:
