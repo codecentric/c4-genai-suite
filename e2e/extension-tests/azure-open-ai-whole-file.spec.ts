@@ -1,4 +1,3 @@
-import { randomInt } from 'crypto';
 import { expect, Locator, test } from '@playwright/test';
 import { config } from './../tests/utils/config';
 import {
@@ -14,10 +13,12 @@ import {
   editBucket,
   enterAdminArea,
   enterUserArea,
+  globalConversationBucketName,
   login,
   newChat,
   selectConfiguration,
   sendMessage,
+  uniqueName,
   uploadFileWithPaperclip,
 } from './../tests/utils/helper';
 
@@ -27,7 +28,7 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
   test('files', async ({ page }) => {
     let lastMessageOriginal: Locator;
     let originalConversationWithCompleteFiles: string | null;
-    const conversationFilesBucket = 'conversation-file-bucket';
+    const conversationFilesBucket = globalConversationBucketName();
 
     const configuration = { name: '', description: '' };
 
@@ -36,7 +37,7 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
     });
 
     await test.step('add assistant', async () => {
-      configuration.name = `E2E-Whole-File-${randomInt(10000)}`;
+      configuration.name = uniqueName('E2E-Whole-File');
       configuration.description = `Description for ${configuration.name}`;
       await enterAdminArea(page);
       await createConfiguration(page, configuration);

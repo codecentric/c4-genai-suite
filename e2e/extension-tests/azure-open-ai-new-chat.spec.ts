@@ -1,4 +1,3 @@
-import { randomInt } from 'crypto';
 import test, { expect } from '@playwright/test';
 import { config } from '../tests/utils/config';
 import {
@@ -13,9 +12,10 @@ import {
   newChat,
   selectConfiguration,
   sendMessage,
+  uniqueName,
 } from '../tests/utils/helper';
 
-const secondAssistantName = `Second Assistant ${randomInt(10000)}`;
+const secondAssistantName = uniqueName('Second Assistant');
 
 if (!config.AZURE_OPEN_AI_API_KEY) {
   test.skip('should configure Azure OpenAI-Open AI LLM for chats [skipped due to missing API_KEY in env]', () => {});
@@ -28,7 +28,7 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
 
     await test.step('add assistant', async () => {
       await enterAdminArea(page);
-      configuration.name = `Azure-OpenAI-Chat-${randomInt(10000)}`;
+      configuration.name = uniqueName('Azure-OpenAI-Chat');
       configuration.description = `Description for ${configuration.name}`;
       await createConfiguration(page, configuration);
       await createConfiguration(page, { ...configuration, name: secondAssistantName });
@@ -43,7 +43,7 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
       // Since we test on the total number of conversations, we switch here to a fresh user without conversation.
       // This way we do not need to delete the conversations of the admin account
       // (which would lead to problems if we ever want to run the tests in parallel)
-      const testuserName = `test-user-${randomInt(10000)}`;
+      const testuserName = uniqueName('test-user');
       await createUserIfNotExists(page, {
         name: testuserName,
         email: `${testuserName}@example.com`,

@@ -11,10 +11,12 @@ import {
   editBucket,
   enterAdminArea,
   enterUserArea,
+  globalConversationBucketName,
   login,
   newChat,
   selectConfiguration,
   sendMessage,
+  uniqueName,
   uploadFileWithPaperclip,
 } from './../tests/utils/helper';
 
@@ -24,7 +26,7 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
   test('files', async ({ page }) => {
     let originalConversationWithChatWithFiles: string | null;
     let originalConversationWithTwoFiles: string | null;
-    const conversationFilesBucket = 'conversation-file-bucket';
+    const conversationFilesBucket = globalConversationBucketName();
 
     const configuration = { name: '', description: '' };
 
@@ -33,7 +35,7 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
     });
 
     await test.step('add assistant', async () => {
-      configuration.name = `E2E-Test-Other-${Date.now()}`;
+      configuration.name = uniqueName('E2E-Test-Other');
       configuration.description = `Description for ${configuration.name}`;
       await enterAdminArea(page);
       await createConfiguration(page, configuration);

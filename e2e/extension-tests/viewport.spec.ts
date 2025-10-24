@@ -9,6 +9,7 @@ import {
   login,
   selectConfiguration,
   sendMessage,
+  uniqueName,
 } from '../tests/utils/helper';
 
 test('Chat viewport scrolling', async ({ page }) => {
@@ -39,7 +40,7 @@ test('Chat viewport scrolling', async ({ page }) => {
     });
   });
 
-  const configuration = { name: `E2E-Test-${Date.now()}`, description: '' };
+  const configuration = { name: uniqueName('E2E-Test'), description: '' };
 
   await test.step('should login', async () => {
     await login(page);

@@ -1,3 +1,4 @@
+import { randomInt } from 'crypto';
 import path from 'path';
 import { expect, Locator, Page } from '@playwright/test';
 import { config } from './config';
@@ -687,4 +688,16 @@ export async function changePassword(page: Page, currentPassword: string, newPas
   await page.getByRole('textbox', { name: 'Confirm Password', exact: true }).click();
   await page.getByRole('textbox', { name: 'Confirm Password', exact: true }).fill(newPassword);
   await page.getByRole('button', { name: 'Update Password' }).click({ timeout: 3000 });
+}
+
+export function uniqueName(prefix: string): string {
+  return `${prefix}-${randomInt(100000)}`;
+}
+
+export function globalUserBucketName(): string {
+  return 'E2E-User-Bucket';
+}
+
+export function globalConversationBucketName(): string {
+  return 'E2E-Conversation-Bucket';
 }
