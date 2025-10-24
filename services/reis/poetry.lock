@@ -183,6 +183,18 @@ frozenlist = ">=1.1.0"
 typing-extensions = {version = ">=4.2", markers = "python_version < \"3.13\""}
 
 [[package]]
+name = "annotated-doc"
+version = "0.0.2"
+description = "Document parameters, class attributes, return types, and variables inline, with Annotated."
+optional = false
+python-versions = ">=3.8"
+groups = ["main"]
+files = [
+    {file = "annotated_doc-0.0.2-py3-none-any.whl", hash = "sha256:2188cb99e353fcb5c20f23b8bc6f5fa7c924b213fac733d4b44883f9edffa090"},
+    {file = "annotated_doc-0.0.2.tar.gz", hash = "sha256:f25664061aee278227abfaec5aeb398298be579b934758c16205d48e896e149c"},
+]
+
+[[package]]
 name = "annotated-types"
 version = "0.7.0"
 description = "Reusable constraint types to use with typing.Annotated"
@@ -1694,17 +1706,18 @@ tzdata = "*"
 
 [[package]]
 name = "fastapi"
-version = "0.119.1"
+version = "0.120.0"
 description = "FastAPI framework, high performance, easy to learn, fast to code, ready for production"
 optional = false
 python-versions = ">=3.8"
 groups = ["main"]
 files = [
-    {file = "fastapi-0.119.1-py3-none-any.whl", hash = "sha256:0b8c2a2cce853216e150e9bd4faaed88227f8eb37de21cb200771f491586a27f"},
-    {file = "fastapi-0.119.1.tar.gz", hash = "sha256:a5e3426edce3fe221af4e1992c6d79011b247e3b03cc57999d697fe76cbf8ae0"},
+    {file = "fastapi-0.120.0-py3-none-any.whl", hash = "sha256:84009182e530c47648da2f07eb380b44b69889a4acfd9e9035ee4605c5cfc469"},
+    {file = "fastapi-0.120.0.tar.gz", hash = "sha256:6ce2c1cfb7000ac14ffd8ddb2bc12e62d023a36c20ec3710d09d8e36fab177a0"},
 ]
 
 [package.dependencies]
+annotated-doc = ">=0.0.2"
 email-validator = {version = ">=2.0.0", optional = true, markers = "extra == \"standard\""}
 fastapi-cli = {version = ">=0.0.8", extras = ["standard"], optional = true, markers = "extra == \"standard\""}
 httpx = {version = ">=0.23.0,<1.0.0", optional = true, markers = "extra == \"standard\""}
@@ -6706,4 +6719,4 @@ cffi = ["cffi (>=1.17,<2.0) ; platform_python_implementation != \"PyPy\" and pyt
 [metadata]
 lock-version = "2.1"
 python-versions = "<4.0,>=3.12.0"
-content-hash = "b8a4aa0fe34830fc2fb3c3838487ed20be59e3875f7c4952deba62cf104fd84e"
+content-hash = "6034e62dd2eb0114c9136917c2e307c65815a57f343df27be846785b3167fb0e"
