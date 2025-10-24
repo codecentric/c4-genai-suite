@@ -43,7 +43,7 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
     });
 
     await test.step('should add OpenAI LLM Extension', async () => {
-      await addAzureModelToConfiguration(page, configuration, { deployment: 'gpt-4o-mini' });
+      await addAzureModelToConfiguration(page, configuration, { deployment: 'gpt-4o-mini' }, true);
     });
 
     await test.step('add prompt', async () => {
@@ -103,11 +103,15 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
 
     await test.step('should create bucket', async () => {
       await enterAdminArea(page);
-      await createBucketIfNotExist(page, {
-        name: bucket.name,
-        type: 'user',
-        endpoint: config.REIS_ENDPOINT,
-      });
+      await createBucketIfNotExist(
+        page,
+        {
+          name: bucket.name,
+          type: 'user',
+          endpoint: config.REIS_ENDPOINT,
+        },
+        true,
+      );
     });
 
     await test.step('should add bucket to Configuration', async () => {

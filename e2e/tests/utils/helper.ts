@@ -148,6 +148,7 @@ export async function clearMessages(page: Page) {
 export async function createBucketIfNotExist(
   page: Page,
   bucket: { name: string; indexName?: string; endpoint: string; type: 'user' | 'conversation' | 'general' },
+  performTest: boolean = false,
 ) {
   await page.getByRole('link', { name: 'Files' }).click();
   if (await page.locator('li').filter({ hasText: bucket.name }).getByTestId('more-actions').count()) {
@@ -164,12 +165,16 @@ export async function createBucketIfNotExist(
   await page.getByLabel(/^Endpoint/).fill(bucket.endpoint);
   await page.getByLabel(/^Index name/).fill(bucket.indexName ?? '');
   await selectOption(page, 'Bucket Type', bucket.type);
-  await page.getByRole('button', { name: 'Test' }).click();
-  await page
-    .getByRole('alert')
-    .filter({ hasText: /^Bucket is valid./ })
-    .getByRole('button')
-    .click();
+
+  if (performTest) {
+    await page.getByRole('button', { name: 'Test' }).click();
+    await page
+      .getByRole('alert')
+      .filter({ hasText: /^Bucket is valid./ })
+      .getByRole('button')
+      .click();
+  }
+
   await save(page);
 }
 
@@ -415,6 +420,7 @@ export async function addAzureModelToConfiguration(
   page: Page,
   configuration: { name: string },
   azure: { deployment: string; configurable?: string[]; apiKey?: string },
+  performTest: boolean = false,
 ) {
   await page.getByRole('link', { name: 'Assistants' }).click();
   await page.getByRole('link').filter({ hasText: configuration.name }).click();
@@ -433,20 +439,21 @@ export async function addAzureModelToConfiguration(
   await page.getByLabel('Seed').fill('42');
   await page.getByLabel('Temperature').fill('0');
   await page.getByRole('button', { name: 'Test' }).click();
-  const loader = page.locator('.mantine-Button-loader');
-  await loader.waitFor({ state: 'visible' });
 
   if (azure.configurable?.length) {
     await selectMultipleOptions(page, 'Configurable', azure.configurable);
   }
 
-  await page
-    .getByRole('alert')
-    .filter({ hasText: /^Extension is valid./ })
-    .getByRole('button')
-    .click();
-
-  await loader.waitFor({ state: 'detached' });
+  if (performTest) {
+    const loader = page.locator('.mantine-Button-loader');
+    await loader.waitFor({ state: 'visible' });
+    await page
+      .getByRole('alert')
+      .filter({ hasText: /^Extension is valid./ })
+      .getByRole('button')
+      .click();
+    await loader.waitFor({ state: 'detached' });
+  }
 
   await save(page);
 }
