@@ -2,7 +2,6 @@ import test, { expect } from '@playwright/test';
 import { sseBodyABC, sseBodyBanana } from '../tests/utils/files/sse-responses';
 import {
   addAzureModelToConfiguration,
-  cleanup,
   createConfiguration,
   enterAdminArea,
   enterUserArea,
@@ -10,6 +9,7 @@ import {
   login,
   selectConfiguration,
   sendMessage,
+  uniqueName,
 } from '../tests/utils/helper';
 
 test('Chat viewport scrolling', async ({ page }) => {
@@ -40,11 +40,10 @@ test('Chat viewport scrolling', async ({ page }) => {
     });
   });
 
-  const configuration = { name: `E2E-Test-${Date.now()}`, description: '' };
+  const configuration = { name: uniqueName('E2E-Test'), description: '' };
 
   await test.step('should login', async () => {
     await login(page);
-    await cleanup(page);
   });
 
   await test.step('should add mock assistant', async () => {

@@ -1,4 +1,3 @@
-import { randomInt } from 'crypto';
 import { expect, Locator, test } from '@playwright/test';
 import { config } from './../tests/utils/config';
 import {
@@ -7,18 +6,20 @@ import {
   addSystemPromptToConfiguration,
   addVisionFileExtensionToConfiguration,
   addWholeFileExtensionToConfiguration,
-  cleanup,
-  createBucket,
+  createBucketIfNotExist,
   createConfiguration,
   deactivateFileInChatExtensionToConfiguration,
   deleteFirstFileFromPaperclip,
+  duplicateActiveConversation,
   editBucket,
   enterAdminArea,
   enterUserArea,
+  globalConversationBucketName,
   login,
   newChat,
   selectConfiguration,
   sendMessage,
+  uniqueName,
   uploadFileWithPaperclip,
 } from './../tests/utils/helper';
 
@@ -27,18 +28,17 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
 } else {
   test('files', async ({ page }) => {
     let lastMessageOriginal: Locator;
-    let originalConversationWithCompleteFiles: string | null;
-    const conversationFilesBucket = 'conversation-file-bucket';
+    let originalConversationName: string | null;
+    const conversationFilesBucket = globalConversationBucketName();
 
     const configuration = { name: '', description: '' };
 
     await test.step('should login', async () => {
       await login(page);
-      await cleanup(page);
     });
 
     await test.step('add assistant', async () => {
-      configuration.name = `E2E-Whole-File-${randomInt(10000)}`;
+      configuration.name = uniqueName('E2E-Whole-File');
       configuration.description = `Description for ${configuration.name}`;
       await enterAdminArea(page);
       await createConfiguration(page, configuration);
@@ -53,7 +53,7 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
     });
 
     await test.step('should add whole file extension to Assistant', async () => {
-      await createBucket(page, {
+      await createBucketIfNotExist(page, {
         name: conversationFilesBucket,
         type: 'conversation',
         endpoint: config.REIS_ENDPOINT,
@@ -99,20 +99,11 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
       const lastMessageLocator = page.locator('[data-testid="chat-item"]').filter({ hasText: '.2001' });
       lastMessageOriginal = lastMessageLocator.last();
 
-      await page.locator('svg.tabler-icon-dots').click();
-
-      const dropdown = page.locator('.mantine-Menu-dropdown');
-      await expect(dropdown).toBeVisible();
-
-      await dropdown.locator('text=Duplicate').click();
-
+      originalConversationName = uniqueName('ChatDuplicationTest');
+      await duplicateActiveConversation(page, originalConversationName);
       await page.locator('text=Conversation duplicated successfully').waitFor({ state: 'visible' });
 
-      const originalConversation = page.getByRole('navigation').first();
-      originalConversationWithCompleteFiles = await originalConversation.textContent();
-      expect(originalConversationWithCompleteFiles).not.toBeNull();
-
-      const duplicatedName = `${originalConversationWithCompleteFiles} (2)`;
+      const duplicatedName = `${originalConversationName} (2)`;
       const duplicatedConversation = page.getByRole('navigation').filter({ hasText: duplicatedName });
       await expect(duplicatedConversation).toBeVisible();
     });
@@ -176,7 +167,7 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
     await test.step('should navigate to duplicated conversation with complete file extension', async () => {
       await enterUserArea(page);
       const duplicatedConversationLocator = page.getByRole('navigation').filter({
-        hasText: `${originalConversationWithCompleteFiles} (2)`,
+        hasText: `${originalConversationName} (2)`,
       });
 
       await expect(duplicatedConversationLocator, 'Duplicated conversation link should be visible').toBeVisible({
@@ -186,6 +177,10 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
     });
 
     await test.step('should check if content of duplicated conversation with complete file extension match original conversation', async () => {
+      const scrollButton = page.locator('button[data-testid="scroll-to-bottom-button"]');
+      if (await scrollButton.isVisible()) {
+        await scrollButton.click();
+      }
       const lastChatItem = page.locator('[data-testid="chat-item"]').last();
 
       const aiName = 'Friendly AI';

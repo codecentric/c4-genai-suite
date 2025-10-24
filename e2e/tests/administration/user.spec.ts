@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker';
 import { expect, test } from '@playwright/test';
-import { createUser, enterAdminArea, login, navigateToUserAdministration } from '../utils/helper';
+import { createUserIfNotExists, enterAdminArea, login, navigateToUserAdministration } from '../utils/helper';
 
 test.describe('User management', () => {
   const randomName = faker.person.fullName();
@@ -15,7 +15,7 @@ test.describe('User management', () => {
 
   test('should create a user', async ({ page }) => {
     await navigateToUserAdministration(page);
-    await createUser(page, { email: randomEmail, name: randomName });
+    await createUserIfNotExists(page, { email: randomEmail, name: randomName });
   });
 
   test('should edit the user details', async ({ page }) => {

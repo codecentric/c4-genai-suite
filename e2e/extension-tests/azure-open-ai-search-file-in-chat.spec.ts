@@ -4,18 +4,19 @@ import {
   addAzureModelToConfiguration,
   addFilesInChatExtensionToConfiguration,
   addSystemPromptToConfiguration,
-  cleanup,
-  createBucket,
+  createBucketIfNotExist,
   createConfiguration,
   deleteFirstFileFromPaperclip,
-  duplicateLastCreatedConversation,
+  duplicateActiveConversation,
   editBucket,
   enterAdminArea,
   enterUserArea,
+  globalConversationBucketName,
   login,
   newChat,
   selectConfiguration,
   sendMessage,
+  uniqueName,
   uploadFileWithPaperclip,
 } from './../tests/utils/helper';
 
@@ -24,24 +25,22 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
 } else {
   test('files', async ({ page }) => {
     let originalConversationWithChatWithFiles: string | null;
-    let originalConversationWithTwoFiles: string | null;
-    const conversationFilesBucket = 'conversation-file-bucket';
+    const conversationFilesBucket = globalConversationBucketName();
 
     const configuration = { name: '', description: '' };
 
     await test.step('should login', async () => {
       await login(page);
-      await cleanup(page);
     });
 
     await test.step('add assistant', async () => {
-      configuration.name = `E2E-Test-Other-${Date.now()}`;
+      configuration.name = uniqueName('E2E-Test-Other');
       configuration.description = `Description for ${configuration.name}`;
       await enterAdminArea(page);
       await createConfiguration(page, configuration);
       await addAzureModelToConfiguration(page, configuration, { deployment: 'gpt-4o-mini' });
       await addSystemPromptToConfiguration(page, configuration, { text: 'Your are a helpful assistant.' });
-      await createBucket(page, {
+      await createBucketIfNotExist(page, {
         name: conversationFilesBucket,
         type: 'conversation',
         endpoint: config.REIS_ENDPOINT,
@@ -84,11 +83,9 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
     });
 
     await test.step('should duplicate a conversation that includes a file uploaded with files in chat extension', async () => {
-      await duplicateLastCreatedConversation(page);
-      const originalConversation = page.locator('role=navigation').first();
-      originalConversationWithChatWithFiles = await originalConversation.textContent();
-      expect(originalConversationWithChatWithFiles).not.toBeNull();
+      originalConversationWithChatWithFiles = uniqueName('ChatWithFilesDuplicationTest');
 
+      await duplicateActiveConversation(page, originalConversationWithChatWithFiles);
       const duplicatedName = `${originalConversationWithChatWithFiles} (2)`;
       const duplicatedConversation = page.locator('role=navigation', { hasText: duplicatedName });
 
@@ -170,12 +167,9 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
     });
 
     await test.step('should duplicate a conversation that includes a file uploaded with chat with files extension', async () => {
-      await duplicateLastCreatedConversation(page);
+      const originalConversationWithTwoFiles = uniqueName('ChatWithTwoFilesDuplicationTest');
 
-      const originalConversation = page.getByRole('navigation').first();
-      originalConversationWithTwoFiles = await originalConversation.textContent();
-      expect(originalConversationWithTwoFiles).not.toBeNull();
-
+      await duplicateActiveConversation(page, originalConversationWithTwoFiles);
       const duplicatedName = `${originalConversationWithTwoFiles} (2)`;
       const duplicatedConversation = page.getByRole('navigation').filter({ hasText: duplicatedName });
       await expect(duplicatedConversation).toBeVisible();
@@ -192,16 +186,15 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
       });
       await page.waitForSelector('[data-testid="chat-item"]:nth-of-type(2)');
 
-      await duplicateLastCreatedConversation(page);
+      const originalConversationName = uniqueName('ChatWithSourcesDuplicationTest');
 
-      const originalConversation = page.getByRole('navigation').first();
-      const originalConversationTitle = await originalConversation.textContent();
-      expect(originalConversationTitle).not.toBeNull();
+      await duplicateActiveConversation(page, originalConversationName);
 
+      const originalConversation = page.getByRole('navigation').filter({ hasText: new RegExp(`^${originalConversationName}$`) });
       await originalConversation.click();
       await deleteFirstFileFromPaperclip(page);
 
-      const duplicatedName = `${originalConversationTitle} (2)`;
+      const duplicatedName = `${originalConversationName} (2)`;
       const duplicatedConversation = page.getByRole('navigation').filter({ hasText: duplicatedName });
       await expect(duplicatedConversation).toBeVisible();
 

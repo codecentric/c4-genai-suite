@@ -14,6 +14,7 @@ import {
   selectConfiguration,
   sendMessage,
   setFilter,
+  uniqueName,
 } from '../tests/utils/helper';
 
 type TUserArgs = {
@@ -46,7 +47,7 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
     });
 
     await test.step('add assistant', async () => {
-      configuration.name = `E2E-Test-User-Args-${Date.now()}`;
+      configuration.name = uniqueName('E2E-Test-User-Args');
       configuration.description = `Description for ${configuration.name}`;
       await enterAdminArea(page);
       await createConfiguration(page, configuration);

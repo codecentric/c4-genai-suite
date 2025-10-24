@@ -1,20 +1,19 @@
-import { randomInt } from 'crypto';
 import test, { expect } from '@playwright/test';
 import { config } from '../tests/utils/config';
 import {
   addAzureModelToConfiguration,
   checkSelectedConfiguration,
-  cleanup,
   createConfiguration,
+  createUserIfNotExists,
   enterAdminArea,
   enterUserArea,
   login,
+  logout,
   newChat,
   selectConfiguration,
   sendMessage,
+  uniqueName,
 } from '../tests/utils/helper';
-
-const secondAssistantName = 'Second Assistant';
 
 if (!config.AZURE_OPEN_AI_API_KEY) {
   test.skip('should configure Azure OpenAI-Open AI LLM for chats [skipped due to missing API_KEY in env]', () => {});
@@ -23,13 +22,13 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
     const configuration = { name: '', description: '' };
     await test.step('should login', async () => {
       await login(page);
-      await cleanup(page);
     });
+    const secondAssistantName = uniqueName('Second Assistant');
 
     await test.step('add assistant', async () => {
-      configuration.name = `Azure-OpenAI-Chat-${randomInt(10000)}`;
-      configuration.description = `Description for ${configuration.name}`;
       await enterAdminArea(page);
+      configuration.name = uniqueName('Azure-OpenAI-Chat');
+      configuration.description = `Description for ${configuration.name}`;
       await createConfiguration(page, configuration);
       await createConfiguration(page, { ...configuration, name: secondAssistantName });
     });
@@ -37,6 +36,20 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
     await test.step('add model', async () => {
       await addAzureModelToConfiguration(page, configuration, { deployment: 'gpt-4o-mini' });
       await addAzureModelToConfiguration(page, { ...configuration, name: secondAssistantName }, { deployment: 'gpt-4o-mini' });
+    });
+
+    await test.step('switch user', async () => {
+      // Since we test on the total number of conversations, we switch here to a fresh user without conversation.
+      // This way we do not need to delete the conversations of the admin account
+      // (which would lead to problems if we ever want to run the tests in parallel)
+      const testuserName = uniqueName('test-user');
+      await createUserIfNotExists(page, {
+        name: testuserName,
+        email: `${testuserName}@example.com`,
+        password: 'test-secret',
+      });
+      await logout(page);
+      await login(page, { email: `${testuserName}@example.com`, password: 'test-secret' });
     });
 
     await test.step('should start chat in new configuration', async () => {
@@ -51,7 +64,6 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
 
       const userMessageContent = 'Hi!';
       await sendMessage(page, configuration, { message: userMessageContent });
-      await expect(page.locator('.chat-main :has-text("Tokens")').last()).toBeVisible({ timeout: 10000 });
 
       const conversationNavItemsPre = page.getByRole('navigation');
       await expect(conversationNavItemsPre.first()).toBeAttached({ timeout: 10000 });

@@ -11,6 +11,7 @@ import {
   newChat,
   selectConfiguration,
   sendMessage,
+  uniqueName,
 } from '../tests/utils/helper';
 
 if (!config.AZURE_OPEN_AI_API_KEY) {
@@ -24,7 +25,7 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
     });
 
     await test.step('add assistant', async () => {
-      configuration.name = `E2E-Test-MCP-${Date.now()}`;
+      configuration.name = uniqueName('E2E-Test-MCP');
       configuration.description = `Description for ${configuration.name}`;
       await enterAdminArea(page);
       await createConfiguration(page, configuration);

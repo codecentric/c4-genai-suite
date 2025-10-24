@@ -4,17 +4,18 @@ import {
   addAzureModelToConfiguration,
   addBucketToConfiguration,
   addSystemPromptToConfiguration,
-  cleanup,
-  createBucket,
+  createBucketIfNotExist,
   createConfiguration,
   editBucket,
   enterAdminArea,
   enterUserArea,
   expectElementInYRange,
+  globalUserBucketName,
   login,
   newChat,
   selectConfiguration,
   sendMessage,
+  uniqueName,
   uploadFileWhileInChat,
 } from '../tests/utils/helper';
 
@@ -22,12 +23,11 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
   test.skip('should configure Azure OpenAI-Open AI LLM for chats [skipped due to missing API_KEY in env]', () => {});
 } else {
   test('chat', async ({ page }) => {
-    const configuration = { name: `E2E-Test-${Date.now()}`, description: '' };
-    const bucket = { name: 'E2E-User-Bucket' };
+    const configuration = { name: uniqueName('E2E-Test'), description: '' };
+    const bucket = { name: globalUserBucketName() };
 
     await test.step('should login', async () => {
       await login(page);
-      await cleanup(page);
     });
     await test.step('should not add Configuration without required fields', async () => {
       await enterAdminArea(page);
@@ -45,7 +45,7 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
     });
 
     await test.step('should add OpenAI LLM Extension', async () => {
-      await addAzureModelToConfiguration(page, configuration, { deployment: 'gpt-4o-mini' });
+      await addAzureModelToConfiguration(page, configuration, { deployment: 'gpt-4o-mini' }, true);
     });
 
     await test.step('add prompt', async () => {
@@ -105,11 +105,15 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
 
     await test.step('should create bucket', async () => {
       await enterAdminArea(page);
-      await createBucket(page, {
-        name: bucket.name,
-        type: 'user',
-        endpoint: config.REIS_ENDPOINT,
-      });
+      await createBucketIfNotExist(
+        page,
+        {
+          name: bucket.name,
+          type: 'user',
+          endpoint: config.REIS_ENDPOINT,
+        },
+        true,
+      );
     });
 
     await test.step('should add bucket to Configuration', async () => {
