@@ -115,6 +115,7 @@ function LogoInput({
       data-testid="logo-upload-input"
       className="file-input file-input-bordered w-full max-w-xs"
       onChange={(event) => onChange(event.target.files?.[0])}
+      aria-label={texts.accessibility.uploadLogoFile}
     />
   );
 }

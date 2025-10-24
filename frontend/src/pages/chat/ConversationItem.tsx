@@ -43,6 +43,7 @@ export const ConversationItem = memo(({ chat }: ChatProps) => {
             onBlur={() => setShowRenameInput(false)}
             onKeyUp={(e) => e.key === 'Escape' && setShowRenameInput(false)}
             defaultValue={chat.name}
+            aria-label={texts.accessibility.renameConversation}
           />
         </div>
       </form>
@@ -50,25 +51,32 @@ export const ConversationItem = memo(({ chat }: ChatProps) => {
   }
 
   return (
-    <Button
-      size="sm"
-      p="xs"
-      onClick={async () => await navigate(`/chat/${chat.id}`)}
-      fullWidth
-      justify="space-between"
-      variant={isSelected ? 'filled' : 'subtle'}
-      classNames={{ root: 'relative group transition-all' }}
-      role="navigation"
-      onDoubleClick={() => isSelected && setShowRenameInput(true)}
-    >
-      {chat.name}
-      <div
-        onClick={(e) => e.stopPropagation()}
-        className={`absolute top-0 right-0 flex h-full items-center px-2 ${isMobile() ? '' : 'opacity-0 group-hover:opacity-100'}`}
+    <div className="group flex w-full items-stretch overflow-hidden" data-testid="conversation-item">
+      <Button
+        size="sm"
+        p="xs"
+        onClick={async () => await navigate(`/chat/${chat.id}`)}
+        justify="flex-start"
+        variant={isSelected ? 'filled' : 'subtle'}
+        classNames={{ root: 'transition-all flex-1 min-w-0 overflow-hidden', label: 'truncate text-left block' }}
+        onDoubleClick={() => isSelected && setShowRenameInput(true)}
+        title={chat.name}
       >
+        {chat.name}
+      </Button>
+      <div className={`flex items-center ${isMobile() ? '' : 'opacity-0 group-hover:opacity-100'}`}>
         <Menu width={200} opened={menuOpen} onChange={setMenuOpen}>
           <Menu.Target>
-            <IconDots style={{ width: rem(18), height: rem(18) }} />
+            <Button
+              variant="subtle"
+              size="compact-xs"
+              p={4}
+              aria-label={texts.common.menu}
+              aria-haspopup="true"
+              aria-expanded={menuOpen}
+            >
+              <IconDots style={{ width: rem(18), height: rem(18) }} />
+            </Button>
           </Menu.Target>
           <Menu.Dropdown>
             <Menu.Item
@@ -96,6 +104,6 @@ export const ConversationItem = memo(({ chat }: ChatProps) => {
           </Menu.Dropdown>
         </Menu>
       </div>
-    </Button>
+    </div>
   );
 });

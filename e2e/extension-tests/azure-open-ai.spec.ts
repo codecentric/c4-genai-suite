@@ -10,6 +10,7 @@ import {
   editBucket,
   enterAdminArea,
   enterUserArea,
+  expectA11yCompliant,
   expectElementInYRange,
   login,
   newChat,
@@ -71,6 +72,8 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
       const image = page.getByRole('img', { name: 'Image' }).first();
       expect(await image.getAttribute('src')).toBe(imageUrl);
       await expect(image).toBeVisible();
+
+      await expectA11yCompliant(page);
     });
 
     await test.step('should edit message', async () => {
@@ -149,6 +152,7 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
       await expect(sourcesSection).toBeVisible();
       const sourcesEntry = sourcesSection.locator(`ul > li >> text=keyword_ä_ö_ß.MD`);
       await expect(sourcesEntry).toHaveCount(1);
+      await expectA11yCompliant(page);
     });
 
     await test.step('should start new Chat and already uploaded file should not be checked', async () => {
@@ -207,6 +211,7 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
     await test.step('should preview the used sources', async () => {
       await page.getByTestId('sources-section').locator('a').click();
       await page.waitForSelector(`:has-text("[...] c4-test [...]")`);
+      await expectA11yCompliant(page);
     });
 
     await test.step('should close the source preview panel', async () => {

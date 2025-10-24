@@ -19,6 +19,7 @@ export function NavigationBar({ theme, redirectTo }: NavigationBarProps) {
   const className = 'flex h-12 items-center text-xl font-bold px-0';
   return (
     <div className="bg-primary-content text-primary flex items-center justify-start px-2">
+      <h1 className="sr-only">{theme.name}</h1>
       {redirectTo ? (
         <TransientNavLink className={cn('btn btn-ghost hover:bg-transparent', className)} to={redirectTo} data-testid="logo-link">
           {content}

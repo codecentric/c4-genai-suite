@@ -1,4 +1,5 @@
 import path from 'path';
+import AxeBuilder from '@axe-core/playwright';
 import { expect, Locator, Page } from '@playwright/test';
 import { config } from './config';
 
@@ -673,4 +674,9 @@ export async function changePassword(page: Page, currentPassword: string, newPas
   await page.getByRole('textbox', { name: 'Confirm Password', exact: true }).click();
   await page.getByRole('textbox', { name: 'Confirm Password', exact: true }).fill(newPassword);
   await page.getByRole('button', { name: 'Update Password' }).click({ timeout: 3000 });
+}
+
+export async function expectA11yCompliant(page: Page, exceptions: any[] = []) {
+  const accessibilityScanResults = await new AxeBuilder({ page }).analyze();
+  expect(accessibilityScanResults.violations).toEqual(exceptions);
 }

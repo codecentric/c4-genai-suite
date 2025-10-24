@@ -42,7 +42,13 @@ export const HumanChatItem = ({ message, editMessage }: ChatItemProps) => {
 
       {isEditing ? (
         <div className="rounded-xl bg-gray-100 p-3">
-          <Textarea value={editedText} onChange={(e) => setEditedText(e.target.value)} onKeyDown={doKeyDown} autosize />
+          <Textarea
+            value={editedText}
+            onChange={(e) => setEditedText(e.target.value)}
+            onKeyDown={doKeyDown}
+            autosize
+            aria-label={texts.accessibility.editMessage}
+          />
           <div className="mt-2 flex items-center justify-end gap-2">
             <Button onClick={() => setIsEditing(false)} size="xs" variant="subtle">
               {texts.common.cancel}
@@ -56,10 +62,24 @@ export const HumanChatItem = ({ message, editMessage }: ChatItemProps) => {
         <>
           <div className="max-w-full rounded-xl bg-gray-100 px-4 py-3 whitespace-pre-wrap">{textContent}</div>
           <div className={'flex items-center justify-end opacity-0 group-hover:opacity-100'}>
-            <ActionIcon color="gray" c="black" size={'lg'} variant="white" onClick={copyTextToClipboard}>
+            <ActionIcon
+              color="gray"
+              c="black"
+              size={'lg'}
+              variant="white"
+              onClick={copyTextToClipboard}
+              aria-label={texts.common.copy}
+            >
               <IconClipboard className="w-4" />
             </ActionIcon>
-            <ActionIcon color="gray" c="black" size={'lg'} variant="white" onClick={() => setIsEditing(true)}>
+            <ActionIcon
+              color="gray"
+              c="black"
+              size={'lg'}
+              variant="white"
+              onClick={() => setIsEditing(true)}
+              aria-label={texts.common.edit}
+            >
               <IconPencil className="w-4" />
             </ActionIcon>
           </div>

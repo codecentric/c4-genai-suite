@@ -43,7 +43,7 @@ test('User settings', async ({ page }) => {
     await changePassword(page, 'test-secret', 'new-secret');
     await expect(page.getByText('Password updated successfully')).toBeVisible({ timeout: 1000 });
     await page.getByRole('button', { name: 'close' }).last().click();
-    await page.getByRole('banner').getByRole('button').click();
+    await page.getByTestId('user-profile-modal').locator('header').getByRole('button').click();
   });
   await test.step('new user should logout and login with the new password', async () => {
     await page.getByTestId('menu user').waitFor();

@@ -464,12 +464,18 @@ export namespace Forms {
             >
               <Icon icon="plus" />
             </button>
-            <input placeholder="general" disabled className={cn('input input-bordered w-full', className)} />
+            <input
+              placeholder="general"
+              disabled
+              className={cn('input input-bordered w-full', className)}
+              aria-label={texts.accessibility.fileTypeGeneral}
+            />
             <input
               placeholder="10"
               step="0.1"
               className={cn('input input-bordered w-full', className)}
               data-testid={`${generalName}.value`}
+              aria-label={texts.accessibility.generalFileSizeLimit}
               {...form.register(generalName, {
                 required: true,
                 onChange: handleFieldChange,
@@ -497,6 +503,7 @@ export namespace Forms {
                 placeholder="pdf"
                 className={cn('input input-bordered w-full', className)}
                 data-testid={`${dyName}.${index}.key`}
+                aria-label={texts.accessibility.fileType(index + 1)}
                 {...form.register(`${dyName}.${index}.key`, {
                   required: true,
                   onChange: handleFieldChange,
@@ -505,6 +512,7 @@ export namespace Forms {
               <input
                 type="number"
                 placeholder="10"
+                aria-label={texts.accessibility.fileSizeLimit(index + 1)}
                 step="0.1"
                 required
                 className={cn('input input-bordered w-full', className)}
