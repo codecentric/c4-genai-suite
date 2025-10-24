@@ -7,7 +7,7 @@ import {
   createBucketIfNotExist,
   createConfiguration,
   deleteFirstFileFromPaperclip,
-  duplicateLastCreatedConversation,
+  duplicateActiveConversation,
   editBucket,
   enterAdminArea,
   enterUserArea,
@@ -82,7 +82,7 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
     });
 
     await test.step('should duplicate a conversation that includes a file uploaded with files in chat extension', async () => {
-      await duplicateLastCreatedConversation(page);
+      await duplicateActiveConversation(page);
       const originalConversation = page.locator('role=navigation').first();
       originalConversationWithChatWithFiles = await originalConversation.textContent();
       expect(originalConversationWithChatWithFiles).not.toBeNull();
@@ -168,7 +168,7 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
     });
 
     await test.step('should duplicate a conversation that includes a file uploaded with chat with files extension', async () => {
-      await duplicateLastCreatedConversation(page);
+      await duplicateActiveConversation(page);
 
       const originalConversation = page.getByRole('navigation').first();
       originalConversationWithTwoFiles = await originalConversation.textContent();
@@ -190,7 +190,7 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
       });
       await page.waitForSelector('[data-testid="chat-item"]:nth-of-type(2)');
 
-      await duplicateLastCreatedConversation(page);
+      await duplicateActiveConversation(page);
 
       const originalConversation = page.getByRole('navigation').first();
       const originalConversationTitle = await originalConversation.textContent();

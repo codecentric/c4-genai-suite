@@ -639,10 +639,8 @@ async function resetOptions(page: Page) {
   }
 }
 
-export async function duplicateLastCreatedConversation(page: Page) {
-  // sometimes there are races between renaiming of the conversation and duplicating it, as a workaround, we wait
-  await page.waitForTimeout(1000);
-  await page.locator('svg.tabler-icon-dots').first().click();
+export async function duplicateActiveConversation(page: Page) {
+  await page.getByTestId('active-conversation-item-more-actions').click();
   const dropdown = page.locator('.mantine-Menu-dropdown');
   await expect(dropdown).toBeVisible();
   await dropdown.locator('text=Duplicate').click();
