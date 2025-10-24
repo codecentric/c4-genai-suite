@@ -40,6 +40,9 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
     });
 
     await test.step('switch user', async () => {
+      // Since we test on the total number of conversations, we switch here to a fresh user without conversation.
+      // This way we do not need to delete the conversations of the admin account
+      // (which would lead to problems if we ever want to run the tests in parallel)
       const testuserName = `test-user-${randomInt(10000)}`;
       await createUserIfNotExists(page, {
         name: testuserName,
