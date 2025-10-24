@@ -24,6 +24,12 @@ jobs:
           - name: oauth-mock
             containerfile: dev/oauth-mock/Dockerfile
             context: dev/oauth-mock/
+          - name: reis-base-image
+            containerfile: dev/reis-base-image/Dockerfile
+            context: dev/reis-base-image/
+          - name: reis-dev-base-image
+            containerfile: dev/reis-dev-base-image/Dockerfile
+            context: dev/reis-dev-base-image/
     steps:
       - uses: actions/checkout@v5
 
@@ -58,6 +64,8 @@ jobs:
           - name: caddy-gateway-proxy
           - name: mcp-tool-as-server
           - name: oauth-mock
+          - name: reis-base-image
+          - name: reis-dev-base-image
     steps:
       - uses: docker/login-action@v3
         with:

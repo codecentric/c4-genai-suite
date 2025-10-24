@@ -1,11 +1,6 @@
-FROM python:3.14-alpine3.22 AS builder
+FROM ghcr.io/codecentric/c4-genai-suite/dev-helper/reis-dev-base-image:latest AS builder
 
 WORKDIR /reis
-
-RUN apk add --no-cache build-base=0.5-r3 linux-headers=6.14.2-r0 rust=1.87.0-r0 cargo=1.87.0-r0
-
-RUN pip install poetry
-
 
 ENV POETRY_NO_INTERACTION=1 \
     POETRY_VIRTUALENVS_IN_PROJECT=1 \
@@ -21,36 +16,10 @@ RUN touch README.md
 RUN poetry install --without dev --no-root && \
     rm -rf $POETRY_CACHE_DIR
 
-# Remove unnecessary files from virtualenv to reduce size
-RUN find /reis/.venv -name "*.pyc" -delete && \
-    find /reis/.venv -name "*.pyo" -delete && \
-    find /reis/.venv -name "*.pyd" -delete && \
-    find /reis/.venv -name "__pycache__" -type d -exec rm -rf {} + 2>/dev/null || true && \
-    find /reis/.venv -name "*.c" -delete && \
-    find /reis/.venv -name "*.h" -delete
-
 #
 # RUNTIME
 #
-FROM python:3.14-alpine3.22 AS production
-
-# we need this library for extracting audio streams from videos and handeling office formats
-RUN apk add --no-cache \
-    ffmpeg=6.1.2-r2 \
-    libreoffice-calc=25.2.5.2-r0 \
-    libreoffice-impress=25.2.5.2-r0 \
-    libreoffice-writer=25.2.5.2-r0
-# Install fonts for pdf generation
-RUN apk --no-cache add \
-    msttcorefonts-installer=3.8.1-r1 \
-    fontconfig=2.15.0-r3 \
-    font-droid-nonlatin=20200215-r4 \
-    font-droid=20200215-r4 \
-    ttf-dejavu=2.37-r6 \
-    ttf-freefont=20120503-r4 \
-    ttf-liberation=2.1.5-r2 && \
-    update-ms-fonts && \
-    fc-cache -f
+FROM ghcr.io/codecentric/c4-genai-suite/dev-helper/reis-base-image:latest
 
 ENV VIRTUAL_ENV=/reis/.venv \
 PATH="/reis/.venv/bin:$PATH"
