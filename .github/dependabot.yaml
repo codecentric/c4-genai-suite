@@ -50,9 +50,8 @@ updates:
       vite:
         patterns:
           - "vite"
+          - "*/vite"
           - "@vitejs/*"
-      vitest:
-        patterns:
           - "vitest"
           - "@vitest/*"
 
