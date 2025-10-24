@@ -43,6 +43,7 @@ export const ConversationItem = memo(({ chat }: ChatProps) => {
             onBlur={() => setShowRenameInput(false)}
             onKeyUp={(e) => e.key === 'Escape' && setShowRenameInput(false)}
             defaultValue={chat.name}
+            data-testid="conversation-rename-input"
           />
         </div>
       </form>

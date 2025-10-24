@@ -152,7 +152,8 @@ export async function createBucketIfNotExist(
   performTest: boolean = false,
 ) {
   await page.getByRole('link', { name: 'Files' }).click();
-  if (await page.locator('li').filter({ hasText: bucket.name }).getByTestId('more-actions').count()) {
+  await page.waitForLoadState('networkidle');
+  if ((await page.locator('li').filter({ hasText: bucket.name }).count()) > 0) {
     // Bucket already exists
     return;
   }
@@ -553,7 +554,7 @@ export async function createUserIfNotExists(page: Page, user: { email: string; n
   const adminCell = page.getByRole('cell', { name: 'Admin', exact: true });
   await adminCell.last().waitFor();
 
-  if (await page.getByRole('table').getByRole('row').filter({ hasText: user.name }).count()) {
+  if ((await page.getByRole('table').getByRole('row').filter({ hasText: user.name }).count()) > 0) {
     // User already exists
     return;
   }
@@ -647,7 +648,18 @@ async function resetOptions(page: Page) {
   }
 }
 
-export async function duplicateActiveConversation(page: Page) {
+export async function duplicateActiveConversation(page: Page, renameBeforeDuplicationTo?: string) {
+  if (renameBeforeDuplicationTo) {
+    await page.getByTestId('active-conversation-item-more-actions').click();
+    const dropdown = page.locator('.mantine-Menu-dropdown');
+    await expect(dropdown).toBeVisible();
+    await dropdown.locator('text=Rename').click();
+    await page.getByTestId('conversation-rename-input').fill(renameBeforeDuplicationTo);
+    await page.getByTestId('conversation-rename-input').press('Enter');
+    const renamedConversation = page.getByText(renameBeforeDuplicationTo).first();
+    await expect(renamedConversation).toBeVisible();
+  }
+
   await page.getByTestId('active-conversation-item-more-actions').click();
   const dropdown = page.locator('.mantine-Menu-dropdown');
   await expect(dropdown).toBeVisible();

@@ -10,6 +10,7 @@ import {
   createConfiguration,
   deactivateFileInChatExtensionToConfiguration,
   deleteFirstFileFromPaperclip,
+  duplicateActiveConversation,
   editBucket,
   enterAdminArea,
   enterUserArea,
@@ -27,7 +28,7 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
 } else {
   test('files', async ({ page }) => {
     let lastMessageOriginal: Locator;
-    let originalConversationWithCompleteFiles: string | null;
+    let originalConversationName: string | null;
     const conversationFilesBucket = globalConversationBucketName();
 
     const configuration = { name: '', description: '' };
@@ -98,20 +99,11 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
       const lastMessageLocator = page.locator('[data-testid="chat-item"]').filter({ hasText: '.2001' });
       lastMessageOriginal = lastMessageLocator.last();
 
-      await page.getByTestId('active-conversation-item-more-actions').click();
-
-      const dropdown = page.locator('.mantine-Menu-dropdown');
-      await expect(dropdown).toBeVisible();
-
-      await dropdown.locator('text=Duplicate').click();
-
+      originalConversationName = uniqueName('ChatDuplicationTest');
+      await duplicateActiveConversation(page, originalConversationName);
       await page.locator('text=Conversation duplicated successfully').waitFor({ state: 'visible' });
 
-      const originalConversation = page.getByRole('navigation').first();
-      originalConversationWithCompleteFiles = await originalConversation.textContent();
-      expect(originalConversationWithCompleteFiles).not.toBeNull();
-
-      const duplicatedName = `${originalConversationWithCompleteFiles} (2)`;
+      const duplicatedName = `${originalConversationName} (2)`;
       const duplicatedConversation = page.getByRole('navigation').filter({ hasText: duplicatedName });
       await expect(duplicatedConversation).toBeVisible();
     });
@@ -175,7 +167,7 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
     await test.step('should navigate to duplicated conversation with complete file extension', async () => {
       await enterUserArea(page);
       const duplicatedConversationLocator = page.getByRole('navigation').filter({
-        hasText: `${originalConversationWithCompleteFiles} (2)`,
+        hasText: `${originalConversationName} (2)`,
       });
 
       await expect(duplicatedConversationLocator, 'Duplicated conversation link should be visible').toBeVisible({

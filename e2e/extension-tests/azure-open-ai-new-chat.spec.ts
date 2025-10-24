@@ -15,8 +15,6 @@ import {
   uniqueName,
 } from '../tests/utils/helper';
 
-const secondAssistantName = uniqueName('Second Assistant');
-
 if (!config.AZURE_OPEN_AI_API_KEY) {
   test.skip('should configure Azure OpenAI-Open AI LLM for chats [skipped due to missing API_KEY in env]', () => {});
 } else {
@@ -25,6 +23,7 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
     await test.step('should login', async () => {
       await login(page);
     });
+    const secondAssistantName = uniqueName('Second Assistant');
 
     await test.step('add assistant', async () => {
       await enterAdminArea(page);
