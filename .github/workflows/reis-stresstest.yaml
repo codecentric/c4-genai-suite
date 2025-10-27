@@ -42,7 +42,7 @@ jobs:
           build-args: |
             VERSION=${{ github.ref_type == 'tag' && github.ref_name || github.sha }}
       - if: ${{ steps.download_reis.outcome == 'failure' }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: reis
           path: /tmp/reis.tar
