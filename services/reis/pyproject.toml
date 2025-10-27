@@ -14,7 +14,7 @@ langchain-core = "0.3.79"
 langchain-community = "0.3.31"
 langchain-openai = "0.3.35"
 langchain-postgres = "0.0.16"
-psycopg = {extras = ["binary"], version = "^3.2.11"}
+psycopg = {extras = ["binary"], version = "^3.2.12"}
 fastapi = {extras = ["standard"], version = "0.120.1"}
 azure-search-documents = "11.6.0"
 azure-identity = "1.25.1"
