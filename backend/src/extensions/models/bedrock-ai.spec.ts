@@ -8,4 +8,11 @@ jest.mock('ai', () => ({
   generateText: jest.fn(() => () => 'test output'),
 }));
 
-describe('BedrockModelExtension', () => modelExtensionTestSuite(BedrockModelExtension));
+const mockConfig = {
+  model: 'test-bedrock-model',
+  region: 'test-region',
+  accessKeyId: 'test-access-key-id',
+  secretAccessKey: 'test-secret-access-key',
+};
+
+describe('BedrockModelExtension', () => modelExtensionTestSuite(BedrockModelExtension, mockConfig));

@@ -148,10 +148,10 @@ type OpenAICompatibleModelExtensionConfiguration = ExtensionConfiguration & {
   apiKey: string;
   baseUrl: string;
   modelName: string;
-  temperature: number;
-  seed: number;
-  presencePenalty: number;
-  frequencyPenalty: number;
+  temperature?: number;
+  seed?: number;
+  presencePenalty?: number;
+  frequencyPenalty?: number;
   effort?: 'low' | 'medium' | 'high';
   summary?: 'detailed' | 'auto';
 };

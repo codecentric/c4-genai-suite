@@ -8,4 +8,9 @@ jest.mock('ai', () => ({
   generateText: jest.fn(() => () => 'test output'),
 }));
 
-describe('GoogleGenAIModelExtension', () => modelExtensionTestSuite(GoogleGenAIModelExtension));
+const mockConfig = {
+  modelName: 'test-model',
+  apiKey: 'test-api-key',
+};
+
+describe('GoogleGenAIModelExtension', () => modelExtensionTestSuite(GoogleGenAIModelExtension, mockConfig));

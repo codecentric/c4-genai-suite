@@ -8,4 +8,9 @@ jest.mock('ai', () => ({
   generateText: jest.fn(() => () => 'test output'),
 }));
 
-describe('MistralModelExtension', () => modelExtensionTestSuite(MistralModelExtension));
+const mockConfig = {
+  apiKey: 'test-api-key',
+  modelName: 'test-model',
+};
+
+describe('MistralModelExtension', () => modelExtensionTestSuite(MistralModelExtension, mockConfig));

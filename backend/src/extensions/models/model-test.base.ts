@@ -6,7 +6,7 @@ import { I18nService } from '../../localization/i18n.service';
 
 type ExtensionConstructor = new (i18n: I18nService) => Extension;
 
-export function modelExtensionTestSuite(modelExtension: ExtensionConstructor) {
+export function modelExtensionTestSuite(modelExtension: ExtensionConstructor, modelExtensionConfig: ExtensionConfiguration) {
   let extension: Extension;
 
   const i18n = {
@@ -37,7 +37,7 @@ export function modelExtensionTestSuite(modelExtension: ExtensionConstructor) {
     const getContext = () => context;
     const next = (context: ChatContext) => Promise.resolve(context);
 
-    const config: ExtensionConfiguration = { modelName: '' };
+    const config: ExtensionConfiguration = modelExtensionConfig;
     const middlewares = await extension.getMiddlewares?.(user, { id: 2, externalId: '', values: config } as ExtensionEntity);
 
     expect(extension.getMiddlewares?.bind(extension)).toBeDefined();
@@ -51,7 +51,7 @@ export function modelExtensionTestSuite(modelExtension: ExtensionConstructor) {
   });
 
   it('should have test method', async () => {
-    const configuration: ExtensionConfiguration = {};
+    const configuration: ExtensionConfiguration = modelExtensionConfig;
     await extension.test?.(configuration);
     expect(extension.test?.bind(extension)).toBeDefined();
     expect(generateText).toHaveBeenCalled();

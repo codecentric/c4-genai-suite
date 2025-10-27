@@ -140,10 +140,10 @@ export class OpenAIModelExtension implements Extension<OpenAIModelExtensionConfi
 type OpenAIModelExtensionConfiguration = ExtensionConfiguration & {
   apiKey: string;
   modelName: string;
-  temperature: number;
-  seed: number;
-  presencePenalty: number;
-  frequencyPenalty: number;
+  temperature?: number;
+  seed?: number;
+  presencePenalty?: number;
+  frequencyPenalty?: number;
   effort?: 'minimal' | 'low' | 'medium' | 'high';
   summary?: 'detailed' | 'auto';
 };

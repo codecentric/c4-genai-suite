@@ -117,6 +117,5 @@ type BedrockConverseExtensionConfiguration = ExtensionConfiguration & {
   region: string;
   accessKeyId: string;
   secretAccessKey: string;
-  temperature: number;
-  topP: number;
+  temperature?: number;
 };
