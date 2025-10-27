@@ -8,4 +8,10 @@ jest.mock('ai', () => ({
   generateText: jest.fn(() => () => 'test output'),
 }));
 
-describe('NvidiaModelExtension', () => modelExtensionTestSuite(NvidiaModelExtension));
+const mockConfig = {
+  apiKey: 'test-api-key',
+  baseUrl: 'test-base-url',
+  modelName: 'test-model',
+};
+
+describe('NvidiaModelExtension', () => modelExtensionTestSuite(NvidiaModelExtension, mockConfig));

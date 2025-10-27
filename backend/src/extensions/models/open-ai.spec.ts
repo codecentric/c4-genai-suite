@@ -10,4 +10,9 @@ jest.mock('ai', () => ({
   generateText: jest.fn(() => () => 'test output'),
 }));
 
-describe('OpenAIModelExtension', () => modelExtensionTestSuite(OpenAIModelExtension));
+const mockConfig = {
+  apiKey: 'test-api-key',
+  modelName: 'test-model',
+};
+
+describe('OpenAIModelExtension', () => modelExtensionTestSuite(OpenAIModelExtension, mockConfig));
