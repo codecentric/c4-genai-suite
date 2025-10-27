@@ -76,7 +76,7 @@ Now you can return to the [chat page](http://localhost:3333/chat) (click on `c4 
 
 > [!TIP]
 > Our `docker-compose` includes a local Ollama, which runs on the CPU. You can use this for quick testing. But it will be slow and you probably want to use another model. If you want to use it, just create the following model extension in your Assistant.
-> * Extension: `Dev: Ollama`
+> * Extension: `Ollama`
 > * Endpoint: `http://ollama:11434`
 > * Model: `llama3.2`
 
