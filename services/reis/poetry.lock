@@ -409,18 +409,18 @@ test-tox-coverage = ["coverage (>=5.5)"]
 
 [[package]]
 name = "boto3"
-version = "1.40.59"
+version = "1.40.61"
 description = "The AWS SDK for Python"
 optional = false
 python-versions = ">=3.9"
 groups = ["main"]
 files = [
-    {file = "boto3-1.40.59-py3-none-any.whl", hash = "sha256:75752e7dc445131700a58926a50ca705794232f0f47d0e21edb59fbf1898db95"},
-    {file = "boto3-1.40.59.tar.gz", hash = "sha256:b1a5a203511e594872b39a129365f02eb5846eea990629e8daf47a3c01e7fd49"},
+    {file = "boto3-1.40.61-py3-none-any.whl", hash = "sha256:6b9c57b2a922b5d8c17766e29ed792586a818098efe84def27c8f582b33f898c"},
+    {file = "boto3-1.40.61.tar.gz", hash = "sha256:d6c56277251adf6c2bdd25249feae625abe4966831676689ff23b4694dea5b12"},
 ]
 
 [package.dependencies]
-botocore = ">=1.40.59,<1.41.0"
+botocore = ">=1.40.61,<1.41.0"
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.14.0,<0.15.0"
 
@@ -865,14 +865,14 @@ xray = ["mypy-boto3-xray (>=1.40.0,<1.41.0)"]
 
 [[package]]
 name = "botocore"
-version = "1.40.59"
+version = "1.40.61"
 description = "Low-level, data-driven core of boto 3."
 optional = false
 python-versions = ">=3.9"
 groups = ["main"]
 files = [
-    {file = "botocore-1.40.59-py3-none-any.whl", hash = "sha256:042dd844ca82155ca1ab9608b9bef36d517515c775d075f57b89257108ae843b"},
-    {file = "botocore-1.40.59.tar.gz", hash = "sha256:842a466d8735272a30fe5b7f97df559d9e211a18e412f62a17ed249fd62f85fe"},
+    {file = "botocore-1.40.61-py3-none-any.whl", hash = "sha256:17ebae412692fd4824f99cde0f08d50126dc97954008e5ba2b522eb049238aa7"},
+    {file = "botocore-1.40.61.tar.gz", hash = "sha256:a2487ad69b090f9cccd64cf07c7021cd80ee9c0655ad974f87045b02f3ef52cd"},
 ]
 
 [package.dependencies]
@@ -6789,4 +6789,4 @@ cffi = ["cffi (>=1.17,<2.0) ; platform_python_implementation != \"PyPy\" and pyt
 [metadata]
 lock-version = "2.1"
 python-versions = "<4.0,>=3.12.0"
-content-hash = "c19db92ce80f2baa8887e080a85e1489257f8338fa760ef59f3e278aa0203255"
+content-hash = "85d1dd6d6e1fba03dd520f4a8c668591fd2cebd7946f31580ace45e04c48de82"
