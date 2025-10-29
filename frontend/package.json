@@ -33,7 +33,7 @@
     "@tanstack/react-table": "^8.21.3",
     "clsx": "^2.1.1",
     "date-fns": "^4.0.0",
-    "i18next": "^25.0.0",
+    "i18next": "^25.6.0",
     "katex": "^0.16.22",
     "msw": "^2.3.5",
     "query-string": "^9.1.0",
