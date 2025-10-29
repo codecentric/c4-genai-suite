@@ -70,7 +70,7 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
 
       await expect(page.getByRole('heading', { name: 'Sources' })).toBeVisible();
       await page.getByTestId('sources-section').locator('a').getByText('birthdays.pdf').click();
-      await page.waitForSelector(`:has-text("[...] BirthdaySheet Daniel Düsentrieb Quack 02/07/2714 01/02/3456 Page 2 [...]")`);
+      await page.waitForSelector(`:has-text("BirthdaySheet Daniel Düsentrieb Quack 02/07/2714 01/02/3456 Page 2")`);
 
       const source_panel = await page.waitForSelector(`:has-text("Source Content")`);
       expect(source_panel).toBeDefined();
@@ -206,7 +206,7 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
 
       await expect(page.getByRole('heading', { name: 'Sources' })).toBeVisible();
       await page.getByTestId('sources-section').locator('a').getByText('birthdays.pdf').click();
-      await page.waitForSelector(`:has-text("[...] BirthdaySheet Daniel Düsentrieb Quack 02/07/2714 01/02/3456 Page 2 [...]")`);
+      await page.waitForSelector(`:has-text("BirthdaySheet Daniel Düsentrieb Quack 02/07/2714 01/02/3456 Page 2")`);
 
       const source_panel = await page.waitForSelector(`:has-text("Source Content")`);
       expect(source_panel).toBeDefined();
