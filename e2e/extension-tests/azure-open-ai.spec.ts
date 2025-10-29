@@ -210,12 +210,12 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
 
     await test.step('should preview the used sources', async () => {
       await page.getByTestId('sources-section').locator('a').click();
-      await page.waitForSelector(`:has-text("[...] c4-test [...]")`);
+      await page.waitForSelector(`blockquote:has-text("c4-test")`);
     });
 
     await test.step('should close the source preview panel', async () => {
       await page.locator('#right').getByRole('button', { name: 'close' }).click();
-      await page.waitForSelector(`:has-text("[...] c4-test [...]")`, { state: 'detached' });
+      await page.waitForSelector(`blockquote:has-text("c4-test")`, { state: 'detached' });
     });
 
     await test.step('should deselect all files', async () => {

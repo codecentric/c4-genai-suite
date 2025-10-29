@@ -52,7 +52,9 @@ export const SourcesChunkPreview = ({ onClose, document }: SourcesChunkPreviewPr
   return container(
     data.map((chunk, index) => (
       <Blockquote key={index} mt="lg" p="md" className="overflow-clip">
-        <Text size="sm">[...] {chunk} [...]</Text>
+        <Text size="sm" style={{ whiteSpace: 'pre-wrap' }}>
+          {chunk}
+        </Text>
       </Blockquote>
     )),
   );
