@@ -56,7 +56,7 @@ jobs:
             -e MINIO_ROOT_USER="admin" \
             -e MINIO_ROOT_PASSWORD="secretsecret" \
             minio/minio:latest server /data
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v6
         with:
           name: backend
           path: /tmp/
@@ -75,7 +75,7 @@ jobs:
             -e AUTH_INITIAL_ADMIN_USERNAME="admin@example.com" \
             -e AUTH_INITIAL_ADMIN_PASSWORD="secret" \
             backend:commit-${{ github.sha }}
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v6
         with:
           name: reis
           path: /tmp/
@@ -114,7 +114,7 @@ jobs:
             --name mcp-fetch \
             -e CONFIG='{"mcpServers":{"mcp-fetch":{"command":"uvx","args":["mcp-server-fetch"],"port":8000}}}' \
             ghcr.io/codecentric/c4-genai-suite/dev-helper/mcp-tool-as-server:latest
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v6
         with:
           name: frontend
           path: /tmp/
