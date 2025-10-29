@@ -95,7 +95,7 @@
                     "properties": {
                         "enablePassword": {
                             "type": "boolean",
-                            "description": "Specifies if the build in Username & Password auth is used",
+                            "description": "Specifies if the built-in username & password auth is used",
                             "default": false
                         },
                         "initialAdminUsername": {
@@ -176,6 +176,16 @@
                         "existingMicrosoftTenant": {
                             "type": "string",
                             "description": "The name of the existing k8s secret. `c4.auth.microsoftTenant` will be ignored. The key must be `microsoftTenant`",
+                            "default": "\"\""
+                        },
+                        "acceptUserGroupsFromAuthProvider": {
+                            "type": "string",
+                            "description": "Sets if user groups from the identity provider are saved in the c4 user. (All groups manually selected in c4 will be overwritten!)",
+                            "default": "\"\""
+                        },
+                        "userGroupsPropertyName": {
+                            "type": "string",
+                            "description": "The property in the auth token from where the user groups are read. Default is \"groups\".",
                             "default": "\"\""
                         }
                     }
