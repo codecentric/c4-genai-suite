@@ -1,5 +1,21 @@
 # Changelog
 
+## [9.7.0](https://github.com/codecentric/c4-genai-suite/compare/v9.6.0...v9.7.0) (2025-10-30)
+
+
+### Features
+
+* **frontend:** preserve newlines in chunk source viewer ([#672](https://github.com/codecentric/c4-genai-suite/issues/672)) ([adf7c91](https://github.com/codecentric/c4-genai-suite/commit/adf7c91b8433a5667670d60d860c937b72ea5e04))
+* support multiple user groups per user ([1bc3ed3](https://github.com/codecentric/c4-genai-suite/commit/1bc3ed30a87bf0aa27c50a59917b5412a5cb7088))
+
+
+### Bug Fixes
+
+* **backend:** auto-append /api to Ollama endpoint for compatibility ([#657](https://github.com/codecentric/c4-genai-suite/issues/657)) ([215a37b](https://github.com/codecentric/c4-genai-suite/commit/215a37bd67bd8e2914f15362a9760b4a4adc1b3e))
+* **frontend:** test button can be clicked for unchanged extensions ([#651](https://github.com/codecentric/c4-genai-suite/issues/651)) ([1758a43](https://github.com/codecentric/c4-genai-suite/commit/1758a43bf894b778c504b7421c7fb2ca618a80fd))
+* **REIS:** mitigate rare race when converting multiple office files at the same time ([#632](https://github.com/codecentric/c4-genai-suite/issues/632)) ([1555d96](https://github.com/codecentric/c4-genai-suite/commit/1555d966b5b7931b39e6fb8f189848d1c6fa1a88))
+* tell the LLM which output formats are supported by c4 ([#631](https://github.com/codecentric/c4-genai-suite/issues/631)) ([9ce4416](https://github.com/codecentric/c4-genai-suite/commit/9ce4416921d11ba7c0ba9dce23c5cd548cc9e8f5))
+
 ## [9.6.0](https://github.com/codecentric/c4-genai-suite/compare/v9.5.0...v9.6.0) (2025-10-22)
 
 
