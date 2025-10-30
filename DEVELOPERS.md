@@ -7,7 +7,7 @@
 - **Postgres**: Automatically configured via Docker Compose
   - Uses pgvector image for vector storage
 - **Python** (currently required): Required for REI-S (Retrieval & Ingestion Server)
-  - Poetry (>= 1.2) for dependency management
+  - uv (>= 0.5.0) for dependency management ([installation guide](https://docs.astral.sh/uv/getting-started/installation/))
   - Python version compatibility issues can be managed with `pyenv`
 - **JRE** (currently required): Required when changing APIs only, to run the OpenAPI Generator. Creates or updates API client files for
   - frontend to backend access
@@ -22,11 +22,7 @@ Set up the `node` version specified in the `.nvmrc` file. We recommend using `nv
 
 ### 2. Python Setup
 
-Set up the python version specified in the .python-version file and make sure poetry (>=1.2) is available.
-
-> [!TIP]
-> In some circumstances, a call to `poetry install` might trigger a lookup to the keyring, which can cause a modal dialog from kwallet to appear.
-> To avoid this, run the following command before calling poetry: `export PYTHON_KEYRING_BACKEND=keyring.backends.null.Keyring`
+Set up the python version specified in the .python-version file and make sure uv (>=0.5.0) is available. See the [uv installation guide](https://docs.astral.sh/uv/getting-started/installation/) for instructions.
 
 ### 3. Install packages
 
@@ -141,7 +137,7 @@ Within the `/services/reis` folder:
 
 ```bash
 # re-generate reis-dev-spec.json
-`poetry run python rei_s/generate_open_api.py`
+uv run python rei_s/generate_open_api.py
 ```
 
 ... and then in `/backend` folder:
