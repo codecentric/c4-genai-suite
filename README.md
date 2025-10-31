@@ -44,7 +44,7 @@ The c4 GenAI Suite is designed for extensibility. Writing extensions is easy, as
 
 * Model Context Protocol (MCP) servers
 * Custom systemprompt
-* Bing Search
+* Brave Search and Grounding with Bing Search
 * Calculator
 
 

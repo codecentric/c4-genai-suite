@@ -120,7 +120,8 @@
     "brave": {
       "title": "Brave Web Search",
       "description": "Führt eine Websuche mit Brave durch",
-      "apiKeyHint": "Der Brave Search API Key"
+      "apiKeyHint": "Der Brave Search API Key",
+      "maxResults": "Anzahl der Suchergebnisse"
     },
     "duckduckgo": {
       "title": "Duckduckgo Web Search",
