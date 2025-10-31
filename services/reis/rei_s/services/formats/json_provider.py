@@ -28,7 +28,10 @@ class JsonProvider(AbstractFormatProvider):
 
         json_dict = json.loads(text)
 
-        chunks = self.splitter(chunk_size).create_documents([json_dict])
+        chunks = self.splitter(chunk_size).create_documents(
+            [json_dict],
+            convert_lists=True,
+        )
         return chunks
 
     def convert_file_to_pdf(self, file: SourceFile) -> SourceFile:
