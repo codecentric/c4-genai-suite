@@ -102,6 +102,11 @@ class PdfProvider(AbstractFormatProvider):
 
         return chunks
 
+    @property
+    def may_start_separate_process_for_converting(self) -> bool:
+        # pdf files are converted to pdf by a simple copy, which does not need a subprocess
+        return False
+
     def convert_file_to_pdf(self, file: SourceFile) -> SourceFile:
         path = get_new_file_path(extension="pdf")
         shutil.copy(file.path, path)
