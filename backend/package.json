@@ -36,7 +36,7 @@
   },
   "dependencies": {
     "@ai-sdk/amazon-bedrock": "^3.0.50",
-    "@ai-sdk/azure": "^2.0.60",
+    "@ai-sdk/azure": "^2.0.62",
     "@ai-sdk/google": "^2.0.26",
     "@ai-sdk/google-vertex": "^3.0.56",
     "@ai-sdk/mistral": "^2.0.22",
