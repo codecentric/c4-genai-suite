@@ -32,7 +32,7 @@ export class AuthService implements OnModuleInit {
     const config: AuthConfig = {
       baseUrl: configService.get('AUTH_BASEURL') || configService.getOrThrow('BASE_URL'),
       trustProxy: configService.get('AUTH_TRUST_PROXY') === 'true',
-      acceptUserGroupsFromAuthProvider: configService.get('AUTH_USE_USER_GROUPS_FROM_AUTH_PROVIDER', false),
+      acceptUserGroupsFromAuthProvider: configService.get('AUTH_USE_USER_GROUPS_FROM_AUTH_PROVIDER') === 'true',
       userGroupsPropertyName: configService.get('AUTH_USER_GROUPS_PROPERTY_NAME', 'groups'),
     };
 
@@ -220,20 +220,24 @@ export class AuthService implements OnModuleInit {
     const userDoesNotExist = !fromDB;
     if (userDoesNotExist) {
       const userGroups = this.config.acceptUserGroupsFromAuthProvider
-        ? await this.getUserGroupOfUser(user)
+        ? await this.getUserGroupsOfUser(user)
         : await this.defineGroupsForNewUser();
-      fromDB = await this.saveAndReloadUser({ ...user, userGroups: userGroups }, userFilter);
+      fromDB = await this.saveAndReloadUser({ ...user, userGroups }, userFilter);
     } else if (this.config.acceptUserGroupsFromAuthProvider) {
-      const userGroups = await this.getUserGroupOfUser(user);
+      const userGroups = await this.getUserGroupsOfUser(user);
       // The groups from the auth provider override the existing groups. They can be empty.
-      fromDB = await this.saveAndReloadUser({ ...user, userGroups: userGroups }, userFilter);
+      fromDB = await this.saveAndReloadUser({ ...user, userGroups }, userFilter);
     }
 
     await this.setSessionUser(req, fromDB ?? undefined);
   }
 
-  private async getUserGroupOfUser(user: User) {
-    return await this.userGroups.findBy({ name: In(user.userGroupIds) });
+  private async getUserGroupsOfUser(user: User) {
+    const ids = user.userGroupIds;
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return [];
+    }
+    return await this.userGroups.findBy({ name: In(ids) });
   }
 
   private async defineGroupsForNewUser() {

@@ -81,7 +81,7 @@ export class OAuthStrategy extends PassportStrategy(Strategy, 'oauth2') {
   }
 
   validate(accessToken: string, refreshToken: string, profile: Profile) {
-    const { sub: id, name, email, [this.userGroupsProperty]: userGroupIds } = profile;
+    const { sub: id, name, email, [this.userGroupsProperty]: userGroupIds = [] } = profile;
 
     return {
       id,

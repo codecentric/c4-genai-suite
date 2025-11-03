@@ -71,8 +71,8 @@ backend:
     existingMicrosoftClientSecret: ""
     ## @param backend.auth.existingMicrosoftTenant [string] The name of the existing k8s secret. `c4.auth.microsoftTenant` will be ignored. The key must be `microsoftTenant`
     existingMicrosoftTenant: ""
-    ## @param backend.auth.acceptUserGroupsFromAuthProvider [string] Sets if user groups from the identity provider are saved in the c4 user. (All groups manually selected in c4 will be overwritten!)
-    acceptUserGroupsFromAuthProvider: ""
+    ## @param backend.auth.acceptUserGroupsFromAuthProvider Sets if user groups from the identity provider are saved in the c4 user. (All groups manually selected in c4 will be overwritten!)
+    acceptUserGroupsFromAuthProvider: false
     ## @param backend.auth.userGroupsPropertyName [string] The property in the auth token from where the user groups are read. Default is "groups".
     userGroupsPropertyName: ""
   postgresql:
