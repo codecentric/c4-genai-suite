@@ -179,9 +179,9 @@
                             "default": "\"\""
                         },
                         "acceptUserGroupsFromAuthProvider": {
-                            "type": "string",
+                            "type": "boolean",
                             "description": "Sets if user groups from the identity provider are saved in the c4 user. (All groups manually selected in c4 will be overwritten!)",
-                            "default": "\"\""
+                            "default": false
                         },
                         "userGroupsPropertyName": {
                             "type": "string",
