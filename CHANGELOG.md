@@ -1,5 +1,19 @@
 # Changelog
 
+## [9.8.0](https://github.com/codecentric/c4-genai-suite/compare/v9.7.0...v9.8.0) (2025-11-04)
+
+
+### Features
+
+* **extensions:** Brave Search now accepts a configurable number of max results and passes extra snippets to the LLM ([#671](https://github.com/codecentric/c4-genai-suite/issues/671)) ([23c38b4](https://github.com/codecentric/c4-genai-suite/commit/23c38b44dcb9b22f06239b655bf8522894483a0c))
+
+
+### Bug Fixes
+
+* avoid error when user groups from oidc are empty/undefined ([#693](https://github.com/codecentric/c4-genai-suite/issues/693)) ([3e9ec24](https://github.com/codecentric/c4-genai-suite/commit/3e9ec24bc70cd0abfd6b85d863686dc88aa8e562))
+* forbid deletion of used buckets ([#578](https://github.com/codecentric/c4-genai-suite/issues/578)) ([37ecb2f](https://github.com/codecentric/c4-genai-suite/commit/37ecb2fa3eee81074d737285fea89f572eaa2241))
+* remove second scrollbar for codeblocks in edge ([#679](https://github.com/codecentric/c4-genai-suite/issues/679)) ([3a86902](https://github.com/codecentric/c4-genai-suite/commit/3a869024eaced07c4b80d4250c2c8cb4df3cad7f))
+
 ## [9.7.0](https://github.com/codecentric/c4-genai-suite/compare/v9.6.0...v9.7.0) (2025-10-30)
 
 
