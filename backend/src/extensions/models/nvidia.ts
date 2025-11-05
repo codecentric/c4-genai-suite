@@ -115,8 +115,8 @@ export class NvidiaModelExtension implements Extension<NvidiaModelExtensionConfi
   // Selfhosted Nvidia Nim seems to reject tool call messages where the content is an empty string,
   // which is the way ai sdk sends them. We fix this in an ad hoc way here until it is fixed upstream.
   repairToolCall = (fetchFunction: Fetch) => async (url: string | Request | URL, options: RequestInit | undefined) => {
-    if (options?.body) {
-      const repairedBody = (options.body as string).replace('"content":"",', '"content":null,');
+    if (options?.body && typeof options.body === 'string') {
+      const repairedBody = options.body.replace('"content":"",', '"content":null,');
       options.body = repairedBody;
     }
     return await fetchFunction(url, options);
