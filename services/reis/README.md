@@ -6,11 +6,11 @@ This server offers RAG functionality for c4.
 
 ## Getting started
 
-For development, install `python` and `poetry`. Then the REI-S can be started with
+For development, install `python` and `uv`. Then the REI-S can be started with
 
 ```bash
-poetry install --with dev
-poetry run fastapi dev rei_s/app.py --port 3201
+uv sync
+uv run fastapi dev rei_s/app.py --port 3201
 ```
 
 ## Testing
@@ -18,7 +18,7 @@ poetry run fastapi dev rei_s/app.py --port 3201
 The tests can be run with
 
 ```bash
-poetry run pytest -rs
+uv run pytest -rs
 ```
 
 Note that end-to-end (e2e) Tests, which test the integration to a third party service (e.g., pgvector, whispher, AI Search),
@@ -28,8 +28,8 @@ or in ".env.test" in the reis root directory.
 Unit tests and e2e tests can also run selectively with
 
 ```bash
-poetry run pytest -rs tests/unit
-poetry run pytest -rs tests/e2e
+uv run pytest -rs tests/unit
+uv run pytest -rs tests/e2e
 ```
 
 Also note that the stress tests are always skipped and can be run with the following command.
@@ -40,12 +40,12 @@ However be careful against which environment you run it, since it might generate
 We suggest to run it against a local postgres with the `random-test-embeddings` embeddings provider.
 
 ```bash
-poetry run pytest -rs --stress tests/stress
+uv run pytest -rs --stress tests/stress
 ```
 
 ## Open API
 
-To generate the specs `reis-dev-spec.json`, run `poetry run python rei_s/generate_open_api.py` in this directory.
+To generate the specs `reis-dev-spec.json`, run `uv run python rei_s/generate_open_api.py` in this directory.
 
 ## Vector stores
 

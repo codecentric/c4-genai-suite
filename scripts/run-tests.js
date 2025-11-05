@@ -78,7 +78,7 @@ const startPostgres = `cd ${
   devSetup ? 'dev' : 'e2e'
 }/postgres && ${dockerComposeDown} && docker compose up > ../../output/e2e-postgres-docker.log 2>&1`;
 const startFrontend = `cd frontend && npm run dev > ../output/frontend.log 2>&1`;
-const startREIS = `cd services/reis && STORE_PGVECTOR_URL="postgresql+psycopg://admin:secret@localhost:${portForPostgres}/cccc" poetry run fastapi dev rei_s/app.py --host 0.0.0.0 --port "${portForREIS}" > ../../output/reis.log 2>&1`;
+const startREIS = `cd services/reis && STORE_PGVECTOR_URL="postgresql+psycopg://admin:secret@localhost:${portForPostgres}/cccc" uv run fastapi dev rei_s/app.py --host 0.0.0.0 --port "${portForREIS}" > ../../output/reis.log 2>&1`;
 const startBackend = `${waitForPostgres} && cd backend && DB_URL="postgres://admin:secret@localhost:${portForPostgres}/cccc" npm run start:dev > ../output/backend.log 2>&1`;
 const startMinio = `cd ${ devSetup ? 'dev' : 'e2e' }/minio && ${dockerComposeDown} && docker compose up > ../../output/e2e-minio-docker.log 2>&1`;
 const startMcpTool = `echo "RUNNING-MCP:" && docker compose -f docker-compose-dev.yml up mcp-fetch > output/mcp-tool.log 2>&1`;
