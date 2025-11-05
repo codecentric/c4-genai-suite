@@ -117,7 +117,7 @@ To ensure consistency throughout the source code, keep these rules in mind as yo
 
 - All features or bug fixes **must be tested** by one or more specs (unit-tests).
 - For /frontend and /backend packages an automated formatter is available by running `npm run format`, `npm run lint`.
-- For the /reis package, use `poetry run ruff format`, `poetry run ruff check` to format the code.
+- For the /reis package, use `uv run ruff format`, `uv run ruff check` to format the code.
 - Formatting and linting is done automatically on commit, so you don't have to worry about it.
 
 ## Commit Message Guidelines

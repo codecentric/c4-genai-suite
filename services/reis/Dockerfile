@@ -4,22 +4,17 @@ WORKDIR /reis
 
 RUN apk add --no-cache build-base=0.5-r3 linux-headers=6.14.2-r0 rust=1.87.0-r0 cargo=1.87.0-r0
 
-RUN pip install poetry
+# Install uv
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
-
-ENV POETRY_NO_INTERACTION=1 \
-    POETRY_VIRTUALENVS_IN_PROJECT=1 \
-    POETRY_VIRTUALENVS_CREATE=1 \
-    POETRY_CACHE_DIR=/tmp/poetry_cache
+ENV UV_COMPILE_BYTECODE=1 \
+    UV_LINK_MODE=copy
 
 # Copy the deps and lockfile to use caching.
-COPY pyproject.toml poetry.lock ./
-# poetry will complain about a missing readme
-RUN touch README.md
+COPY pyproject.toml uv.lock ./
 
-# install from the lockfile without the project files
-RUN poetry install --without dev --no-root && \
-    rm -rf $POETRY_CACHE_DIR
+# Install dependencies
+RUN uv sync --frozen --no-install-project --no-dev
 
 # Remove unnecessary files from virtualenv to reduce size
 RUN find /reis/.venv -name "*.pyc" -delete && \
