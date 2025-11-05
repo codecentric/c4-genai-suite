@@ -1,5 +1,12 @@
 # Changelog
 
+## [9.8.1](https://github.com/codecentric/c4-genai-suite/compare/v9.8.0...v9.8.1) (2025-11-05)
+
+
+### Bug Fixes
+
+* **extensiosn:** tool-calling compatability fix for selfhosted Nvidia NIM ([cd504dd](https://github.com/codecentric/c4-genai-suite/commit/cd504dd543c62eeaf872f2b29ff422145288cc47))
+
 ## [9.8.0](https://github.com/codecentric/c4-genai-suite/compare/v9.7.0...v9.8.0) (2025-11-04)
 
 
