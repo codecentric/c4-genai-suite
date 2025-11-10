@@ -19,7 +19,7 @@ fastapi = {extras = ["standard"], version = "0.121.0"}
 azure-search-documents = "11.6.0"
 azure-identity = "1.25.1"
 pdfminer-six = "^20250506"
-pypdf = "^6.1.3"
+pypdf = "^6.2.0"
 ffmpeg-python = "^0.2.0"
 python-oxmsg = "^0.0.2"
 aiofiles = "^25.1.0"
