@@ -64,7 +64,7 @@ services:
       start_period: 60s
 
   ollama-models-pull:
-    image: curlimages/curl:8.16.0
+    image: curlimages/curl:8.17.0
     depends_on:
       ollama:
         condition: service_healthy
