@@ -8,4 +8,4 @@ class MsPptProvider(OfficeProvider):
     file_name_extensions = [".pptx"]
 
     def __init__(self, chunk_size: int = 1000, chunk_overlap: int = 200, **_kwargs: Any) -> None:
-        super().__init__()
+        super().__init__(chunk_size, chunk_overlap, **_kwargs)
