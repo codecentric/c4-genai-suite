@@ -409,18 +409,18 @@ test-tox-coverage = ["coverage (>=5.5)"]
 
 [[package]]
 name = "boto3"
-version = "1.40.73"
+version = "1.40.75"
 description = "The AWS SDK for Python"
 optional = false
 python-versions = ">=3.9"
 groups = ["main"]
 files = [
-    {file = "boto3-1.40.73-py3-none-any.whl", hash = "sha256:85172e11e3b8d5a09504bc532b6589730ac68845410403ca3793d037b8a5d445"},
-    {file = "boto3-1.40.73.tar.gz", hash = "sha256:3716703cb8b126607533853d7e2a85f0bb23b0b9d4805c69170abead33d725ef"},
+    {file = "boto3-1.40.75-py3-none-any.whl", hash = "sha256:c246fb35d9978b285c5b827a20b81c9e77d52f99c9d175fbd91f14396432953f"},
+    {file = "boto3-1.40.75.tar.gz", hash = "sha256:a5219a2f397f8616462d7908e696c281f120aa2d8458280ff24f7ddeb2108faf"},
 ]
 
 [package.dependencies]
-botocore = ">=1.40.73,<1.41.0"
+botocore = ">=1.40.75,<1.41.0"
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.14.0,<0.15.0"
 
@@ -859,14 +859,14 @@ xray = ["mypy-boto3-xray (>=1.40.0,<1.41.0)"]
 
 [[package]]
 name = "botocore"
-version = "1.40.73"
+version = "1.40.75"
 description = "Low-level, data-driven core of boto 3."
 optional = false
 python-versions = ">=3.9"
 groups = ["main"]
 files = [
-    {file = "botocore-1.40.73-py3-none-any.whl", hash = "sha256:87524c5fe552ecceaea72f51163b37ab35eb82aaa6a64eb80489ade7340c1d23"},
-    {file = "botocore-1.40.73.tar.gz", hash = "sha256:0650ceada268824282da9af8615f3e4cf2453be8bf85b820f9207eff958d56d0"},
+    {file = "botocore-1.40.75-py3-none-any.whl", hash = "sha256:e822004688ca8035c518108e27d5b450d3ab0e0b3a73bcb8b87b80a8e5bd1910"},
+    {file = "botocore-1.40.75.tar.gz", hash = "sha256:bf8b067209fee5a9738800d41852e113b8ebdb01bd7f1e8b4541d55ecdbdb8f3"},
 ]
 
 [package.dependencies]
@@ -875,7 +875,7 @@ python-dateutil = ">=2.1,<3.0.0"
 urllib3 = {version = ">=1.25.4,<2.2.0 || >2.2.0,<3", markers = "python_version >= \"3.10\""}
 
 [package.extras]
-crt = ["awscrt (==0.27.6)"]
+crt = ["awscrt (==0.28.4)"]
 
 [[package]]
 name = "botocore-stubs"
@@ -6799,4 +6799,4 @@ cffi = ["cffi (>=1.17,<2.0) ; platform_python_implementation != \"PyPy\" and pyt
 [metadata]
 lock-version = "2.1"
 python-versions = "<4.0,>=3.12.0"
-content-hash = "d51381dbf89272e58da49f167d064f43f5ad792a2e8c467e67b57e9f9516ee71"
+content-hash = "fb224452616d4ec344e4405734d94a5cb72ba07c113d3e43f893af3c316d0fb6"
