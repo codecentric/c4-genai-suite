@@ -92,7 +92,7 @@
     "undici": "^7.11.0",
     "uuid": "^9.0.1",
     "winston": "^3.17.0",
-    "zod": "3.25.51"
+    "zod": "3.25.76"
   },
   "devDependencies": {
     "@eslint/compat": "1.2.9",
