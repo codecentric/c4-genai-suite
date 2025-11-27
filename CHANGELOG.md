@@ -1,5 +1,12 @@
 # Changelog
 
+## [9.8.2](https://github.com/codecentric/c4-genai-suite/compare/v9.8.1...v9.8.2) (2025-11-27)
+
+
+### Bug Fixes
+
+* avoid possible problems in nvidia extension ([#706](https://github.com/codecentric/c4-genai-suite/issues/706)) ([0ffe5b7](https://github.com/codecentric/c4-genai-suite/commit/0ffe5b77af60c226e746144bca5406022aea4744))
+
 ## [9.8.1](https://github.com/codecentric/c4-genai-suite/compare/v9.8.0...v9.8.1) (2025-11-05)
 
 
