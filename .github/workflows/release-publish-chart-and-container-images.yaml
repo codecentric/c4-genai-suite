@@ -28,6 +28,7 @@ jobs:
     with:
       push-to-registry: true
       tag-prefix: ghcr.io/${{ github.repository }}/
+      platforms: linux/amd64,linux/arm64
 
   upstream-workflows:
     name: Upstream Workflows
