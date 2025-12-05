@@ -17,7 +17,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
         with:
           node-version: 24.x
@@ -32,7 +32,7 @@ jobs:
       matrix:
         service: [reis, tools, executor]
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
         with:
           node-version: 24.x
@@ -45,7 +45,7 @@ jobs:
   check-generated-specs:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
         with:
           node-version: 24.x
@@ -60,7 +60,7 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
         with:
           node-version: 24.x
@@ -89,7 +89,7 @@ jobs:
       BASE_URL: 'https://example.com'
       DB_URL: postgres://admin:secret@localhost:5432/cccc
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
         with:
           node-version: 24.x
@@ -126,7 +126,7 @@ jobs:
       BASE_URL: 'https://example.com'
       DB_URL: postgres://admin:secret@localhost:5432/cccc
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
         with:
           node-version: 24.x
@@ -157,7 +157,7 @@ jobs:
       BASE_URL: 'https://example.com'
       DB_URL: postgres://admin:secret@localhost:5432/cccc
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
         with:
           node-version: 24.x
