@@ -47,7 +47,7 @@ def clean_db(app: FastAPI) -> None:
     url = get_config_override().store_pgvector_url
     assert url is not None
 
-    engine = create_engine(url)
+    engine = create_engine(url.get_secret_value())
     with engine.connect() as con:
         try:
             con.execute(
