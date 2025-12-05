@@ -31,6 +31,7 @@ Call Example: `node scripts/run-tests.js --file tests/administration/userGroups.
 | `Backend`    | `3000`                      | Node.js/Express or equivalent    |
 | `Frontend`   | `5173`                      | Vite/React frontend              |
 | `REIS`       | `3201`                      | FastAPI-based microservice       |
+| `Minio`      | `9000` (dev) / `9001` (e2e) | S3 Chooses based on `--devSetup` |
 | `MCP Tool`   | `8000`                      | A Dockerized mcp example service |
 
 ## Log Output
@@ -43,6 +44,7 @@ All output files are written to the `./output` directory. All log files are rese
 | `frontend.log`            | Frontend dev server log        |
 | `backend.log`             | Backend server log             |
 | `reis.log`                | REIS service log               |
+| `e2e-minio-docker.log`    | Docker output for Minio        |
 | `mcp-tool.log`            | MCP tool service log           |
 | `playwright-install.log`  | Playwright installation output |
 
