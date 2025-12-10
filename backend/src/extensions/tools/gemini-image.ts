@@ -52,7 +52,7 @@ export class GeminiImageExtension implements Extension<GeminiImageExtensionConfi
 
     await generateText({
       model: client(modelName),
-      prompt: 'test',
+      prompt: 'Generate a simple test image',
     });
   }
 
