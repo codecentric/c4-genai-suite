@@ -13,7 +13,7 @@ import { BlobCategory } from '../../domain/database';
 import { I18nService } from '../../localization/i18n.service';
 
 @Extension()
-export class NanoBananaExtension implements Extension<NanoBananaExtensionConfiguration> {
+export class GeminiImageExtension implements Extension<GeminiImageExtensionConfiguration> {
   constructor(
     private readonly authService: AuthService,
     @Inject(forwardRef(() => CommandBus))
@@ -23,10 +23,10 @@ export class NanoBananaExtension implements Extension<NanoBananaExtensionConfigu
 
   get spec(): ExtensionSpec {
     return {
-      name: 'nanobanana',
-      title: this.i18n.t('texts.extensions.nanobanana.title'),
+      name: 'gemini-image',
+      title: this.i18n.t('texts.extensions.gemini-image.title'),
       logo: '<svg fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M16 8.016A8.522 8.522 0 008.016 16h-.032A8.521 8.521 0 000 8.016v-.032A8.521 8.521 0 007.984 0h.032A8.522 8.522 0 0016 7.984v.032z" fill="url(#prefix__paint0_radial_980_20147)"/><defs><radialGradient id="prefix__paint0_radial_980_20147" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="matrix(16.1326 5.4553 -43.70045 129.2322 1.588 6.503)"><stop offset=".067" stop-color="#9168C0"/><stop offset=".343" stop-color="#5684D1"/><stop offset=".672" stop-color="#1BA1E3"/></radialGradient></defs></svg>',
-      description: this.i18n.t('texts.extensions.nanobanana.description'),
+      description: this.i18n.t('texts.extensions.gemini-image.description'),
       type: 'tool',
       arguments: {
         apiKey: {
@@ -40,14 +40,14 @@ export class NanoBananaExtension implements Extension<NanoBananaExtensionConfigu
           title: this.i18n.t('texts.extensions.common.modelName'),
           required: true,
           format: 'select',
-          enum: ['gemini-2.5-flash-image', 'gemini-3-pro-image-preview'],
+          examples: ['gemini-2.5-flash-image', 'gemini-3-pro-image-preview'],
           showInList: true,
         },
       },
     };
   }
 
-  async test({ apiKey, modelName }: NanoBananaExtensionConfiguration) {
+  async test({ apiKey, modelName }: GeminiImageExtensionConfiguration) {
     const client = createGoogleGenerativeAI({ apiKey });
 
     await generateText({
@@ -56,7 +56,7 @@ export class NanoBananaExtension implements Extension<NanoBananaExtensionConfigu
     });
   }
 
-  async getMiddlewares(_user: User, extension: ExtensionEntity<NanoBananaExtensionConfiguration>): Promise<ChatMiddleware[]> {
+  async getMiddlewares(_user: User, extension: ExtensionEntity<GeminiImageExtensionConfiguration>): Promise<ChatMiddleware[]> {
     const middleware = {
       invoke: async (context: ChatContext, getContext: GetContext, next: ChatNextDelegate): Promise<any> => {
         const tool = await context.cache.get(this.spec.name, extension.values, () => {
@@ -74,7 +74,7 @@ export class NanoBananaExtension implements Extension<NanoBananaExtensionConfigu
 class InternalTool extends NamedStructuredTool {
   readonly name: string;
   readonly description =
-    'A tool to generate images from a prompt using Google Nano Banana (Gemini image). It returns a link to an image. Show the image to the user by using Markdown to embed the image into your response, like `![alttext](link/from/the/response)`.';
+    'A tool to generate images from a prompt using Google Gemini Image (Nano Banana). It returns a link to an image. Show the image to the user by using Markdown to embed the image into your response, like `![alttext](link/from/the/response)`.';
   readonly displayName = this.name;
   readonly returnDirect = false;
   private readonly logger = new Logger(InternalTool.name);
@@ -87,7 +87,7 @@ class InternalTool extends NamedStructuredTool {
     private readonly authService: AuthService,
     private readonly commandBus: CommandBus,
     spec: ExtensionSpec,
-    private readonly configuration: NanoBananaExtensionConfiguration,
+    private readonly configuration: GeminiImageExtensionConfiguration,
   ) {
     super();
     this.name = spec.name;
@@ -133,7 +133,7 @@ class InternalTool extends NamedStructuredTool {
   }
 }
 
-export type NanoBananaExtensionConfiguration = ExtensionConfiguration & {
+export type GeminiImageExtensionConfiguration = ExtensionConfiguration & {
   apiKey: string;
   modelName: string;
 };

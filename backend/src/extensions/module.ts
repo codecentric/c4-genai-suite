@@ -37,7 +37,7 @@ import { GroundingWithBingSearchExtension } from './tools/grounding-with-bing';
 import { MCPToolsExtension } from './tools/mcp-tools';
 import { OpenApiExtension } from './tools/open-api';
 import { WholeFilesExtension } from './tools/whole-files-conversation';
-import { NanoBananaExtension } from './tools/nanobanana';
+import { GeminiImageExtension } from './tools/gemini-image';
 
 const extensionClassSuffix = 'Extension';
 
@@ -123,7 +123,7 @@ export class ExtensionLibraryModule {
         GroundingWithBingSearchExtension,
         MCPToolsExtension,
         MistralModelExtension,
-        NanoBananaExtension,
+        GeminiImageExtension,
         NvidiaModelExtension,
         OllamaModelExtension,
         OpenAICompatibleModelExtension,
