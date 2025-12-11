@@ -1804,14 +1804,14 @@ standard = ["uvicorn[standard] (>=0.15.0)"]
 
 [[package]]
 name = "fastmcp"
-version = "2.13.2"
+version = "2.13.3"
 description = "The fast, Pythonic way to build MCP servers and clients."
 optional = false
 python-versions = ">=3.10"
 groups = ["main"]
 files = [
-    {file = "fastmcp-2.13.2-py3-none-any.whl", hash = "sha256:300c59eb970c235bb9d0575883322922e4f2e2468a3d45e90cbfd6b23b7be245"},
-    {file = "fastmcp-2.13.2.tar.gz", hash = "sha256:2a206401a6579fea621974162674beba85b467ad72c70c1a3752a31951dff7f0"},
+    {file = "fastmcp-2.13.3-py3-none-any.whl", hash = "sha256:5173d335f4e6aabcfb5a5131af3fa092f604b303130fd3a49226b7a844a48e65"},
+    {file = "fastmcp-2.13.3.tar.gz", hash = "sha256:ebca59e99412c596dd75ebdd5147800f6abc2490d025af76fa8ea4fc5f68781d"},
 ]
 
 [package.dependencies]
@@ -1820,7 +1820,7 @@ cyclopts = ">=4.0.0"
 exceptiongroup = ">=1.2.2"
 httpx = ">=0.28.1"
 jsonschema-path = ">=0.3.4"
-mcp = ">=1.19.0,<1.21.1 || >1.21.1,<2.0.0"
+mcp = ">=1.19.0,<1.21.1 || >1.21.1,<1.23"
 openapi-pydantic = ">=0.5.1"
 platformdirs = ">=4.0.0"
 py-key-value-aio = {version = ">=0.2.8,<0.4.0", extras = ["disk", "memory"]}
@@ -3058,14 +3058,14 @@ test = ["Faker (>=1.0.2)", "pytest (>=6.0.1)", "pytest-md-report (>=0.6.2)"]
 
 [[package]]
 name = "mcp"
-version = "1.23.0"
+version = "1.22.0"
 description = "Model Context Protocol SDK"
 optional = false
 python-versions = ">=3.10"
 groups = ["main"]
 files = [
-    {file = "mcp-1.23.0-py3-none-any.whl", hash = "sha256:5a645cf111ed329f4619f2629a3f15d9aabd7adc2ea09d600d31467b51ecb64f"},
-    {file = "mcp-1.23.0.tar.gz", hash = "sha256:84e0c29316d0a8cf0affd196fd000487ac512aa3f771b63b2ea864e22961772b"},
+    {file = "mcp-1.22.0-py3-none-any.whl", hash = "sha256:bed758e24df1ed6846989c909ba4e3df339a27b4f30f1b8b627862a4bade4e98"},
+    {file = "mcp-1.22.0.tar.gz", hash = "sha256:769b9ac90ed42134375b19e777a2858ca300f95f2e800982b3e2be62dfc0ba01"},
 ]
 
 [package.dependencies]
@@ -6713,4 +6713,4 @@ cffi = ["cffi (>=1.17,<2.0) ; platform_python_implementation != \"PyPy\" and pyt
 [metadata]
 lock-version = "2.1"
 python-versions = "<4.0,>=3.12.0"
-content-hash = "c828445c2be5fc984a2f80e4b3ba968808f0747257a44f7217aa0910d33872d0"
+content-hash = "5300e11a8b2b56eaef376e7d8c1524385ead28793aa5d65a7d81a1a077e51e3d"
