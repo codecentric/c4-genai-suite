@@ -28,7 +28,7 @@ fastmcp = "^2.14.0"
 langchain-ollama = "^0.3.10"
 langchain-aws = "^0.2.35"
 langchain-nvidia-ai-endpoints = "^0.3.19"
-boto3 = "^1.42.7"
+boto3 = "^1.42.8"
 boto3-stubs = {extras = ["s3"], version = "^1.42.8"}
 weasyprint = "^66.0"
 markdown = "^3.10"
