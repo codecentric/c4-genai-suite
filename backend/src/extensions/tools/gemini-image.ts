@@ -1,9 +1,9 @@
+import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { forwardRef, Inject, Logger } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
+import { generateText } from 'ai';
 import * as uuid from 'uuid';
 import { z } from 'zod';
-import { generateText } from 'ai';
-import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { AuthService } from 'src/domain/auth';
 import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext, NamedStructuredTool } from 'src/domain/chat';
 import { Extension, ExtensionConfiguration, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions';
@@ -41,6 +41,14 @@ export class GeminiImageExtension implements Extension<GeminiImageExtensionConfi
           required: true,
           format: 'select',
           examples: ['gemini-2.5-flash-image', 'gemini-3-pro-image-preview'],
+          showInList: true,
+        },
+        aspectRatio: {
+          type: 'string',
+          title: 'Aspect Ratio',
+          required: false,
+          format: 'select',
+          examples: ['1:1', '2:3', '3:2', '3:4', '4:3', '4:5', '5:4', '9:16', '16:9', '21:9'],
           showInList: true,
         },
       },
@@ -95,7 +103,7 @@ class InternalTool extends NamedStructuredTool {
 
   protected async _call({ prompt }: z.infer<typeof this.schema>): Promise<string> {
     try {
-      const { apiKey, modelName } = this.configuration;
+      const { apiKey, modelName, aspectRatio } = this.configuration;
 
       const googleProvider = createGoogleGenerativeAI({
         apiKey,
@@ -104,9 +112,17 @@ class InternalTool extends NamedStructuredTool {
       const result = await generateText({
         model: googleProvider(modelName),
         prompt,
+        providerOptions: {
+          google: {
+            imageConfig: {
+              aspectRatio: aspectRatio || '1:1',
+            },
+          },
+        },
       });
 
       const file = result.files?.find((f) => f.mediaType?.startsWith('image/'));
+
       if (!file) {
         throw new Error('No image file received from Google');
       }
@@ -136,4 +152,5 @@ class InternalTool extends NamedStructuredTool {
 export type GeminiImageExtensionConfiguration = ExtensionConfiguration & {
   apiKey: string;
   modelName: string;
+  aspectRatio?: '1:1' | '2:3' | '3:2' | '3:4' | '4:3' | '4:5' | '5:4' | '9:16' | '16:9' | '21:9';
 };
