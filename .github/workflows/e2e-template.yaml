@@ -142,7 +142,7 @@ jobs:
       - run: npm ci --ignore-scripts  # install deps without installing playwright
       - run: npx playwright install ${{ inputs.browser }} --with-deps
       - run: npx playwright test --project=${{ inputs.browser }}
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         if: ${{ !cancelled() }}
         with:
           name: e2e-report-${{ inputs.browser }}-${{ inputs.testdir }}
