@@ -409,18 +409,18 @@ test-tox-coverage = ["coverage (>=5.5)"]
 
 [[package]]
 name = "boto3"
-version = "1.42.8"
+version = "1.42.16"
 description = "The AWS SDK for Python"
 optional = false
 python-versions = ">=3.9"
 groups = ["main"]
 files = [
-    {file = "boto3-1.42.8-py3-none-any.whl", hash = "sha256:747acc83488fc80b0e7d1c4ff0c533039ff3ede21bdbd4e89544e25b010b070c"},
-    {file = "boto3-1.42.8.tar.gz", hash = "sha256:e967706af5887339407481562c389c612d5eae641eb854ddd59026d049df740e"},
+    {file = "boto3-1.42.16-py3-none-any.whl", hash = "sha256:37a43d42aebd06a8f93ee801ea1b7b5181ac42a30869ef403c9dadc160a748e5"},
+    {file = "boto3-1.42.16.tar.gz", hash = "sha256:811391611db88c8a061f6e6fabbd7ca784ad9de04490a879f091cbaa9de7de74"},
 ]
 
 [package.dependencies]
-botocore = ">=1.42.8,<1.43.0"
+botocore = ">=1.42.16,<1.43.0"
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.16.0,<0.17.0"
 
@@ -867,14 +867,14 @@ xray = ["mypy-boto3-xray (>=1.42.0,<1.43.0)"]
 
 [[package]]
 name = "botocore"
-version = "1.42.8"
+version = "1.42.16"
 description = "Low-level, data-driven core of boto 3."
 optional = false
 python-versions = ">=3.9"
 groups = ["main"]
 files = [
-    {file = "botocore-1.42.8-py3-none-any.whl", hash = "sha256:4cb89c74dd9083d16e45868749b999265a91309b2499907c84adeffa0a8df89b"},
-    {file = "botocore-1.42.8.tar.gz", hash = "sha256:4921aa454f82fed0880214eab21126c98a35fe31ede952693356f9c85ce3574b"},
+    {file = "botocore-1.42.16-py3-none-any.whl", hash = "sha256:b1f584a0f8645c12e07bf6ec9c18e05221a789f2a9b2d3c6291deb42f8c1c542"},
+    {file = "botocore-1.42.16.tar.gz", hash = "sha256:29ee8555cd5d5023350405387cedcf3fe1c7f02fcb8060bf9e01602487482c25"},
 ]
 
 [package.dependencies]
@@ -7292,4 +7292,4 @@ cffi = ["cffi (>=1.17,<2.0) ; platform_python_implementation != \"PyPy\" and pyt
 [metadata]
 lock-version = "2.1"
 python-versions = "<4.0,>=3.12.0"
-content-hash = "01470fc940e16f41f79d9d2b145cc0c82a380982ec676a58d86cf2ae193a93c8"
+content-hash = "d0ec986bd926329a49c49d658f1ea3f856d2c5c67c7d237959e84e3541c7cc8b"
