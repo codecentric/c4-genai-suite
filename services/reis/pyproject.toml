@@ -36,7 +36,7 @@ pygments = "^2.19.2"
 orjson = "^3.11.5"
 
 [tool.poetry.group.dev.dependencies]
-ruff = "0.14.9"
+ruff = "0.14.10"
 mypy = "1.19.1"
 pre-commit = "4.5.0"
 pytest = "9.0.2"
