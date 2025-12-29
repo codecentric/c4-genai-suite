@@ -18,7 +18,7 @@ psycopg = {extras = ["binary"], version = "^3.3.2"}
 fastapi = {extras = ["standard"], version = "0.127.1"}
 azure-search-documents = "11.6.0"
 azure-identity = "1.25.1"
-pdfminer-six = "^20251107"
+pdfminer-six = "^20251228"
 pypdf = "^6.5.0"
 ffmpeg-python = "^0.2.0"
 python-oxmsg = "^0.0.2"
