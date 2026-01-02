@@ -1,5 +1,15 @@
 # Changelog
 
+## [9.8.2](https://github.com/codecentric/c4-genai-suite/compare/v9.8.1...v9.8.2) (2026-01-02)
+
+
+### Bug Fixes
+
+* avoid possible problems in nvidia extension ([#706](https://github.com/codecentric/c4-genai-suite/issues/706)) ([0ffe5b7](https://github.com/codecentric/c4-genai-suite/commit/0ffe5b77af60c226e746144bca5406022aea4744))
+* fix PGVector connection pooling to prevent too many clients error ([#855](https://github.com/codecentric/c4-genai-suite/issues/855)) ([713ba66](https://github.com/codecentric/c4-genai-suite/commit/713ba665dc939dce4af0145c54f5b4b91b80dac1))
+* **frontend:** codeblocks with unrecognized languages are copyable ([#613](https://github.com/codecentric/c4-genai-suite/issues/613)) ([5e69c25](https://github.com/codecentric/c4-genai-suite/commit/5e69c25064d0169f157c0295046934e297c74a46))
+* **REIS:** validate pgvector url, log config at start and hide all secrets ([#605](https://github.com/codecentric/c4-genai-suite/issues/605)) ([7f60256](https://github.com/codecentric/c4-genai-suite/commit/7f6025626d9d648a7c31202410814c368bf4ba97))
+
 ## [9.8.1](https://github.com/codecentric/c4-genai-suite/compare/v9.8.0...v9.8.1) (2025-11-05)
 
 
