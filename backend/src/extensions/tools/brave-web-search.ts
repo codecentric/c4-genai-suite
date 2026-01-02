@@ -23,6 +23,13 @@ export class BraveWebSearchExtension implements Extension<BraveWebSearchExtensio
           format: 'password',
           description: this.i18n.t('texts.extensions.brave.apiKeyHint'),
         },
+        maxResults: {
+          type: 'number',
+          title: this.i18n.t('texts.extensions.brave.maxResults'),
+          default: 5,
+          minimum: 1,
+          maximum: 20,
+        },
       },
     };
   }
@@ -44,6 +51,7 @@ class InternalTool extends NamedStructuredTool {
   readonly description: string;
   readonly displayName = 'Brave Search';
   readonly apiKey: string;
+  readonly maxResults: number;
 
   readonly schema = z.object({
     query: z.string().describe('The search query.'),
@@ -59,6 +67,24 @@ class InternalTool extends NamedStructuredTool {
     this.name = extensionExternalId;
     this.apiKey = configuration.apiKey;
     this.description = 'Performs a web search using Brave Search.';
+    this.maxResults = configuration.maxResults || 5;
+  }
+
+  private formatContent(title: string, url: string, description?: string, extra_snippets?: string[]): string {
+    const parts = [`Title: ${title}`, `URL: ${url}`];
+
+    if (description) {
+      parts.push(`Description: ${description}`);
+    }
+
+    if (Array.isArray(extra_snippets) && extra_snippets.length > 0) {
+      parts.push('Additional Snippets:');
+      extra_snippets.forEach((snippet, index) => {
+        parts.push(`  ${index + 1}. ${snippet}`);
+      });
+    }
+
+    return parts.join('\n');
   }
 
   protected async _call(arg: z.infer<typeof this.schema>): Promise<string> {
@@ -69,7 +95,7 @@ class InternalTool extends NamedStructuredTool {
       Accept: 'application/json',
     };
     const encodedQuery = encodeURIComponent(query);
-    const searchUrl = new URL(`https://api.search.brave.com/res/v1/web/search?q=${encodedQuery}`);
+    const searchUrl = new URL(`https://api.search.brave.com/res/v1/web/search?q=${encodedQuery}&count=${this.maxResults}`);
 
     const response = await fetch(searchUrl, { headers });
 
@@ -84,14 +110,14 @@ class InternalTool extends NamedStructuredTool {
     const toolResult = [];
     const sources: Source[] = [];
     for (const item of items) {
-      const { title, url, description, content_type } = item;
+      const { title, url, description, content_type, extra_snippets } = item;
 
-      toolResult.push({ title, link: url, snippet: description });
+      toolResult.push(this.formatContent(title, url, description, extra_snippets));
 
       const source: Source = {
         title: title ?? 'Search result',
         chunk: {
-          content: description ?? 'no content',
+          content: this.formatContent(title, url, description, extra_snippets),
           score: 0,
         },
         document: {
@@ -104,12 +130,13 @@ class InternalTool extends NamedStructuredTool {
     }
 
     this.context.history?.addSources(this.name, sources);
-    return JSON.stringify(toolResult);
+    return toolResult.join('\n\n');
   }
 }
 
 export type BraveWebSearchExtensionConfiguration = ExtensionConfiguration & {
   apiKey: string;
+  maxResults?: number;
 };
 
 // see also https://api-dashboard.search.brave.com/app/documentation/web-search/responses

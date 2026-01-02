@@ -3226,7 +3226,7 @@
             "type": "string",
             "description": "The optional executor headers."
           },
-          "userGroupsIds": {
+          "userGroupIds": {
             "description": "The allowed user groups.",
             "type": "array",
             "items": {
@@ -3295,7 +3295,7 @@
             "type": "string",
             "description": "The optional executor headers."
           },
-          "userGroupsIds": {
+          "userGroupIds": {
             "description": "The allowed user groups.",
             "type": "array",
             "items": {
@@ -4267,9 +4267,12 @@
             "type": "string",
             "description": "The API Key."
           },
-          "userGroupId": {
-            "type": "string",
-            "description": "The user group ID."
+          "userGroupIds": {
+            "description": "The user group IDs.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           },
           "hasPassword": {
             "type": "boolean",
@@ -4280,7 +4283,7 @@
             "description": "Indicates if the user has an api key configured."
           }
         },
-        "required": ["id", "name", "email", "userGroupId", "hasPassword", "hasApiKey"]
+        "required": ["id", "name", "email", "userGroupIds", "hasPassword", "hasApiKey"]
       },
       "UsersDto": {
         "type": "object",
@@ -4314,9 +4317,12 @@
             "type": "string",
             "description": "The optional password."
           },
-          "userGroupId": {
-            "type": "string",
-            "description": "The user group ID."
+          "userGroupIds": {
+            "description": "The user group IDs.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           },
           "apiKey": {
             "type": "string",
@@ -4324,7 +4330,7 @@
             "nullable": true
           }
         },
-        "required": ["name", "email", "userGroupId"]
+        "required": ["name", "email", "userGroupIds"]
       },
       "ChangePasswordDto": {
         "type": "object",

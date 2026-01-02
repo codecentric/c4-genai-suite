@@ -128,6 +128,7 @@ describe('ChatInput', () => {
       enabled: false,
       id: 0,
       name: '',
+      userGroupIds: [],
       chatSuggestions: [
         {
           title: 'Suggestion Title',

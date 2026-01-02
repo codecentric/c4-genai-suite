@@ -164,7 +164,7 @@ type AzureOpenAIModelExtensionConfiguration = ExtensionConfiguration & {
   apiKey: string;
   deploymentName: string;
   instanceName: string;
-  seed: number;
+  seed?: number;
   temperature?: number;
   presencePenalty?: number;
   frequencyPenalty?: number;

@@ -1,29 +1,19 @@
 import test, { expect } from '@playwright/test';
-import { changePassword, cleanup, login } from '../utils/helper';
+import { changePassword, createUserIfNotExists, enterAdminArea, login, logout } from '../utils/helper';
 
 test('User settings', async ({ page }) => {
   await test.step('admin user should login', async () => {
     await login(page);
-    await cleanup(page);
   });
 
   await test.step('admin user should create a new user', async () => {
-    await page.getByTestId('menu user').waitFor();
-    await page.getByTestId('menu user').click();
-    await page.getByRole('menuitem', { name: 'Admin' }).waitFor();
-    await page.getByRole('menuitem', { name: 'Admin' }).click();
-    await page.getByRole('link', { name: 'Users' }).waitFor();
-    await page.getByRole('link', { name: 'Users' }).click();
-    await page.getByRole('button', { name: 'Create User' }).click();
-    await page.getByLabel('Create User').getByText('Create User').waitFor();
-    await page.getByRole('textbox', { name: 'Name*' }).fill('test-user');
-    await page.getByRole('textbox', { name: 'Email*' }).fill('test-user@example.com');
-    await page.getByRole('textbox', { name: 'Password', exact: true }).fill('test-secret');
-    await page.getByRole('textbox', { name: 'Confirm Password' }).fill('test-secret');
-    await page.getByRole('button', { name: 'Save' }).click({ timeout: 10000 });
-    await page.getByTestId('menu user').click();
-    await page.getByRole('menuitem', { name: 'Logout' }).waitFor();
-    await page.getByRole('menuitem', { name: 'Logout' }).click();
+    await enterAdminArea(page);
+    await createUserIfNotExists(page, {
+      name: 'test-user',
+      email: 'test-user@example.com',
+      password: 'test-secret',
+    });
+    await logout(page);
   });
   await test.step('new user should login', async () => {
     await login(page, { email: 'test-user@example.com', password: 'test-secret' });

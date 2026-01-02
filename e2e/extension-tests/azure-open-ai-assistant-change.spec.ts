@@ -3,7 +3,6 @@ import { config } from '../tests/utils/config';
 import {
   addAzureModelToConfiguration,
   addSystemPromptToConfiguration,
-  cleanup,
   createConfiguration,
   deleteConfiguration,
   disableConfiguration,
@@ -13,18 +12,18 @@ import {
   newChat,
   selectConfiguration,
   sendMessage,
+  uniqueName,
 } from '../tests/utils/helper';
 
 if (!config.AZURE_OPEN_AI_API_KEY) {
   test.skip('should configure Azure OpenAI-Open AI LLM for chats [skipped due to missing API_KEY in env]', () => {});
 } else {
   test('chat', async ({ page }) => {
-    const firstAssistant = { name: `E2E-Test-${Date.now()}`, description: 'Bob' };
-    const secondAssistant = { name: `E2E-Test-${Date.now()}-B`, description: 'Alice' };
+    const firstAssistant = { name: uniqueName('E2E-Test-A'), description: 'Bob' };
+    const secondAssistant = { name: uniqueName('E2E-Test-B'), description: 'Alice' };
 
     await test.step('should login', async () => {
       await login(page);
-      await cleanup(page);
     });
     await test.step('should add two assistants', async () => {
       await enterAdminArea(page);

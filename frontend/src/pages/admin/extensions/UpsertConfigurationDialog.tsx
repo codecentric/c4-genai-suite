@@ -22,7 +22,7 @@ const schema = z.object({
   executorEndpoint: z.string().optional(),
   executorHeaders: z.string().optional(),
   chatFooter: z.string().optional(),
-  userGroupsIds: z.array(z.string()).optional(),
+  userGroupIds: z.array(z.string()).optional(),
   chatSuggestions: z.array(chatSuggestionScheme).max(MAX_SUGGESTIONS).optional(),
 });
 
@@ -61,7 +61,7 @@ export function UpsertConfigurationDialog(props: UpsertConfigurationDialogProps)
       description: '',
       enabled: true,
       chatSuggestions: [],
-      userGroupsIds: [],
+      userGroupIds: [],
       executorEndpoint: undefined,
       executorHeaders: undefined,
       chatFooter: undefined,
@@ -113,7 +113,7 @@ export function UpsertConfigurationDialog(props: UpsertConfigurationDialogProps)
             />
             <ChatSuggestionsInput form={form} description={texts.theme.suggestionsHints(MAX_SUGGESTIONS)} />
           </fieldset>
-          <Flex gap="sm" justify={'end'}>
+          <Flex gap="sm" pt="sm" justify={'end'}>
             <Button onClick={onClose} variant="subtle">
               {texts.common.cancel}
             </Button>

@@ -23,7 +23,7 @@ export class RoleGuard implements CanActivate {
     const request: Request = context.switchToHttp().getRequest();
 
     if (requiredRole === 'admin') {
-      return request.user?.userGroupId === BUILTIN_USER_GROUP_ADMIN;
+      return Array.isArray(request.user?.userGroupIds) && request.user.userGroupIds.includes(BUILTIN_USER_GROUP_ADMIN);
     }
 
     return !!request.user;

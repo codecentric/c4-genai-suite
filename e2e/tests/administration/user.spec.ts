@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker';
 import { expect, test } from '@playwright/test';
-import { createUser, enterAdminArea, login, navigateToUserAdministration } from '../utils/helper';
+import { createUserIfNotExists, enterAdminArea, login, navigateToUserAdministration } from '../utils/helper';
 
 test.describe('User management', () => {
   const randomName = faker.person.fullName();
@@ -15,7 +15,7 @@ test.describe('User management', () => {
 
   test('should create a user', async ({ page }) => {
     await navigateToUserAdministration(page);
-    await createUser(page, { email: randomEmail, name: randomName });
+    await createUserIfNotExists(page, { email: randomEmail, name: randomName });
   });
 
   test('should edit the user details', async ({ page }) => {
@@ -55,13 +55,13 @@ test.describe('User management', () => {
     await expect(editedRows).toHaveCount(0);
   });
 
-  test('should set user group to default, on creating a new user', async ({ page }) => {
+  test('should set user group to default when creating a new user', async ({ page }) => {
     await navigateToUserAdministration(page);
 
     await page.getByRole('button', { name: 'Create User' }).click();
-    const userValue = await page.getByLabel('User Group').first().inputValue();
+    const groupIdsValue = await page.locator('input[type="hidden"][name="userGroupIds"]').first().inputValue();
 
-    expect(userValue).toEqual('Default');
+    expect(groupIdsValue).toEqual('default');
   });
 
   test('should alert when username and email is empty', async ({ page }) => {

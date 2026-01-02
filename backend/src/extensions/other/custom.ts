@@ -15,6 +15,12 @@ export class CustomPromptExtension implements Extension<CustomPromptExtensionCon
       description: this.i18n.t('texts.extensions.customPrompt.description'),
       type: 'other',
       arguments: {
+        title: {
+          type: 'string',
+          title: this.i18n.t('texts.extensions.common.title'),
+          required: true,
+          showInList: true,
+        },
         text: {
           type: 'string',
           title: this.i18n.t('texts.extensions.common.text'),

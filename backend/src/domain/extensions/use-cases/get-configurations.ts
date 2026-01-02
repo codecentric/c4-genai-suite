@@ -37,9 +37,9 @@ export class GetConfigurationsHandler implements IQueryHandler<GetConfigurations
       },
       relations: withExtensions ? ['extensions'] : [],
     });
-    if (user.userGroupId !== BUILTIN_USER_GROUP_ADMIN) {
+    if (!user.userGroupIds?.includes(BUILTIN_USER_GROUP_ADMIN)) {
       entities = entities.filter(
-        (e) => !e.userGroupsIds || e.userGroupsIds.length === 0 || e.userGroupsIds.indexOf(user.userGroupId) >= 0,
+        (e) => !e.userGroupIds || e.userGroupIds.length === 0 || user.userGroupIds.some((id) => e.userGroupIds.includes(id)),
       );
     }
 

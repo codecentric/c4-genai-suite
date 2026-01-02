@@ -25,7 +25,11 @@ export function TestButton(props: TestButtonProps) {
     },
   });
 
-  const isDisabled = !form.formState.isValid || testing.isPending;
+  // The test button is testable if the form is valid or if the form was not changed
+  // (in which case validation did not run, but it probably is valid)
+  const isTestable = form.formState.isValid || !form.formState.isDirty;
+  // Disable if form can not be tested or is currently testing
+  const isDisabled = !isTestable || testing.isPending;
 
   return (
     <Button

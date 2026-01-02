@@ -11,7 +11,7 @@ describe('UpdateUserDialog', () => {
     id: '1',
     name: 'tester',
     email: 'testuser@example.com',
-    userGroupId: 'admin',
+    userGroupIds: ['admin'],
     hasPassword: false,
     hasApiKey: true,
   };
@@ -37,13 +37,14 @@ describe('UpdateUserDialog', () => {
   };
 
   it('should open update dialog with provided user data', () => {
-    render(<UpdateUserDialog {...defaultProps} />);
+    const adminGroupId = mockUser.userGroupIds[0];
 
-    const [first, ...other] = mockUser.userGroupId;
+    render(<UpdateUserDialog {...defaultProps} />);
 
     expect(screen.getByLabelText(required(texts.common.name))).toHaveValue(mockUser.name);
     expect(screen.getByLabelText(required(texts.common.email))).toHaveValue(mockUser.email);
-    expect(screen.getByLabelText(required(texts.common.userGroup))).toHaveValue(`${first.toUpperCase()}${other.join('')}`);
+    // eslint-disable-next-line testing-library/no-node-access
+    expect(document.querySelector('input[name="userGroupIds"]')).toHaveValue(adminGroupId);
   });
 
   it('should generate a random API Key', async () => {
@@ -83,20 +84,22 @@ describe('UpdateUserDialog', () => {
     expect(defaultProps.onUpdate).not.toHaveBeenCalled();
   });
 
-  it('should show the confirm dialog when user group change from admin to default and there is a api key', async () => {
+  it('should show the confirm dialog if the Admin user group is removed and there is an API key', async () => {
     render(<UpdateUserDialog {...defaultProps} />);
 
     const user = userEvent.setup();
 
-    const userGroup = screen.getByLabelText(required(texts.common.userGroup));
+    const userGroup = screen.getByLabelText(required(texts.common.userGroups));
     await user.click(userGroup);
+    const adminOption = screen.getByRole('option', { name: /Admin/i });
+    await user.click(adminOption); // Remove the Admin group.
     const defaultOption = screen.getByRole('option', { name: /Default/i });
-    await user.click(defaultOption);
+    await user.click(defaultOption); // Add Default group.
 
     await user.click(screen.getByRole('button', { name: texts.common.save }));
 
     const confirmationDialog = screen.getByText(
-      /Only users in the Admin User Group can have an API key. The API key will be removed./i,
+      /Only users in the Admin user group can have an API key. The API key will be removed./i,
     );
     expect(confirmationDialog).toBeInTheDocument();
   });

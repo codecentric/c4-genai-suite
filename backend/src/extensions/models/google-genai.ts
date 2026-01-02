@@ -123,7 +123,7 @@ export class GoogleGenAIModelExtension implements Extension<VertexAIModelExtensi
 type VertexAIModelExtensionConfiguration = ExtensionConfiguration & {
   modelName: string;
   apiKey: string;
-  temperature: number;
-  topK: number;
-  topP: number;
+  temperature?: number;
+  topK?: number;
+  topP?: number;
 };

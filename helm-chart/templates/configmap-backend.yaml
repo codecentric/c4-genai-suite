@@ -12,6 +12,12 @@ data:
   AUTH_OAUTH_AUTHORIZATION_URL: "{{ .Values.backend.auth.authorizationUrl }}"
   AUTH_OAUTH_TOKEN_URL: "{{ .Values.backend.auth.tokenUrl }}"
   AUTH_OAUTH_USER_INFO_URL: "{{ .Values.backend.auth.userInfoUrl }}"
+  {{- if .Values.backend.auth.acceptUserGroupsFromAuthProvider }}
+  AUTH_USE_USER_GROUPS_FROM_AUTH_PROVIDER: "{{ .Values.backend.auth.acceptUserGroupsFromAuthProvider }}"
+  {{- if .Values.backend.auth.userGroupsPropertyName }}
+  AUTH_USER_GROUPS_PROPERTY_NAME: "{{ .Values.backend.auth.userGroupsPropertyName }}"
+  {{- end }}
+  {{- end }}
   METRICS_PORT: "{{ .Values.backend.metrics.port }}"
   {{- if and .Values.backend.ssl.rootCertificateConfigMapName .Values.backend.ssl.rootCertificateConfigMapKey }}
   NODE_EXTRA_CA_CERTS: "/etc/ssl/certs/{{ .Values.backend.ssl.rootCertificateConfigMapKey }}"
