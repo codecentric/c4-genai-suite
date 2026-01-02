@@ -45,7 +45,7 @@
     "@azure/ai-agents": "^1.1.0",
     "@azure/core-util": "^1.13.0",
     "@azure/identity": "^4.11.0",
-    "@modelcontextprotocol/sdk": "^1.17.0",
+    "@modelcontextprotocol/sdk": "^1.24.0",
     "@n8n/json-schema-to-zod": "^1.1.0",
     "@nestjs/common": "^11.1.8",
     "@nestjs/config": "^4.0.2",
