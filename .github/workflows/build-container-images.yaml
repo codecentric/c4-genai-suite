@@ -20,6 +20,10 @@ on:
         required: false
         type: string
         default: ''
+      platforms:
+        required: false
+        type: string
+        default: linux/amd64
 
 jobs:
   build-container:
@@ -58,6 +62,7 @@ jobs:
           context: ${{ matrix.service.context }}
           file: ${{ matrix.service.containerfile }}
           tags: ${{ inputs.tag-prefix }}${{ matrix.service.name }}:commit-${{ github.sha }}
+          platforms: ${{ inputs.platforms }}
           outputs: ${{ inputs.push-to-registry && 'type=registry' || format('type=docker,dest=/tmp/{0}.tar', matrix.service.name) }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
