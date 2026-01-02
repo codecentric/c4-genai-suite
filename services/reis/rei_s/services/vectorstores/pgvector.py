@@ -43,7 +43,7 @@ class PGVectorStoreAdapter(VectorStoreAdapter):
             # Check if we already have a vector store instance for this configuration
             if cache_key not in _vector_store_cache:
                 engine = create_engine(
-                    config.store_pgvector_url,
+                    config.store_pgvector_url.get_secret_value(),
                     pool_size=5,
                     max_overflow=10,
                     pool_recycle=3600,
