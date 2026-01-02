@@ -92,6 +92,7 @@ function LinkRenderer({ href, children }: React.AnchorHTMLAttributes<HTMLAnchorE
 function Code(props: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>) {
   const { children, className, ref: _, ...other } = props;
   const match = /language-(\w+)/.exec(className || '');
+  const language = match ? match[1] : 'plain';
   const clipboard = useClipboard();
 
   const handleCopy = () => {
@@ -101,9 +102,9 @@ function Code(props: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, 
     }
   };
 
-  return match && typeof children === 'string' ? (
+  return typeof children === 'string' ? (
     <div className="group relative max-w-full overflow-x-auto">
-      <Prism {...other} language={match[1]} style={vscDarkPlus} customStyle={{ backgroundColor: 'transparent', padding: 0 }}>
+      <Prism {...other} language={language} style={vscDarkPlus} customStyle={{ backgroundColor: 'transparent', padding: 0 }}>
         {children.replace(/\n$/, '')}
       </Prism>
       <IconClipboard
