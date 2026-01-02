@@ -1,7 +1,7 @@
 import os
 from typing import Generator
 from unittest import mock
-from pydantic import ValidationError
+from pydantic import SecretStr, ValidationError
 import pytest
 
 from rei_s.config import Config
@@ -87,3 +87,25 @@ def test_env_wrong(empty_env: None, env_file: str) -> None:
 
     err_msg = exc_info.value.errors()[0]["msg"]
     assert err_msg.startswith("Input should be")
+
+
+def test_postgres_connection_string_validation() -> None:
+    from rei_s.config import check_valid_postgres_connection_string
+
+    valid1_connection_string = SecretStr("postgresql+psycopg://user:password@localhost:5432/mydatabase")
+    valid2_connection_string = SecretStr("postgres+psycopg://user:password@localhost:5432/mydatabase")
+    invalid1_connection_string = SecretStr("postgresql://user:password@localhost:5432/mydatabase")
+    invalid2_connection_string = SecretStr("invalid_connection_string")
+    invalid3_connection_string = SecretStr("postgressql+psycopg://user:password@localhost:5432/mydatabase")
+
+    check_valid_postgres_connection_string(valid1_connection_string)
+    check_valid_postgres_connection_string(valid2_connection_string)
+
+    with pytest.raises(ValueError, match=r"The STORE_PGVECTOR_URL must start with `postgresql\+psycopg://`.*"):
+        check_valid_postgres_connection_string(invalid1_connection_string)
+
+    with pytest.raises(ValueError, match=r"The STORE_PGVECTOR_URL must start with `postgresql\+psycopg://`.*"):
+        check_valid_postgres_connection_string(invalid2_connection_string)
+
+    with pytest.raises(ValueError, match=r"The STORE_PGVECTOR_URL must start with `postgresql\+psycopg://`.*"):
+        check_valid_postgres_connection_string(invalid3_connection_string)
