@@ -63,7 +63,7 @@ jobs:
           cache-to: type=gha,mode=max
           build-args: |
             VERSION=${{ github.ref_type == 'tag' && github.ref_name || github.sha }}
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         with:
           name: ${{ matrix.service.name }}
           path: /tmp/${{ matrix.service.name }}.tar
