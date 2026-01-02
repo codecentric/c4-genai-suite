@@ -103,7 +103,7 @@ function Code(props: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, 
   };
 
   return typeof children === 'string' ? (
-    <div className="group relative max-w-full overflow-x-scroll">
+    <div className="group relative max-w-full overflow-x-auto">
       <Prism {...other} language={language} style={vscDarkPlus} customStyle={{ backgroundColor: 'transparent', padding: 0 }}>
         {children.replace(/\n$/, '')}
       </Prism>
