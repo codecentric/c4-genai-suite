@@ -119,7 +119,7 @@ async function createUserEntities(
   userEntity.id = crypto.randomUUID();
   userEntity.name = name;
   userEntity.email = `${name}@test.com`;
-  userEntity.userGroup = userGroup;
+  userEntity.userGroups = [userGroup];
   return userRepository.save(userEntity);
 }
 

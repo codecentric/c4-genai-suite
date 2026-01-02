@@ -661,7 +661,7 @@ export class UpsertConfigurationDto {
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
-  userGroupsIds?: string[];
+  userGroupIds?: string[];
 
   @ApiProperty({
     description: 'The suggestions to be shown for the chat.',
@@ -758,7 +758,7 @@ export class ConfigurationDto {
     required: false,
     type: [String],
   })
-  userGroupsIds?: string[];
+  userGroupIds?: string[];
 
   @ApiProperty({
     description: 'Extension information.',
@@ -800,7 +800,7 @@ export class ConfigurationDto {
     result.executorHeaders = source.executorHeaders;
     result.name = source.name;
     result.description = source.description;
-    result.userGroupsIds = source.userGroupsIds;
+    result.userGroupIds = source.userGroupIds;
     result.extensions = source.extensions?.map((arg) => ExtensionUserInfoDto.fromDomain(arg));
     result.configurableArguments = ConfigurationDto.mergeConfigurableArguments(source);
 

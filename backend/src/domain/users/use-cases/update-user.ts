@@ -3,12 +3,12 @@ import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
-import { UserEntity, UserRepository } from 'src/domain/database';
+import { UserEntity, UserGroupEntity, UserRepository } from 'src/domain/database';
 import { assignDefined, isNull } from 'src/lib';
 import { User } from '../interfaces';
 import { buildUser } from './utils';
 
-type Values = Partial<Pick<User, 'apiKey' | 'name' | 'email' | 'userGroupId'> & { password: string; currentPassword?: string }>;
+type Values = Partial<Pick<User, 'apiKey' | 'name' | 'email' | 'userGroupIds'> & { password: string; currentPassword?: string }>;
 
 export class UpdateUser {
   constructor(
@@ -30,7 +30,7 @@ export class UpdateUserHandler implements ICommandHandler<UpdateUser, UpdateUser
 
   async execute(request: UpdateUser): Promise<UpdateUserResponse> {
     const { id, values } = request;
-    const { apiKey, email, name, password, userGroupId, currentPassword } = values;
+    const { apiKey, email, name, password, userGroupIds, currentPassword } = values;
 
     const entity = await this.users.findOneBy({ id });
 
@@ -56,7 +56,10 @@ export class UpdateUserHandler implements ICommandHandler<UpdateUser, UpdateUser
     }
 
     // Assign the object manually to avoid updating unexpected values.
-    assignDefined(entity, { email, name, userGroupId });
+    assignDefined(entity, { email, name });
+    if (userGroupIds) {
+      entity.userGroups = userGroupIds.map((id) => ({ id }) as UserGroupEntity);
+    }
 
     // Use the save method otherwise we would not get previous values.
     const updated = await this.users.save(entity);

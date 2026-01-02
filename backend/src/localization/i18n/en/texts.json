@@ -37,6 +37,7 @@
       "size": "Size",
       "bucket": "Bucket",
       "take": "Take",
+      "title": "Title",
       "fileIds": "File IDs",
       "temperatureHint": "Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic.",
       "seedHint": "This feature is in Beta. If specified, OpenAI will make a best effort to sample deterministically, such that repeated requests with the same seed and parameters should return the same result.",
@@ -119,7 +120,8 @@
     "brave": {
       "title": "Brave Web Search",
       "description": "Performs a web search using Brave",
-      "apiKeyHint": "The Brave Search API Key"
+      "apiKeyHint": "The Brave Search API Key",
+      "maxResults": "Number of search results"
     },
     "duckduckgo": {
       "title": "Duckduckgo Web Search",

@@ -8,7 +8,7 @@ import { withStore } from './strategy-helper';
 type Profile = {
   sub: string;
   email: string;
-  name?: string;
+  [key: string]: string;
 };
 
 type ErrorResponse =
@@ -26,6 +26,7 @@ type ErrorResponse =
 @Injectable()
 export class OAuthStrategy extends PassportStrategy(Strategy, 'oauth2') {
   private readonly userInfoURL;
+  private readonly userGroupsProperty;
 
   constructor(authService: AuthService) {
     super(
@@ -40,6 +41,7 @@ export class OAuthStrategy extends PassportStrategy(Strategy, 'oauth2') {
     );
 
     this.userInfoURL = authService.config.oauth?.userInfoURL || 'INVALID';
+    this.userGroupsProperty = authService.config.userGroupsPropertyName;
   }
 
   userProfile(accessToken: string, done: (error?: Error | null, result?: any) => void) {
@@ -67,7 +69,7 @@ export class OAuthStrategy extends PassportStrategy(Strategy, 'oauth2') {
       }
 
       try {
-        // It is not clear what type this s
+        // We cannot know the type here.
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         json = JSON.parse(body as string);
       } catch (ex) {
@@ -79,16 +81,15 @@ export class OAuthStrategy extends PassportStrategy(Strategy, 'oauth2') {
   }
 
   validate(accessToken: string, refreshToken: string, profile: Profile) {
-    const { sub: id, name, email } = profile;
+    const { sub: id, name, email, [this.userGroupsProperty]: userGroupIds = [] } = profile;
 
-    const user = {
+    return {
       id,
       accessToken,
       email,
       name: name || email,
+      userGroupIds,
       refreshToken,
     };
-
-    return user;
   }
 }

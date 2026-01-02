@@ -11,4 +11,11 @@ jest.mock('ai', () => ({
   generateText: jest.fn(() => () => 'test output'),
 }));
 
-describe('OpenAIModelExtension', () => modelExtensionTestSuite(AzureOpenAIModelExtension));
+const mockConfig = {
+  modelName: 'test-model',
+  apiKey: 'test-api-key',
+  deploymentName: 'test-deployment',
+  instanceName: 'test-instance',
+};
+
+describe('OpenAIModelExtension', () => modelExtensionTestSuite(AzureOpenAIModelExtension, mockConfig));

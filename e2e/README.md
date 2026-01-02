@@ -6,7 +6,7 @@ As you can find in the root repository's `./package.json`, there are several way
 
 ## How to Add or Debug E2Es
 
-**It is important to understand, that many of our E2E tests require the correct database state** to run as expected. To ensure the state is as expected we do not run tests in parallel and we use the test step syntax, which you can find in test files by looking for the `.step` keyword. The state issue is also one of the reasons, why we kept the extension tests (which use real LLM APIs) separately.
+**It is important to understand that many of our E2E tests require the correct database state** to run as expected. To ensure the state is as expected we do not run tests in parallel and we use the test step syntax, which you can find in test files by looking for the `.step` keyword. The state issue is also one of the reasons, why we kept the extension tests (which use real LLM APIs) separately.
 
 Note that the "extension tests" will be skipped if no `AZURE_OPEN_AI_API_KEY` environment variable is set.
 

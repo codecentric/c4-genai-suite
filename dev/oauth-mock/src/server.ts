@@ -241,6 +241,7 @@ app.get('/default/userinfo', (req: Request, res: Response) => {
     sub: generateId(tokenData.user),
     name: tokenData.user,
     email: tokenData.user,
+    groups: ['admin', 'gpt-oss', 'mistral'],
   });
 });
 
