@@ -25,7 +25,7 @@ def update_tempdir() -> None:
 update_tempdir()
 
 
-def check_needed(needed: Mapping[str, str | SecretStr | None], switch_name: str, switch_value: str) -> None:
+def check_required_arguments(needed: Mapping[str, str | SecretStr | None], switch_name: str, switch_value: str) -> None:
     missing = []
     for name, value in needed.items():
         if value is None:
@@ -134,14 +134,14 @@ class Config(BaseSettings, frozen=True):  # type: ignore
                 "STORE_PGVECTOR_URL": self.store_pgvector_url,
             }
             check_valid_postgres_connection_string(self.store_pgvector_url)
-            check_needed(needed_for_pgvector, "STORE_TYPE", "pgvector")
+            check_required_arguments(needed_for_pgvector, "STORE_TYPE", "pgvector")
 
         if self.store_type == "azure-ai-search":
             needed_for_azure_ai_search = {
                 "STORE_AZURE_AI_SEARCH_SERVICE_ENDPOINT": self.store_azure_ai_search_service_endpoint,
                 "STORE_AZURE_AI_SEARCH_SERVICE_API_KEY": self.store_azure_ai_search_service_api_key,
             }
-            check_needed(needed_for_azure_ai_search, "STORE_TYPE", "azure-ai-search")
+            check_required_arguments(needed_for_azure_ai_search, "STORE_TYPE", "azure-ai-search")
 
         return self
 
@@ -154,14 +154,14 @@ class Config(BaseSettings, frozen=True):  # type: ignore
                 "FILE_STORE_S3_SECRET_ACCESS_KEY": self.file_store_s3_secret_access_key,
                 "FILE_STORE_S3_BUCKET_NAME": self.file_store_s3_bucket_name,
             }
-            check_needed(needed_for_s3, "FILE_STORE_TYPE", "s3")
+            check_required_arguments(needed_for_s3, "FILE_STORE_TYPE", "s3")
             check_valid_s3_bucket_name(self.file_store_s3_bucket_name)
 
         if self.file_store_type == "filesystem":
             needed_for_filesystem = {
                 "FILE_STORE_FILESYSTEM_BASEPATH": self.file_store_filesystem_basepath,
             }
-            check_needed(needed_for_filesystem, "FILE_STORE_TYPE", "filesystemsearch")
+            check_required_arguments(needed_for_filesystem, "FILE_STORE_TYPE", "filesystemsearch")
 
         return self
 
@@ -172,7 +172,7 @@ class Config(BaseSettings, frozen=True):  # type: ignore
                 "EMBEDDINGS_OPENAI_API_KEY": self.embeddings_openai_api_key,
                 "EMBEDDINGS_OPENAI_MODEL_NAME": self.embeddings_openai_model_name,
             }
-            check_needed(needed_for_openai, "EMBEDDINGS_TYPE", "openai")
+            check_required_arguments(needed_for_openai, "EMBEDDINGS_TYPE", "openai")
 
         if self.embeddings_type == "azure-openai":
             needed_for_azure_open_ai = {
@@ -182,7 +182,7 @@ class Config(BaseSettings, frozen=True):  # type: ignore
                 "EMBEDDINGS_AZURE_OPENAI_API_VERSION": self.embeddings_azure_openai_api_version,
                 "EMBEDDINGS_AZURE_OPENAI_MODEL_NAME": self.embeddings_azure_openai_model_name,
             }
-            check_needed(needed_for_azure_open_ai, "EMBEDDINGS_TYPE", "azure-openai")
+            check_required_arguments(needed_for_azure_open_ai, "EMBEDDINGS_TYPE", "azure-openai")
 
         if self.embeddings_type == "bedrock":
             needed_for_bedrock = {
@@ -191,14 +191,14 @@ class Config(BaseSettings, frozen=True):  # type: ignore
                 "EMBEDDINGS_BEDROCK_AWS_ACCESS_KEY_ID": self.embeddings_bedrock_aws_access_key_id,
                 "EMBEDDINGS_BEDROCK_AWS_SECRET_ACCESS_KEY": self.embeddings_bedrock_aws_secret_access_key,
             }
-            check_needed(needed_for_bedrock, "EMBEDDINGS_TYPE", "bedrock")
+            check_required_arguments(needed_for_bedrock, "EMBEDDINGS_TYPE", "bedrock")
 
         if self.embeddings_type == "ollama":
             needed_for_azure_open_ai = {
                 "EMBEDDINGS_OLLAMA_ENDPOINT": self.embeddings_ollama_endpoint,
                 "EMBEDDINGS_OLLAMA_MODEL_NAME": self.embeddings_ollama_model_name,
             }
-            check_needed(needed_for_azure_open_ai, "EMBEDDINGS_TYPE", "ollama")
+            check_required_arguments(needed_for_azure_open_ai, "EMBEDDINGS_TYPE", "ollama")
 
         if self.embeddings_type == "nvidia":
             needed_for_azure_open_ai = {
@@ -206,7 +206,7 @@ class Config(BaseSettings, frozen=True):  # type: ignore
                 "EMBEDDINGS_NVIDIA_BASE_URL": self.embeddings_nvidia_base_url,
                 "EMBEDDINGS_NVIDIA_API_KEY": self.embeddings_nvidia_api_key,
             }
-            check_needed(needed_for_azure_open_ai, "EMBEDDINGS_TYPE", "nvidia")
+            check_required_arguments(needed_for_azure_open_ai, "EMBEDDINGS_TYPE", "nvidia")
 
         return self
 
@@ -219,7 +219,7 @@ class Config(BaseSettings, frozen=True):  # type: ignore
                 "STT_AZURE_OPENAI_WHISPER_API_KEY": self.stt_azure_openai_whisper_api_key,
                 "STT_AZURE_OPENAI_WHISPER_API_VERSION": self.stt_azure_openai_whisper_api_version,
             }
-            check_needed(needed_for_azure_open_ai_whisper, "STT_TYPE", "azure-openai-whisper")
+            check_required_arguments(needed_for_azure_open_ai_whisper, "STT_TYPE", "azure-openai-whisper")
 
         return self
 
