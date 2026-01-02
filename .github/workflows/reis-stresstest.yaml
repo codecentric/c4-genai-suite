@@ -20,7 +20,7 @@ jobs:
   build-reis-if-needed:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v7
         id: download_reis
         continue-on-error: true
         with:
@@ -66,7 +66,7 @@ jobs:
             -e POSTGRES_PASSWORD="secret" \
             -e POSTGRES_DB="cccc" \
             pgvector/pgvector:pg16
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v7
         with:
           name: reis
           path: /tmp/
