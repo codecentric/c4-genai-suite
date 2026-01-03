@@ -11,9 +11,6 @@ export class UsageEntity {
   userId!: string;
 
   @PrimaryColumn()
-  userGroup!: string;
-
-  @PrimaryColumn()
   counter!: string;
 
   @PrimaryColumn()
