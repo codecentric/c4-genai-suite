@@ -208,6 +208,9 @@ export interface ChatContext {
   // The system messages.
   systemMessages: string[];
 
+  // Whether to replace the default system prompt (set by custom prompt extension).
+  replaceDefaultPrompt?: boolean;
+
   // The deployment.
   readonly configuration: ConfigurationModel;
 
