@@ -1,5 +1,5 @@
 import { ActionIcon, Button, Portal } from '@mantine/core';
-import { IconFilter, IconPaperclip } from '@tabler/icons-react';
+import { IconFilter, IconPaperclip, IconSquare } from '@tabler/icons-react';
 import React, { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
 import { ConfigurationDto, FileDto } from 'src/api';
@@ -27,8 +27,9 @@ interface ChatInputProps {
   isDisabled?: boolean;
   isEmpty?: boolean;
   submitMessage: (input: string, files?: FileDto[]) => void;
+  cancelStream?: () => void;
 }
-export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEmpty, submitMessage }: ChatInputProps) {
+export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEmpty, submitMessage, cancelStream }: ChatInputProps) {
   const extensionsWithFilter = configuration?.extensions?.filter(isExtensionWithUserArgs) ?? [];
   const { updateContext, context } = useExtensionContext(chatId);
   const [defaultValues, setDefaultValues] = useState<UserArgumentDefaultValueByExtensionIDAndName>({});
@@ -279,14 +280,26 @@ export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEm
                     languages={speechRecognitionLanguages}
                   />
                 )}
-                <ActionIcon
-                  type="submit"
-                  size="lg"
-                  disabled={!input || isDisabled || uploadMutations.some((m) => m.status === 'pending') || listening}
-                  data-testid="chat-submit-button"
-                >
-                  <Icon icon="arrow-up" />
-                </ActionIcon>
+                {isDisabled ? (
+                  <ActionIcon
+                    type="button"
+                    size="lg"
+                    onClick={cancelStream}
+                    data-testid="chat-cancel-button"
+                    color="red"
+                  >
+                    <IconSquare className="w-4" />
+                  </ActionIcon>
+                ) : (
+                  <ActionIcon
+                    type="submit"
+                    size="lg"
+                    disabled={!input || uploadMutations.some((m) => m.status === 'pending') || listening}
+                    data-testid="chat-submit-button"
+                  >
+                    <Icon icon="arrow-up" />
+                  </ActionIcon>
+                )}
               </div>
             </div>
           </div>

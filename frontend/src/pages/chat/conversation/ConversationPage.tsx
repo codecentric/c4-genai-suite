@@ -11,6 +11,7 @@ import { cn } from 'src/lib';
 import { useStateOfSelectedAssistant } from 'src/pages/chat/state/listOfAssistants';
 import { texts } from 'src/texts';
 import { useChatStream, useStateOfChat, useStateOfIsAiWriting, useStateOfMessages } from '../state/chat';
+import { useChatStore } from '../state/zustand/chatStore';
 import { useChatDropzone } from '../useChatDropzone';
 import { ChatHistory } from './ChatHistory';
 import { ChatInput } from './ChatInput';
@@ -32,6 +33,7 @@ export function ConversationPage(props: ConversationPageProps) {
   const messages = useStateOfMessages();
   const isAiWriting = useStateOfIsAiWriting();
   const assistant = useStateOfSelectedAssistant();
+  const chatStore = useChatStore();
 
   const { theme } = useTheme();
   const { canScrollToBottom, scrollToBottom, containerRef } = useScrollToBottom([chat.id], [messages]);
@@ -46,6 +48,10 @@ export function ConversationPage(props: ConversationPageProps) {
     sendMessage(input, uploadedFiles, editMessageId);
     setTimeout(() => scrollToBottom(), 500);
     return false;
+  });
+
+  const cancelStream = useEventCallback(() => {
+    chatStore.cancelActiveStream(chatId);
   });
   const { uploadLimitReached, allowedFileNameExtensions, handleUploadFile, multiple } = useChatDropzone();
   const { getRootProps, getInputProps, isDragActive, isDragAccept, isDragReject } = useDropzone({
@@ -97,6 +103,7 @@ export function ConversationPage(props: ConversationPageProps) {
                 isDisabled={isAiWriting}
                 isEmpty={isNewConversation}
                 submitMessage={submitMessage}
+                cancelStream={cancelStream}
               />
               <div
                 data-testid={'scrollToBottomButton'}

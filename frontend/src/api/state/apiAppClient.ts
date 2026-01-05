@@ -61,8 +61,9 @@ export class AppClient {
 class StreamApi {
   constructor(private readonly configuration: Configuration) {}
 
-  streamPrompt(conversationId: number, message: SendMessageDto, messageId?: number): Observable<StreamEventDto> {
+  streamPrompt(conversationId: number, message: SendMessageDto, messageId?: number): { observable: Observable<StreamEventDto>; abortController: AbortController } {
     const replaySubject = new ReplaySubject<StreamEventDto>();
+    const abortController = new AbortController();
 
     const basePath = `${this.configuration.basePath}/api/conversations/${conversationId}`;
     const path = messageId ? `${basePath}/messages/${messageId}/sse` : `${basePath}/messages/sse`;
@@ -74,6 +75,7 @@ class StreamApi {
         body: JSON.stringify(message),
         openWhenHidden: true,
         credentials: 'include',
+        signal: abortController.signal,
         headers: {
           'Accept-Language': i18next.language,
           'Content-Type': 'application/json',
@@ -100,6 +102,6 @@ class StreamApi {
       });
     });
     observable.subscribe(replaySubject);
-    return replaySubject;
+    return { observable: replaySubject, abortController };
   }
 }
