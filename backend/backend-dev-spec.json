@@ -4202,10 +4202,6 @@
             "type": "boolean",
             "description": "Indicates if the user group is builtin and cannot be deleted."
           },
-          "monthlyTokens": {
-            "type": "number",
-            "description": "The monthly allowed tokens for all users in the group."
-          },
           "monthlyUserTokens": {
             "type": "number",
             "description": "The monthly allowed tokens per user in the group."
@@ -4232,10 +4228,6 @@
           "name": {
             "type": "string",
             "description": "The display name."
-          },
-          "monthlyTokens": {
-            "type": "number",
-            "description": "The monthly allowed tokens for all users in the group."
           },
           "monthlyUserTokens": {
             "type": "number",
