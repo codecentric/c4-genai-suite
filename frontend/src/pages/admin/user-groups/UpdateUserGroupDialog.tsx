@@ -12,11 +12,6 @@ import { texts } from 'src/texts';
 
 const SCHEME = Yup.object({
   name: Yup.string().label(texts.common.name).required(),
-  monthlyTokens: Yup.number()
-    .positive()
-    .label(texts.common.monthlyTokens)
-    .nullable()
-    .transform((value: number, originalValue: string) => (originalValue === '' ? null : value)),
   monthlyUserTokens: Yup.number()
     .positive()
     .label(texts.common.monthlyUserTokens)
@@ -45,7 +40,7 @@ export function UpdateUserGroupDialog({ onClose, onDelete, onUpdate, target }: U
 
   const form = useForm<SchemaType>({
     resolver: RESOLVER,
-    defaultValues: { name: '', monthlyUserTokens: null, monthlyTokens: null },
+    defaultValues: { name: '', monthlyUserTokens: null },
   });
   useEffect(() => {
     form.reset(target);
@@ -59,7 +54,6 @@ export function UpdateUserGroupDialog({ onClose, onDelete, onUpdate, target }: U
           onSubmit={form.handleSubmit((v) =>
             userGroupUpdate.mutate({
               name: v.name,
-              monthlyTokens: v.monthlyTokens ? v.monthlyTokens : undefined,
               monthlyUserTokens: v.monthlyUserTokens ? v.monthlyUserTokens : undefined,
             }),
           )}
@@ -84,8 +78,6 @@ export function UpdateUserGroupDialog({ onClose, onDelete, onUpdate, target }: U
               <FormAlert common={texts.userGroups.updateFailed} error={userGroupUpdate.error} />
 
               <Forms.Text required name="name" label={texts.common.groupName} />
-
-              <Forms.Number name="monthlyTokens" label={texts.common.monthlyTokens} refreshable />
 
               <Forms.Number name="monthlyUserTokens" label={texts.common.monthlyUserTokens} refreshable />
 

@@ -52,9 +52,6 @@ export class CheckUsageMiddleware implements ChatMiddleware {
     const dateFrom = startOfMonth(new Date());
     const dateTo = addMonths(dateFrom, 1);
 
-    // Note: Group-level quota check removed because userGroup field was removed from usage tracking (issue #673)
-    // Only user-level quotas are enforced now
-
     if (monthlyUserTokens > 0) {
       const userUsage =
         (await this.usages.sum('count', {

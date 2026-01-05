@@ -37,9 +37,6 @@ export interface UserGroup {
   // Indicates if the user group is builtin and cannot be deleted.
   isBuiltIn: boolean;
 
-  // The monthly allowed tokens for all users in the group.
-  monthlyTokens?: number;
-
   // The monthly allowed tokens per user in the group.
   monthlyUserTokens?: number;
 }

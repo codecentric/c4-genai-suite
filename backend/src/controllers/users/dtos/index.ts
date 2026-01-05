@@ -166,12 +166,6 @@ export class UpsertUserGroupDto {
   name!: string;
 
   @ApiProperty({
-    description: 'The monthly allowed tokens for all users in the group.',
-    required: false,
-  })
-  monthlyTokens?: number;
-
-  @ApiProperty({
     description: 'The monthly allowed tokens per user in the group.',
     required: false,
   })
@@ -204,12 +198,6 @@ export class UserGroupDto {
   isBuiltIn!: boolean;
 
   @ApiProperty({
-    description: 'The monthly allowed tokens for all users in the group.',
-    required: false,
-  })
-  monthlyTokens?: number;
-
-  @ApiProperty({
     description: 'The monthly allowed tokens per user in the group.',
     required: false,
   })
@@ -220,7 +208,6 @@ export class UserGroupDto {
     result.id = source.id;
     result.isAdmin = source.isAdmin;
     result.isBuiltIn = source.isBuiltIn;
-    result.monthlyTokens = source.monthlyTokens;
     result.monthlyUserTokens = source.monthlyUserTokens;
     result.name = source.name;
 
