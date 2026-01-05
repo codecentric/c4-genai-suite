@@ -12,7 +12,6 @@ describe('UpdateUserGroupDialog', () => {
     name: 'St1',
     isAdmin: false,
     isBuiltIn: false,
-    monthlyTokens: 0,
     monthlyUserTokens: 0,
   };
 
@@ -27,7 +26,6 @@ describe('UpdateUserGroupDialog', () => {
     render(<UpdateUserGroupDialog {...defaultProps} />);
 
     expect(screen.getByLabelText(required(texts.common.groupName))).toHaveValue(mockUserGroup.name);
-    expect(screen.getByLabelText(texts.common.monthlyTokens)).toHaveValue(mockUserGroup.monthlyTokens);
     expect(screen.getByLabelText(texts.common.monthlyUserTokens)).toHaveValue(mockUserGroup.monthlyUserTokens);
   });
 
@@ -47,7 +45,6 @@ describe('UpdateUserGroupDialog', () => {
     const user = userEvent.setup();
     const nameInput = screen.getByLabelText(required(texts.common.groupName));
     await user.clear(nameInput);
-    await user.type(screen.getByLabelText(texts.common.monthlyTokens), '1200');
     await user.type(screen.getByLabelText(texts.common.monthlyUserTokens), '120');
     const saveButton = screen.getByRole('button', { name: texts.common.save });
     await user.click(saveButton);
