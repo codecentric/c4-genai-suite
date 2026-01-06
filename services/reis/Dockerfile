@@ -16,14 +16,6 @@ COPY pyproject.toml uv.lock ./
 # Install dependencies
 RUN uv sync --frozen --no-install-project --no-dev
 
-# Remove unnecessary files from virtualenv to reduce size
-RUN find /reis/.venv -name "*.pyc" -delete && \
-    find /reis/.venv -name "*.pyo" -delete && \
-    find /reis/.venv -name "*.pyd" -delete && \
-    find /reis/.venv -name "__pycache__" -type d -exec rm -rf {} + 2>/dev/null || true && \
-    find /reis/.venv -name "*.c" -delete && \
-    find /reis/.venv -name "*.h" -delete
-
 #
 # RUNTIME
 #
