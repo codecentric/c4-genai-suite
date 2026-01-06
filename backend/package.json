@@ -68,7 +68,7 @@
     "date-fns": "^4.1.0",
     "dotenv": "^17.2.3",
     "duck-duck-scrape": "^2.2.7",
-    "expr-eval": "^2.0.2",
+    "expr-eval-fork": "^3.0.1",
     "express-session": "^1.18.2",
     "json-diff-ts": "^4.6.3",
     "langfuse-vercel": "^3.38.5",
