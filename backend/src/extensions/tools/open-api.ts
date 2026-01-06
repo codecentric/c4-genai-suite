@@ -116,7 +116,7 @@ export class OpenApiExtension implements Extension<OpenApiExtensionConfiguration
 
 class InternalTool extends NamedStructuredTool {
   readonly name: string;
-  readonly schema: z.ZodObject<any, any, any, any>;
+  readonly schema: z.ZodObject<any, any>;
   readonly displayName: string;
   readonly description: string;
 
@@ -130,7 +130,7 @@ class InternalTool extends NamedStructuredTool {
   ) {
     super();
 
-    const shape: z.ZodRawShape = {};
+    const shape: Record<string, z.ZodType> = {};
 
     for (const [name, argument] of Object.entries(tool.arguments)) {
       let type: z.ZodType;
@@ -212,7 +212,7 @@ class InternalTool extends NamedStructuredTool {
         name,
         email,
       },
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+
       values: arg,
     });
 
