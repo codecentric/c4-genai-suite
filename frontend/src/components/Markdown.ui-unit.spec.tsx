@@ -39,7 +39,7 @@ describe('Markdown component', () => {
   });
 
   it('renders img correctly', () => {
-    const imageUrl = 'https://c4.dev.ccopt.de/blobs/7a181be7-fa78-4bfe-bf02-faaa3392b926';
+    const imageUrl = 'http://example.com/image.png';
     const content = `![Image](${imageUrl})`;
     render(<Markdown>{content}</Markdown>);
 
