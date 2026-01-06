@@ -21,7 +21,7 @@ import {
 } from './chat-input-utils';
 
 interface ChatInputProps {
-  textareaRef?: React.RefObject<HTMLTextAreaElement>;
+  textareaRef?: React.RefObject<HTMLTextAreaElement | null>;
   configuration?: ConfigurationDto;
   chatId: number;
   isDisabled?: boolean;

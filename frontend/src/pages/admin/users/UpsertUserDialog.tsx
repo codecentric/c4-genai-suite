@@ -52,9 +52,9 @@ export type CreateUserProps = {
 
 type UpsertUserDialogProps = UpdateUserProps | CreateUserProps;
 
-export const UpdateUserDialog = (props: Omit<UpdateUserProps, 'type'>): JSX.Element =>
+export const UpdateUserDialog = (props: Omit<UpdateUserProps, 'type'>): React.ReactElement =>
   UpsertUserDialog({ ...props, type: 'update' });
-export const CreateUserDialog = (props: Omit<CreateUserProps, 'type'>): JSX.Element =>
+export const CreateUserDialog = (props: Omit<CreateUserProps, 'type'>): React.ReactElement =>
   UpsertUserDialog({ ...props, type: 'create' });
 
 function UpsertUserDialog(props: UpsertUserDialogProps) {

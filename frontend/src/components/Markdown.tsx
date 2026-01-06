@@ -94,7 +94,7 @@ function PreBlock({ children, ...props }: React.HTMLAttributes<HTMLPreElement>) 
   if (typeof children === 'object' && children && 'props' in children && children.type === Code) {
     return (
       <pre {...props}>
-        <CodeBlock {...children.props} />
+        <CodeBlock {...(children.props as React.ComponentProps<typeof Code>)} />
       </pre>
     );
   }
