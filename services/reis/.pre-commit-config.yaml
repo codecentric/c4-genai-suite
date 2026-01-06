@@ -35,9 +35,9 @@ repos:
           types_or: [ python, pyi ]
           require_serial: true
           files: ^services/reis/
-        - id: mypy
-          name: mypy
-          entry: bash -c 'cd services/reis && poetry run mypy .'
+        - id: ty
+          name: ty
+          entry: bash -c 'cd services/reis && uv run ty check'
           language: python
           types: [ python ]
           files: ^services/reis/

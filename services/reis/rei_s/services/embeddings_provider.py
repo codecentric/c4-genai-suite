@@ -16,18 +16,18 @@ def get_embeddings(config: Config) -> Embeddings:
     max_retries = 1337
 
     if config.embeddings_type.lower() == "openai":
-        # this is ensured by the config validation, the following lines are there to help the mypy typechecker
+        # this is ensured by the config validation, the following lines are there to help the ty typechecker
         if config.embeddings_openai_model_name is None:
             raise ValueError("The env variable `EMBEDDINGS_OPENAI_MODEL_NAME` is missing.")
 
         return OpenAIEmbeddings(
-            api_key=config.embeddings_openai_api_key,
+            openai_api_key=config.embeddings_openai_api_key,
             model=config.embeddings_openai_model_name,
             max_retries=max_retries,
-            base_url=config.embeddings_openai_endpoint,
+            openai_api_base=config.embeddings_openai_endpoint,
         )
     elif config.embeddings_type.lower() == "ollama":
-        # this is ensured by the config validation, the following lines are there to help the mypy typechecker
+        # this is ensured by the config validation, the following lines are there to help the ty typechecker
         if config.embeddings_ollama_model_name is None:
             raise ValueError("The env variable `EMBEDDINGS_OLLAMA_MODEL_NAME` is missing.")
         if config.embeddings_ollama_endpoint is None:
@@ -38,16 +38,16 @@ def get_embeddings(config: Config) -> Embeddings:
             base_url=config.embeddings_ollama_endpoint,
         )
     elif config.embeddings_type.lower() == "azure-openai":
-        # this is ensured by the config validation, the following lines are there to help the mypy typechecker
+        # this is ensured by the config validation, the following lines are there to help the ty typechecker
         if config.embeddings_azure_openai_model_name is None:
             raise ValueError("The env variable `EMBEDDINGS_AZURE_OPENAI_MODEL_NAME` is missing.")
 
         return AzureOpenAIEmbeddings(
-            api_key=config.embeddings_azure_openai_api_key,
+            openai_api_key=config.embeddings_azure_openai_api_key,
             model=config.embeddings_azure_openai_model_name,
-            azure_deployment=config.embeddings_azure_openai_deployment_name,
+            deployment=config.embeddings_azure_openai_deployment_name,
             azure_endpoint=config.embeddings_azure_openai_endpoint,
-            api_version=config.embeddings_azure_openai_api_version,
+            openai_api_version=config.embeddings_azure_openai_api_version,
             max_retries=max_retries,
         )
     elif config.embeddings_type.lower() == "bedrock":
