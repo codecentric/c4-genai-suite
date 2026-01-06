@@ -68,9 +68,7 @@ def check_valid_s3_bucket_name(bucket_name: str | None) -> None:
         raise ValueError("FILE_STORE_S3_BUCKET_NAME cannot be formatted like an IP address")
 
 
-# will be fixed in next mypy release
-# TODO: remove `type: ignore` when mypy was updated
-class Config(BaseSettings, frozen=True):  # type: ignore
+class Config(BaseSettings, frozen=True):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore", env_ignore_empty=True)
 
     workers: Annotated[int, Field(gt=0)] = 1

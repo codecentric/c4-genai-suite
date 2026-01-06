@@ -9,6 +9,7 @@ import pytest
 from pytest_mock import MockerFixture
 from sqlalchemy import create_engine
 import sqlalchemy
+import sqlalchemy.exc
 
 from rei_s.config import Config, get_config
 from rei_s.services.vectorstore_adapter import VectorStoreFilter
@@ -36,6 +37,7 @@ def get_config_override() -> Config:
         )
     except ValidationError as e:
         pytest.skip(f"Skipped! A config value is missing: {e!r}")
+        raise  # For type checker - pytest.skip raises but type checker doesn't know
 
 
 @pytest.fixture(scope="function", autouse=True)

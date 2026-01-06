@@ -38,7 +38,8 @@ dependencies = [
 [dependency-groups]
 dev = [
     "ruff==0.14.11",
-    "mypy==1.19.1",
+    "ty>=0.0.9",
+    "ruff==0.14.11",
     "pip==25.3",
     "pre-commit==4.5.1",
     "pytest==9.0.2",
@@ -70,11 +71,5 @@ line-length = 120
 [tool.ruff.lint]
 select = ["E", "W", "F", "N", "A", "B"]
 
-[tool.mypy]
-strict = true
-install_types = true
-non_interactive = true
-ignore_missing_imports = true
-exclude = [
-    ".cache",
-    ]
+[tool.ty.terminal]
+error-on-warning = true
