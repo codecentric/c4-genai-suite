@@ -189,8 +189,8 @@ export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEm
           {chatFiles.map((file) => (
             <FileItemComponent key={file.id} file={file} onRemove={remove} />
           ))}
-          {uploadingFiles.map((file) => (
-            <FileItemComponent key={file.name} file={{ fileName: file.name }} loading={true} />
+          {uploadingFiles.map((file, n) => (
+            <FileItemComponent key={`${n}-${file.name}`} file={{ fileName: file.name }} loading={true} />
           ))}
         </div>
 
@@ -216,7 +216,7 @@ export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEm
           <div className="box-border rounded-2xl border border-gray-200 p-4 pb-3 leading-none shadow-2xl shadow-gray-100 focus-within:border-gray-400">
             <TextareaAutosize
               className={`w-full resize-none bg-transparent pb-4 outline-none`}
-              maxRows={5}
+              maxRows={15}
               minRows={1}
               value={input}
               autoFocus

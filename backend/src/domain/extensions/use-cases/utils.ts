@@ -157,24 +157,26 @@ export async function buildConfiguration(
   withExtensions: boolean = false,
   onlyEnabledExtensions: boolean = false,
 ): Promise<ConfigurationModel> {
-  const { userGroupsIds, extensions: configuredExtensions, status, ...other } = source;
+  const { userGroupIds, extensions: configuredExtensions, status, ...other } = source;
 
   const extensions =
     withExtensions && extensionExplorer && configuredExtensions
       ? await Promise.all(
-          configuredExtensions.map((extensionEntity) => {
-            const extensionConfiguration = extensionExplorer.getExtension(extensionEntity.name);
-            if (extensionConfiguration && (!onlyEnabledExtensions || extensionEntity.enabled)) {
-              return buildExtension(extensionEntity, extensionConfiguration);
-            }
-          }, [] as ConfiguredExtension[]),
+          configuredExtensions
+            .map((extensionEntity) => {
+              const extensionConfiguration = extensionExplorer.getExtension(extensionEntity.name);
+              if (extensionConfiguration && (!onlyEnabledExtensions || extensionEntity.enabled)) {
+                return buildExtension(extensionEntity, extensionConfiguration);
+              }
+            }, [] as ConfiguredExtension[])
+            .filter((x) => x !== undefined),
         )
       : [];
 
   return {
     ...other,
     enabled: status === ConfigurationStatus.ENABLED,
-    userGroupsIds: userGroupsIds || [],
+    userGroupIds: userGroupIds || [],
     extensions: extensions.filter((x) => !!x),
   };
 }

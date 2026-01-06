@@ -8,42 +8,47 @@ license = "Apache-2.0"
 
 [tool.poetry.dependencies]
 python = "<4.0,>=3.12.0"
-pydantic = "2.11.9"
-pydantic-settings = "^2.11.0"
-langchain-core = "0.3.78"
-langchain-community = "0.3.30"
-langchain-openai = "0.3.34"
-langchain-postgres = "0.0.15"
-psycopg = {extras = ["binary"], version = "^3.2.10"}
-fastapi = {extras = ["standard"], version = "0.118.0"}
-azure-search-documents = "11.5.3"
-azure-identity = "1.25.0"
-unstructured = {extras = ["docx", "md", "pptx", "xlsx"], version = "0.18.15"}
-pdfminer-six = "^20250506"
-pypdf = "^6.1.1"
+pydantic = "2.12.5"
+pydantic-settings = "^2.12.0"
+langchain-core = "0.3.81"
+langchain-community = "0.3.31"
+langchain-openai = "0.3.35"
+langchain-postgres = "0.0.16"
+psycopg = {extras = ["binary"], version = "^3.3.2"}
+fastapi = {extras = ["standard"], version = "0.128.0"}
+azure-search-documents = "11.6.0"
+azure-identity = "1.25.1"
+pdfminer-six = "^20251230"
+pypdf = "^6.5.0"
 ffmpeg-python = "^0.2.0"
-aiofiles = "^24.1.0"
+python-oxmsg = "^0.0.2"
+aiofiles = "^25.1.0"
 prometheus-fastapi-instrumentator = "^7.0.0"
-fastmcp = "^2.12.4"
+fastmcp = "^2.14.2"
 langchain-ollama = "^0.3.10"
 langchain-aws = "^0.2.35"
-langchain-nvidia-ai-endpoints = "^0.3.18"
+langchain-nvidia-ai-endpoints = "^0.3.19"
+boto3 = "^1.42.21"
+boto3-stubs = {extras = ["s3"], version = "^1.42.21"}
+weasyprint = "^67.0"
+markdown = "^3.10"
+pygments = "^2.19.2"
+orjson = "^3.11.5"
 
 [tool.poetry.group.dev.dependencies]
-ruff = "0.13.3"
-mypy = "1.18.2"
-pre-commit = "4.3.0"
-pytest = "8.4.2"
+ruff = "0.14.10"
+mypy = "1.19.1"
+pre-commit = "4.5.1"
+pytest = "9.0.2"
 pytest-cov = "7.0.0"
 pytest-mock = "3.15.1"
 pytest-responses = "0.5.1"
 pytest-github-report = "0.0.1"
 pytest-error-for-skips = "2.0.2"
-faker = "37.8.0"
+faker = "40.1.0"
 responses = "0.25.8"
 
 [tool.poetry.scripts]
-download-tokenizers = "rei_s.prepare:download"
 generate-api-spec = "rei_s.generate_open_api:generate"
 
 [build-system]

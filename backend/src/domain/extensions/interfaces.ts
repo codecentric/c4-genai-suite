@@ -24,7 +24,7 @@ export interface ConfigurationModel {
 
   executorHeaders?: string;
 
-  userGroupsIds: string[];
+  userGroupIds: string[];
 
   extensions?: ConfiguredExtension<ExtensionConfiguration>[];
 }
@@ -219,8 +219,8 @@ export class ConfiguredExtension<T extends ExtensionConfiguration = ExtensionCon
     return this.extension.getChunks?.(this.entity.values, documentUri, chunkUris);
   }
 
-  async getDocument(documentUri: string): Promise<File | undefined> {
-    return this.extension.getDocument?.(this.entity.values, documentUri);
+  async getDocument(documentUri: string, user: User): Promise<File | undefined> {
+    return this.extension.getDocument?.(this.entity.values, documentUri, user);
   }
 
   private mergeExtensionUserValues(...extensionUserValues: (ExtensionUserArgumentValues | undefined)[]) {
@@ -279,7 +279,7 @@ export interface Extension<
   buildSpec?(extension: ExtensionEntity<TConfig>, throwOnError: boolean, forceRebuild: boolean): Promise<ExtensionSpec>;
 
   getChunks?(configuration: TConfig, documentUri: string, chunkUris: string[]): Promise<string[]>;
-  getDocument?(configuration: TConfig, documentUri: string): Promise<File>;
+  getDocument?(configuration: TConfig, documentUri: string, user: User): Promise<File>;
 
   fixedValues?: Partial<TConfig>;
 

@@ -1,5 +1,6 @@
-import { ApiProperty, ApiPropertyOptional, getSchemaPath } from '@nestjs/swagger';
+import { ApiExtension, ApiExtraModels, ApiProperty, ApiPropertyOptional, getSchemaPath } from '@nestjs/swagger';
 
+@ApiExtension('x-external', true)
 export class ResponseInputFile {
   @ApiProperty({ enum: ['input_file'] })
   type!: 'input_file';
@@ -17,6 +18,7 @@ export class ResponseInputFile {
   filename?: string;
 }
 
+@ApiExtension('x-external', true)
 export class ResponseInputImage {
   @ApiProperty({ enum: ['low', 'high', 'auto'] })
   detail!: 'low' | 'high' | 'auto';
@@ -31,6 +33,7 @@ export class ResponseInputImage {
   image_url?: string | null;
 }
 
+@ApiExtension('x-external', true)
 export class ResponseInputText {
   @ApiProperty({ type: 'string' })
   text!: string;
@@ -40,9 +43,10 @@ export class ResponseInputText {
 }
 
 export type ResponseInputContent = ResponseInputText | ResponseInputImage | ResponseInputFile;
-
 export type ResponseInputMessageContentList = Array<ResponseInputContent>;
 
+@ApiExtraModels(ResponseInputText, ResponseInputImage, ResponseInputFile)
+@ApiExtension('x-external', true)
 export class EasyInputMessage {
   @ApiProperty({
     oneOf: [
@@ -72,6 +76,8 @@ export type ResponseInputItem = EasyInputMessage;
 
 export type ResponseInput = Array<ResponseInputItem>;
 
+@ApiExtraModels(EasyInputMessage, ResponseInputText, ResponseInputImage, ResponseInputFile)
+@ApiExtension('x-external', true)
 export class ResponseCreateDto {
   @ApiProperty({ type: 'string' })
   model!: string;

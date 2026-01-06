@@ -23,7 +23,7 @@ type Values = Partial<
     | 'executorHeaders'
     | 'name'
     | 'description'
-    | 'userGroupsIds'
+    | 'userGroupIds'
   >
 >;
 
@@ -55,13 +55,13 @@ export class CreateConfigurationHandler implements ICommandHandler<CreateConfigu
       executorHeaders,
       name,
       description,
-      userGroupsIds,
+      userGroupIds,
     } = values;
 
     const entity = this.configurations.create();
 
-    if (userGroupsIds) {
-      entity.userGroups = await this.userGroups.findBy({ id: In(userGroupsIds) });
+    if (userGroupIds) {
+      entity.userGroups = await this.userGroups.findBy({ id: In(userGroupIds) });
     }
 
     // Assign the object manually to avoid updating unexpected values.

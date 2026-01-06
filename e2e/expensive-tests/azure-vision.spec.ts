@@ -1,4 +1,3 @@
-import { randomInt } from 'crypto';
 import { expect, test } from '@playwright/test';
 import { config } from '../tests/utils/config';
 import {
@@ -13,6 +12,7 @@ import {
   newChat,
   selectConfiguration,
   sendMessage,
+  uniqueName,
   uploadFileWithPaperclip,
 } from '../tests/utils/helper';
 
@@ -27,7 +27,7 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
     });
 
     await test.step('add assistant', async () => {
-      configuration.name = `E2E-Vision-${randomInt(10000)}`;
+      configuration.name = uniqueName('E2E-Vision');
       configuration.description = `Description for ${configuration.name}`;
       await enterAdminArea(page);
       await createConfiguration(page, configuration);

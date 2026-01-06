@@ -25,6 +25,8 @@ services:
       NODE_ENV: production
       SESSION_SECRET: random
       # settings related to oicd
+      AUTH_USER_GROUPS_PROPERTY_NAME: groups
+      AUTH_USE_USER_GROUPS_FROM_AUTH_PROVIDER: true
       AUTH_OAUTH_AUTHORIZATION_URL: http://localhost:9999/default/authorize
       AUTH_OAUTH_BRAND_NAME: Local OICD
       AUTH_OAUTH_CLIENTID: client_id
@@ -54,6 +56,11 @@ services:
       STORE_TYPE: pgvector
       STORE_PGVECTOR_URL: postgresql+psycopg://admin:secret@postgres:5432/cccc
       STORE_PGVECTOR_INDEX_NAME: basisreistest
+      FILE_STORE_TYPE: s3
+      FILE_STORE_S3_ENDPOINT_URL: http://minio:9000
+      FILE_STORE_S3_ACCESS_KEY_ID: admin
+      FILE_STORE_S3_SECRET_ACCESS_KEY: secretsecret
+      FILE_STORE_S3_BUCKET_NAME: reisbucket
     ports:
       - "3201:3201"
       - "3202:3202"
@@ -147,6 +154,12 @@ services:
             }
           }
         }
+
+  minio:
+    hostname: minio
+    extends:
+      file: ./dev/minio/docker-compose.yml
+      service: minio
 
 volumes:
   extension-volume:

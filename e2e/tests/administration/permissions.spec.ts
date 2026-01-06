@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker';
 import { expect, test } from '@playwright/test';
 import {
-  createUser,
+  createUserIfNotExists,
   enterAdminArea,
   enterUserArea,
   hasMenuItem,
@@ -31,7 +31,7 @@ test.describe('User permissions', () => {
 
   test('newly created user with group default should not see admin section', async ({ page }) => {
     await navigateToUserAdministration(page);
-    await createUser(page, { email: randomEmail, name: randomName, password: randomPassword });
+    await createUserIfNotExists(page, { email: randomEmail, name: randomName, password: randomPassword });
     await logout(page);
     await login(page, { email: randomEmail, password: randomPassword });
     expect(await hasMenuItem(page, { name: 'Admin' })).toBe(false);

@@ -37,6 +37,7 @@
       "size": "Größe",
       "bucket": "Bucket",
       "take": "Take",
+      "title": "Titel",
       "fileIds": "Datei-IDs",
       "temperatureHint": "Höhere Werte wie 0.8 machen die Ausgabe zufälliger, während niedrigere Werte wie 0.2 die Ausgabe fokussierter und deterministischer machen.",
       "seedHint": "Dieses Feature befindet sich in der Beta-Phase. Wenn angegeben, wird OpenAI versuchen, deterministisch zu arbeiten, sodass wiederholte Anfragen mit demselben Seed und denselben Parametern das gleiche Ergebnis liefern sollten.",
@@ -88,7 +89,8 @@
     },
     "customPrompt": {
       "title": "Prompt",
-      "description": "Verwendet einen freien Text als Systemnachricht."
+      "description": "Verwendet einen freien Text als Systemnachricht.",
+      "templateDescription": "Der Text kann bestimmte Platzhalter enthalten, die zur Laufzeit ersetzt werden. Verfügbare Platzhalter:\n\n* `{{{{date}}}}`: Tagesdatum\n* `{{{{timestamp}}}}`: Aktuelles Datum und Uhrzeit\n* `{{{{llm_name}}}}`: Name des Modells\n* `{{{{llm_provider}}}}`: Betreiber des Modells\n* `{{{{user}}}}`: Username oder Email\n* `{{{{assistant}}}}`: Name des Assistenten\n* `{{{{assistant_description}}}}`: Beschreibung des Assistenten"
     },
     "hubPrompt": {
       "title": "Hub Prompt",
@@ -118,7 +120,8 @@
     "brave": {
       "title": "Brave Web Search",
       "description": "Führt eine Websuche mit Brave durch",
-      "apiKeyHint": "Der Brave Search API Key"
+      "apiKeyHint": "Der Brave Search API Key",
+      "maxResults": "Anzahl der Suchergebnisse"
     },
     "duckduckgo": {
       "title": "Duckduckgo Web Search",

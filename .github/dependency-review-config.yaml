@@ -1,19 +1,33 @@
 allow_licenses:
   - 'Apache-2.0'
+  - 'BlueOak-1.0.0'
   - '0BSD'
   - 'BSD-2-Clause'
   - 'BSD-3-Clause'
+  - 'CC-BY-SA-4.0'
+  - 'FTL'
   - 'MIT'
+  - 'MIT-0'
   - 'MIT-CMU'
   - 'ISC'
   - 'MPL-1.1'
   - 'MPL-2.0'
   - 'PSF-2.0'
+  - 'Python-2.0'
+  - 'CNRI-Python'
   - 'LGPL-2.1'
   - 'LGPL-2.1-or-later'
   - 'LGPL-2.1-only'
   - 'Unlicense'
   - 'CC0-1.0'
+  - 'OFL-1.1'
+  - 'Zlib'
 allow-dependencies-licenses:
   - 'pkg:pypi/structlog' # This package is a false-positive because of a Contributor License Agreement, which is not a software license.
-  - 'pkg:pypi/azure-identity' # This package is a false-positive because of a Contributor License Agreement, which is not a software license.
+  - 'pkg:pypi/azure-core' # This package is a false-positive because of a Contributor License Agreement, which is not a software license.
+  - 'pkg:pypi/azure-core' # This package is a false-positive because of a Contributor License Agreement, which is not a software license.
+  - 'pkg:pypi/pyphen' # This package is a false-positive because it is GPL or LGPL or MPL (not "and").
+  - 'pkg:pypi/docutils' # Docutils is mostly public domain. The one file under GPL is not used here and should therefore not apply. See also https://docutils.sourceforge.io/0.7/COPYING.html
+  - 'pkg:pypi/fastapi-cloud-cli' # False positive, is MIT
+  - 'pkg:pypi/aiohttp' # False positive, is Apache-2.0
+  - 'pkg:pypi/langsmith' # False positive, is MIT

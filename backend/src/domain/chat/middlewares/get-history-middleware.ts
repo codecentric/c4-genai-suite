@@ -2,7 +2,13 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { onErrorResumeNextWith } from 'rxjs';
 import { In } from 'typeorm';
-import { ExtensionSource, MessageEntity, MessageRepository } from 'src/domain/database';
+import {
+  ConversationEntity,
+  ConversationRepository,
+  ExtensionSource,
+  MessageEntity,
+  MessageRepository,
+} from 'src/domain/database';
 import { ConversationFileEntity, ConversationFileRepository } from '../../database/entities/conversation-file';
 import {
   AIMessage,
@@ -23,6 +29,8 @@ export class GetHistoryMiddleware implements ChatMiddleware {
   constructor(
     @InjectRepository(MessageEntity)
     private readonly messages: MessageRepository,
+    @InjectRepository(ConversationEntity)
+    private readonly conversations: ConversationRepository,
     @InjectRepository(ConversationFileEntity)
     private readonly conversationFiles: ConversationFileRepository,
   ) {}
@@ -32,7 +40,14 @@ export class GetHistoryMiddleware implements ChatMiddleware {
   async invoke(context: ChatContext, getContext: GetContext, next: ChatNextDelegate): Promise<any> {
     const { conversationId, configuration } = context;
 
-    const history = new InternalChatHistory(conversationId, configuration.id, context, this.messages, this.conversationFiles);
+    const history = new InternalChatHistory(
+      conversationId,
+      configuration.id,
+      context,
+      this.messages,
+      this.conversations,
+      this.conversationFiles,
+    );
 
     await history.addMessage(new HumanMessage(context.input), true, context.editMessageId);
 
@@ -54,6 +69,7 @@ class InternalChatHistory extends MessagesHistory {
     private readonly configurationId: number,
     private readonly context: ChatContext,
     private readonly messages: MessageRepository,
+    private readonly conversations: ConversationRepository,
     private readonly conversationFiles: ConversationFileRepository,
   ) {
     super();
@@ -196,6 +212,11 @@ class InternalChatHistory extends MessagesHistory {
         await this.attachNewFilesToConversation(entity.conversationId, entity.id, this.context.files);
         this.context.result.next({ type: 'saved', messageId: entity.id, messageType: 'human' });
       }
+
+      // also mark the conversation as updated
+      const conversation = await this.conversations.findOneByOrFail({ id: this.conversationId });
+      conversation.updatedAt = new Date();
+      await this.conversations.save(conversation);
     } catch (err) {
       this.logger.error('Failed to store message in history.', err);
     }

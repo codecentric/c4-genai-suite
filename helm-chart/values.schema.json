@@ -95,7 +95,7 @@
                     "properties": {
                         "enablePassword": {
                             "type": "boolean",
-                            "description": "Specifies if the build in Username & Password auth is used",
+                            "description": "Specifies if the built-in username & password auth is used",
                             "default": false
                         },
                         "initialAdminUsername": {
@@ -176,6 +176,16 @@
                         "existingMicrosoftTenant": {
                             "type": "string",
                             "description": "The name of the existing k8s secret. `c4.auth.microsoftTenant` will be ignored. The key must be `microsoftTenant`",
+                            "default": "\"\""
+                        },
+                        "acceptUserGroupsFromAuthProvider": {
+                            "type": "boolean",
+                            "description": "Sets if user groups from the identity provider are saved in the c4 user. (All groups manually selected in c4 will be overwritten!)",
+                            "default": false
+                        },
+                        "userGroupsPropertyName": {
+                            "type": "string",
+                            "description": "The property in the auth token from where the user groups are read. Default is \"groups\".",
                             "default": "\"\""
                         }
                     }
@@ -853,6 +863,51 @@
                                 "indexName": {
                                     "type": "string",
                                     "description": "Name of the collection used for the PGVector store (this is a logical distinction in the same table).",
+                                    "default": "\"\""
+                                }
+                            }
+                        }
+                    }
+                },
+                "fileStore": {
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "type": "string",
+                            "description": "The file store to use, one of: s3",
+                            "default": "\"\""
+                        },
+                        "s3": {
+                            "type": "object",
+                            "properties": {
+                                "endpointUrl": {
+                                    "type": "string",
+                                    "description": "The s3 compatible endpoint.",
+                                    "default": "\"\""
+                                },
+                                "bucketName": {
+                                    "type": "string",
+                                    "description": "The s3 compatible bucket name.",
+                                    "default": "\"\""
+                                },
+                                "regionName": {
+                                    "type": "string",
+                                    "description": "The AWS region.",
+                                    "default": "\"\""
+                                },
+                                "accessKeyId": {
+                                    "type": "string",
+                                    "description": "The s3 compatible access key Id.",
+                                    "default": "\"\""
+                                },
+                                "secretAccessKey": {
+                                    "type": "string",
+                                    "description": "The s3 compatible secret access key.",
+                                    "default": "\"\""
+                                },
+                                "existingAccessKeySecret": {
+                                    "type": "string",
+                                    "description": "Name of the Kubernetes Secret containing the s3 compatible secret access key. The secret must have the keys `s3AccessKeyId` and `s3SecretAccessKey`.",
                                     "default": "\"\""
                                 }
                             }

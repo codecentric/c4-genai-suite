@@ -1,3 +1,4 @@
+import { randomInt } from 'crypto';
 import path from 'path';
 import { expect, Locator, Page } from '@playwright/test';
 import { config } from './config';
@@ -145,11 +146,17 @@ export async function clearMessages(page: Page) {
   await confirm.waitFor({ state: 'detached' });
 }
 
-export async function createBucket(
+export async function createBucketIfNotExist(
   page: Page,
   bucket: { name: string; indexName?: string; endpoint: string; type: 'user' | 'conversation' | 'general' },
+  performTest: boolean = false,
 ) {
   await page.getByRole('link', { name: 'Files' }).click();
+  await page.waitForLoadState('networkidle');
+  if ((await page.locator('li').filter({ hasText: bucket.name }).count()) > 0) {
+    // Bucket already exists
+    return;
+  }
 
   await page
     .locator('*')
@@ -160,11 +167,16 @@ export async function createBucket(
   await page.getByLabel(/^Endpoint/).fill(bucket.endpoint);
   await page.getByLabel(/^Index name/).fill(bucket.indexName ?? '');
   await selectOption(page, 'Bucket Type', bucket.type);
-  await page.getByRole('button', { name: 'Test' }).click();
-  await page
-    .getByRole('alert')
-    .filter({ hasText: /^Bucket is valid./ })
-    .click();
+
+  if (performTest) {
+    await page.getByRole('button', { name: 'Test' }).click();
+    await page
+      .getByRole('alert')
+      .filter({ hasText: /^Bucket is valid./ })
+      .getByRole('button')
+      .click();
+  }
+
   await save(page);
 }
 
@@ -225,6 +237,7 @@ export async function editBucket(
   await page
     .getByRole('alert')
     .filter({ hasText: /^Bucket is valid./ })
+    .getByRole('button')
     .click();
   await save(page);
 }
@@ -408,7 +421,8 @@ export async function wait(timeout: number) {
 export async function addAzureModelToConfiguration(
   page: Page,
   configuration: { name: string },
-  azure: { deployment: string; configurable?: string[] },
+  azure: { deployment: string; configurable?: string[]; apiKey?: string },
+  performTest: boolean = false,
 ) {
   await page.getByRole('link', { name: 'Assistants' }).click();
   await page.getByRole('link').filter({ hasText: configuration.name }).click();
@@ -421,25 +435,27 @@ export async function addAzureModelToConfiguration(
     .nth(1)
     .click();
   await page.getByLabel('API Key').click();
-  await page.getByLabel('API Key').fill(config.AZURE_OPEN_AI_API_KEY);
+  await page.getByLabel('API Key').fill(azure.apiKey ?? config.AZURE_OPEN_AI_API_KEY);
   await page.getByLabel('Deployment Name').fill(azure.deployment);
   await page.getByLabel('Instance Name').fill('cccc-testing');
   await page.getByLabel('Seed').fill('42');
   await page.getByLabel('Temperature').fill('0');
   await page.getByRole('button', { name: 'Test' }).click();
-  const loader = page.locator('.mantine-Button-loader');
-  await loader.waitFor({ state: 'visible' });
 
   if (azure.configurable?.length) {
     await selectMultipleOptions(page, 'Configurable', azure.configurable);
   }
 
-  await page
-    .getByRole('alert')
-    .filter({ hasText: /^Extension is valid./ })
-    .click();
-
-  await loader.waitFor({ state: 'detached' });
+  if (performTest) {
+    const loader = page.locator('.mantine-Button-loader');
+    await loader.waitFor({ state: 'visible' });
+    await page
+      .getByRole('alert')
+      .filter({ hasText: /^Extension is valid./ })
+      .getByRole('button')
+      .click();
+    await loader.waitFor({ state: 'detached' });
+  }
 
   await save(page);
 }
@@ -456,7 +472,7 @@ export async function configureAssistantByUser(page: Page, config: { values: { l
 export async function addSystemPromptToConfiguration(
   page: Page,
   configuration: { name: string },
-  prompt: { text: string; configurable?: boolean },
+  prompt: { title?: string; text: string; configurable?: boolean },
 ) {
   await page.getByRole('link', { name: 'Assistants' }).click();
   await page.getByRole('link').filter({ hasText: configuration.name }).click();
@@ -466,6 +482,7 @@ export async function addSystemPromptToConfiguration(
   await page.getByLabel('Create Extension').getByRole('tab', { name: 'Other' }).click();
 
   await page.getByRole('heading', { name: 'Prompt', exact: true }).click();
+  await page.getByLabel('Title').fill(prompt.title ?? 'systemprompt');
   await page.getByLabel('Text').fill(prompt.text);
 
   if (prompt.configurable) {
@@ -493,6 +510,7 @@ export async function addOllamaModelToConfiguration(page: Page, configuration: {
   await page
     .getByRole('alert')
     .filter({ hasText: /^Extension is valid./ })
+    .getByRole('button')
     .click();
 
   await save(page);
@@ -530,11 +548,16 @@ export async function navigateToThemeAdministration(page: Page) {
   await page.waitForURL(`${config.URL}/admin/theme`);
 }
 
-export async function createUser(page: Page, user: { email: string; name: string; password?: string }) {
+export async function createUserIfNotExists(page: Page, user: { email: string; name: string; password?: string }) {
   await navigateToUserAdministration(page);
 
   const adminCell = page.getByRole('cell', { name: 'Admin', exact: true });
   await adminCell.last().waitFor();
+
+  if ((await page.getByRole('table').getByRole('row').filter({ hasText: user.name }).count()) > 0) {
+    // User already exists
+    return;
+  }
 
   const oldUsersCount = await page.getByRole('table').getByRole('row').count();
 
@@ -625,10 +648,19 @@ async function resetOptions(page: Page) {
   }
 }
 
-export async function duplicateLastCreatedConversation(page: Page) {
-  // sometimes there are races between renaiming of the conversation and duplicating it, as a workaround, we wait
-  await page.waitForTimeout(1000);
-  await page.locator('svg.tabler-icon-dots').first().click();
+export async function duplicateActiveConversation(page: Page, renameBeforeDuplicationTo?: string) {
+  if (renameBeforeDuplicationTo) {
+    await page.getByTestId('active-conversation-item-more-actions').click();
+    const dropdown = page.locator('.mantine-Menu-dropdown');
+    await expect(dropdown).toBeVisible();
+    await dropdown.locator('text=Rename').click();
+    await page.getByTestId('conversation-rename-input').fill(renameBeforeDuplicationTo);
+    await page.getByTestId('conversation-rename-input').press('Enter');
+    const renamedConversation = page.getByText(renameBeforeDuplicationTo).first();
+    await expect(renamedConversation).toBeVisible();
+  }
+
+  await page.getByTestId('active-conversation-item-more-actions').click();
   const dropdown = page.locator('.mantine-Menu-dropdown');
   await expect(dropdown).toBeVisible();
   await dropdown.locator('text=Duplicate').click();
@@ -668,4 +700,16 @@ export async function changePassword(page: Page, currentPassword: string, newPas
   await page.getByRole('textbox', { name: 'Confirm Password', exact: true }).click();
   await page.getByRole('textbox', { name: 'Confirm Password', exact: true }).fill(newPassword);
   await page.getByRole('button', { name: 'Update Password' }).click({ timeout: 3000 });
+}
+
+export function uniqueName(prefix: string): string {
+  return `${prefix}-${randomInt(100000)}`;
+}
+
+export function globalUserBucketName(): string {
+  return 'E2E-User-Bucket';
+}
+
+export function globalConversationBucketName(): string {
+  return 'E2E-Conversation-Bucket';
 }

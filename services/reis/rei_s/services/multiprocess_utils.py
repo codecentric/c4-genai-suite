@@ -29,3 +29,17 @@ def process_file_in_process(
         queue.put(e)
     else:
         queue.put(chunks)
+
+
+def convert_file_in_process(
+    format_: AbstractFormatProvider,
+    file: SourceFile,
+    queue: mp.Queue,  # type: ignore[type-arg]
+) -> None:
+    try:
+        init_subprocess_logger()
+        chunks = format_.convert_file_to_pdf(file)
+    except Exception as e:
+        queue.put(e)
+    else:
+        queue.put(chunks)

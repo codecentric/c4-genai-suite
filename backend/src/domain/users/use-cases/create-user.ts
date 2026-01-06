@@ -3,12 +3,12 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import * as uuid from 'uuid';
-import { UserEntity, UserRepository } from 'src/domain/database';
+import { UserEntity, UserGroupEntity, UserRepository } from 'src/domain/database';
 import { assignDefined } from 'src/lib';
 import { User } from '../interfaces';
 import { buildUser } from './utils';
 
-type Values = Pick<User, 'apiKey' | 'email' | 'name' | 'userGroupId'> & { password?: string };
+type Values = Pick<User, 'apiKey' | 'email' | 'name' | 'userGroupIds'> & { password?: string };
 
 export class CreateUser {
   constructor(public readonly values: Values) {}
@@ -27,7 +27,7 @@ export class CreateUserHandler implements ICommandHandler<CreateUser, CreateUser
 
   async execute(request: CreateUser): Promise<CreateUserResponse> {
     const { values } = request;
-    const { apiKey, email, name, password, userGroupId } = values;
+    const { apiKey, email, name, password, userGroupIds } = values;
 
     const entity = this.users.create({ id: uuid.v4() });
 
@@ -40,7 +40,12 @@ export class CreateUserHandler implements ICommandHandler<CreateUser, CreateUser
     }
 
     // Assign the object manually to avoid updating unexpected values.
-    assignDefined(entity, { email, name, userGroupId });
+    assignDefined(entity, { email, name });
+    if (userGroupIds && userGroupIds.length > 0) {
+      entity.userGroups = userGroupIds.map((id) => ({ id }) as UserGroupEntity);
+    } else {
+      entity.userGroups = [];
+    }
 
     // Use the save method otherwise we would not get previous values.
     const created = await this.users.save(entity);

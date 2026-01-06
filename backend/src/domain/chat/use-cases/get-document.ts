@@ -27,12 +27,12 @@ export class GetDocumentHandler implements IQueryHandler<GetDocument, GetDocumen
     private readonly queryBus: QueryBus,
   ) {}
 
-  private async fetchDocument(documentUri: string, source: ExtensionSource): Promise<File | undefined> {
+  private async fetchDocument(documentUri: string, source: ExtensionSource, user: User): Promise<File | undefined> {
     const response: GetExtensionResponse = await this.queryBus.execute(
       new GetExtension({ externalId: source.extensionExternalId }),
     );
 
-    return await response.extension?.getDocument(documentUri);
+    return await response.extension?.getDocument(documentUri, user);
   }
 
   async execute(query: GetDocument): Promise<GetDocumentResponse> {
@@ -51,6 +51,6 @@ export class GetDocumentHandler implements IQueryHandler<GetDocument, GetDocumen
       throw new NotFoundException(`Cannot find a document with uri ${query.documentUri}`);
     }
 
-    return new GetDocumentResponse(await this.fetchDocument(query.documentUri, references[0]));
+    return new GetDocumentResponse(await this.fetchDocument(query.documentUri, references[0], query.user));
   }
 }

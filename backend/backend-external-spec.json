@@ -1,0 +1,340 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "c4 GenAI Suite",
+    "version": "1.0"
+  },
+  "paths": {
+    "/api/public/assistants/{assistantId}/responses": {
+      "post": {
+        "operationId": "ApiResponsesController_createResponse",
+        "parameters": [
+          {
+            "name": "assistantId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResponseCreateDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The Health Check is successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "ok"
+                    },
+                    "info": {
+                      "type": "object",
+                      "example": {
+                        "database": {
+                          "status": "up"
+                        }
+                      },
+                      "additionalProperties": {
+                        "type": "object",
+                        "required": ["status"],
+                        "properties": {
+                          "status": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": true
+                      },
+                      "nullable": true
+                    },
+                    "error": {
+                      "type": "object",
+                      "example": {},
+                      "additionalProperties": {
+                        "type": "object",
+                        "required": ["status"],
+                        "properties": {
+                          "status": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": true
+                      },
+                      "nullable": true
+                    },
+                    "details": {
+                      "type": "object",
+                      "example": {
+                        "database": {
+                          "status": "up"
+                        }
+                      },
+                      "additionalProperties": {
+                        "type": "object",
+                        "required": ["status"],
+                        "properties": {
+                          "status": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "The Health Check is not successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "error"
+                    },
+                    "info": {
+                      "type": "object",
+                      "example": {
+                        "database": {
+                          "status": "up"
+                        }
+                      },
+                      "additionalProperties": {
+                        "type": "object",
+                        "required": ["status"],
+                        "properties": {
+                          "status": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": true
+                      },
+                      "nullable": true
+                    },
+                    "error": {
+                      "type": "object",
+                      "example": {
+                        "redis": {
+                          "status": "down",
+                          "message": "Could not connect"
+                        }
+                      },
+                      "additionalProperties": {
+                        "type": "object",
+                        "required": ["status"],
+                        "properties": {
+                          "status": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": true
+                      },
+                      "nullable": true
+                    },
+                    "details": {
+                      "type": "object",
+                      "example": {
+                        "database": {
+                          "status": "up"
+                        },
+                        "redis": {
+                          "status": "down",
+                          "message": "Could not connect"
+                        }
+                      },
+                      "additionalProperties": {
+                        "type": "object",
+                        "required": ["status"],
+                        "properties": {
+                          "status": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": ["responses"],
+        "x-external": true
+      }
+    },
+    "/api/public/assistants/{assistantId}/files": {
+      "post": {
+        "operationId": "ApiResponsesController_uploadFile",
+        "parameters": [
+          {
+            "name": "assistantId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": ["responses"],
+        "x-external": true
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ResponseInputText": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["input_text"]
+          }
+        },
+        "x-external": true,
+        "required": ["text", "type"]
+      },
+      "ResponseInputImage": {
+        "type": "object",
+        "properties": {
+          "detail": {
+            "type": "string",
+            "enum": ["low", "high", "auto"]
+          },
+          "type": {
+            "type": "string",
+            "enum": ["input_image"]
+          },
+          "file_id": {
+            "type": "string"
+          },
+          "image_url": {
+            "type": "string"
+          }
+        },
+        "x-external": true,
+        "required": ["detail", "type"]
+      },
+      "ResponseInputFile": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["input_file"]
+          },
+          "file_data": {
+            "type": "string"
+          },
+          "file_id": {
+            "type": "string"
+          },
+          "file_url": {
+            "type": "string"
+          },
+          "filename": {
+            "type": "string"
+          }
+        },
+        "x-external": true,
+        "required": ["type"]
+      },
+      "EasyInputMessage": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ResponseInputText"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ResponseInputImage"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ResponseInputFile"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "role": {
+            "type": "string",
+            "enum": ["user", "assistant", "system", "developer"]
+          },
+          "type": {
+            "type": "string",
+            "enum": ["message"]
+          }
+        },
+        "x-external": true,
+        "required": ["content", "role"]
+      },
+      "ResponseCreateDto": {
+        "type": "object",
+        "properties": {
+          "model": {
+            "type": "string"
+          },
+          "input": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/EasyInputMessage"
+                }
+              }
+            ]
+          },
+          "stream": {
+            "type": "boolean"
+          },
+          "temperature": {
+            "type": "number"
+          },
+          "instructions": {
+            "type": "string"
+          },
+          "store": {
+            "type": "boolean"
+          }
+        },
+        "x-external": true,
+        "required": ["model", "input"]
+      }
+    }
+  }
+}

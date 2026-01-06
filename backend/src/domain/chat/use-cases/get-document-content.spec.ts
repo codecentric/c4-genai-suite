@@ -15,7 +15,7 @@ describe('Get Document Content', () => {
     id: '1',
     name: 'Test User',
     email: 'test@example.com',
-    userGroupId: 'group1',
+    userGroupIds: ['group1'],
   };
 
   beforeAll(async () => {

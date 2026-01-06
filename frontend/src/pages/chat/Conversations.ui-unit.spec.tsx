@@ -51,11 +51,11 @@ describe('Conversations', () => {
   const now = new Date();
 
   const mockedChats: ConversationDto[] = [
-    { id: 1, createdAt: now, configurationId: 1 },
-    { id: 4, createdAt: new Date('2023-10-01'), configurationId: 1 },
-    { id: 3, createdAt: startOfDay(addDays(now, -20)), configurationId: 1 },
-    { id: 2, createdAt: startOfDay(addDays(now, -2)), configurationId: 1 },
-    { id: 5, createdAt: new Date('2022-10-01'), configurationId: 1 },
+    { id: 1, updatedAt: now, createdAt: now, configurationId: 1 },
+    { id: 4, updatedAt: new Date('2023-10-01'), createdAt: new Date('2023-10-01'), configurationId: 1 },
+    { id: 3, updatedAt: startOfDay(addDays(now, -20)), createdAt: startOfDay(addDays(now, -20)), configurationId: 1 },
+    { id: 2, updatedAt: startOfDay(addDays(now, -2)), createdAt: startOfDay(addDays(now, -2)), configurationId: 1 },
+    { id: 5, updatedAt: new Date('2022-10-01'), createdAt: new Date('2022-10-01'), configurationId: 1 },
   ];
 
   it('should render conversations components sorted by date', () => {

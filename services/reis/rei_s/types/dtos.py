@@ -16,6 +16,7 @@ class DocumentDto(BaseModel):
     name: str = Field(description="The name of the document, e.g. the file name")
     mime_type: str = Field(description="The mime type of the document")
     link: Optional[str] = Field(description="A link to the source of the document")
+    download_available: bool = Field(description="Indicates if the document is available")
     model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
 
 

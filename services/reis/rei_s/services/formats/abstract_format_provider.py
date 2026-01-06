@@ -17,6 +17,10 @@ class AbstractFormatProvider(ABC):
     def process_file(self, file: SourceFile, chunk_size: int | None = None) -> list[Document]:
         raise NotImplementedError
 
+    @abstractmethod
+    def convert_file_to_pdf(self, file: SourceFile) -> SourceFile:
+        raise NotImplementedError
+
     def clean_up(self, document: Document) -> Document:
         return document
 

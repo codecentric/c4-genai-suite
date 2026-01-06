@@ -28,6 +28,7 @@ export interface Conversation {
 
   readonly rating?: ConversationRating;
 
+  readonly updatedAt: Date;
   readonly createdAt: Date;
 
   // The chosen llm.
@@ -205,7 +206,7 @@ export interface ChatContext {
   readonly cache: ChatCache;
 
   // The system messages.
-  readonly systemMessages: string[];
+  systemMessages: string[];
 
   // The deployment.
   readonly configuration: ConfigurationModel;

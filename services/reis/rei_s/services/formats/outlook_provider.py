@@ -3,11 +3,12 @@ from typing import Any
 
 from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_community.document_loaders import UnstructuredEmailLoader
+from oxmsg import Message
 
 from rei_s.services.formats.abstract_format_provider import AbstractFormatProvider
-from rei_s.types.source_file import SourceFile
-from rei_s.services.formats.utils import validate_chunk_overlap, validate_chunk_size
+from rei_s.services.formats.html_provider import HtmlProvider
+from rei_s.types.source_file import SourceFile, temp_file
+from rei_s.services.formats.utils import generate_pdf_from_md, validate_chunk_overlap, validate_chunk_size
 
 
 class OutlookProvider(AbstractFormatProvider):
@@ -33,10 +34,25 @@ class OutlookProvider(AbstractFormatProvider):
     def process_file(
         self, file: SourceFile, chunk_size: int | None = None, chunk_overlap: int | None = None
     ) -> list[Document]:
-        loader = UnstructuredEmailLoader(
-            file.path, mode="elements", process_attachments=True, metadata_filename=file.path
-        )
-        docs = loader.load()
+        msg = Message.load(str(file.path))
+
+        text = msg.html_body
+        if text is None:
+            text = msg.body
+        if text is None:
+            text = ""
+
+        docs = [
+            Document(
+                text,
+                metadata={
+                    "source": file.file_name,
+                    "sender": msg.sender,
+                    "date": msg.sent_date,
+                    "subject": msg.subject,
+                },
+            )
+        ]
 
         for doc in docs:
             for key, value in doc.metadata.items():
@@ -46,3 +62,20 @@ class OutlookProvider(AbstractFormatProvider):
         chunks = self.splitter(chunk_size, chunk_overlap).split_documents(docs)
 
         return chunks
+
+    def convert_file_to_pdf(self, file: SourceFile) -> SourceFile:
+        msg = Message.load(str(file.path))
+
+        html = msg.html_body
+        if html is not None:
+            with temp_file(html.encode()) as f:
+                f.id = file.id
+                return HtmlProvider().convert_file_to_pdf(f)
+
+        text = msg.body
+        if text is None:
+            text = "[empty body]"
+
+        markdown = f"# From: {msg.sender}\nSubject: {msg.subject}\n\n{text}"
+
+        return generate_pdf_from_md(markdown, file.id, file.file_name)

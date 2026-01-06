@@ -3,6 +3,7 @@ import { createOllama } from 'ollama-ai-provider-v2';
 import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from 'src/domain/chat';
 import { Extension, ExtensionConfiguration, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions';
 import { User } from 'src/domain/users';
+import { fetchWithDebugLogging } from 'src/lib/log-requests';
 import { I18nService } from '../../localization/i18n.service';
 
 @Extension()
@@ -60,9 +61,15 @@ export class OllamaModelExtension implements Extension<OllamaModelExtensionConfi
   private createModel(configuration: OllamaModelExtensionConfiguration, streaming = false) {
     const { endpoint, modelName } = configuration;
 
+    // Ensure endpoint ends with /api for compatibility with ollama-ai-provider-v2
+    // The provider appends /chat to baseURL, so we need baseURL to be http://host:port/api
+    // Ollama API endpoints are: /api/chat, /api/generate, etc.
+    const normalizedEndpoint = this.normalizeEndpoint(endpoint);
+
     const open = createOllama({
       name: 'ollama',
-      baseURL: endpoint,
+      baseURL: normalizedEndpoint,
+      fetch: fetchWithDebugLogging(OllamaModelExtension.name),
     });
 
     return {
@@ -73,6 +80,19 @@ export class OllamaModelExtension implements Extension<OllamaModelExtensionConfi
       modelName: modelName,
       providerName: 'ollama',
     };
+  }
+
+  private normalizeEndpoint(endpoint: string): string {
+    // Remove trailing slash
+    const trimmedEndpoint = endpoint.replace(/\/$/, '');
+
+    // If endpoint already ends with /api, use it as-is
+    if (trimmedEndpoint.endsWith('/api')) {
+      return trimmedEndpoint;
+    }
+
+    // Otherwise, append /api
+    return `${trimmedEndpoint}/api`;
   }
 }
 

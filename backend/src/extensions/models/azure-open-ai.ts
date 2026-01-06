@@ -3,6 +3,7 @@ import { CallSettings, generateText } from 'ai';
 import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext, LanguageModelContext } from 'src/domain/chat';
 import { Extension, ExtensionConfiguration, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions';
 import { User } from 'src/domain/users';
+import { fetchWithDebugLogging } from 'src/lib/log-requests';
 import { I18nService } from '../../localization/i18n.service';
 
 @Extension()
@@ -126,6 +127,7 @@ export class AzureOpenAIModelExtension implements Extension<AzureOpenAIModelExte
     const azure = createAzure({
       apiKey,
       resourceName: instanceName,
+      fetch: fetchWithDebugLogging(AzureOpenAIModelExtension.name),
     });
 
     const reasoningOptions: Partial<CallSettings> = !effort
@@ -162,7 +164,7 @@ type AzureOpenAIModelExtensionConfiguration = ExtensionConfiguration & {
   apiKey: string;
   deploymentName: string;
   instanceName: string;
-  seed: number;
+  seed?: number;
   temperature?: number;
   presencePenalty?: number;
   frequencyPenalty?: number;

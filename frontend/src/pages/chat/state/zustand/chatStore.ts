@@ -57,7 +57,7 @@ type ChatActions = {
 
 const createEmptyChatData = (chatId: number): ChatData => ({
   messages: [],
-  chat: { id: chatId, configurationId: -1, createdAt: new Date() },
+  chat: { id: chatId, configurationId: -1, updatedAt: new Date(), createdAt: new Date() },
   isAiWriting: false,
   activeStreamSubscription: undefined,
   streamingMessageId: undefined,

@@ -8,4 +8,9 @@ jest.mock('ai', () => ({
   generateText: jest.fn(() => () => 'test output'),
 }));
 
-describe('OllamaModelExtension', () => modelExtensionTestSuite(OllamaModelExtension));
+const mockConfig = {
+  endpoint: 'test-endpoint',
+  modelName: 'test-model',
+};
+
+describe('OllamaModelExtension', () => modelExtensionTestSuite(OllamaModelExtension, mockConfig));

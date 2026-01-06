@@ -39,7 +39,7 @@ describe('DeleteUserGroup', () => {
     const userGroupId = crypto.randomUUID();
     const userId = crypto.randomUUID();
     const user = { id: userId, name: 'user1' };
-    jest.spyOn(userGroupRepository, 'findOne').mockResolvedValueOnce({ id: userGroupId, users: [{ user }] } as UserGroupEntity);
+    jest.spyOn(userGroupRepository, 'findOne').mockResolvedValueOnce({ id: userGroupId, users: [user] } as UserGroupEntity);
     const command = new DeleteUserGroup(userGroupId);
     await expect(handler.execute(command)).rejects.toThrow('Cannot delete a user group with existing users.');
   });

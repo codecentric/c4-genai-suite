@@ -1,10 +1,10 @@
 from responses import Response
 
 
-def index_get(endpoint: str, index_name: str) -> Response:
+def index_get(endpoint: str, index_name: str, api_version: str) -> Response:
     return Response(
         method="GET",
-        url=f"{endpoint}/indexes('{index_name}')?api-version=2024-07-01",
+        url=f"{endpoint}/indexes('{index_name}')?api-version={api_version}",
         json={
             "@odata.context": f"{endpoint}/$metadata#indexes/$entity",
             "@odata.etag": '"0x8DCD16D9D04234C"',

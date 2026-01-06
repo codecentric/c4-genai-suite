@@ -8,6 +8,7 @@ export * from './executor-middleware';
 export * from './get-history-middleware';
 export * from './get-user-middleware';
 export * from './langfuse-middleware';
+export * from './render-prompt-middleware';
 export * from './store-usage-middleware';
 export * from './summarize-history-middleware';
 export * from './ui-middleware';

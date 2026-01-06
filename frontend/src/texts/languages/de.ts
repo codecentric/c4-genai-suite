@@ -75,6 +75,7 @@ export const de: typeof en = {
     userGroups: 'Benutzergruppen',
     yes: 'Ja',
     errorLoading: 'Fehler bei Laden.',
+    errorSourcePdfViewer: 'Das Dokument wurde in der Zwischenzeit gelöscht und kann daher nicht mehr angezeigt werden.',
     tryAgain: 'Neu versuchen',
     selectOption: 'Option auswählen',
     selectOptions: 'Optionen auswählen',
@@ -269,6 +270,9 @@ export const de: typeof en = {
     updateBucket: 'Bucket aktualisieren',
     updateBucketFailed: 'Aktualisierung fehlgeschlagen.',
     uploadFailed: 'Hochladen der Datei fehlgeschlagen.',
+    uploadFormatUnsupported: 'Format wird nicht unterstützt.',
+    uploadTooManyFiles:
+      'Zu viele Dateien hochgeladen. Nach dem Löschen einiger Dateien kann das Hochladen erneut versucht werden.',
     uploadImageFailedNotYetSupported:
       'Datei {{fileName}} konnte nicht hochgeladen werden. Das Hochladen von Bildern in den Benutzerdateien-Bucket wird derzeit nicht unterstützt.',
     uploadImageFailedUseThePaperclip:
@@ -295,7 +299,7 @@ export const de: typeof en = {
     updateFailed: 'Aktualisierung fehlgeschlagen',
   },
   users: {
-    apiKeyHint: 'Ein API Key kann nur für Benutzer in der Benutzergruppe Admin generiert werden',
+    apiKeyHint: 'Ein API-Key kann nur für Benutzer in der Benutzergruppe Admin generiert werden.',
     create: 'Benutzer erstellen',
     empty: 'Keine Benutzer gefunden.',
     removeConfirmText: 'Möchtest du den Benutzer wirklich löschen?',
@@ -308,14 +312,14 @@ export const de: typeof en = {
   },
   theme: {
     agentName: 'Name des Agenten',
-    agentNameHints: 'Wie der Agent im Chat benannt wird.',
+    agentNameHints: 'Wie der Agent im Chat benannt wird',
     appName: 'Name der App',
     language: 'Sprache',
     languages: {
       de: 'Deutsch',
       en: 'Englisch',
     },
-    appNameHints: 'Der Name dieser App, verwendet für den Titel und das Menü.',
+    appNameHints: 'Der Name dieser App, verwendet für den Titel und das Menü',
     customCss: 'Benutzerdefiniertes CSS',
     footer: 'Chat-Fußzeile',
     footerHints:

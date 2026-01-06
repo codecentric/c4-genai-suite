@@ -3,6 +3,7 @@ import { CallSettings, generateText } from 'ai';
 import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from 'src/domain/chat';
 import { Extension, ExtensionConfiguration, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions';
 import { User } from 'src/domain/users';
+import { fetchWithDebugLogging } from 'src/lib/log-requests';
 import { I18nService } from '../../localization/i18n.service';
 
 @Extension()
@@ -110,6 +111,7 @@ export class OpenAIModelExtension implements Extension<OpenAIModelExtensionConfi
     const open = createOpenAI({
       name: 'open-ai',
       apiKey: apiKey,
+      fetch: fetchWithDebugLogging(OpenAIModelExtension.name),
     });
 
     return {
@@ -138,10 +140,10 @@ export class OpenAIModelExtension implements Extension<OpenAIModelExtensionConfi
 type OpenAIModelExtensionConfiguration = ExtensionConfiguration & {
   apiKey: string;
   modelName: string;
-  temperature: number;
-  seed: number;
-  presencePenalty: number;
-  frequencyPenalty: number;
+  temperature?: number;
+  seed?: number;
+  presencePenalty?: number;
+  frequencyPenalty?: number;
   effort?: 'minimal' | 'low' | 'medium' | 'high';
   summary?: 'detailed' | 'auto';
 };

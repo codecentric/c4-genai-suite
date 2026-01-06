@@ -3,7 +3,10 @@ import { CallSettings, generateText } from 'ai';
 import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from 'src/domain/chat';
 import { Extension, ExtensionConfiguration, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions';
 import { User } from 'src/domain/users';
+import { fetchWithDebugLogging } from 'src/lib/log-requests';
 import { I18nService } from '../../localization/i18n.service';
+
+type Fetch = (input: string | URL | Request, init?: RequestInit) => Promise<Response>;
 
 @Extension()
 export class NvidiaModelExtension implements Extension<NvidiaModelExtensionConfiguration> {
@@ -109,16 +112,27 @@ export class NvidiaModelExtension implements Extension<NvidiaModelExtensionConfi
     return Promise.resolve([middleware]);
   }
 
+  // Selfhosted Nvidia Nim seems to reject tool call messages where the content is an empty string,
+  // which is the way ai sdk sends them. We fix this in an ad hoc way here until it is fixed upstream.
+  repairToolCall = (fetchFunction: Fetch) => async (url: string | Request | URL, options: RequestInit | undefined) => {
+    if (options?.body && typeof options.body === 'string') {
+      const repairedBody = options.body.replace('"content":"",', '"content":null,');
+      options.body = repairedBody;
+    }
+    return await fetchFunction(url, options);
+  };
+
   private createModel(config: NvidiaModelExtensionConfiguration, streaming = false) {
-    const open = createOpenAICompatible({
+    const openAi = createOpenAICompatible({
       name: 'nvidia',
       apiKey: config.apiKey,
       baseURL: config.baseUrl,
       includeUsage: true,
+      fetch: this.repairToolCall(fetchWithDebugLogging(NvidiaModelExtension.name)),
     });
 
     return {
-      model: open(config.modelName),
+      model: openAi(config.modelName),
       options: {
         presencePenalty: config.presencePenalty,
         frequencyPenalty: config.frequencyPenalty,
@@ -142,10 +156,10 @@ type NvidiaModelExtensionConfiguration = ExtensionConfiguration & {
   apiKey: string;
   baseUrl: string;
   modelName: string;
-  temperature: number;
-  seed: number;
-  presencePenalty: number;
-  frequencyPenalty: number;
+  temperature?: number;
+  seed?: number;
+  presencePenalty?: number;
+  frequencyPenalty?: number;
   effort?: 'minimal' | 'low' | 'medium' | 'high';
   summary?: 'detailed' | 'auto';
 };

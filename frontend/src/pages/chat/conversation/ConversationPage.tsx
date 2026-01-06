@@ -18,8 +18,6 @@ import { ChatRating } from './ChatRating';
 import { Configuration } from './Configuration';
 import { DragAndDropLayout } from './DragAndDropLayout/DragAndDropLayout';
 
-const transformMimeTypes = (mimeTypes: string[]) => Object.fromEntries(mimeTypes.map((type) => [type, []]));
-
 interface ConversationPageProps {
   textareaRef: RefObject<HTMLTextAreaElement>;
 }
@@ -53,7 +51,6 @@ export function ConversationPage(props: ConversationPageProps) {
   const { getRootProps, getInputProps, isDragActive, isDragAccept, isDragReject } = useDropzone({
     multiple,
     onDrop: handleUploadFile,
-    accept: transformMimeTypes(allowedFileNameExtensions),
     noClick: true,
   });
 

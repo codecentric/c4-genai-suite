@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any
 
 from langchain_core.documents import Document
@@ -11,8 +12,13 @@ import ffmpeg
 from rei_s import logger
 from rei_s.config import Config
 from rei_s.services.formats.abstract_format_provider import AbstractFormatProvider
-from rei_s.services.formats.utils import ProcessingError, validate_chunk_overlap, validate_chunk_size
-from rei_s.types.source_file import SourceFile
+from rei_s.services.formats.utils import (
+    ProcessingError,
+    validate_chunk_overlap,
+    validate_chunk_size,
+    generate_pdf_from_md_file,
+)
+from rei_s.types.source_file import SourceFile, temp_file
 
 
 @dataclass
@@ -104,7 +110,7 @@ class VoiceTranscriptionProvider(AbstractFormatProvider):
     def build_ffmpeg_error_message(e: ffmpeg.Error) -> str:
         return f"Error handling audio file for voice transcription\n\nffmpeg stderr:\n{e.stderr}"
 
-    def probe_audio_codec(self, input_video_file: str) -> MediaMetadata:
+    def probe_audio_codec(self, input_video_file: str | Path) -> MediaMetadata:
         try:
             metadata = ffmpeg.probe(input_video_file, loglevel="warning")
         except ffmpeg.Error as e:
@@ -124,7 +130,7 @@ class VoiceTranscriptionProvider(AbstractFormatProvider):
 
     def split_into_compatible_format(
         self,
-        input_path: str,
+        input_path: str | Path,
         segment_duration_seconds: int | None = None,
         output_bitrate: str = "128k",
         force_reencode: bool = False,
@@ -178,9 +184,7 @@ class VoiceTranscriptionProvider(AbstractFormatProvider):
 
         return segments_files, segment_timestamps, audio_codec
 
-    def process_file(
-        self, file: SourceFile, chunk_size: int | None = None, chunk_overlap: int | None = None
-    ) -> list[Document]:
+    def parse_file(self, file: SourceFile) -> list[Document]:
         if self.parser is None:
             raise ValueError(f"calling disabled format provider: `{self.__class__.name}`")
 
@@ -210,5 +214,20 @@ class VoiceTranscriptionProvider(AbstractFormatProvider):
 
             results.extend(docs)
 
+        return results
+
+    def process_file(
+        self, file: SourceFile, chunk_size: int | None = None, chunk_overlap: int | None = None
+    ) -> list[Document]:
+        results = self.parse_file(file)
+
         chunks = self.splitter(chunk_size, chunk_overlap).split_documents(results)
         return chunks
+
+    def convert_file_to_pdf(self, file: SourceFile) -> SourceFile:
+        docs = self.parse_file(file)
+
+        plain = "\n".join([doc.page_content for doc in docs])
+
+        with temp_file(plain.encode()) as plain_file:
+            return generate_pdf_from_md_file(plain_file, "plain")
