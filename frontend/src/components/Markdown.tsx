@@ -54,6 +54,7 @@ export function Markdown({ children, animateText, className }: MarkdownProps) {
         components={{
           a: LinkRenderer,
           code: Code,
+          pre: PreBlock,
           p: animateText ? AnimatedP : 'p',
         }}
         remarkPlugins={[remarkGfm, remarkMath]}
@@ -89,7 +90,18 @@ function LinkRenderer({ href, children }: React.AnchorHTMLAttributes<HTMLAnchorE
   }
 }
 
-function Code(props: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>) {
+function PreBlock({ children, ...props }: React.HTMLAttributes<HTMLPreElement>) {
+  if (typeof children === 'object' && children && 'props' in children && children.type === Code) {
+    return (
+      <pre {...props}>
+        <CodeBlock {...children.props} />
+      </pre>
+    );
+  }
+  return <pre {...props}>{children}</pre>;
+}
+
+function CodeBlock(props: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>) {
   const { children, className, ref: _, ...other } = props;
   const match = /language-(\w+)/.exec(className || '');
   const language = match ? match[1] : 'plain';
@@ -109,10 +121,18 @@ function Code(props: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, 
       </Prism>
       <IconClipboard
         onClick={handleCopy}
+        data-testid="copy-code-button"
         className="absolute top-2 right-2 cursor-pointer rounded bg-gray-800 p-1 text-white opacity-0 transition-all group-hover:opacity-100"
       />
     </div>
   ) : (
+    <Code {...props}>{children}</Code>
+  );
+}
+
+function Code(props: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>) {
+  const { children, className, ref: _, ...other } = props;
+  return (
     <code {...other} className={cn(className, 'overflow-auto')}>
       {children}
     </code>

@@ -1,7 +1,22 @@
 import { render } from '@testing-library/react';
 import { screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+
 import { Markdown } from 'src/components/Markdown';
+
+vi.mock('react-syntax-highlighter', () => ({
+  Prism: (props: { children: React.ReactNode; [key: string]: unknown }) => {
+    const { children, ...other } = props;
+    return (
+      <code data-testid="syntax-highlighted-code" {...other}>
+        {children}
+      </code>
+    );
+  },
+}));
+vi.mock('react-syntax-highlighter/dist/esm/styles/prism', () => ({
+  vscDarkPlus: {},
+}));
 
 describe('Markdown component', () => {
   it('renders table correctly', () => {
@@ -31,5 +46,36 @@ describe('Markdown component', () => {
     const markdownImage = screen.getByRole<HTMLImageElement>('img');
     expect(markdownImage).toBeInTheDocument();
     expect(markdownImage.src).toBe(imageUrl);
+  });
+
+  it('inline code does not have a copy button', () => {
+    const content = 'This is `inline code` in a sentence.';
+    render(<Markdown>{content}</Markdown>);
+
+    const codeElement = screen.getByText('inline code');
+    expect(codeElement.tagName).toBe('CODE');
+
+    const copyIcon = screen.queryByTestId('copy-code-button');
+    expect(copyIcon).not.toBeInTheDocument();
+  });
+
+  it('fenced code block without language has a copy button', () => {
+    const content = '```\nconst x = 42;\n```';
+    render(<Markdown>{content}</Markdown>);
+
+    expect(screen.getByText(/const x = 42/)).toBeInTheDocument();
+
+    const copyIcon = screen.getByTestId('copy-code-button');
+    expect(copyIcon).toBeInTheDocument();
+  });
+
+  it('fenced code block with language has a copy button', () => {
+    const content = '```javascript\nconst greeting = "Hello";\n```';
+    render(<Markdown>{content}</Markdown>);
+
+    expect(screen.getByText(/const greeting = "Hello";/)).toBeInTheDocument();
+
+    const copyIcon = screen.getByTestId('copy-code-button');
+    expect(copyIcon).toBeInTheDocument();
   });
 });
