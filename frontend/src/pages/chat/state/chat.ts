@@ -110,7 +110,9 @@ export const useChatStream = (chatId: number) => {
     // Keep track of the actual message ID after it's saved
     let actualAiMessageId = aiMessageId;
 
-    const subscription = chatStore.getStream(chatId, input, files, api, editMessageId).subscribe({
+    const { observable, abortController } = chatStore.getStream(chatId, input, files, api, editMessageId);
+
+    const subscription = observable.subscribe({
       next: (msg) => {
         if (msg.type === 'error' || msg.type === 'completed') {
           chatStore.setIsAiWriting(chatId, false);
@@ -181,11 +183,13 @@ export const useChatStream = (chatId: number) => {
         const currentChatData = chatStore.chatDataMap.get(chatId);
         if (currentChatData?.activeStreamSubscription === subscription) {
           chatStore.setActiveStreamSubscription(chatId, undefined);
+          chatStore.setActiveAbortController(chatId, undefined);
         }
       },
     });
 
     chatStore.setActiveStreamSubscription(chatId, subscription);
+    chatStore.setActiveAbortController(chatId, abortController);
   };
 
   return { sendMessage, isChatLoading };

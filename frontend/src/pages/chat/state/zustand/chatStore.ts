@@ -9,6 +9,7 @@ type ChatData = {
   chat: ConversationDto;
   isAiWriting: boolean;
   activeStreamSubscription?: Subscription;
+  activeAbortController?: AbortController;
   streamingMessageId?: number;
   hasLoadedFromServer?: boolean;
 };
@@ -39,6 +40,7 @@ type ChatActions = {
   setStreamingMessageId: (chatId: number, messageId?: number) => void;
   appendToStreamingMessage: (chatId: number, text: string) => void;
   setActiveStreamSubscription: (chatId: number, subscription?: Subscription) => void;
+  setActiveAbortController: (chatId: number, abortController?: AbortController) => void;
   cancelActiveStream: (chatId: number) => void;
   getStream: (
     chatId: number,
@@ -46,7 +48,7 @@ type ChatActions = {
     files: FileDto[] | undefined,
     api: AppClient,
     editMessageId: number | undefined,
-  ) => Observable<StreamEventDto>;
+  ) => { observable: Observable<StreamEventDto>; abortController: AbortController };
 
   updateReasoning: (chatId: number, content: string) => void;
   clearReasoning: (chatId: number) => void;
@@ -60,6 +62,7 @@ const createEmptyChatData = (chatId: number): ChatData => ({
   chat: { id: chatId, configurationId: -1, updatedAt: new Date(), createdAt: new Date() },
   isAiWriting: false,
   activeStreamSubscription: undefined,
+  activeAbortController: undefined,
   streamingMessageId: undefined,
   hasLoadedFromServer: false,
 });
@@ -92,6 +95,16 @@ export const useChatStore = create<ChatState & ChatActions>()((set, get) => {
     getStream: (chatId, query, files, api, editMessageId) => {
       return api.stream.streamPrompt(chatId, { query, files }, editMessageId);
     },
+
+    setActiveAbortController: (chatId, abortController) =>
+      set((state) => {
+        const chatData = state.chatDataMap.get(chatId);
+        if (!chatData) return state;
+
+        const newMap = new Map(state.chatDataMap);
+        newMap.set(chatId, { ...chatData, activeAbortController: abortController });
+        return { chatDataMap: newMap };
+      }),
 
     setStreamingMessageId: (chatId, messageId) =>
       set((state) => {
@@ -206,11 +219,19 @@ export const useChatStore = create<ChatState & ChatActions>()((set, get) => {
         const chatData = state.chatDataMap.get(chatId);
         if (!chatData?.activeStreamSubscription) return state;
 
+        // Abort the HTTP connection
+        if (chatData.activeAbortController) {
+          chatData.activeAbortController.abort();
+        }
+
+        // Unsubscribe from the RxJS observable
         chatData.activeStreamSubscription.unsubscribe();
+
         const newMap = new Map(state.chatDataMap);
         newMap.set(chatId, {
           ...chatData,
           activeStreamSubscription: undefined,
+          activeAbortController: undefined,
           isAiWriting: false,
           streamingMessageId: undefined,
         });
