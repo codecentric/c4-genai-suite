@@ -44,16 +44,16 @@ function getZodArgumentType(arg: ExtensionArgument): z.ZodType | undefined {
     return !arg.required ? type.optional() : type;
   } else if (arg.type === 'string') {
     type EnumStringType = [string, ...string[]];
-    let type: DynamicZodType<z.ZodString | z.ZodEnum<EnumStringType>> = z.string().describe(arg.title);
-
-    if (arg.format === 'email') {
-      type = type.email();
-    } else if (arg.format === 'date') {
-      type = type.date();
-    }
+    let type: DynamicZodType<z.ZodType>;
 
     if (arg.enum?.length) {
       type = z.enum(arg.enum as EnumStringType);
+    } else if (arg.format === 'email') {
+      type = z.email().describe(arg.title);
+    } else if (arg.format === 'date') {
+      type = z.iso.date().describe(arg.title);
+    } else {
+      type = z.string().describe(arg.title);
     }
 
     if (arg.default != null) {
@@ -93,7 +93,7 @@ export function validateObjectArgument(data: ExtensionConfiguration, schema: Ext
     return validate.parse(data) as ExtensionConfiguration;
   } catch (err) {
     const zodError = err as z.ZodError;
-    throw new BadRequestException(zodError.errors.map((x) => `${x.path.join('.')}: ${x.message}`));
+    throw new BadRequestException(zodError.issues.map((x) => `${x.path.join('.')}: ${x.message}`));
   }
 }
 
