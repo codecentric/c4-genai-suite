@@ -90,7 +90,9 @@
     "customPrompt": {
       "title": "Prompt",
       "description": "Uses a free prompt text as system message.",
-      "templateDescription": "The text may contain certain placeholders that are replaced at runtime. Available placeholders:\n\n* `{{{{date}}}}`: today's date\n* `{{{{timestamp}}}}`: current date and time\n* `{{{{llm_name}}}}`: model name\n* `{{{{llm_provider}}}}`: model provider\n* `{{{{user}}}}`: username or email\n* `{{{{assistant}}}}`: assistant name\n* `{{{{assistant_description}}}}`: assistant description"
+      "templateDescription": "The text may contain certain placeholders that are replaced at runtime. Available placeholders:\n\n* `{{{{date}}}}`: today's date\n* `{{{{timestamp}}}}`: current date and time\n* `{{{{llm_name}}}}`: model name\n* `{{{{llm_provider}}}}`: model provider\n* `{{{{user}}}}`: username or email\n* `{{{{assistant}}}}`: assistant name\n* `{{{{assistant_description}}}}`: assistant description",
+      "replaceDefaultTitle": "Replace default systemprompt",
+      "replaceDefaultDescription": "When enabled, the custom prompt replaces the default systemprompt entirely. When disabled (default), the custom prompt extends the default systemprompt."
     },
     "hubPrompt": {
       "title": "Hub Prompt",
@@ -282,6 +284,10 @@
     "azure-gpt-image-1": {
       "title": "Azure gpt-image-1",
       "description": "Generate images using Azure OpenAI gpt-image-1."
+    },
+    "gemini-image": {
+      "title": "Gemini Image",
+      "description": "Generate images using Gemini Image (Nano banana)."
     }
   },
   "chat": {

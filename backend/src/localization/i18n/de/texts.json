@@ -90,7 +90,9 @@
     "customPrompt": {
       "title": "Prompt",
       "description": "Verwendet einen freien Text als Systemnachricht.",
-      "templateDescription": "Der Text kann bestimmte Platzhalter enthalten, die zur Laufzeit ersetzt werden. Verfügbare Platzhalter:\n\n* `{{{{date}}}}`: Tagesdatum\n* `{{{{timestamp}}}}`: Aktuelles Datum und Uhrzeit\n* `{{{{llm_name}}}}`: Name des Modells\n* `{{{{llm_provider}}}}`: Betreiber des Modells\n* `{{{{user}}}}`: Username oder Email\n* `{{{{assistant}}}}`: Name des Assistenten\n* `{{{{assistant_description}}}}`: Beschreibung des Assistenten"
+      "templateDescription": "Der Text kann bestimmte Platzhalter enthalten, die zur Laufzeit ersetzt werden. Verfügbare Platzhalter:\n\n* `{{{{date}}}}`: Tagesdatum\n* `{{{{timestamp}}}}`: Aktuelles Datum und Uhrzeit\n* `{{{{llm_name}}}}`: Name des Modells\n* `{{{{llm_provider}}}}`: Betreiber des Modells\n* `{{{{user}}}}`: Username oder Email\n* `{{{{assistant}}}}`: Name des Assistenten\n* `{{{{assistant_description}}}}`: Beschreibung des Assistenten",
+      "replaceDefaultTitle": "Standard-Systemprompt ersetzen",
+      "replaceDefaultDescription": "Wenn aktiviert, ersetzt der benutzerdefinierte Prompt den Standard-Systemprompt vollständig. Wenn deaktiviert (Standard), erweitert der benutzerdefinierte Prompt den Standard-Systemprompt."
     },
     "hubPrompt": {
       "title": "Hub Prompt",
@@ -282,6 +284,10 @@
     "azure-gpt-image-1": {
       "title": "Azure GPT-Image-1",
       "description": "Bilder mit Azure OpenAI gpt-image-1 generieren."
+    },
+    "gemini-image": {
+      "title": "Gemini Image",
+      "description": "Bilder mit Gemini Image (Nano Banana) generieren."
     }
   },
   "chat": {
