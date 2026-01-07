@@ -117,6 +117,11 @@ export class ExecuteMiddleware implements ChatMiddleware {
         this.logger.error({ event });
         error = event.error as GenericAIError;
       }
+      if (event.type === 'finish') {
+        if (event.finishReason === 'content-filter') {
+          error = { error: { code: 'content_filter' } };
+        }
+      }
     }
 
     await history?.addAIMessage(text.join(''));
