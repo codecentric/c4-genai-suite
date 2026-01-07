@@ -38,6 +38,7 @@ updates:
         patterns:
           - "ai"
           - "@ai-sdk/*"
+          - "ollama-ai-provider-v2"
       nestjs:
         patterns:
           - "nest-"
