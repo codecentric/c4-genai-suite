@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { stepCountIs, streamText, tool, ToolSet } from 'ai';
+import * as z from 'zod';
 import { I18nService } from '../../../localization/i18n.service';
 import { MetricsService } from '../../../metrics/metrics.service';
 import { ChatContext, ChatError, ChatMiddleware, LanguageModelContext, NamedStructuredTool } from '../interfaces';
@@ -39,14 +40,13 @@ export class ExecuteMiddleware implements ChatMiddleware {
 
     const messages = await history?.getMessages();
 
-    const mapTool = (namedTool: NamedStructuredTool) => {
+    const mapTool = <TSchema extends z.ZodObject<z.ZodRawShape>>(namedTool: NamedStructuredTool<any, TSchema>) => {
       return {
         name: namedTool.name,
         tool: tool({
-          name: namedTool.name,
-          inputSchema: namedTool.schema,
-          execute: (input) => namedTool.execute(input),
           description: namedTool.description,
+          inputSchema: namedTool.schema,
+          execute: async (input: z.infer<TSchema>) => namedTool.execute(input),
         }),
       };
     };
