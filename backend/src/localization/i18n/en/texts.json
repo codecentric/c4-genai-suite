@@ -284,6 +284,10 @@
     "azure-gpt-image-1": {
       "title": "Azure gpt-image-1",
       "description": "Generate images using Azure OpenAI gpt-image-1."
+    },
+    "gemini-image": {
+      "title": "Gemini Image",
+      "description": "Generate images using Gemini Image (Nano banana)."
     }
   },
   "chat": {
