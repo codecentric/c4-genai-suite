@@ -31,4 +31,4 @@ const logo = `<svg width="192" height="26" viewBox="0 0 192 26" fill="none" xmln
       </svg>`;
 export const fileWithLogo = new File([new Blob([logo], { type: 'image/svg+xml' })], 'logo-new.svg', { type: 'image/svg+xml' });
 
-export const apiBaseUrl = `${process.env.VITE_SERVER_URL}/api`;
+export const apiBaseUrl = `${import.meta.env.VITE_SERVER_URL}/api`;
