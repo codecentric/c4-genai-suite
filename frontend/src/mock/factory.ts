@@ -10,7 +10,7 @@ export class mockedAPI {
 
   withGet<T extends JsonBodyType = never>(path: string, response: NoInfer<T>) {
     this.handler.push(
-      http.get(`${process.env.VITE_SERVER_URL}${path}`, () => {
+      http.get(`${import.meta.env.VITE_SERVER_URL}${path}`, () => {
         return HttpResponse.json(response);
       }),
     );
@@ -19,7 +19,7 @@ export class mockedAPI {
 
   withPost(path: string) {
     this.handler.push(
-      http.post(`${process.env.VITE_SERVER_URL}${path}`, () => {
+      http.post(`${import.meta.env.VITE_SERVER_URL}${path}`, () => {
         return HttpResponse.json();
       }),
     );
@@ -28,7 +28,7 @@ export class mockedAPI {
 
   withPostError(path: string) {
     this.handler.push(
-      http.post(`${process.env.VITE_SERVER_URL}${path}`, () => {
+      http.post(`${import.meta.env.VITE_SERVER_URL}${path}`, () => {
         return HttpResponse.error();
       }),
     );
@@ -41,7 +41,7 @@ export class mockedAPI {
 
   withGetError(path: string) {
     this.handler.push(
-      http.get(`${process.env.VITE_SERVER_URL}${path}`, () => {
+      http.get(`${import.meta.env.VITE_SERVER_URL}${path}`, () => {
         return HttpResponse.error();
       }),
     );
