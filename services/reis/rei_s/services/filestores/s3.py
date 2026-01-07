@@ -48,6 +48,8 @@ class S3FileStoreAdapter(FileStoreAdapter):
 
     @classmethod
     def create(cls, config: Config) -> "S3FileStoreAdapter":
+        if config.file_store_s3_secret_access_key is None:
+            raise ValueError("The env variable `FILE_STORE_S3_SECRET_ACCESS_KEY` is missing.")
         if config.file_store_s3_bucket_name is None:
             raise ValueError("The env variable `FILE_STORE_S3_BUCKET_NAME` is missing.")
 
@@ -55,7 +57,7 @@ class S3FileStoreAdapter(FileStoreAdapter):
             "s3",
             endpoint_url=config.file_store_s3_endpoint_url,
             aws_access_key_id=config.file_store_s3_access_key_id,
-            aws_secret_access_key=config.file_store_s3_secret_access_key,
+            aws_secret_access_key=config.file_store_s3_secret_access_key.get_secret_value(),
             region_name=config.file_store_s3_region_name,
         )
 

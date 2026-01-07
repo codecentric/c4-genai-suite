@@ -20,6 +20,10 @@ on:
         required: false
         type: string
         default: ''
+      platforms:
+        required: false
+        type: string
+        default: linux/amd64
 
 jobs:
   build-container:
@@ -46,7 +50,7 @@ jobs:
             containerfile: services/confluence-importer/Dockerfile
             context: services/confluence-importer/
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: docker/login-action@74a5d142397b4f367a81961eba4e8cd7edddf772 # v3
         with:
           registry: ghcr.io
@@ -58,12 +62,13 @@ jobs:
           context: ${{ matrix.service.context }}
           file: ${{ matrix.service.containerfile }}
           tags: ${{ inputs.tag-prefix }}${{ matrix.service.name }}:commit-${{ github.sha }}
+          platforms: ${{ inputs.platforms }}
           outputs: ${{ inputs.push-to-registry && 'type=registry' || format('type=docker,dest=/tmp/{0}.tar', matrix.service.name) }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |
             VERSION=${{ github.ref_type == 'tag' && github.ref_name || github.sha }}
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         with:
           name: ${{ matrix.service.name }}
           path: /tmp/${{ matrix.service.name }}.tar

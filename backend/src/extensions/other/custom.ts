@@ -28,6 +28,13 @@ export class CustomPromptExtension implements Extension<CustomPromptExtensionCon
           required: false,
           description: this.i18n.t('texts.extensions.customPrompt.templateDescription'),
         },
+        replaceDefault: {
+          type: 'boolean',
+          title: this.i18n.t('texts.extensions.customPrompt.replaceDefaultTitle'),
+          description: this.i18n.t('texts.extensions.customPrompt.replaceDefaultDescription'),
+          default: false,
+          required: false,
+        },
       },
     };
   }
@@ -35,7 +42,13 @@ export class CustomPromptExtension implements Extension<CustomPromptExtensionCon
   getMiddlewares(_: User, extension: ExtensionEntity<CustomPromptExtensionConfiguration>): Promise<ChatMiddleware[]> {
     const middleware = {
       invoke: async (context: ChatContext, getContext: GetContext, next: ChatNextDelegate): Promise<any> => {
-        const { text } = extension.values;
+        const { text, replaceDefault } = extension.values;
+
+        // If replaceDefault is true, set flag to skip default prompt
+        if (replaceDefault) {
+          context.replaceDefaultPrompt = true;
+        }
+
         if (text) {
           context.systemMessages.push(text);
         }
@@ -48,4 +61,4 @@ export class CustomPromptExtension implements Extension<CustomPromptExtensionCon
   }
 }
 
-type CustomPromptExtensionConfiguration = ExtensionConfiguration & { text: string };
+type CustomPromptExtensionConfiguration = ExtensionConfiguration & { text: string; replaceDefault?: boolean };

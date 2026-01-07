@@ -5,6 +5,7 @@ import {
   CallToolRequest,
   CallToolResultSchema,
   ElicitRequestSchema,
+  ListToolsResult,
   ListToolsResultSchema,
   McpError,
   ReadResourceRequest,
@@ -40,8 +41,6 @@ function jsonSchemaToZodInternal(schema: JsonSchema): z.ZodObject<z.ZodRawShape>
   return jsonSchemaToZod(schema);
 }
 
-type MCPListToolsResultSchema = z.infer<typeof ListToolsResultSchema>;
-
 enum Transport {
   SSE = 'sse',
   STREAMABLE_HTTP = 'streamableHttp',
@@ -75,7 +74,7 @@ interface Configuration {
 }
 
 interface ExtensionState extends Pick<Configuration, 'endpoint'> {
-  tools?: MCPListToolsResultSchema['tools'];
+  tools?: ListToolsResult['tools'];
   changed?: boolean;
 }
 
@@ -154,7 +153,7 @@ function toExtensionArgument(
   }
 }
 
-function toArguments(i18n: I18nService, tools: MCPListToolsResultSchema['tools']) {
+function toArguments(i18n: I18nService, tools: ListToolsResult['tools']) {
   return tools.reduce(
     (toolObject, tool) => {
       const methodSchema = tool.inputSchema as JsonSchemaObject;
@@ -301,7 +300,7 @@ export class MCPToolsExtension implements Extension<Configuration> {
     };
   }
 
-  toolsChanged(before: z.infer<typeof ListToolsResultSchema>['tools'], after: z.infer<typeof ListToolsResultSchema>['tools']) {
+  toolsChanged(before: ListToolsResult['tools'], after: ListToolsResult['tools']) {
     return diff(before, after);
   }
 
@@ -365,7 +364,11 @@ export class MCPToolsExtension implements Extension<Configuration> {
     const res = await client.request(req, ReadResourceResultSchema);
     const content = res.contents[0];
 
-    const base64String = content.blob as string;
+    if (!('blob' in content)) {
+      throw new BadRequestException('Resource does not contain blob data');
+    }
+
+    const base64String = content.blob;
     const binaryString = atob(base64String);
     const bytes = new Uint8Array(binaryString.length);
     for (let i = 0; i < binaryString.length; i++) {
@@ -381,10 +384,7 @@ export class MCPToolsExtension implements Extension<Configuration> {
     return this.getTools(configuration);
   }
 
-  private resetUnmodifiedDescriptionNames(
-    schema: Configuration['schema'],
-    tools: z.infer<typeof ListToolsResultSchema>['tools'],
-  ) {
+  private resetUnmodifiedDescriptionNames(schema: Configuration['schema'], tools: ListToolsResult['tools']) {
     if (!schema) {
       return;
     }
