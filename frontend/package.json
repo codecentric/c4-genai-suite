@@ -98,7 +98,7 @@
     "msw": "2.9.0",
     "msw-auto-mock": "0.31.0",
     "postcss": "8.5.4",
-    "postcss-preset-mantine": "1.17.0",
+    "postcss-preset-mantine": "1.18.0",
     "postcss-simple-vars": "7.0.1",
     "prettier": "3.6.2",
     "prettier-plugin-tailwindcss": "0.6.12",
