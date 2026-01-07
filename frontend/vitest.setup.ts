@@ -1,6 +1,19 @@
 import '@testing-library/jest-dom/vitest';
 import { cleanup } from '@testing-library/react';
 import { afterEach, beforeAll, vi } from 'vitest';
+import React from 'react';
+
+// Mock react-syntax-highlighter to avoid ES module issues
+vi.mock('react-syntax-highlighter', () => ({
+  Prism: (props: { children: React.ReactNode; [key: string]: unknown }) => {
+    const { children, ...other } = props;
+    return React.createElement('code', { 'data-testid': 'syntax-highlighted-code', ...other }, children);
+  },
+}));
+
+vi.mock('react-syntax-highlighter/dist/esm/styles/prism', () => ({
+  vscDarkPlus: {},
+}));
 
 beforeAll(() => {
   vi.spyOn(console, 'error').mockImplementation(vi.fn());

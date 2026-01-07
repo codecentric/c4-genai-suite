@@ -22,7 +22,7 @@ interface ClickOutsideProps
 export const ClickOutside = React.memo((props: ClickOutsideProps) => {
   const { children, isActive, onClickOutside, ...other } = props;
 
-  const container = React.useRef<HTMLDivElement>();
+  const container = React.useRef<HTMLDivElement>(null);
 
   const initContainer = useEventCallback((div: HTMLDivElement) => {
     container.current = div;

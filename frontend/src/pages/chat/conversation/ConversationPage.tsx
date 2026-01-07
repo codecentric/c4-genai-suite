@@ -19,7 +19,7 @@ import { Configuration } from './Configuration';
 import { DragAndDropLayout } from './DragAndDropLayout/DragAndDropLayout';
 
 interface ConversationPageProps {
-  textareaRef: RefObject<HTMLTextAreaElement>;
+  textareaRef: RefObject<HTMLTextAreaElement | null>;
 }
 
 export function ConversationPage(props: ConversationPageProps) {
