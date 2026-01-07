@@ -1,5 +1,23 @@
 # Changelog
 
+## [9.9.0](https://github.com/codecentric/c4-genai-suite/compare/v9.8.1...v9.9.0) (2026-01-07)
+
+
+### Features
+
+* Add option to extend vs replace default systemprompt (fixes [#652](https://github.com/codecentric/c4-genai-suite/issues/652)) ([#858](https://github.com/codecentric/c4-genai-suite/issues/858)) ([ae8ceb0](https://github.com/codecentric/c4-genai-suite/commit/ae8ceb03d6c0f9dd6acea67feadb7fd18dae200c))
+* **extensions:** add Gemini image generation extension ([#830](https://github.com/codecentric/c4-genai-suite/issues/830)) ([39676b8](https://github.com/codecentric/c4-genai-suite/commit/39676b8dd0981f5a766427df7ebb05995cc30114))
+
+
+### Bug Fixes
+
+* avoid possible problems in nvidia extension ([#706](https://github.com/codecentric/c4-genai-suite/issues/706)) ([0ffe5b7](https://github.com/codecentric/c4-genai-suite/commit/0ffe5b77af60c226e746144bca5406022aea4744))
+* **frontend:** codeblocks with unrecognized languages are copyable ([#613](https://github.com/codecentric/c4-genai-suite/issues/613)) ([5e69c25](https://github.com/codecentric/c4-genai-suite/commit/5e69c25064d0169f157c0295046934e297c74a46))
+* **frontend:** ensure inline code is rendered correctly ([#860](https://github.com/codecentric/c4-genai-suite/issues/860)) ([d60782d](https://github.com/codecentric/c4-genai-suite/commit/d60782d279fe9c7369b2dce9af2139d98595ab0a))
+* **REIS:** repair pgvector connection pooling to prevent too "many clients" error ([713ba66](https://github.com/codecentric/c4-genai-suite/commit/713ba665dc939dce4af0145c54f5b4b91b80dac1))
+* **REIS:** validate pgvector url, log config at start and hide all secrets ([#605](https://github.com/codecentric/c4-genai-suite/issues/605)) ([7f60256](https://github.com/codecentric/c4-genai-suite/commit/7f6025626d9d648a7c31202410814c368bf4ba97))
+* report content filter violations to the user ([#633](https://github.com/codecentric/c4-genai-suite/issues/633)) ([2d66b53](https://github.com/codecentric/c4-genai-suite/commit/2d66b53864578afb0b6141853fd7592591d1ccec))
+
 ## [9.8.1](https://github.com/codecentric/c4-genai-suite/compare/v9.8.0...v9.8.1) (2025-11-05)
 
 
