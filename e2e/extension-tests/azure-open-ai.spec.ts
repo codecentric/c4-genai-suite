@@ -33,7 +33,7 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
       await enterAdminArea(page);
       await createConfiguration(page, configuration, { detached: false });
 
-      const testoutput = await page.waitForSelector(`:has-text("String must contain at least")`);
+      const testoutput = await page.waitForSelector(`:has-text("Too small: expected string to have >=1 characters")`);
       expect(testoutput).toBeDefined();
 
       await page.getByText('Cancel').click();

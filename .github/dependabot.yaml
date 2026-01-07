@@ -39,6 +39,10 @@ updates:
           - "ai"
           - "@ai-sdk/*"
           - "ollama-ai-provider-v2"
+      mantine:
+        patterns:
+          - "mantine-"
+          - "@mantine/*"
       nestjs:
         patterns:
           - "nest-"

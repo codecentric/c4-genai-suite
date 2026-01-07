@@ -1,7 +1,8 @@
-import { FormErrors, zodResolver } from '@mantine/form';
+import { FormErrors } from '@mantine/form';
 import { type ClassValue, clsx } from 'clsx';
+import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { twMerge } from 'tailwind-merge';
-import { SomeZodObject, infer as ZodInfer } from 'zod';
+import { infer as ZodInfer, ZodTypeAny } from 'zod';
 import { ResponseError } from 'src/api';
 import { texts } from 'src/texts';
 
@@ -66,6 +67,7 @@ export function formatBoolean(value: boolean) {
   return value ? texts.common.yes : texts.common.no;
 }
 
-export function typedZodResolver<S extends SomeZodObject>(schema: S): (values: ZodInfer<S>) => FormErrors {
-  return zodResolver(schema);
+export function typedZodResolver<S extends ZodTypeAny>(schema: S): (values: ZodInfer<S>) => FormErrors {
+  const base = zod4Resolver(schema);
+  return (values: ZodInfer<S>) => base(values as Parameters<typeof base>[0]);
 }
