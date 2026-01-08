@@ -114,7 +114,7 @@
     "@types/passport-github2": "1.2.9",
     "@types/passport-google-oauth2": "0.1.10",
     "@types/passport-microsoft": "2.1.1",
-    "@types/pg": "8.15.4",
+    "@types/pg": "8.16.0",
     "@types/supertest": "6.0.3",
     "@types/uuid": "^10.0.0",
     "@typescript-eslint/eslint-plugin": "8.52.0",
