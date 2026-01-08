@@ -133,7 +133,7 @@
     "supertest": "7.2.2",
     "testcontainers": "^11.11.0",
     "ts-jest": "29.4.6",
-    "ts-loader": "9.5.2",
+    "ts-loader": "9.5.4",
     "ts-node": "10.9.2",
     "tsconfig-paths": "4.2.0",
     "typescript": "5.8.3"
