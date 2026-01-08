@@ -75,7 +75,7 @@
     "logform": "^2.7.0",
     "mime-types": "^3.0.1",
     "nest-winston": "^1.10.2",
-    "nestjs-i18n": "^10.5.1",
+    "nestjs-i18n": "^10.6.0",
     "nunjucks": "^3.2.4",
     "ollama-ai-provider-v2": "^2.0.0",
     "openai": "5.12.2",
