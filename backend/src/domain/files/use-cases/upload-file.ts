@@ -209,7 +209,7 @@ export class UploadFileHandler implements ICommandHandler<UploadFile, UploadFile
       updatedAt: new Date(),
     });
 
-    const blob = new File([buffer], fileName, { type: mimeType });
+    const blob = new File([new Uint8Array(buffer)], fileName, { type: mimeType });
 
     let result: UploadedFile | undefined;
 
