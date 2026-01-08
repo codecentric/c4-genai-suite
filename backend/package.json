@@ -73,7 +73,7 @@
     "json-diff-ts": "^4.8.2",
     "langfuse-vercel": "^3.38.6",
     "logform": "^2.7.0",
-    "mime-types": "^3.0.1",
+    "mime-types": "^3.0.2",
     "nest-winston": "^1.10.2",
     "nestjs-i18n": "^10.6.0",
     "nunjucks": "^3.2.4",
