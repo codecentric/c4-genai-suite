@@ -425,6 +425,16 @@ export class MCPToolsExtension implements Extension<Configuration> {
 
   private enableElicitRequests(client: Client, context: ChatContext) {
     client.setRequestHandler(ElicitRequestSchema, async (request) => {
+      // Check if this is a form mode request (vs URL mode)
+      if (request.params.mode === 'url') {
+        this.logger.warn('URL mode elicitation is not supported, canceling request');
+        return {
+          action: 'cancel',
+          content: undefined,
+        };
+      }
+
+      // Form mode (mode is optional or "form")
       const schema = toExtensionArgument(request.params.requestedSchema as JsonSchemaObject, {});
       if (schema) {
         const userResponse = await context.ui.form(request.params.message, schema);
@@ -435,6 +445,7 @@ export class MCPToolsExtension implements Extension<Configuration> {
       }
 
       // the schema is invalid or not supported
+      this.logger.warn('Invalid or unsupported schema for elicitation request, canceling');
       return {
         action: 'cancel',
         content: undefined,
