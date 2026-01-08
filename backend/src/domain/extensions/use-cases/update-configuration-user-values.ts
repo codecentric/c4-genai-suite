@@ -18,9 +18,10 @@ export class UpdateConfigurationUserValuesResponse {
 }
 
 @QueryHandler(UpdateConfigurationUserValues)
-export class UpdateConfigurationUserValuesHandler
-  implements ICommandHandler<UpdateConfigurationUserValues, UpdateConfigurationUserValuesResponse>
-{
+export class UpdateConfigurationUserValuesHandler implements ICommandHandler<
+  UpdateConfigurationUserValues,
+  UpdateConfigurationUserValuesResponse
+> {
   constructor(
     @InjectRepository(ConfigurationUserEntity)
     private readonly repository: ConfigurationUserRepository,

@@ -15,9 +15,10 @@ export class GetConfigurationUserValuesResponse {
 }
 
 @QueryHandler(GetConfigurationUserValues)
-export class GetConfigurationUserValuesHandler
-  implements IQueryHandler<GetConfigurationUserValues, GetConfigurationUserValuesResponse>
-{
+export class GetConfigurationUserValuesHandler implements IQueryHandler<
+  GetConfigurationUserValues,
+  GetConfigurationUserValuesResponse
+> {
   constructor(
     @InjectRepository(ConfigurationUserEntity)
     private readonly repository: ConfigurationUserRepository,
