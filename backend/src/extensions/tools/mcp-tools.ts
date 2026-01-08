@@ -339,7 +339,7 @@ export class MCPToolsExtension implements Extension<Configuration> {
         properties: toUserArguments(values, spec.arguments['schema']),
       };
     } catch (err) {
-      const errorMessage = `Cannot connect to mcp tool`;
+      const errorMessage = `Cannot connect to mcp tool ${values.serverName} at ${values.endpoint} (extension id: ${extension.externalId})`;
 
       this.logger.error(errorMessage, err);
       delete state.tools;
