@@ -1,5 +1,12 @@
 # Changelog
 
+## [9.9.1](https://github.com/codecentric/c4-genai-suite/compare/v9.9.0...v9.9.1) (2026-01-08)
+
+
+### Bug Fixes
+
+* **backend:** do not log user objects since they might contain sensitive information ([#920](https://github.com/codecentric/c4-genai-suite/issues/920)) ([6ed7dd5](https://github.com/codecentric/c4-genai-suite/commit/6ed7dd5b80b4156c93c598a9b940dff14c012d65))
+
 ## [9.9.0](https://github.com/codecentric/c4-genai-suite/compare/v9.8.1...v9.9.0) (2026-01-07)
 
 
