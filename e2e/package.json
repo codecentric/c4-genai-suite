@@ -13,7 +13,7 @@
   "license": "Apache-2.0",
   "devDependencies": {
     "@eslint/compat": "1.2.9",
-    "@eslint/eslintrc": "3.3.1",
+    "@eslint/eslintrc": "3.3.3",
     "@faker-js/faker": "9.8.0",
     "@playwright/test": "1.56.1",
     "@types/node": "25.0.3",
