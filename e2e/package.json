@@ -23,7 +23,7 @@
     "eslint-config-prettier": "10.1.8",
     "eslint-plugin-import": "2.32.0",
     "eslint-plugin-prettier": "5.4.1",
-    "globals": "16.3.0",
+    "globals": "17.0.0",
     "wait-on": "8.0.3"
   },
   "dependencies": {
