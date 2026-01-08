@@ -103,7 +103,7 @@
     "@nestjs/testing": "11.1.11",
     "@openapitools/openapi-generator-cli": "2.27.0",
     "@testcontainers/postgresql": "^11.11.0",
-    "@types/bcrypt": "5.0.2",
+    "@types/bcrypt": "6.0.0",
     "@types/cookie-parser": "1.4.10",
     "@types/express": "5.0.6",
     "@types/express-session": "1.18.2",
