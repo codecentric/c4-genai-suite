@@ -104,7 +104,7 @@
     "@openapitools/openapi-generator-cli": "2.25.1",
     "@testcontainers/postgresql": "^11.0.3",
     "@types/bcrypt": "5.0.2",
-    "@types/cookie-parser": "1.4.9",
+    "@types/cookie-parser": "1.4.10",
     "@types/express": "5.0.3",
     "@types/express-session": "1.18.2",
     "@types/jest": "30.0.0",
