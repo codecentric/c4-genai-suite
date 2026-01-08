@@ -11,9 +11,9 @@ import { User } from 'src/domain/users';
 import { I18nService } from '../../localization/i18n.service';
 
 @Extension()
-export class FilesExtension<T extends FilesExtensionConfiguration = FilesExtensionConfiguration>
-  implements Extension<FilesExtensionConfiguration>
-{
+export class FilesExtension<
+  T extends FilesExtensionConfiguration = FilesExtensionConfiguration,
+> implements Extension<FilesExtensionConfiguration> {
   constructor(
     @Inject(forwardRef(() => QueryBus))
     protected readonly queryBus: QueryBus,

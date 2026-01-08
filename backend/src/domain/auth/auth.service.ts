@@ -212,7 +212,6 @@ export class AuthService implements OnModuleInit {
   }
 
   async login(user: User, req: Request) {
-    this.logger.log('user from id provider', user);
     const userFilter = user.email ? { email: user.email } : { id: user.id };
     // Check if the user exist in the database.
     let fromDB = await this.users.findOne({ where: userFilter, relations: ['userGroups'] });
