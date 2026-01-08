@@ -71,7 +71,7 @@
     "expr-eval-fork": "^3.0.1",
     "express-session": "^1.18.2",
     "json-diff-ts": "^4.8.2",
-    "langfuse-vercel": "^3.38.5",
+    "langfuse-vercel": "^3.38.6",
     "logform": "^2.7.0",
     "mime-types": "^3.0.1",
     "nest-winston": "^1.10.2",
