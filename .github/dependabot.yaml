@@ -52,6 +52,10 @@ updates:
         patterns:
           - "eslint"
           - "@typescript-eslint/*"
+      testcontainers:
+        patterns:
+          - "testcontainers"
+          - "@testcontainers/*"
       vite:
         patterns:
           - "vite"
