@@ -20,9 +20,6 @@ export class UserGroupEntity {
   isBuiltIn!: boolean;
 
   @Column({ nullable: true })
-  monthlyTokens?: number;
-
-  @Column({ nullable: true })
   monthlyUserTokens?: number;
 
   @ManyToMany(() => UserEntity, (user) => user.userGroups)

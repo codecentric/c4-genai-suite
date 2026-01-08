@@ -40,11 +40,11 @@ export class CheckUsageMiddleware implements ChatMiddleware {
       await next(context);
       return;
     }
+
     const userGroup = await this.userGroups.findOneBy({ id: userGroupId });
-    const monthlyTokens = userGroup?.monthlyTokens ?? 0;
     const monthlyUserTokens = userGroup?.monthlyUserTokens ?? 0;
 
-    if (!userGroup || (monthlyTokens < 0 && monthlyUserTokens < 0)) {
+    if (!userGroup || monthlyUserTokens < 0) {
       await next(context);
       return;
     }
@@ -52,26 +52,14 @@ export class CheckUsageMiddleware implements ChatMiddleware {
     const dateFrom = startOfMonth(new Date());
     const dateTo = addMonths(dateFrom, 1);
 
-    if (monthlyTokens > 0) {
-      const groupUsage =
-        (await this.usages.sum('count', {
-          date: And(MoreThanOrEqual(dateFrom), LessThan(dateTo)),
-          userGroup: userGroupId,
-        })) ?? 0;
-
-      if (groupUsage >= monthlyTokens) {
-        throw new HttpException('Monthly token limit exceeded for user group.', HttpStatus.TOO_MANY_REQUESTS);
-      }
-    }
-
     if (monthlyUserTokens > 0) {
-      const groupUsage =
+      const userUsage =
         (await this.usages.sum('count', {
           date: And(MoreThanOrEqual(dateFrom), LessThan(dateTo)),
           userId: user.id,
         })) ?? 0;
 
-      if (groupUsage >= monthlyUserTokens) {
+      if (userUsage >= monthlyUserTokens) {
         throw new HttpException('Monthly token limit exceeded for user.', HttpStatus.TOO_MANY_REQUESTS);
       }
     }

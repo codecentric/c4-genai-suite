@@ -45,7 +45,6 @@ describe('User Group', () => {
   it('should create user group', async () => {
     const newUserGroup = {
       name: 'test-group',
-      monthlyTokens: 1000,
       monthlyUserTokens: 1000,
     };
 
@@ -54,7 +53,6 @@ describe('User Group', () => {
     const typedBody = response.body as UserGroupDto;
     expect(typedBody.id).toBeDefined();
     expect(typedBody.name).toBe(newUserGroup.name);
-    expect(typedBody.monthlyTokens).toBe(newUserGroup.monthlyTokens);
     expect(typedBody.monthlyUserTokens).toBe(newUserGroup.monthlyUserTokens);
     expect(typedBody.isAdmin).toBe(false);
     expect(typedBody.isBuiltIn).toBe(false);
@@ -65,7 +63,6 @@ describe('User Group', () => {
 
     const updatedUserGroup = {
       name: 'test-group',
-      monthlyTokens: 2000,
       monthlyUserTokens: 2000,
     };
 
@@ -77,7 +74,6 @@ describe('User Group', () => {
     const typedBody = response.body as UserGroupDto;
     expect(typedBody.id).toBe(userGroupToUpdate?.id);
     expect(typedBody.name).toBe(updatedUserGroup.name);
-    expect(typedBody.monthlyTokens).toBe(updatedUserGroup.monthlyTokens);
     expect(typedBody.monthlyUserTokens).toBe(updatedUserGroup.monthlyUserTokens);
     expect(typedBody.isAdmin).toBe(false);
     expect(typedBody.isBuiltIn).toBe(false);

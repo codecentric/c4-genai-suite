@@ -6,7 +6,7 @@ import { assignWithUndefined } from 'src/lib';
 import { UserGroup } from '../interfaces';
 import { buildUserGroup } from './utils';
 
-type Values = Pick<UserGroup, 'monthlyTokens' | 'monthlyUserTokens' | 'name'>;
+type Values = Pick<UserGroup, 'monthlyUserTokens' | 'name'>;
 
 export class UpdateUserGroup {
   constructor(
@@ -28,7 +28,7 @@ export class UpdateUserGroupHandler implements ICommandHandler<UpdateUserGroup, 
 
   async execute(request: UpdateUserGroup): Promise<UpdateUserGroupResponse> {
     const { id, values } = request;
-    const { monthlyTokens, monthlyUserTokens, name } = values;
+    const { monthlyUserTokens, name } = values;
 
     const entity = await this.userGroups.findOneBy({ id });
 
@@ -40,7 +40,7 @@ export class UpdateUserGroupHandler implements ICommandHandler<UpdateUserGroup, 
       throw new BadRequestException('Cannot update builtin user group.');
     }
 
-    assignWithUndefined(entity, { monthlyTokens, monthlyUserTokens, name });
+    assignWithUndefined(entity, { monthlyUserTokens, name });
 
     // Use the save method otherwise we would not get previous values.
     const updated = await this.userGroups.save(entity);

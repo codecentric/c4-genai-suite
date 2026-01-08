@@ -22,21 +22,6 @@ describe('User Page', () => {
     expect(screen.getAllByRole('alert')).toHaveLength(1);
   });
 
-  it('should alert when monthly tokens goes below zero', async () => {
-    render(<CreateUserGroupDialog onCreate={() => {}} onClose={() => {}} />);
-
-    const user = userEvent.setup();
-    const nameInput = screen.getByLabelText(required(texts.common.groupName));
-    await user.click(nameInput);
-    await user.type(nameInput, 'st1');
-    const monthlyTokenInput = screen.getByLabelText('Monthly tokens');
-    await user.click(monthlyTokenInput);
-    await user.type(monthlyTokenInput, '-1');
-    const saveBtn = screen.getByRole('button', { name: 'Save' });
-    await user.click(saveBtn);
-    expect(screen.getAllByRole('alert')).toHaveLength(1);
-  });
-
   it('should alert when monthly tokens/user goes below zero', async () => {
     render(<CreateUserGroupDialog onCreate={() => {}} onClose={() => {}} />);
 
@@ -44,9 +29,6 @@ describe('User Page', () => {
     const nameInput = screen.getByLabelText(required(texts.common.groupName));
     await user.click(nameInput);
     await user.type(nameInput, 'st1');
-    const monthlyTokenInput = screen.getByLabelText('Monthly tokens');
-    await user.click(monthlyTokenInput);
-    await user.type(monthlyTokenInput, '1');
     const monthlyUserTokenInput = screen.getByLabelText('Monthly tokens / User');
     await user.click(monthlyUserTokenInput);
     await user.type(monthlyUserTokenInput, '-1');

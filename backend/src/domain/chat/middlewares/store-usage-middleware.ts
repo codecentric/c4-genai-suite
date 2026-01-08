@@ -28,7 +28,6 @@ export class StorageUsageMiddleware implements ChatMiddleware {
         date: new Date(),
         key: usage.llm,
         subKey: usage.model,
-        userGroup: context.user.userGroupIds?.[0],
         userId: context.user.id,
       });
     } catch (err) {

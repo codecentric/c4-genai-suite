@@ -6,7 +6,7 @@ import { assignDefined } from 'src/lib';
 import { UserGroup } from '../interfaces';
 import { buildUserGroup } from './utils';
 
-type Values = Pick<UserGroup, 'monthlyTokens' | 'monthlyUserTokens' | 'name'>;
+type Values = Pick<UserGroup, 'monthlyUserTokens' | 'name'>;
 
 export class CreateUserGroup {
   constructor(public readonly values: Values) {}
@@ -25,12 +25,12 @@ export class CreateUserGroupHandler implements ICommandHandler<CreateUserGroup, 
 
   async execute(request: CreateUserGroup): Promise<CreateUserGroupResponse> {
     const { values } = request;
-    const { monthlyTokens, monthlyUserTokens, name } = values;
+    const { monthlyUserTokens, name } = values;
 
     const entity = this.userGroups.create({ id: uuid.v4() });
 
     // Assign the object manually to avoid updating unexpected values.
-    assignDefined(entity, { monthlyTokens, monthlyUserTokens, name });
+    assignDefined(entity, { monthlyUserTokens, name });
 
     // Use the save method otherwise we would not get previous values.
     const created = await this.userGroups.save(entity);
