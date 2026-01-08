@@ -44,7 +44,7 @@
     "@ai-sdk/openai-compatible": "^2.0.4",
     "@azure/ai-agents": "^1.1.0",
     "@azure/core-util": "^1.13.1",
-    "@azure/identity": "^4.11.0",
+    "@azure/identity": "^4.13.0",
     "@modelcontextprotocol/sdk": "^1.25.2",
     "@n8n/json-schema-to-zod": "^1.1.0",
     "@nestjs/common": "^11.1.11",
