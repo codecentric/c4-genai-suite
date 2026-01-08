@@ -139,6 +139,7 @@
     "typescript": "5.8.3"
   },
   "overrides": {
-    "zod": "4.3.5"
+    "zod": "4.3.5",
+    "chokidar": "^4.0.0"
   }
 }
