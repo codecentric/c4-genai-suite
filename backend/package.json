@@ -113,7 +113,7 @@
     "@types/nunjucks": "3.2.6",
     "@types/passport-github2": "1.2.9",
     "@types/passport-google-oauth2": "0.1.10",
-    "@types/passport-microsoft": "2.1.0",
+    "@types/passport-microsoft": "2.1.1",
     "@types/pg": "8.15.4",
     "@types/supertest": "6.0.3",
     "@types/uuid": "^10.0.0",
