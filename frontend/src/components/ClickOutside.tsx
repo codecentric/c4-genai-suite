@@ -10,8 +10,7 @@ import { DetailedHTMLProps, useEffect } from 'react';
 import { useEventCallback } from 'src/hooks';
 
 interface ClickOutsideProps
-  extends DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>,
-    React.PropsWithChildren {
+  extends DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>, React.PropsWithChildren {
   // When clicked outside.
   onClickOutside: (event: MouseEvent) => unknown;
 
