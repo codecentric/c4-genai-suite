@@ -14,7 +14,7 @@ defaults:
     working-directory: services/confluence-importer
 
 jobs:
-  format-check:
+  confluence-importer-format-check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -28,7 +28,7 @@ jobs:
       - name: Check formatting with ruff
         run: uv run ruff format --check .
 
-  lint:
+  confluence-importer-lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -44,7 +44,7 @@ jobs:
       - name: Lint with mypy
         run: uv run mypy .
 
-  test:
+  confluence-importer-test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6

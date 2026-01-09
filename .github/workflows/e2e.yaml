@@ -20,12 +20,12 @@ defaults:
     working-directory: e2e
 
 jobs:
-  build:
+  e2e-build:
     uses: ./.github/workflows/build-container-images.yaml
 
   e2e:
     needs:
-      - build
+      - e2e-build
     strategy:
       fail-fast: false
       matrix:
@@ -41,7 +41,7 @@ jobs:
       testdir: ${{ matrix.testdir }}
     secrets: inherit
 
-  lint:
+  e2e-lint:
     runs-on: ubuntu-latest
     permissions:
       contents: read

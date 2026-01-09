@@ -14,7 +14,7 @@ defaults:
     working-directory: frontend
 
 jobs:
-  build:
+  frontend-build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -26,7 +26,7 @@ jobs:
       - run: npm install
       - run: npm run build
 
-  check-generated-files:
+  frontend-check-generated-files:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -42,7 +42,7 @@ jobs:
       # exits with exitcode != 0 if changes are detected
       - run: git diff --quiet .
 
-  lint:
+  frontend-lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -55,7 +55,7 @@ jobs:
       - run: npm run lint
       - run: npm run find-unused-resources
 
-  test:
+  frontend-test:
     runs-on: ubuntu-latest
     env:
       VITE_SERVER_URL: http://localhost:5173/api-proxy

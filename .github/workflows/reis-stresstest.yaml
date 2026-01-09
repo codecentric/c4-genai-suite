@@ -17,7 +17,7 @@ defaults:
 
 jobs:
 
-  build-reis-if-needed:
+  reis-build-if-needed:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v7
@@ -48,9 +48,9 @@ jobs:
           path: /tmp/reis.tar
           retention-days: 2
 
-  test-stress:
+  reis-test-stress:
     runs-on: ubuntu-latest
-    needs: build-reis-if-needed
+    needs: reis-build-if-needed
     steps:
       - uses: actions/checkout@v6
         with:

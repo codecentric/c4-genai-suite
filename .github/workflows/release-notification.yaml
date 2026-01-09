@@ -8,7 +8,7 @@ on:
       - created
 
 jobs:
-  notify_slack:
+  notify-slack:
     runs-on: ubuntu-latest
     name: Notify Slack on Release
     steps:
