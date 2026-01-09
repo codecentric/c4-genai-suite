@@ -43,7 +43,6 @@ describe('UpdateUserDialog', () => {
 
     expect(screen.getByLabelText(required(texts.common.name))).toHaveValue(mockUser.name);
     expect(screen.getByLabelText(required(texts.common.email))).toHaveValue(mockUser.email);
-    // eslint-disable-next-line testing-library/no-node-access
     expect(document.querySelector('input[name="userGroupIds"]')).toHaveValue(adminGroupId);
   });
 

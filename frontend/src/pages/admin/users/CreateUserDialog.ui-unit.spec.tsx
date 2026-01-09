@@ -69,7 +69,6 @@ describe('User Page', () => {
   it('should select the user group default on initial state', () => {
     render(<CreateUserDialog userGroups={mockUserGroups} onCreate={() => {}} onClose={() => {}} />);
 
-    // eslint-disable-next-line testing-library/no-node-access
     expect(document.querySelector('input[name="userGroupIds"]')).toHaveValue('default');
   });
 
@@ -83,7 +82,6 @@ describe('User Page', () => {
     const groupOption = screen.getByRole('option', { name: /Group/i });
     await user.click(groupOption);
 
-    // eslint-disable-next-line testing-library/no-node-access
     expect(document.querySelector('input[name="userGroupIds"]')).toHaveValue('default,group');
   });
 

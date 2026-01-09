@@ -51,6 +51,7 @@ updates:
       eslint:
         patterns:
           - "eslint"
+          - "eslint-"
           - "@typescript-eslint/*"
       testcontainers:
         patterns:

@@ -41,7 +41,6 @@ export default defineConfig([globalIgnores([
         "plugin:prettier/recommended",
         "plugin:react/recommended",
         "plugin:react-hooks/recommended",
-        "plugin:testing-library/react",
     )),
 
     plugins: {
@@ -164,7 +163,4 @@ export default defineConfig([globalIgnores([
         }],
         "no-warning-comments": "error",
     },
-}, {
-    files: ["**/*.[jt]s?(x)", "**/?(*.)+(spec|test).[jt]s?(x)"],
-    extends: fixupConfigRules(compat.extends("plugin:testing-library/react")),
 }]);
