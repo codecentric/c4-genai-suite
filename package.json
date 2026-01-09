@@ -2,7 +2,7 @@
   "license": "Apache-2.0",
   "scripts": {
     "prepare": "husky && npm run install-all && npm run env",
-    "install-all": "(cd backend && npm install) && (cd frontend && npm install) && (cd services/reis && command -v poetry && poetry install || echo 'poetry not installed, skipping')",
+    "install-all": "(cd backend && npm install) && (cd frontend && npm install) && (cd services/reis && command -v uv && uv sync || echo 'uv not installed, skipping')",
     "env": "node scripts/env-setup.js --noOverwrites",
     "env:fix": "node scripts/env-setup.js",
     "dev": "node scripts/run-tests.js --devSetup",
@@ -22,11 +22,11 @@
     "test:e2e:codegen": "npx playwright codegen http://localhost:5173/login",
     "test:frontend": "cd frontend && npm run test",
     "test:backend": "cd backend && npm run test",
-    "test:reis": "cd services/reis && poetry run pytest",
+    "test:reis": "cd services/reis && uv run pytest",
     "generate-apis": "npm run generate-specs && npm run generate-clients",
     "generate-specs": "npm run generate-specs-backend && npm run generate-specs-reis",
     "generate-clients": "npm run generate-clients-frontend && npm run generate-clients-backend",
-    "generate-specs-reis": "(cd ./services/reis && command -v poetry && poetry run python rei_s/generate_open_api.py || echo 'poetry not installed, skipping')",
+    "generate-specs-reis": "(cd ./services/reis && command -v uv && uv run python rei_s/generate_open_api.py || echo 'uv not installed, skipping')",
     "generate-specs-backend": "(cd ./backend && npm run generate-openapi-dev)",
     "generate-clients-backend": "cd ./backend && npm run generate-tools && npm run generate-reis && npm run generate-executor",
     "generate-clients-frontend": "cd ./frontend && npm run generate-api"

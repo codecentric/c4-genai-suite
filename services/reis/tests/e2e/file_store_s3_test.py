@@ -36,6 +36,7 @@ def get_config_override() -> Config:
         )
     except ValidationError as e:
         pytest.skip(f"Skipped! A config value is missing: {e!r}")
+        raise  # For type checker - pytest.skip raises but type checker doesn't know
 
 
 @pytest.fixture(scope="function", autouse=True)
@@ -47,7 +48,7 @@ def clean_bucket(app: FastAPI) -> None:
 
         objects = s3.client.list_objects_v2(Bucket=s3.bucket_name)
         if "Contents" in objects:
-            objects_to_delete: list[ObjectIdentifierTypeDef] = [{"Key": obj["Key"]} for obj in objects["Contents"]]
+            objects_to_delete: list[ObjectIdentifierTypeDef] = [{"Key": obj["Key"]} for obj in objects["Contents"]]  # type: ignore[misc]
             s3.client.delete_objects(Bucket=s3.bucket_name, Delete={"Objects": objects_to_delete})
 
         # Delete the bucket

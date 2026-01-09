@@ -87,17 +87,18 @@ jobs:
             -e STORE_PGVECTOR_INDEX_NAME="stresstest" \
             -e EMBEDDINGS_TYPE="random-test-embeddings" \
             reis:commit-${{ github.sha }}
-      - run: pipx install poetry
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: services/reis/uv.lock
       - uses: actions/setup-python@v6
         with:
           python-version: '3.13'
-          cache: 'poetry'
-          cache-dependency-path: services/reis/poetry.lock
-      - run: poetry install --with dev
+      - run: uv sync
       - name: Stresstest
         env:
           pytest_github_report: true
-        run: poetry run pytest -rs --cov=rei_s --cov-report=xml --cov-report=term --stress --error-for-skips tests/stress
+        run: uv run pytest -rs --cov=rei_s --cov-report=xml --cov-report=term --stress --error-for-skips tests/stress
       - name: get logs
         if: ${{ !cancelled() }}
         run: |

@@ -7,8 +7,8 @@
 - **Postgres**: Automatically configured via Docker Compose
   - Uses pgvector image for vector storage
 - **Python** (currently required): Required for REI-S (Retrieval & Ingestion Server)
-  - Poetry (>= 1.2) for dependency management
-  - Python version compatibility issues can be managed with `pyenv`
+  - uv (>= 0.5.0) for dependency management ([installation guide](https://docs.astral.sh/uv/getting-started/installation/))
+  - Python version compatibility issues can be managed with `uv`
 - **JRE** (currently required): Required when changing APIs only, to run the OpenAPI Generator. Creates or updates API client files for
   - frontend to backend access
   - backend to REI-S access
@@ -22,11 +22,7 @@ Set up the `node` version specified in the `.nvmrc` file. We recommend using `nv
 
 ### 2. Python Setup
 
-Set up the python version specified in the .python-version file and make sure poetry (>=1.2) is available.
-
-> [!TIP]
-> In some circumstances, a call to `poetry install` might trigger a lookup to the keyring, which can cause a modal dialog from kwallet to appear.
-> To avoid this, run the following command before calling poetry: `export PYTHON_KEYRING_BACKEND=keyring.backends.null.Keyring`
+Make sure uv (>=0.5.0) is available. See the [uv installation guide](https://docs.astral.sh/uv/getting-started/installation/) for instructions. It will manage the python installation (regardless if and which version of python is installed systemwide.)
 
 ### 3. Install packages
 
@@ -48,7 +44,7 @@ In this step, you might be asked for some API-Keys, e.g., for the REI-S.
 
 ### 5. Verify your setup and start developing
 
-Run `npm run dev` in the root of the repository to start all components locally and try them out. This will use docker for some components like the postgres database. 
+Run `npm run dev` in the root of the repository to start all components locally and try them out. This will use docker for some components like the postgres database.
 Other components will directly run on your system, and **your systems ports will be used if available**. Live reloading is enabled for the react frontend.
 
 To debug any issues, checkout the `./output` during, or after the run of `npm run dev`.
@@ -141,7 +137,7 @@ Within the `/services/reis` folder:
 
 ```bash
 # re-generate reis-dev-spec.json
-`poetry run python rei_s/generate_open_api.py`
+uv run python rei_s/generate_open_api.py
 ```
 
 ... and then in `/backend` folder:

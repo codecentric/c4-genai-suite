@@ -76,7 +76,7 @@ class VoiceTranscriptionProvider(AbstractFormatProvider):
         self.default_segment_duration = default_segment_duration
 
         if config and config.stt_type == "azure-openai-whisper":
-            # this is ensured by the config validation, the following lines are there to help the mypy typechecker
+            # this is ensured by the config validation, the following lines are there to help the ty typechecker
             if config.stt_azure_openai_whisper_api_key is None:
                 raise ValueError("The env variable `STT_AZURE_OPENAI_WHISPER_API_KEY` is missing.")
             if config.stt_azure_openai_whisper_deployment_name is None:

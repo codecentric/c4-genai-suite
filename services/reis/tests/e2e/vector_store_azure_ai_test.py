@@ -34,6 +34,7 @@ def get_config_override() -> Config:
         )
     except ValidationError as e:
         pytest.skip(f"Skipped! A config value is missing: {e!r}")
+        raise  # For type checker - pytest.skip raises but type checker doesn't know
 
 
 @pytest.fixture

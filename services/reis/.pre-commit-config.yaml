@@ -23,21 +23,21 @@ repos:
     hooks:
         - id: ruff
           name: ruff_check
-          entry: bash -c 'cd services/reis && poetry run ruff check --fix --exit-non-zero-on-fix'
+          entry: bash -c 'cd services/reis && uv run ruff check --fix --exit-non-zero-on-fix'
           language: python
           types_or: [ python, pyi ]
           require_serial: true
           files: ^services/reis/
         - id: ruff
           name: ruff_format
-          entry: bash -c 'cd services/reis && poetry run ruff format'
+          entry: bash -c 'cd services/reis && uv run ruff format'
           language: python
           types_or: [ python, pyi ]
           require_serial: true
           files: ^services/reis/
-        - id: mypy
-          name: mypy
-          entry: bash -c 'cd services/reis && poetry run mypy .'
+        - id: ty
+          name: ty
+          entry: bash -c 'cd services/reis && uv run ty check'
           language: python
           types: [ python ]
           files: ^services/reis/

@@ -11,7 +11,7 @@ from uuid import uuid4
 from langchain_core.documents.base import Blob
 from langchain_community.document_loaders.blob_loaders import BlobLoader
 import markdown
-from pygments.formatters import HtmlFormatter
+from pygments.formatters import HtmlFormatter  # type: ignore[import-untyped]
 from weasyprint import HTML
 
 from rei_s import logger
