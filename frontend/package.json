@@ -41,7 +41,7 @@
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
     "react-dropzone": "^14.3.5",
-    "react-hook-form": "^7.53.0",
+    "react-hook-form": "^7.70.0",
     "react-i18next": "^15.1.3",
     "react-markdown": "^10.0.0",
     "react-pdf": "^10.0.1",
