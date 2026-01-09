@@ -4,7 +4,6 @@ import react from "eslint-plugin-react";
 import _import from "eslint-plugin-import";
 import reactRefresh from "eslint-plugin-react-refresh";
 import typescriptEslintEslintPlugin from "@typescript-eslint/eslint-plugin";
-import testingLibrary from "eslint-plugin-testing-library";
 import globals from "globals";
 import tsParser from "@typescript-eslint/parser";
 import path from "node:path";
@@ -49,7 +48,6 @@ export default defineConfig([globalIgnores([
         import: fixupPluginRules(_import),
         "react-refresh": reactRefresh,
         "@typescript-eslint": fixupPluginRules(typescriptEslintEslintPlugin),
-        "testing-library": fixupPluginRules(testingLibrary),
         "custom": {
             rules: {
                 "no-restricted-api-conversations": noRestrictedApiConversations,
