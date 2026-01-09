@@ -12,7 +12,7 @@
   "author": "",
   "license": "Apache-2.0",
   "devDependencies": {
-    "@eslint/compat": "2.0.0",
+    "@eslint/compat": "2.0.1",
     "@eslint/eslintrc": "3.3.3",
     "@faker-js/faker": "10.2.0",
     "@playwright/test": "1.57.0",
