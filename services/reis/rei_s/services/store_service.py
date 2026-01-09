@@ -7,7 +7,6 @@ from langchain_core.documents import Document
 
 from rei_s import logger
 from rei_s.services.filestore_adapter import FileStoreAdapter
-from rei_s.services.formats.pdf_provider import PdfProvider
 from rei_s.services.formats.utils import ProcessingError
 from rei_s.services.multiprocess_utils import convert_file_in_process, process_file_in_process
 from rei_s.services.embeddings_provider import get_embeddings
@@ -87,7 +86,7 @@ def process_file_synchronously(
     # * large files will start a new process to avoid the GIL
     #   this will also lead python to release the RAM used for the processing back to the operating system
 
-    if not format_.multiprocessable or file.size < threshold:
+    if not format_.may_start_separate_process_for_chunking or file.size < threshold:
         return format_.process_file(file, chunk_size)
     else:
         ctx = mp.get_context("spawn")
@@ -114,7 +113,7 @@ def convert_file_synchronously(format_: AbstractFormatProvider, file: SourceFile
     # * large files will start a new process to avoid the GIL
     #   this will also lead python to release the RAM used for the processing back to the operating system
 
-    if not format_.multiprocessable or file.size < threshold:
+    if not format_.may_start_separate_process_for_converting or file.size < threshold:
         return format_.convert_file_to_pdf(file)
     else:
         ctx = mp.get_context("spawn")
@@ -217,22 +216,18 @@ def add_file(config: Config, file: SourceFile, bucket: str, doc_id: str, index_n
     format_ = find_format_provider(config, file)
     logger.info(f"start adding doc_id {doc_id} with format {format_.name}")
 
+    chunks = process_file_into_chunks(config, file, format_, doc_id)
+    logger.info(f"chunked doc_id {doc_id} into {len(chunks)} chunks")
+
     file_store = get_file_store(config=config)
     if file_store:
-        pdf = convert_file_to_pdf(config, file, format_, doc_id)
+        pdf_preview = convert_file_to_pdf(config, file, format_, doc_id)
+        logger.info(f"converted doc_id {doc_id} to pdf")
         try:
-            logger.info(f"converted doc_id {doc_id} to pdf")
-            chunks = process_file_into_chunks(config, pdf, PdfProvider(), doc_id)
-            logger.info(f"chunked pdf version of doc_id {doc_id} into {len(chunks)} chunks")
-            file_store.add_document(pdf)
+            file_store.add_document(pdf_preview)
             logger.info(f"saved pdf for doc_id {doc_id}")
-        except Exception as e:
-            raise e
         finally:
-            pdf.delete()
-    else:
-        chunks = process_file_into_chunks(config, file, format_, doc_id)
-        logger.info(f"chunked doc_id {doc_id} into {len(chunks)} chunks")
+            pdf_preview.delete()
 
     vector_store = get_vector_store(config=config, index_name=index_name)
     for batch, index, num_batches in generate_batches(config, file, chunks, format_, bucket, doc_id):
