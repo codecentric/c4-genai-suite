@@ -33,3 +33,4 @@ allow-dependencies-licenses:
   - 'pkg:pypi/aiohttp' # False positive, is Apache-2.0
   - 'pkg:pypi/langsmith' # False positive, is MIT
   - 'pkg:npm/@n8n/json-schema-to-zod' # False positive, is ISC for this part of a large repository
+  - 'pkg:npm/sql-highlight' # False positive, is MIT
