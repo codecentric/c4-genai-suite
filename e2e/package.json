@@ -24,7 +24,7 @@
     "eslint-plugin-import": "2.32.0",
     "eslint-plugin-prettier": "5.5.4",
     "globals": "17.0.0",
-    "wait-on": "8.0.3"
+    "wait-on": "9.0.3"
   },
   "dependencies": {
     "dotenv": "^17.0.1",
