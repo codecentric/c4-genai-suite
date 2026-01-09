@@ -90,7 +90,7 @@
     "customPrompt": {
       "title": "Prompt",
       "description": "Verwendet einen freien Text als Systemnachricht.",
-      "templateDescription": "Der Text kann bestimmte Platzhalter enthalten, die zur Laufzeit ersetzt werden. Verfügbare Platzhalter:\n\n* `{{{{date}}}}`: Tagesdatum\n* `{{{{timestamp}}}}`: Aktuelles Datum und Uhrzeit\n* `{{{{llm_name}}}}`: Name des Modells\n* `{{{{llm_provider}}}}`: Betreiber des Modells\n* `{{{{user}}}}`: Nutzername oder Email\n* `{{{{assistant}}}}`: Name der Assistenz\n* `{{{{assistant_description}}}}`: Beschreibung der Assistenz",
+      "templateDescription": "Der Text kann bestimmte Platzhalter enthalten, die zur Laufzeit ersetzt werden. Verfügbare Platzhalter:\n\n* `{{{{date}}}}`: Tagesdatum\n* `{{{{timestamp}}}}`: Aktuelles Datum und Uhrzeit\n* `{{{{llm_name}}}}`: Name des Modells\n* `{{{{llm_provider}}}}`: Betreiber des Modells\n* `{{{{user}}}}`: Nutzername oder Email\n* `{{{{assistant}}}}`: Name des Assistenten\n* `{{{{assistant_description}}}}`: Beschreibung des Assistenten",
       "replaceDefaultTitle": "Standard-Systemprompt ersetzen",
       "replaceDefaultDescription": "Wenn aktiviert, ersetzt der benutzerdefinierte Prompt den Standard-Systemprompt vollständig. Wenn deaktiviert (Standard), erweitert der benutzerdefinierte Prompt den Standard-Systemprompt."
     },
@@ -291,7 +291,7 @@
     }
   },
   "chat": {
-    "errorLastConfigurationdDeleted": "Es muss mindestens eine aktivierte Assistenz geben, wenn Konversationen existieren.",
+    "errorLastConfigurationdDeleted": "Es muss mindestens einen aktivierten Assistenten geben, wenn Konversationen existieren.",
     "errorContentFilter": "Die Frage wurde vom System aufgrund ihres Inhalts abgewiesen und wird daher nicht beantwortet.",
     "errorContextLengthExceeded": "Der Kontext des aktuellen Chats ist zu groß für das genutzte LLM. Entweder gibt es zu viel Text in dieser Konversation oder es wurde eine zu große Datei mit der \"Vollständige Dateien\"-Extension hochgeladen.",
     "errorStringAboveMaxLength": "Die Anfrage an das LLM is zu lang. Entweder gibt es zu viel Text in dieser Konversation oder es wurde eine zu große Datei mit der \"Vollständige Dateien\"-Extension hochgeladen.",
