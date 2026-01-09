@@ -25,6 +25,7 @@ allow_licenses:
   - 'CC0-1.0'
   - 'OFL-1.1'
   - 'Zlib'
+  - 'ZPL-2.1'
 allow-dependencies-licenses:
   - 'pkg:pypi/structlog' # This package is a false-positive because of a Contributor License Agreement, which is not a software license.
   - 'pkg:pypi/azure-core' # This package is a false-positive because of a Contributor License Agreement, which is not a software license.
@@ -36,3 +37,14 @@ allow-dependencies-licenses:
   - 'pkg:pypi/langsmith' # False positive, is MIT
   - 'pkg:npm/@n8n/json-schema-to-zod' # False positive, is ISC for this part of a large repository
   - 'pkg:npm/sql-highlight' # False positive, is MIT
+  - 'pkg:pypi/pypdf' # False positive, is free license
+  - 'pkg:pypi/aiohappyeyeballs' # False positive
+  - 'pkg:pypi/msal-extensions' # False positive because of a Contributor License Agreement
+  - 'pkg:pypi/pillow' # False positive because of addition to MIT-CMU license, but still free
+  - 'pkg:pypi/python-dateutil' # False positive, is Apache
+  - 'pkg:pypi/pytz' # False positive, is Apache
+  - 'pkg:pypi/psycopg-binary' # False positive, is LGPL-3.0-only
+  - 'pkg:pypi/jaraco-classes' # False positive, is MIT
+  - 'pkg:pypi/jaraco-context' # False positive, is MIT
+  - 'pkg:pypi/jaraco-functools' # False positive, is MIT
+  - 'pkg:pypi/pydocket' # False positive, is MIT
