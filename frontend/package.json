@@ -33,7 +33,7 @@
     "@tanstack/react-table": "^8.21.3",
     "clsx": "^2.1.1",
     "date-fns": "^4.0.0",
-    "i18next": "^25.6.0",
+    "i18next": "^25.7.4",
     "katex": "^0.16.22",
     "mantine-form-zod-resolver": "^1.3.0",
     "msw": "^2.3.5",
