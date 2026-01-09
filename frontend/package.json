@@ -93,7 +93,7 @@
     "eslint-plugin-react-hooks": "5.2.0",
     "eslint-plugin-react-refresh": "0.4.20",
     "eslint-plugin-testing-library": "7.15.4",
-    "glob": "11.1.0",
+    "glob": "13.0.0",
     "globals": "17.0.0",
     "jsdom": "26.1.0",
     "knip": "5.80.2",
