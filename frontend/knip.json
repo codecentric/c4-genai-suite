@@ -1,4 +1,4 @@
 {
   "ignore": ["**/generated/**", "**/dist/**", "**/*.d.ts", "lint-staged.config.mjs", "**/mock/**", "public/**"],
-  "ignoreDependencies": ["eslint-*", "msw-auto-mock", "tailwindcss", "@tailwindcss/typography", "daisyui"]
+  "ignoreDependencies": ["eslint-*", "msw-auto-mock"]
 }
