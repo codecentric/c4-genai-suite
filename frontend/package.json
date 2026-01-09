@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "@floating-ui/react-dom": "^2.1.1",
-    "@hookform/resolvers": "^4.0.0",
+    "@hookform/resolvers": "^5.2.2",
     "@mantine/colors-generator": "7.17.8",
     "@mantine/core": "7.17.8",
     "@mantine/dropzone": "7.17.8",
