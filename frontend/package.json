@@ -102,7 +102,7 @@
     "postcss-preset-mantine": "1.18.0",
     "postcss-simple-vars": "7.0.1",
     "prettier": "3.7.4",
-    "prettier-plugin-tailwindcss": "0.6.12",
+    "prettier-plugin-tailwindcss": "0.7.2",
     "rimraf": "6.1.2",
     "tailwindcss": "4.1.8",
     "typescript": "5.9.3",
