@@ -26,8 +26,8 @@ export const FileItemComponent = ({ file, onRemove, loading }: FileItemProps) =>
       data-testid="file-chip"
     >
       <div className="flex w-full items-center gap-2" data-testid={loading ? 'file-chip-uploading' : 'file-chip-uploaded'}>
-        <div className="relative h-6 w-6 flex-shrink-0">
-          {loading ? <IconRotate2 className="loading w-6" /> : <IconFile />}
+        <div className="relative h-10 w-10 flex-shrink-0">
+          {loading ? <IconRotate2 className="loading h-full w-full" /> : <IconFile className="h-full w-full" />}
           {fileType && (
             <span className="absolute -right-1 -bottom-1 truncate rounded-md bg-black px-[3px] py-[1px] text-[8px] text-white">
               {fileType}
