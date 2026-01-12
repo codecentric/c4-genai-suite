@@ -30,6 +30,14 @@ export class BraveWebSearchExtension implements Extension<BraveWebSearchExtensio
           minimum: 1,
           maximum: 20,
         },
+        safesearch: {
+          type: 'string',
+          title: this.i18n.t('texts.extensions.brave.safesearch'),
+          format: 'select',
+          enum: ['off', 'moderate', 'strict'],
+          default: 'moderate',
+          required: false,
+        },
       },
     };
   }
@@ -52,6 +60,7 @@ class InternalTool extends NamedStructuredTool {
   readonly displayName = 'Brave Search';
   readonly apiKey: string;
   readonly maxResults: number;
+  readonly safesearch: 'off' | 'moderate' | 'strict';
 
   readonly schema = z.object({
     query: z.string().describe('The search query.'),
@@ -68,6 +77,7 @@ class InternalTool extends NamedStructuredTool {
     this.apiKey = configuration.apiKey;
     this.description = 'Performs a web search using Brave Search.';
     this.maxResults = configuration.maxResults || 5;
+    this.safesearch = configuration.safesearch || 'moderate';
   }
 
   private formatContent(title: string, url: string, description?: string, extra_snippets?: string[]): string {
@@ -95,7 +105,9 @@ class InternalTool extends NamedStructuredTool {
       Accept: 'application/json',
     };
     const encodedQuery = encodeURIComponent(query);
-    const searchUrl = new URL(`https://api.search.brave.com/res/v1/web/search?q=${encodedQuery}&count=${this.maxResults}`);
+    const searchUrl = new URL(
+      `https://api.search.brave.com/res/v1/web/search?q=${encodedQuery}&count=${this.maxResults}&safesearch=${this.safesearch}`,
+    );
 
     const response = await fetch(searchUrl, { headers });
 
@@ -137,6 +149,7 @@ class InternalTool extends NamedStructuredTool {
 export type BraveWebSearchExtensionConfiguration = ExtensionConfiguration & {
   apiKey: string;
   maxResults?: number;
+  safesearch?: 'off' | 'moderate' | 'strict';
 };
 
 // see also https://api-dashboard.search.brave.com/app/documentation/web-search/responses
