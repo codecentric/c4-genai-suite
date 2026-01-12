@@ -105,7 +105,7 @@
     "prettier": "3.7.4",
     "prettier-plugin-tailwindcss": "0.7.2",
     "rimraf": "6.1.2",
-    "tailwindcss": "4.1.8",
+    "tailwindcss": "4.1.18",
     "typescript": "5.9.3",
     "vite": "7.3.1",
     "vitest": "4.0.16"
