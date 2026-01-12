@@ -28,7 +28,7 @@ class AzureAISearchStoreAdapter(VectorStoreAdapter):
         if index_name is None:
             index_name = "index"
 
-        # this is ensured by the config validation, the following lines are there to help the mypy typechecker
+        # this is ensured by the config validation, the following lines are there to help the ty typechecker
         if config.store_azure_ai_search_service_endpoint is None:
             raise ValueError("The env variable `STORE_AZURE_AI_SEARCH_SERVICE_ENDPOINT` is missing.")
         if config.store_azure_ai_search_service_api_key is None:
@@ -106,7 +106,7 @@ class AzureAISearchStoreAdapter(VectorStoreAdapter):
         # The `delete` method can only delete by the "key", which is unique, i.e., the chunk id.
         # To delete by our doc_id, we first need to fetch all chunk_ids of the doc_id.
         response = self.vector_store.client.search(search_text="*", filter=f"doc_id eq '{doc_id}'", select=["id"])
-        # assure mypy that we get the sync type
+        # assure ty that we get the sync type
         if isinstance(response, Awaitable):
             raise TypeError("Got awaitable response from client. Expected sync Azure AI Search client")
 

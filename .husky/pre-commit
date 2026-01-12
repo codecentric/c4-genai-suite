@@ -2,16 +2,11 @@ lint-staged
 
 if [ -n "$(git status --porcelain --untracked-files=no services/reis)" ]
 then
-  # if we do not find poetry, give the User a clean error message
-  if ! command -v poetry > /dev/null ; then
-    echo "￼ ERROR! Pre commit hook for REI-S can not run! Please install Poetry. Please refer to the c4 main readme." >&2
+  # if we do not find uv, give the User a clean error message
+  if ! command -v uv > /dev/null ; then
+    echo "￼ ERROR! Pre commit hook for REI-S can not run! Please install uv. Please refer to the c4 main readme." >&2
     exit 1
   fi
 
-  # apparently pip sometimes tries to access the keyring,
-  # even though we need no keys to download our dependencies
-  # therefore we use a keyring without key
-  # see also https://stackoverflow.com/a/64620347
-  export PYTHON_KEYRING_BACKEND=keyring.backends.null.Keyring
-  (cd services/reis && poetry install --with dev && poetry run pre-commit run)
+  (cd services/reis && uv sync && uv run pre-commit run)
 fi
