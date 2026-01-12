@@ -29,7 +29,7 @@
     "@tabler/icons-react": "^3.36.1",
     "@tailwindcss/postcss": "4.1.18",
     "@tailwindcss/vite": "4.1.18",
-    "@tanstack/react-query": "^5.90.5",
+    "@tanstack/react-query": "^5.90.16",
     "@tanstack/react-table": "^8.21.3",
     "clsx": "^2.1.1",
     "date-fns": "^4.0.0",
