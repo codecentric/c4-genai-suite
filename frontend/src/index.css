@@ -50,6 +50,23 @@
   animation: loading-dot 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
+@keyframes show-after-delay {
+  0%, 80% {
+    opacity: 0;
+    max-height: 0em;
+  }
+  93.3% {
+    opacity: 0;
+    max-height: 1.5em;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+.animate-show-after-7s {
+  animation: show-after-delay 5.5s forwards;
+}
+
 .white-shadow {
   box-shadow: 0 -20px 16px 4px white;
 }
