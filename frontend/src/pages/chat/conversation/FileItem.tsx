@@ -38,7 +38,12 @@ export const FileItemComponent = ({ file, onRemove, loading }: FileItemProps) =>
         <div className="min-w-0 flex-grow">
           <div className="flex flex-col">
             <span className="truncate text-sm font-medium">{fileName}</span>
-            <span className="animate-show-after-7s truncate text-sm font-medium text-orange-800 italic">Bitte warten...</span>
+            <div className="animate-show-after-7s relative">
+              <span className="animate-alternate-first truncate text-sm font-medium text-orange-800 italic">Please wait...</span>
+              <span className="animate-alternate-second absolute top-0 left-0 truncate text-sm font-medium text-orange-800 italic">
+                May take a bit...
+              </span>
+            </div>
           </div>
         </div>
 
