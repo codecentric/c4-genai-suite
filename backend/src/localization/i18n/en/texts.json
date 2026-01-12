@@ -123,7 +123,12 @@
       "title": "Brave Web Search",
       "description": "Performs a web search using Brave",
       "apiKeyHint": "The Brave Search API Key",
-      "maxResults": "Number of search results"
+      "maxResults": "Number of search results",
+      "safeSearch": "Safe Search Filter",
+      "country": "Country",
+      "searchLang": "Search Language",
+      "freshness": "Freshness",
+      "freshnessHint": "Filters search results by when they were discovered. pd: last 24 hours, pw: last 7 days, pm: last 31 days, py: last 365 days. Custom date range also supported (YYYY-MM-DDtoYYYY-MM-DD)."
     },
     "duckduckgo": {
       "title": "Duckduckgo Web Search",

@@ -30,6 +30,39 @@ export class BraveWebSearchExtension implements Extension<BraveWebSearchExtensio
           minimum: 1,
           maximum: 20,
         },
+        safeSearch: {
+          type: 'string',
+          title: this.i18n.t('texts.extensions.brave.safeSearch'),
+          format: 'select',
+          enum: ['off', 'moderate', 'strict'],
+          default: 'moderate',
+          required: false,
+        },
+        country: {
+          type: 'string',
+          title: this.i18n.t('texts.extensions.brave.country'),
+          format: 'select',
+          enum: ['', 'US', 'GB', 'DE', 'FR', 'ES', 'IT'],
+          default: '',
+          required: false,
+        },
+        searchLang: {
+          type: 'string',
+          title: this.i18n.t('texts.extensions.brave.searchLang'),
+          format: 'select',
+          enum: ['', 'en', 'de', 'fr', 'es', 'it'],
+          default: '',
+          required: false,
+        },
+        freshness: {
+          type: 'string',
+          title: this.i18n.t('texts.extensions.brave.freshness'),
+          description: this.i18n.t('texts.extensions.brave.freshnessHint'),
+          format: 'select',
+          examples: ['', 'pd', 'pw', 'pm', 'py'],
+          showInList: true,
+          default: '',
+        },
       },
     };
   }
@@ -52,6 +85,10 @@ class InternalTool extends NamedStructuredTool {
   readonly displayName = 'Brave Search';
   readonly apiKey: string;
   readonly maxResults: number;
+  readonly safeSearch: 'off' | 'moderate' | 'strict';
+  readonly country?: string;
+  readonly searchLang?: string;
+  readonly freshness?: string;
 
   readonly schema = z.object({
     query: z.string().describe('The search query.'),
@@ -68,6 +105,10 @@ class InternalTool extends NamedStructuredTool {
     this.apiKey = configuration.apiKey;
     this.description = 'Performs a web search using Brave Search.';
     this.maxResults = configuration.maxResults || 5;
+    this.safeSearch = configuration.safeSearch || 'moderate';
+    this.country = configuration.country;
+    this.searchLang = configuration.searchLang;
+    this.freshness = configuration.freshness;
   }
 
   private formatContent(title: string, url: string, description?: string, extra_snippets?: string[]): string {
@@ -94,8 +135,24 @@ class InternalTool extends NamedStructuredTool {
       'X-Subscription-Token': this.apiKey,
       Accept: 'application/json',
     };
-    const encodedQuery = encodeURIComponent(query);
-    const searchUrl = new URL(`https://api.search.brave.com/res/v1/web/search?q=${encodedQuery}&count=${this.maxResults}`);
+
+    const params = new URLSearchParams({
+      q: query,
+      count: this.maxResults.toString(),
+      safesearch: this.safeSearch,
+    });
+
+    if (this.country && this.country !== '') {
+      params.append('country', this.country);
+    }
+    if (this.searchLang && this.searchLang !== '') {
+      params.append('search_lang', this.searchLang);
+    }
+    if (this.freshness && this.freshness !== '') {
+      params.append('freshness', this.freshness);
+    }
+
+    const searchUrl = new URL(`https://api.search.brave.com/res/v1/web/search?${params.toString()}`);
 
     const response = await fetch(searchUrl, { headers });
 
@@ -137,6 +194,10 @@ class InternalTool extends NamedStructuredTool {
 export type BraveWebSearchExtensionConfiguration = ExtensionConfiguration & {
   apiKey: string;
   maxResults?: number;
+  safeSearch?: 'off' | 'moderate' | 'strict';
+  country?: string;
+  searchLang?: string;
+  freshness?: string;
 };
 
 // see also https://api-dashboard.search.brave.com/app/documentation/web-search/responses
