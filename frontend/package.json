@@ -53,7 +53,7 @@
     "react-textarea-autosize": "^8.5.5",
     "react-toastify": "^11.0.3",
     "react-tooltip": "^5.30.0",
-    "recharts": "^2.13.3",
+    "recharts": "^3.6.0",
     "rehype-katex": "^7.0.1",
     "remark-gfm": "^4.0.0",
     "remark-math": "^6.0.0",
