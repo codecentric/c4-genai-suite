@@ -177,9 +177,12 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
     });
 
     await test.step('should check if content of duplicated conversation with complete file extension match original conversation', async () => {
-      const scrollButton = page.locator('button[data-testid="scroll-to-bottom-button"]');
-      if (await scrollButton.isVisible()) {
+      const scrollButton = page.locator('button[data-testid="scrollToBottomButton"]');
+      try {
+        await scrollButton.waitFor({ state: 'visible', timeout: 5000 });
         await scrollButton.click();
+      } catch {
+        // Scroll button not visible, page is already at bottom
       }
       const lastChatItem = page.locator('[data-testid="chat-item"]').last();
 

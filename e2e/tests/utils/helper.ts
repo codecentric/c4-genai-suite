@@ -153,7 +153,7 @@ export async function createBucketIfNotExist(
 ) {
   await page.getByRole('link', { name: 'Files' }).click();
   await page.waitForLoadState('networkidle');
-  if ((await page.locator('li').filter({ hasText: bucket.name }).count()) > 0) {
+  if ((await page.getByRole('link', { name: bucket.name }).count()) > 0) {
     // Bucket already exists
     return;
   }
@@ -183,11 +183,12 @@ export async function createBucketIfNotExist(
 export async function deleteBucket(page: Page, bucket: { name: string }, ifExists = false) {
   await page.getByRole('link', { name: 'Files' }).click();
 
-  const bucketMenu = page.locator('li').filter({ hasText: bucket.name }).getByTestId('more-actions');
-  if (ifExists && !bucketMenu) {
+  const bucketLink = page.getByRole('link', { name: bucket.name });
+  if (ifExists && (await bucketLink.count()) === 0) {
     // in the case the bucket does not exist, we are done
     return;
   }
+  const bucketMenu = bucketLink.locator('..').getByTestId('more-actions');
   await bucketMenu.click();
   await page.click('button:has-text("Delete")');
   await page.click('button:has-text("Confirm")');
@@ -199,7 +200,7 @@ export async function editBucket(
 ) {
   await page.getByRole('link', { name: 'Files', exact: true }).click();
 
-  await page.locator('li').filter({ hasText: bucket.name }).getByTestId('more-actions').click();
+  await page.getByRole('link', { name: bucket.name }).locator('..').getByTestId('more-actions').click();
   await page.click('button:has-text("Edit")');
 
   if (bucket.endpoint) {
