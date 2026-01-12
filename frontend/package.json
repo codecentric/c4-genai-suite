@@ -62,7 +62,7 @@
     "universal-cookie": "^8.0.0",
     "yup": "^1.7.1",
     "zod": "^4.3.5",
-    "zustand": "^5.0.0"
+    "zustand": "^5.0.10"
   },
   "devDependencies": {
     "@eslint/compat": "2.0.1",
