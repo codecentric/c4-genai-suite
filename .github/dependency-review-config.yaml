@@ -48,3 +48,4 @@ allow-dependencies-licenses:
   - 'pkg:pypi/jaraco-context' # False positive, is MIT
   - 'pkg:pypi/jaraco-functools' # False positive, is MIT
   - 'pkg:pypi/pydocket' # False positive, is MIT
+  - 'pkg:pypi/typing-extensions' # False positive, it is PSF
