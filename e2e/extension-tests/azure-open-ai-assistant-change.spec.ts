@@ -55,7 +55,7 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
     await test.step('should return message for second assistant', async () => {
       await selectConfiguration(page, secondAssistant);
 
-      await sendMessage(page, firstAssistant, { message: 'Who are you' });
+      await sendMessage(page, secondAssistant, { message: 'Who are you' });
 
       const firstResponse = await page.waitForSelector(`:has-text("Bob")`);
       expect(firstResponse).toBeDefined();
