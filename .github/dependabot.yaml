@@ -65,12 +65,19 @@ updates:
           - "vitest"
           - "@vitest/*"
 
-  - package-ecosystem: "pip"
+  - package-ecosystem: "uv"
     directories:
       - "/services/reis"
+      - "/services/confluence-importer"
     schedule:
       interval: "daily"
     groups:
-      ai-sdk:
+      langchain:
         patterns:
           - "langchain-"
+      pytest:
+        patterns:
+          - "pytest"
+      pydantic:
+        patterns:
+          - "pydantic"
