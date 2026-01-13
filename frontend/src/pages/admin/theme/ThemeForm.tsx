@@ -1,23 +1,23 @@
-import { yupResolver } from '@hookform/resolvers/yup';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@mantine/core';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { FormProvider, useForm, useWatch } from 'react-hook-form';
 import { toast } from 'react-toastify';
-import * as Yup from 'yup';
+import { z } from 'zod';
 import { SettingsDto, useApi } from 'src/api';
 import { CHAT_SUGGESTIONS_SCHEME, ChatSuggestions, FormAlert, Forms, MAX_SUGGESTIONS, SiteLinks } from 'src/components';
 import { useTheme } from 'src/hooks';
 import { texts } from 'src/texts';
 import { i18next } from 'src/texts/i18n';
 
-const SCHEME = Yup.object().shape({
+const SCHEME = z.object({
   // Optional array of chat suggestions.
-  chatSuggestions: CHAT_SUGGESTIONS_SCHEME,
+  chatSuggestions: CHAT_SUGGESTIONS_SCHEME.optional(),
 });
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const RESOLVER = yupResolver<any>(SCHEME);
+const RESOLVER = zodResolver(SCHEME) as any;
 
 export function ThemeForm() {
   const api = useApi();

@@ -1,17 +1,17 @@
-import * as Yup from 'yup';
+import { z } from 'zod';
 import { texts } from 'src/texts';
 
 export const MAX_SUGGESTIONS = 12;
 
-export const CHAT_SUGGESTIONS_SCHEME = Yup.array(
-  Yup.object().shape({
+export const CHAT_SUGGESTIONS_SCHEME = z.array(
+  z.object({
     // Required title.
-    title: Yup.string().required().label(texts.common.title),
+    title: z.string().min(1, texts.common.title),
 
     // Required subtitle.
-    subtitle: Yup.string().required().label(texts.common.subtitle),
+    subtitle: z.string().min(1, texts.common.subtitle),
 
     // Required text.
-    text: Yup.string().required().label(texts.common.text),
+    text: z.string().min(1, texts.common.text),
   }),
 ).max(MAX_SUGGESTIONS);

@@ -1,27 +1,28 @@
-import { yupResolver } from '@hookform/resolvers/yup';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, Tabs } from '@mantine/core';
 import { IconLock, IconUser } from '@tabler/icons-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
-import * as Yup from 'yup';
+import { z } from 'zod';
 import { ChangePasswordDto, useApi } from 'src/api';
 import { Forms, Modal } from 'src/components';
 import { useProfile } from 'src/hooks';
 import { texts } from 'src/texts';
 
-const PASSWORD_CHANGE_SCHEMA = Yup.object({
-  currentPassword: Yup.string().label(texts.chat.settings.currentPassword).required(texts.common.required),
-  password: Yup.string().label(texts.chat.settings.password).required(texts.common.required),
-  passwordConfirm: Yup.string()
-    .label(texts.chat.settings.passwordConfirm)
-    .oneOf([Yup.ref('password'), '', undefined], texts.common.passwordsDoNotMatch)
-    .required(texts.common.required),
+const PASSWORD_CHANGE_SCHEMA = z.object({
+  currentPassword: z.string().min(1, texts.common.required),
+  password: z.string().min(1, texts.common.required),
+  passwordConfirm: z.string()
+    .min(1, texts.common.required),
+}).refine((data) => data.password === data.passwordConfirm, {
+  message: texts.common.passwordsDoNotMatch,
+  path: ['passwordConfirm'],
 });
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const PASSWORD_RESOLVER = yupResolver<any>(PASSWORD_CHANGE_SCHEMA);
+const PASSWORD_RESOLVER = zodResolver(PASSWORD_CHANGE_SCHEMA) as any;
 interface UserProfileModalProps {
   isOpen: boolean;
   onClose: () => void;
