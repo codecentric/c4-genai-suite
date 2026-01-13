@@ -16,8 +16,7 @@ const SCHEME = z.object({
   chatSuggestions: CHAT_SUGGESTIONS_SCHEME.optional(),
 });
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const RESOLVER = zodResolver(SCHEME) as any;
+const RESOLVER = zodResolver(SCHEME);
 
 export function ThemeForm() {
   const api = useApi();

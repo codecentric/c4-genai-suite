@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useMemo } from 'react';
 import { z } from 'zod';
 import {
@@ -50,15 +51,18 @@ export function useListValues(spec: ExtensionSpecDto, buckets: BucketDto[], exte
 
 function getType(arg: ExtensionUserInfoDtoUserArgumentsValue): z.ZodTypeAny | undefined {
   if (arg.type === 'number') {
-    let type = z.number().default(arg._default as number);
+    const defaultValue = typeof arg._default === 'number' ? arg._default : undefined;
+    let baseType = z.number();
 
-    if (arg.minimum != null) {
-      type = type.min(arg.minimum);
+    if (arg.minimum != null && typeof arg.minimum === 'number') {
+      baseType = baseType.min(arg.minimum);
     }
 
-    if (arg.maximum != null) {
-      type = type.max(arg.maximum);
+    if (arg.maximum != null && typeof arg.maximum === 'number') {
+      baseType = baseType.max(arg.maximum);
     }
+
+    const type = defaultValue !== undefined ? baseType.default(defaultValue) : baseType;
 
     if (!arg.required) {
       return type.optional().or(z.literal('').transform(() => undefined));
@@ -66,7 +70,8 @@ function getType(arg: ExtensionUserInfoDtoUserArgumentsValue): z.ZodTypeAny | un
 
     return type;
   } else if (arg.type === 'boolean') {
-    let type = z.boolean().default(arg._default as boolean);
+    const defaultValue = typeof arg._default === 'boolean' ? arg._default : undefined;
+    const type = defaultValue !== undefined ? z.boolean().default(defaultValue) : z.boolean();
 
     if (!arg.required) {
       return type.optional();
@@ -74,11 +79,14 @@ function getType(arg: ExtensionUserInfoDtoUserArgumentsValue): z.ZodTypeAny | un
 
     return type;
   } else if (arg.type === 'string') {
-    let type = z.string().default(arg._default as string);
+    const defaultValue = typeof arg._default === 'string' ? arg._default : undefined;
+    let baseType = z.string();
 
     if (arg.format === 'email') {
-      type = type.email();
+      baseType = baseType.email();
     }
+
+    const type = defaultValue !== undefined ? baseType.default(defaultValue) : baseType;
 
     if (arg.format === 'date' || arg.format === 'select') {
       if (!arg.required) {
@@ -97,7 +105,8 @@ function getType(arg: ExtensionUserInfoDtoUserArgumentsValue): z.ZodTypeAny | un
       return;
     }
 
-    let arrayType = z.array(itemType).default(arg._default as unknown[]);
+    const defaultValue = Array.isArray(arg._default) ? arg._default : undefined;
+    const arrayType = defaultValue !== undefined ? z.array(itemType).default(defaultValue) : z.array(itemType);
 
     if (!arg.required) {
       return arrayType.optional();
@@ -105,15 +114,14 @@ function getType(arg: ExtensionUserInfoDtoUserArgumentsValue): z.ZodTypeAny | un
 
     return arrayType;
   } else if (arg.type === 'object') {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const values: { [name: string]: any } = {};
+    const values: Record<string, z.ZodTypeAny> = {};
     for (const [name, value] of Object.entries(arg.properties)) {
       const type = getType(value);
       if (type != null) {
         values[name] = type;
       }
     }
-    let schema = z.object(values);
+    const schema = z.object(values);
 
     if (!arg.required) {
       return schema.optional();
@@ -124,8 +132,7 @@ function getType(arg: ExtensionUserInfoDtoUserArgumentsValue): z.ZodTypeAny | un
 }
 
 function getSchema(args?: Record<string, ExtensionUserInfoDtoUserArgumentsValue>) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const extensionValues: { [name: string]: any } = {};
+  const extensionValues: Record<string, z.ZodTypeAny> = {};
   for (const [name, arg] of Object.entries(args || {})) {
     const type = getType(arg);
     if (type != null) {
@@ -139,23 +146,20 @@ function getSchema(args?: Record<string, ExtensionUserInfoDtoUserArgumentsValue>
 export function useArgumentObjectSpecResolver(argumentObject: ExtensionArgumentObjectSpecDto | undefined) {
   return useMemo(() => {
     const schema = getSchema(argumentObject?.properties);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return zodResolver(schema) as any;
+    return zod4Resolver(schema);
   }, [argumentObject]);
 }
 
 export function useUserArgumentsSpecResolver(extensions: ExtensionUserInfoDto[]) {
   return useMemo(() => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const values: { [name: string]: any } = {};
+    const values: Record<string, z.ZodTypeAny> = {};
 
     for (const extension of extensions) {
       values[extension.id] = getSchema(extension.userArguments ?? {});
     }
 
     const schema = z.object(values);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return zodResolver(schema) as any;
+    return zod4Resolver(schema);
   }, [extensions]);
 }
 
@@ -163,12 +167,11 @@ export function useSpecResolver(spec?: ExtensionSpecDto) {
   return useMemo(() => {
     const schema = getSchema(spec?.arguments ?? {});
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return zodResolver(
       z.object({
         enabled: z.boolean(),
         values: schema,
       }),
-    ) as any;
+    );
   }, [spec]);
 }

@@ -30,8 +30,7 @@ const SCHEME = z.object({
   allowedFileNameExtensions: z.array(z.string()).min(1),
 });
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const RESOLVER = zodResolver(SCHEME) as any;
+const RESOLVER = zodResolver(SCHEME);
 
 interface UpsertBucketDialogProps {
   // The bucket to update.

@@ -11,18 +11,18 @@ import { Forms, Modal } from 'src/components';
 import { useProfile } from 'src/hooks';
 import { texts } from 'src/texts';
 
-const PASSWORD_CHANGE_SCHEMA = z.object({
-  currentPassword: z.string().min(1, texts.common.required),
-  password: z.string().min(1, texts.common.required),
-  passwordConfirm: z.string()
-    .min(1, texts.common.required),
-}).refine((data) => data.password === data.passwordConfirm, {
-  message: texts.common.passwordsDoNotMatch,
-  path: ['passwordConfirm'],
-});
+const PASSWORD_CHANGE_SCHEMA = z
+  .object({
+    currentPassword: z.string().min(1, texts.common.required),
+    password: z.string().min(1, texts.common.required),
+    passwordConfirm: z.string().min(1, texts.common.required),
+  })
+  .refine((data) => data.password === data.passwordConfirm, {
+    message: texts.common.passwordsDoNotMatch,
+    path: ['passwordConfirm'],
+  });
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const PASSWORD_RESOLVER = zodResolver(PASSWORD_CHANGE_SCHEMA) as any;
+const PASSWORD_RESOLVER = zodResolver(PASSWORD_CHANGE_SCHEMA);
 interface UserProfileModalProps {
   isOpen: boolean;
   onClose: () => void;

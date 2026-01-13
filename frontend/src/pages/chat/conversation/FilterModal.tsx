@@ -34,12 +34,7 @@ export function FilterModal(props: JsonFormProps & PropsWithChildren) {
         footer={
           <fieldset>
             <div className="flex flex-row justify-between">
-              <Button
-                type="button"
-                variant="outline"
-                leftSection={<IconRotate className="w-4" />}
-                onClick={() => form.reset()}
-              >
+              <Button type="button" variant="outline" leftSection={<IconRotate className="w-4" />} onClick={() => form.reset()}>
                 {texts.chat.filterResetAll}
               </Button>
               <div className="flex gap-2">
