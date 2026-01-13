@@ -94,7 +94,7 @@
     "eslint-plugin-testing-library": "7.15.4",
     "glob": "13.0.0",
     "globals": "17.0.0",
-    "jsdom": "26.1.0",
+    "jsdom": "27.4.0",
     "knip": "5.80.2",
     "msw": "2.12.7",
     "msw-auto-mock": "0.31.0",
