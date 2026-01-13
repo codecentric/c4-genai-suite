@@ -37,13 +37,12 @@ describe('UpdateUserDialog', () => {
   };
 
   it('should open update dialog with provided user data', () => {
-    const adminGroupId = mockUser.userGroupIds[0];
-
     render(<UpdateUserDialog {...defaultProps} />);
 
     expect(screen.getByLabelText(required(texts.common.name))).toHaveValue(mockUser.name);
     expect(screen.getByLabelText(required(texts.common.email))).toHaveValue(mockUser.email);
-    expect(document.querySelector('input[name="userGroupIds"]')).toHaveValue(adminGroupId);
+    // Check that the Admin pill is shown in the MultiSelect (using Mantine Pill class)
+    expect(document.querySelector('.mantine-Pill-label')).toHaveTextContent('Admin');
   });
 
   it('should generate a random API Key', async () => {
@@ -68,7 +67,7 @@ describe('UpdateUserDialog', () => {
 
     await user.click(screen.getByRole('button', { name: texts.common.save }));
 
-    expect(screen.getByRole('alert')).toHaveTextContent(texts.common.passwordsDoNotMatch);
+    expect(screen.getByText(texts.common.passwordsDoNotMatch)).toBeInTheDocument();
   });
 
   it('should call onClose when cancel button is clicked', async () => {
@@ -88,7 +87,8 @@ describe('UpdateUserDialog', () => {
 
     const user = userEvent.setup();
 
-    const userGroup = screen.getByLabelText(required(texts.common.userGroups));
+    // Use base label without asterisk since the asterisk is aria-hidden
+    const userGroup = screen.getByRole('textbox', { name: texts.common.userGroups });
     await user.click(userGroup);
     const adminOption = screen.getByRole('option', { name: /Admin/i });
     await user.click(adminOption); // Remove the Admin group.

@@ -19,9 +19,9 @@
   },
   "dependencies": {
     "@floating-ui/react-dom": "^2.1.1",
-    "@hookform/resolvers": "^4.0.0",
     "@mantine/colors-generator": "7.17.8",
     "@mantine/core": "7.17.8",
+    "@mantine/dates": "^7.17.8",
     "@mantine/dropzone": "7.17.8",
     "@mantine/form": "7.17.8",
     "@mantine/hooks": "7.17.8",
@@ -41,7 +41,6 @@
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
     "react-dropzone": "^14.3.5",
-    "react-hook-form": "^7.71.1",
     "react-i18next": "^16.5.3",
     "react-markdown": "^10.0.0",
     "react-pdf": "^10.3.0",

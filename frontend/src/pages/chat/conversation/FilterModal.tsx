@@ -59,15 +59,7 @@ export function FilterModal(props: JsonFormProps & PropsWithChildren) {
               }
             >
               {Object.entries(x.userArguments).map(([name, spec]) => (
-                <Argument
-                  namePrefix={`${x.id}.`}
-                  refreshable
-                  vertical
-                  key={`${x.id}-${name}`}
-                  buckets={[]}
-                  name={name}
-                  argument={spec}
-                />
+                <Argument namePrefix={`${x.id}.`} key={`${x.id}-${name}`} buckets={[]} name={name} argument={spec} form={form} />
               ))}
             </Fieldset>
           ))}

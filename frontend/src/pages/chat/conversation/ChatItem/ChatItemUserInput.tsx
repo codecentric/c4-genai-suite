@@ -1,5 +1,5 @@
 import { Button } from '@mantine/core';
-import { useForm } from '@mantine/form';
+import { useForm, UseFormReturnType } from '@mantine/form';
 import { memo } from 'react';
 import { ChatUICallbackResultDto, type ExtensionArgumentObjectSpecDto, StreamUIRequestDto } from 'src/api';
 import { Markdown } from 'src/components';
@@ -8,17 +8,17 @@ import { useArgumentObjectSpecResolver } from 'src/pages/admin/extensions/hooks'
 import { texts } from 'src/texts';
 import { useConfirmAiAction } from '../../state/chat';
 
-type DynamicFormProps = { schema: ExtensionArgumentObjectSpecDto };
+type DynamicFormProps = { schema: ExtensionArgumentObjectSpecDto; form: UseFormReturnType<unknown> };
 
 function DynamicForm(props: DynamicFormProps) {
-  const { schema } = props;
+  const { schema, form } = props;
 
   return (
     <>
       {schema.type === 'object' && Object.keys(schema.properties).length > 0 && (
         <div className="flex flex-col">
           {Object.entries(schema.properties).map(([name, spec]) => (
-            <Argument vertical key={name} buckets={[]} name={name} argument={spec} />
+            <Argument key={name} buckets={[]} name={name} argument={spec} form={form} />
           ))}
         </div>
       )}
@@ -48,7 +48,7 @@ export const ChatItemUserInput = memo(({ request }: { request: StreamUIRequestDt
         <div>
           <Markdown>{request.text}</Markdown>
         </div>
-        <DynamicForm schema={request.schema} />
+        <DynamicForm schema={request.schema} form={form as UseFormReturnType<unknown>} />
         <fieldset>
           <div className="flex flex-row justify-between">
             <div></div>

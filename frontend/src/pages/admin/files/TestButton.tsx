@@ -1,15 +1,14 @@
 import { Button, Tooltip } from '@mantine/core';
+import { UseFormReturnType } from '@mantine/form';
 import { useMutation } from '@tanstack/react-query';
-import { useFormContext } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import { UpsertBucketDto, useApi } from 'src/api';
 import { buildError } from 'src/lib';
 import { texts } from 'src/texts';
 
-export function TestButton() {
+export function TestButton({ form }: { form: UseFormReturnType<UpsertBucketDto> }) {
   const api = useApi();
 
-  const form = useFormContext<UpsertBucketDto>();
   const testing = useMutation({
     mutationFn: () => {
       const values = form.getValues();
@@ -24,7 +23,7 @@ export function TestButton() {
     },
   });
 
-  const isDisabled = !form.formState.isValid || testing.isPending;
+  const isDisabled = !form.isValid() || testing.isPending;
 
   return (
     <Tooltip label={texts.files.testTooltip}>

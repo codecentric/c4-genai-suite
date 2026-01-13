@@ -84,12 +84,11 @@ export function ConfigurationUserValuesModal(props: JsonFormProps & PropsWithChi
                         {Object.entries(x.properties).map(([name, spec]) => (
                           <Argument
                             namePrefix={`${id}.`}
-                            refreshable
-                            vertical
                             key={`${id}-${name}`}
                             buckets={[]}
                             name={name}
                             argument={spec}
+                            form={form}
                           />
                         ))}
                       </Fieldset>

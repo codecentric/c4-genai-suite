@@ -1,4 +1,3 @@
-import { zodResolver } from '@hookform/resolvers/zod';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useMemo } from 'react';
 import { z } from 'zod';
@@ -167,7 +166,7 @@ export function useSpecResolver(spec?: ExtensionSpecDto) {
   return useMemo(() => {
     const schema = getSchema(spec?.arguments ?? {});
 
-    return zodResolver(
+    return zod4Resolver(
       z.object({
         enabled: z.boolean(),
         values: schema,
