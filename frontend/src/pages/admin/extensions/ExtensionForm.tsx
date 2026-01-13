@@ -145,7 +145,7 @@ export function Argument({
   if (type === 'string' && argument.format === 'date') {
     return (
       <FormRow name={fieldName} label={title} hints={hints()}>
-        <DateInput required={required} key={form.key(fieldName)} {...form.getInputProps(fieldName)} />
+        <DateInput id={fieldName} required={required} key={form.key(fieldName)} {...form.getInputProps(fieldName)} />
       </FormRow>
     );
   }
@@ -177,7 +177,7 @@ export function Argument({
   if (type === 'string' && argument.format === 'password') {
     return (
       <FormRow name={fieldName} label={title} hints={hints()}>
-        <PasswordInput required={required} key={form.key(fieldName)} {...form.getInputProps(fieldName)} />
+        <PasswordInput id={fieldName} required={required} key={form.key(fieldName)} {...form.getInputProps(fieldName)} />
       </FormRow>
     );
   }
@@ -188,6 +188,7 @@ export function Argument({
     return (
       <FormRow name={fieldName} label={title} hints={hints()}>
         <Select
+          id={fieldName}
           data={options}
           required={required}
           searchable={!!argument.examples?.length}
@@ -203,13 +204,19 @@ export function Argument({
       const options = argument.items._enum.map((x) => ({ value: x, label: x }));
       return (
         <FormRow name={fieldName} label={title} hints={hints()}>
-          <MultiSelect data={options} required={required} key={form.key(fieldName)} {...form.getInputProps(fieldName)} />
+          <MultiSelect
+            id={fieldName}
+            data={options}
+            required={required}
+            key={form.key(fieldName)}
+            {...form.getInputProps(fieldName)}
+          />
         </FormRow>
       );
     } else {
       return (
         <FormRow name={fieldName} label={title} hints={hints()}>
-          <TagsInput required={required} key={form.key(fieldName)} {...form.getInputProps(fieldName)} />
+          <TagsInput id={fieldName} required={required} key={form.key(fieldName)} {...form.getInputProps(fieldName)} />
         </FormRow>
       );
     }
@@ -218,7 +225,14 @@ export function Argument({
   if (type === 'string' && argument.format === 'textarea') {
     return (
       <FormRow name={fieldName} label={title} hints={hints()}>
-        <Textarea required={required} autosize minRows={3} key={form.key(fieldName)} {...form.getInputProps(fieldName)} />
+        <Textarea
+          id={fieldName}
+          required={required}
+          autosize
+          minRows={3}
+          key={form.key(fieldName)}
+          {...form.getInputProps(fieldName)}
+        />
       </FormRow>
     );
   }
@@ -226,7 +240,7 @@ export function Argument({
   if (type === 'string') {
     return (
       <FormRow name={fieldName} label={title} hints={hints()}>
-        <TextInput required={required} key={form.key(fieldName)} {...form.getInputProps(fieldName)} />
+        <TextInput id={fieldName} required={required} key={form.key(fieldName)} {...form.getInputProps(fieldName)} />
       </FormRow>
     );
   }
@@ -238,7 +252,7 @@ export function Argument({
 
     return (
       <FormRow name={fieldName} label={title} hints={hints()}>
-        <Slider min={min} max={max} step={step} key={form.key(fieldName)} {...form.getInputProps(fieldName)} />
+        <Slider id={fieldName} min={min} max={max} step={step} key={form.key(fieldName)} {...form.getInputProps(fieldName)} />
       </FormRow>
     );
   }
@@ -249,6 +263,7 @@ export function Argument({
     return (
       <FormRow name={fieldName} label={title} hints={hints()}>
         <Select
+          id={fieldName}
           data={options}
           required={required}
           key={form.key(fieldName)}
@@ -271,6 +286,7 @@ export function Argument({
     return (
       <FormRow name={fieldName} label={title} hints={hints()}>
         <NumberInput
+          id={fieldName}
           required={required}
           min={min}
           max={max}
@@ -285,7 +301,12 @@ export function Argument({
   if (type === 'boolean') {
     return (
       <FormRow name={fieldName} label={title} hints={hints()}>
-        <Checkbox required={required} key={form.key(fieldName)} {...form.getInputProps(fieldName, { type: 'checkbox' })} />
+        <Checkbox
+          id={fieldName}
+          required={required}
+          key={form.key(fieldName)}
+          {...form.getInputProps(fieldName, { type: 'checkbox' })}
+        />
       </FormRow>
     );
   }
@@ -306,7 +327,11 @@ function FormRow({
 }) {
   return (
     <div className="form-row mb-4 flex flex-row" data-testid={name}>
-      <label className="mt-3 w-48 shrink-0 text-sm font-semibold">{label}</label>
+      {label && (
+        <label htmlFor={name} className="mt-3 w-48 shrink-0 text-sm font-semibold">
+          {label}
+        </label>
+      )}
       <div className="min-w-0 grow">
         {children}
         {hints && <div className="text-sm leading-6 text-slate-500">{hints}</div>}

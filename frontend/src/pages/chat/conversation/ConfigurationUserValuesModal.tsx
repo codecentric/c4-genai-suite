@@ -27,7 +27,7 @@ export function ConfigurationUserValuesModal(props: JsonFormProps & PropsWithChi
 
   const form = useForm<ExtensionContext>({
     mode: 'controlled',
-    initialValues: fetchedValues?.values ?? {},
+    initialValues: {},
     validate: useArgumentObjectSpecResolver(configuration.configurableArguments),
   });
 
@@ -45,7 +45,8 @@ export function ConfigurationUserValuesModal(props: JsonFormProps & PropsWithChi
     if (fetchedValues) {
       form.setValues(fetchedValues.values);
     }
-  }, [fetchedValues, form]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fetchedValues]);
 
   return (
     <>
@@ -70,10 +71,9 @@ export function ConfigurationUserValuesModal(props: JsonFormProps & PropsWithChi
             >
               <div className="flex flex-col">
                 {Object.entries(configuration.configurableArguments?.properties ?? {}).map(([id, x]) => (
-                  <>
+                  <div key={id}>
                     {x.type === 'object' && (
                       <Fieldset
-                        key={x.title}
                         legend={
                           <div className="flex items-center">
                             <h4 className="mr-2.5 font-bold">{x.title}</h4>
@@ -93,7 +93,7 @@ export function ConfigurationUserValuesModal(props: JsonFormProps & PropsWithChi
                         ))}
                       </Fieldset>
                     )}
-                  </>
+                  </div>
                 ))}
               </div>
             </Modal>
