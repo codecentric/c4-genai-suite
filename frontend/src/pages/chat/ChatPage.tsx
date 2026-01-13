@@ -1,7 +1,7 @@
 import { Button, Tabs } from '@mantine/core';
 import { IconEdit } from '@tabler/icons-react';
 import { useEffect, useRef } from 'react';
-import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
+import { Group, Panel, Separator } from 'react-resizable-panels';
 import { Route, Routes } from 'react-router-dom';
 
 import { CollapseButton, ProfileButton } from 'src/components';
@@ -27,9 +27,9 @@ import { useListOfChatsInit, useMutateNewChat, useStateMutateRemoveAllChats, use
 import { useUserBucket } from './useUserBucket';
 
 const CustomResizeHandle = () => (
-  <PanelResizeHandle className="group ml-[-2px] flex w-2 items-center bg-gray-100 p-[2px] transition-all hover:bg-gray-200">
+  <Separator className="group ml-[-2px] flex w-2 items-center bg-gray-100 p-[2px] transition-all hover:bg-gray-200">
     <div className="h-6 w-full rounded group-hover:bg-white" />
-  </PanelResizeHandle>
+  </Separator>
 );
 
 const getPanelSizes = (isRightPanelOpen: boolean) => {
@@ -108,13 +108,12 @@ export function ChatPage() {
   return (
     <div className="flex h-screen flex-col">
       <NavigationBar theme={theme} />
-      <PanelGroup direction="horizontal">
+      <Group orientation="horizontal">
         {sidebarLeft && (
           <>
             <Panel
               className="chat-conversations flex w-64 shrink-0 flex-col overflow-hidden bg-gray-100"
               id="left"
-              order={0}
               style={{ overflow: 'auto' }}
               onClick={() => {
                 if (isMobileView) setSidebarLeft(false);
@@ -146,7 +145,7 @@ export function ChatPage() {
           </>
         )}
 
-        <Panel id="center" order={1} {...panelSizes.content}>
+        <Panel id="center" {...panelSizes.content}>
           <div className="chat-main relative min-h-0 grow overflow-hidden">
             {isMobileView && (rightPanelVisible || sidebarLeft) ? (
               <div
@@ -188,7 +187,7 @@ export function ChatPage() {
         {rightPanelVisible && (
           <>
             {!isMobileView && <CustomResizeHandle />}
-            <Panel style={{ overflow: 'auto' }} id="right" order={2} {...panelSizes.right} className="bg-gray-100">
+            <Panel style={{ overflow: 'auto' }} id="right" {...panelSizes.right} className="bg-gray-100">
               {selectedDocument ? (
                 <Tabs defaultValue="sources-chunk-preview">
                   <Tabs.List>
@@ -219,7 +218,7 @@ export function ChatPage() {
             </Panel>
           </>
         )}
-      </PanelGroup>
+      </Group>
     </div>
   );
 }
