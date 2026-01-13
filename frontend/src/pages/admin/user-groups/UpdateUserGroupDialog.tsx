@@ -41,7 +41,7 @@ export function UpdateUserGroupDialog({ onClose, onDelete, onUpdate, target }: U
   const userGroupDelete = useDeleteUserGroup(api, target, onDelete, onClose);
 
   const form = useForm<SchemaType>({
-    validate: zod4Resolver(SCHEME) as (values: SchemaType) => Record<string, string | null>,
+    validate: zod4Resolver(SCHEME),
     initialValues: { name: '', monthlyUserTokens: null, monthlyTokens: null },
     mode: 'uncontrolled',
   });
