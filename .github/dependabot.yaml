@@ -45,13 +45,13 @@ updates:
           - "@mantine/*"
       nestjs:
         patterns:
-          - "nest-"
-          - "nestjs-"
+          - "nest-*"
+          - "nestjs-*"
           - "@nestjs/*"
       eslint:
         patterns:
           - "eslint"
-          - "eslint-"
+          - "eslint-*"
           - "@typescript-eslint/*"
       testcontainers:
         patterns:
@@ -74,10 +74,10 @@ updates:
     groups:
       langchain:
         patterns:
-          - "langchain-"
+          - "langchain-*"
       pytest:
         patterns:
-          - "pytest"
+          - "pytest*"
       pydantic:
         patterns:
-          - "pydantic"
+          - "pydantic*"
