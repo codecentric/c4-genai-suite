@@ -47,7 +47,7 @@ describe('CreateUserDialog', () => {
     const nameInput = screen.getByLabelText(required(texts.common.name));
     await user.clear(nameInput);
     await user.type(nameInput, newUserName);
-    const email = screen.getByRole('textbox', { name: 'Email *' });
+    const email = screen.getByLabelText(required(texts.common.email));
     await user.type(email, 'John@Johnson.com');
 
     const saveButton = screen.getByRole('button', { name: texts.common.save });
@@ -67,7 +67,7 @@ describe('CreateUserDialog', () => {
     const user = userEvent.setup();
     const username = screen.getByLabelText(required('Name'));
     await user.type(username, 'John Johnson');
-    const email = screen.getByRole('textbox', { name: 'Email *' });
+    const email = screen.getByLabelText(required(texts.common.email));
     await user.type(email, 'John@Johnson.com');
 
     const saveButton = screen.getByRole('button', { name: texts.common.save });
