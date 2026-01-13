@@ -100,7 +100,7 @@ describe('User Page', () => {
     const user = userEvent.setup();
     const username = screen.getByLabelText(required('Name'));
     await user.type(username, 'st1');
-    const email = screen.getByRole('textbox', { name: 'Email *' });
+    const email = screen.getByLabelText(required(texts.common.email));
     await user.type(email, 'st1@st1.com');
     const pwd = screen.getByLabelText('Password');
     await user.type(pwd, 'abc');
