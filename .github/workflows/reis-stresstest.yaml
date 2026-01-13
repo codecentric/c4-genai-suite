@@ -87,7 +87,7 @@ jobs:
             -e STORE_PGVECTOR_INDEX_NAME="stresstest" \
             -e EMBEDDINGS_TYPE="random-test-embeddings" \
             reis:commit-${{ github.sha }}
-      - uses: astral-sh/setup-uv@v5
+      - uses: astral-sh/setup-uv@v7
         with:
           enable-cache: true
           cache-dependency-glob: services/reis/uv.lock
