@@ -2,6 +2,7 @@ import { IconFile, IconRotate2, IconTrash } from '@tabler/icons-react';
 import React from 'react';
 import { FileDto } from 'src/api';
 import { extractType } from 'src/pages/utils';
+import { texts } from 'src/texts';
 
 type FileItemProps = {
   file: FileDto | { fileName: string };
@@ -39,9 +40,11 @@ export const FileItemComponent = ({ file, onRemove, loading }: FileItemProps) =>
           <div className="flex flex-col">
             <span className="truncate text-sm font-medium">{fileName}</span>
             <div className="animate-show-after-7s relative">
-              <span className="animate-alternate-first truncate text-sm font-medium text-orange-800 italic">Please wait...</span>
+              <span className="animate-alternate-first truncate text-sm font-medium text-orange-800 italic">
+                {texts.files.waitingMessage1}
+              </span>
               <span className="animate-alternate-second absolute top-0 left-0 truncate text-sm font-medium text-orange-800 italic">
-                May take a bit...
+                {texts.files.waitingMessage2}
               </span>
             </div>
           </div>
