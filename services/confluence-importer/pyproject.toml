@@ -5,7 +5,7 @@ description = "Imports Confluence pages into c4 Buckets, enabling c4 Assistants 
 readme = "README.md"
 requires-python = ">=3.13.2"
 dependencies = [
-    "atlassian-python-api==4.0.4",
+    "atlassian-python-api==4.0.7",
     "markitdown==0.1.4",
     "requests==2.32.5",
     "structlog==25.4.0",
