@@ -42,18 +42,18 @@ const getPanelSizes = (isRightPanelOpen: boolean) => {
 
   return {
     left: {
-      defaultSize: isMobileView ? mobileSideBarRatio : leftBarRatio,
-      minSize: isMobileView ? mobileSideBarRatio : leftBarRatio,
-      maxSize: isMobileView ? mobileSideBarRatio : leftBarRatio + 1000,
+      defaultSize: (isMobileView ? mobileSideBarRatio : leftBarRatio) + '%',
+      minSize: (isMobileView ? mobileSideBarRatio : 10) + '%',
+      maxSize: (isMobileView ? mobileSideBarRatio : 40) + '%',
     },
     content: {
-      defaultSize: isMobileView ? mobileContentRatio : contentRatio,
-      minSize: isMobileView ? mobileContentRatio : 50,
+      defaultSize: (isMobileView ? mobileContentRatio : contentRatio) + '%',
+      minSize: (isMobileView ? mobileContentRatio : 40) + '%',
     },
     right: {
-      defaultSize: isMobileView ? mobileSideBarRatio : rightBarRatio,
-      minSize: isMobileView ? mobileSideBarRatio : rightBarRatio,
-      maxSize: isMobileView ? mobileSideBarRatio : 50,
+      defaultSize: (isMobileView ? mobileSideBarRatio : rightBarRatio) + '%',
+      minSize: (isMobileView ? mobileSideBarRatio : 10) + '%',
+      maxSize: (isMobileView ? mobileSideBarRatio : 40) + '%',
     },
   };
 };
