@@ -1,13 +1,13 @@
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Button, Tabs } from '@mantine/core';
+import { Button, PasswordInput, Tabs } from '@mantine/core';
+import { useForm } from '@mantine/form';
 import { IconLock, IconUser } from '@tabler/icons-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useState } from 'react';
-import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import { z } from 'zod';
 import { ChangePasswordDto, useApi } from 'src/api';
-import { Forms, Modal } from 'src/components';
+import { Modal } from 'src/components';
 import { useProfile } from 'src/hooks';
 import { texts } from 'src/texts';
 
@@ -22,7 +22,6 @@ const PASSWORD_CHANGE_SCHEMA = z
     path: ['passwordConfirm'],
   });
 
-const PASSWORD_RESOLVER = zodResolver(PASSWORD_CHANGE_SCHEMA);
 interface UserProfileModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -35,8 +34,9 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
   const [activeTab, setActiveTab] = useState<'personal' | 'security'>('personal');
 
   const passwordForm = useForm<{ currentPassword?: string; password?: string; passwordConfirm?: string }>({
-    resolver: PASSWORD_RESOLVER,
-    defaultValues: { currentPassword: '', password: '', passwordConfirm: '' },
+    validate: zod4Resolver(PASSWORD_CHANGE_SCHEMA),
+    initialValues: { currentPassword: '', password: '', passwordConfirm: '' },
+    mode: 'controlled',
   });
 
   const updatePassword = useMutation({
@@ -51,7 +51,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
       void queryClient.invalidateQueries({
         queryKey: ['profile'],
       });
-      passwordForm.reset({ currentPassword: '', password: '', passwordConfirm: '' });
+      passwordForm.setValues({ currentPassword: '', password: '', passwordConfirm: '' });
       toast.success(texts.chat.settings.passwordUpdatedSuccessfully);
     },
     onError: () => {
@@ -86,29 +86,36 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
   const SecuritySection = () => (
     <div>
       <h3 className="mb-4 text-lg font-semibold text-gray-900">{texts.chat.settings.security}</h3>
-      <FormProvider {...passwordForm}>
-        <form onSubmit={passwordForm.handleSubmit(handlePasswordSubmit)} className="space-y-4">
-          <div className="space-y-4">
-            <Forms.Password
-              name="currentPassword"
-              label={texts.chat.settings.currentPassword}
-              placeholder={texts.chat.settings.enterCurrentPassword}
-            />
-            <Forms.Password name="password" label={texts.common.password} placeholder={texts.chat.settings.enterNewPassword} />
-            <Forms.Password
-              name="passwordConfirm"
-              label={texts.common.passwordConfirm}
-              placeholder={texts.chat.settings.enterConfirmNewPassword}
-            />
-          </div>
+      <form onSubmit={passwordForm.onSubmit(handlePasswordSubmit)} className="space-y-4">
+        <div className="space-y-4">
+          <PasswordInput
+            label={texts.chat.settings.currentPassword}
+            placeholder={texts.chat.settings.enterCurrentPassword}
+            key={passwordForm.key('currentPassword')}
+            {...passwordForm.getInputProps('currentPassword')}
+          />
 
-          <div className="flex justify-end pt-4">
-            <Button type="submit" disabled={updatePassword.isPending}>
-              {updatePassword.isPending ? texts.chat.settings.updatingPassword : texts.chat.settings.updatePassword}
-            </Button>
-          </div>
-        </form>
-      </FormProvider>
+          <PasswordInput
+            label={texts.common.password}
+            placeholder={texts.chat.settings.enterNewPassword}
+            key={passwordForm.key('password')}
+            {...passwordForm.getInputProps('password')}
+          />
+
+          <PasswordInput
+            label={texts.common.passwordConfirm}
+            placeholder={texts.chat.settings.enterConfirmNewPassword}
+            key={passwordForm.key('passwordConfirm')}
+            {...passwordForm.getInputProps('passwordConfirm')}
+          />
+        </div>
+
+        <div className="flex justify-end pt-4">
+          <Button type="submit" disabled={updatePassword.isPending}>
+            {updatePassword.isPending ? texts.chat.settings.updatingPassword : texts.chat.settings.updatePassword}
+          </Button>
+        </div>
+      </form>
     </div>
   );
 
@@ -117,7 +124,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
       size="xl"
       header={<div className="flex items-center gap-4">{texts.chat.settings.header}</div>}
       onClose={() => {
-        passwordForm.reset({ currentPassword: '', password: '', passwordConfirm: '' });
+        passwordForm.setValues({ currentPassword: '', password: '', passwordConfirm: '' });
         updatePassword.reset();
         onClose();
       }}

@@ -1,8 +1,8 @@
 import { Alert, Button, Divider, Portal, Tabs } from '@mantine/core';
+import { useForm } from '@mantine/form';
 import { IconBlocks, IconBrain, IconInfoCircle, IconRefresh, IconTool, IconTrash } from '@tabler/icons-react';
 import { useMutation } from '@tanstack/react-query';
 import { useEffect, useRef, useState } from 'react';
-import { FormProvider, useForm } from 'react-hook-form';
 import {
   BucketDto,
   CreateExtensionDto,
@@ -12,7 +12,7 @@ import {
   UpdateExtensionDto,
   useApi,
 } from 'src/api';
-import { ConfirmDialog, FormAlert, Forms, Modal } from 'src/components';
+import { ConfirmDialog, FormAlert, Modal } from 'src/components';
 import { texts } from 'src/texts';
 import { ExtensionCard } from './ExtensionCard';
 import { ExtensionForm } from './ExtensionForm';
@@ -45,7 +45,7 @@ export function UpsertExtensionDialog(props: UpsertExtensionDialogProps) {
     onSuccess: (extension) => {
       setSpec(extension.spec);
       setSpecChanged(extension.changed);
-      form.reset({}, { keepValues: true });
+      form.resetDirty();
     },
   });
 
@@ -85,10 +85,11 @@ export function UpsertExtensionDialog(props: UpsertExtensionDialogProps) {
   });
   const resolver = useSpecResolver(spec);
 
-  const defaultValues = selected ?? { enabled: true, values: {} };
+  const defaultValues: CreateExtensionDto = selected ?? { name: '', enabled: true, values: {} };
   const form = useForm<CreateExtensionDto>({
-    resolver,
-    defaultValues,
+    validate: resolver as unknown as (values: CreateExtensionDto) => Record<string, string | null>,
+    initialValues: defaultValues,
+    mode: 'uncontrolled',
   });
 
   const rebuildTriggered = useRef(false);
@@ -101,79 +102,86 @@ export function UpsertExtensionDialog(props: UpsertExtensionDialogProps) {
 
   useEffect(() => {
     if (spec) {
-      form.setValue('name', spec.name);
+      form.setFieldValue('name', spec.name);
     }
-  }, [spec, form]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [spec]);
 
   const asTools = specs.filter((x) => x.type === 'tool');
   const asOthers = specs.filter((x) => x.type === 'other');
   const asModels = specs.filter((x) => x.type === 'llm');
 
-  const modified = spec?.triggers?.some((x) => form.formState.dirtyFields.values?.[x as keyof CreateExtensionDto['values']]);
+  const modified = spec?.triggers?.some((x) => form.isDirty(`values.${x}`));
 
   return (
     <Portal>
-      <FormProvider {...form}>
-        <form noValidate onSubmit={form.handleSubmit((v) => (selected ? updating.mutate(v) : creating.mutate(v)))}>
-          <Modal
-            onClose={onClose}
-            header={
-              <div className="flex items-center gap-4">
-                {spec?.logo && <img className="h-6" src={`data:image/svg+xml;utf8,${encodeURIComponent(spec.logo)}`} />}
-                {selected && texts.extensions.updateExtension}
-                {!selected && texts.extensions.createExtension}
-              </div>
-            }
-            footer={
-              spec ? (
-                <fieldset disabled={creating.isPending || updating.isPending || rebuild.isPending}>
-                  <div className="flex flex-row justify-between">
-                    <div className="flex flex-row gap-4">
-                      {spec.testable ? <TestButton extensionId={selected?.id} /> : <div />}
-                    </div>
-                    <div className="flex flex-row gap-4">
-                      <Button type="button" variant="subtle" onClick={onClose}>
-                        {texts.common.cancel}
-                      </Button>
-                      {modified && (
-                        <Button
-                          type="button"
-                          variant="outline"
-                          data-tooltip-id="default"
-                          data-tooltip-content={texts.extensions.testTooltip}
-                          onClick={form.handleSubmit((v) => rebuild.mutate(v))}
-                          loading={rebuild.isPending}
-                          disabled={rebuild.isPending}
-                        >
-                          <IconRefresh size={20} />
-                          {texts.extensions.rebuildSchema}
-                        </Button>
-                      )}
-                      {!modified && <Button type="submit">{texts.common.save}</Button>}
-                    </div>
+      <form
+        noValidate
+        onSubmit={form.onSubmit((v) => (selected ? updating.mutate(v as UpdateExtensionDto) : creating.mutate(v)))}
+      >
+        <Modal
+          onClose={onClose}
+          header={
+            <div className="flex items-center gap-4">
+              {spec?.logo && <img className="h-6" src={`data:image/svg+xml;utf8,${encodeURIComponent(spec.logo)}`} />}
+              {selected && texts.extensions.updateExtension}
+              {!selected && texts.extensions.createExtension}
+            </div>
+          }
+          footer={
+            spec ? (
+              <fieldset disabled={creating.isPending || updating.isPending || rebuild.isPending}>
+                <div className="flex flex-row justify-between">
+                  <div className="flex flex-row gap-4">
+                    {/* eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment */}
+                    {spec.testable ? <TestButton extensionId={selected?.id} form={form as any} /> : <div />}
                   </div>
-                </fieldset>
-              ) : undefined
-            }
-          >
-            <fieldset disabled={updating.isPending || deleting.isPending || creating.isPending}>
-              <FormAlert common={texts.extensions.createExtensionFailed} error={creating.error} />
-              <FormAlert common={texts.extensions.updateExtensionFailed} error={updating.error} />
-              <FormAlert common={texts.extensions.rebuildSchemaFailed} error={rebuild.error} />
-              {specChanged && (
-                <Alert variant="light" color="orange" icon={<IconInfoCircle />}>
-                  {texts.extensions.schemaChanged}
-                </Alert>
-              )}
+                  <div className="flex flex-row gap-4">
+                    <Button type="button" variant="subtle" onClick={onClose}>
+                      {texts.common.cancel}
+                    </Button>
+                    {modified && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        data-tooltip-id="default"
+                        data-tooltip-content={texts.extensions.testTooltip}
+                        onClick={() => form.onSubmit((v) => rebuild.mutate(v as TestExtensionDto))()}
+                        loading={rebuild.isPending}
+                        disabled={rebuild.isPending}
+                      >
+                        <IconRefresh size={20} />
+                        {texts.extensions.rebuildSchema}
+                      </Button>
+                    )}
+                    {!modified && <Button type="submit">{texts.common.save}</Button>}
+                  </div>
+                </div>
+              </fieldset>
+            ) : undefined
+          }
+        >
+          <fieldset disabled={updating.isPending || deleting.isPending || creating.isPending}>
+            <FormAlert common={texts.extensions.createExtensionFailed} error={creating.error} />
+            <FormAlert common={texts.extensions.updateExtensionFailed} error={updating.error} />
+            <FormAlert common={texts.extensions.rebuildSchemaFailed} error={rebuild.error} />
+            {specChanged && (
+              <Alert variant="light" color="orange" icon={<IconInfoCircle />}>
+                {texts.extensions.schemaChanged}
+              </Alert>
+            )}
 
-              {spec ? (
-                <>
-                  <ExtensionForm buckets={buckets} spec={spec} />
+            {spec ? (
+              <>
+                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment */}
+                <ExtensionForm buckets={buckets} spec={spec} form={form as any} />
 
-                  {selected && <Divider my="xs" label={texts.common.dangerZone} labelPosition="left" />}
+                {selected && <Divider my="xs" label={texts.common.dangerZone} labelPosition="left" />}
 
-                  {selected && (
-                    <Forms.Row name="danger" label={texts.common.remove}>
+                {selected && (
+                  <div className="form-row mb-4 flex flex-row">
+                    <label className="mt-3 w-48 shrink-0 text-sm font-semibold">{texts.common.remove}</label>
+                    <div className="min-w-0 grow">
                       <ConfirmDialog
                         title={texts.extensions.removeExtensionConfirmText}
                         text={texts.extensions.removeExtensionConfirmText}
@@ -191,55 +199,55 @@ export function UpsertExtensionDialog(props: UpsertExtensionDialogProps) {
                           </Button>
                         )}
                       </ConfirmDialog>
-                    </Forms.Row>
-                  )}
-                </>
-              ) : (
-                <div className="flex flex-col gap-6">
-                  <Tabs
-                    color={'blue'}
-                    classNames={{ tabLabel: 'custom-tabLabel', panel: 'dialogue-tab-panel' }}
-                    defaultValue={'models'}
-                  >
-                    <Tabs.List grow>
-                      <Tabs.Tab value="models" leftSection={<IconBrain size={18} />}>
-                        {texts.extensions.typeModels}
-                      </Tabs.Tab>
-                      <Tabs.Tab value="tools" leftSection={<IconTool size={18} />}>
-                        {texts.extensions.typeTools}
-                      </Tabs.Tab>
-                      <Tabs.Tab value="others" leftSection={<IconBlocks size={18} />}>
-                        {texts.extensions.typeOther}
-                      </Tabs.Tab>
-                    </Tabs.List>
-                    <Tabs.Panel value="models">
-                      <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
-                        {asModels.map((spec) => (
-                          <ExtensionCard key={spec.name} buckets={buckets} spec={spec} onClick={setSpec} />
-                        ))}
-                      </div>
-                    </Tabs.Panel>
-                    <Tabs.Panel value="tools">
-                      <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
-                        {asTools.map((spec) => (
-                          <ExtensionCard key={spec.name} buckets={buckets} spec={spec} onClick={setSpec} />
-                        ))}
-                      </div>
-                    </Tabs.Panel>
-                    <Tabs.Panel value="others">
-                      <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
-                        {asOthers.map((spec) => (
-                          <ExtensionCard key={spec.name} buckets={buckets} spec={spec} onClick={setSpec} />
-                        ))}
-                      </div>
-                    </Tabs.Panel>
-                  </Tabs>
-                </div>
-              )}
-            </fieldset>
-          </Modal>
-        </form>
-      </FormProvider>
+                    </div>
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="flex flex-col gap-6">
+                <Tabs
+                  color={'blue'}
+                  classNames={{ tabLabel: 'custom-tabLabel', panel: 'dialogue-tab-panel' }}
+                  defaultValue={'models'}
+                >
+                  <Tabs.List grow>
+                    <Tabs.Tab value="models" leftSection={<IconBrain size={18} />}>
+                      {texts.extensions.typeModels}
+                    </Tabs.Tab>
+                    <Tabs.Tab value="tools" leftSection={<IconTool size={18} />}>
+                      {texts.extensions.typeTools}
+                    </Tabs.Tab>
+                    <Tabs.Tab value="others" leftSection={<IconBlocks size={18} />}>
+                      {texts.extensions.typeOther}
+                    </Tabs.Tab>
+                  </Tabs.List>
+                  <Tabs.Panel value="models">
+                    <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+                      {asModels.map((spec) => (
+                        <ExtensionCard key={spec.name} buckets={buckets} spec={spec} onClick={setSpec} />
+                      ))}
+                    </div>
+                  </Tabs.Panel>
+                  <Tabs.Panel value="tools">
+                    <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+                      {asTools.map((spec) => (
+                        <ExtensionCard key={spec.name} buckets={buckets} spec={spec} onClick={setSpec} />
+                      ))}
+                    </div>
+                  </Tabs.Panel>
+                  <Tabs.Panel value="others">
+                    <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+                      {asOthers.map((spec) => (
+                        <ExtensionCard key={spec.name} buckets={buckets} spec={spec} onClick={setSpec} />
+                      ))}
+                    </div>
+                  </Tabs.Panel>
+                </Tabs>
+              </div>
+            )}
+          </fieldset>
+        </Modal>
+      </form>
     </Portal>
   );
 }

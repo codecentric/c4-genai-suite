@@ -2,7 +2,6 @@ import { Button, Fieldset, Tabs } from '@mantine/core';
 import { IconBlocks, IconBrain, IconCopy, IconEdit, IconPlus, IconTool, IconTrash } from '@tabler/icons-react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
-import { FormProvider, useForm } from 'react-hook-form';
 import { useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useApi } from 'src/api';
@@ -10,7 +9,6 @@ import { BucketDto, ConfigurationDto, ExtensionDto } from 'src/api/generated';
 import { Alert, ConfirmDialog, Icon } from 'src/components';
 import { useEventCallback, useTransientNavigate } from 'src/hooks';
 import { buildError } from 'src/lib';
-import { Argument } from 'src/pages/admin/extensions/ExtensionForm';
 import { texts } from 'src/texts';
 import { ExtensionCard } from './ExtensionCard';
 import { UpsertConfigurationDialog } from './UpsertConfigurationDialog';
@@ -152,8 +150,6 @@ export function ExtensionsPage() {
     incompatibleToolPairs.map(([tool, otherTool]) => [tool.spec.title, otherTool.spec.title]),
   );
 
-  const form = useForm<Record<string, unknown>>({});
-
   return (
     <>
       {thisConfiguration && (
@@ -281,39 +277,31 @@ export function ExtensionsPage() {
             </div>
 
             {extensions.some((x) => x.configurableArguments) && (
-              <FormProvider {...form}>
-                <form>
-                  <div className="flex flex-col gap-2">
-                    <h3 className="text-xl">{texts.common.configurableArguments}</h3>
+              <div className="flex flex-col gap-2">
+                <h3 className="text-xl">{texts.common.configurableArguments}</h3>
 
-                    {extensions
-                      .filter((x) => x.configurableArguments)
-                      .map((x) => (
-                        <Fieldset
-                          key={x.id}
-                          legend={
-                            <div className="flex items-center">
-                              <h4 className="mr-2.5 font-bold">{x.configurableArguments?.title}</h4>
-                              <p className="text-xs">{x.configurableArguments?.description}</p>
-                            </div>
-                          }
-                        >
-                          {Object.entries(x.configurableArguments!.properties).map(([name, spec]) => (
-                            <Argument
-                              namePrefix={`${x.id}.`}
-                              refreshable
-                              vertical
-                              key={`${x.id}-${name}`}
-                              buckets={[]}
-                              name={name}
-                              argument={spec}
-                            />
-                          ))}
-                        </Fieldset>
-                      ))}
-                  </div>
-                </form>
-              </FormProvider>
+                {extensions
+                  .filter((x) => x.configurableArguments)
+                  .map((x) => (
+                    <Fieldset
+                      key={x.id}
+                      legend={
+                        <div className="flex items-center">
+                          <h4 className="mr-2.5 font-bold">{x.configurableArguments?.title}</h4>
+                          <p className="text-xs">{x.configurableArguments?.description}</p>
+                        </div>
+                      }
+                    >
+                      <div className="text-sm text-slate-500">
+                        {Object.entries(x.configurableArguments!.properties).map(([name, spec]) => (
+                          <div key={`${x.id}-${name}`} className="mb-2">
+                            <strong>{spec.title}:</strong> {spec.description}
+                          </div>
+                        ))}
+                      </div>
+                    </Fieldset>
+                  ))}
+              </div>
             )}
           </div>
 

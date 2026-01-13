@@ -19,7 +19,8 @@ describe('User Page', () => {
     const user = userEvent.setup();
     const saveBtn = screen.getByRole('button', { name: 'Save' });
     await user.click(saveBtn);
-    expect(screen.getAllByRole('alert')).toHaveLength(1);
+    // Mantine form errors use InputWrapper-error class, not role="alert"
+    expect(document.querySelectorAll('.mantine-InputWrapper-error')).toHaveLength(1);
   });
 
   it('should alert when monthly tokens goes below zero', async () => {
@@ -34,7 +35,8 @@ describe('User Page', () => {
     await user.type(monthlyTokenInput, '-1');
     const saveBtn = screen.getByRole('button', { name: 'Save' });
     await user.click(saveBtn);
-    expect(screen.getAllByRole('alert')).toHaveLength(1);
+    // Mantine form errors use InputWrapper-error class, not role="alert"
+    expect(document.querySelectorAll('.mantine-InputWrapper-error')).toHaveLength(1);
   });
 
   it('should alert when monthly tokens/user goes below zero', async () => {
@@ -52,7 +54,8 @@ describe('User Page', () => {
     await user.type(monthlyUserTokenInput, '-1');
     const saveBtn = screen.getByRole('button', { name: 'Save' });
     await user.click(saveBtn);
-    expect(screen.getAllByRole('alert')).toHaveLength(1);
+    // Mantine form errors use InputWrapper-error class, not role="alert"
+    expect(document.querySelectorAll('.mantine-InputWrapper-error')).toHaveLength(1);
   });
 
   it('should call onClose when cancel button is clicked', async () => {
@@ -77,6 +80,7 @@ describe('User Page', () => {
     const saveButton = screen.getByRole('button', { name: texts.common.save });
     await user.click(saveButton);
 
-    expect(await screen.findAllByRole('alert')).toHaveLength(1);
+    // Mantine form errors use InputWrapper-error class, not role="alert"
+    expect(document.querySelectorAll('.mantine-InputWrapper-error')).toHaveLength(1);
   });
 });
