@@ -241,7 +241,7 @@ interface FileSizeDynamicFieldsProps {
   className?: string;
 }
 
-function FileSizeDynamicFields({ form, name: _name, label, suffix, className }: FileSizeDynamicFieldsProps) {
+export function FileSizeDynamicFields({ form, name: _name, label, suffix, className }: FileSizeDynamicFieldsProps) {
   type DynamicFieldValue = { key: string; value: number }[];
   type FileSizeLimitsValue = { [key: string]: number };
 
