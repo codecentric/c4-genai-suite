@@ -20,7 +20,7 @@ def process_file_in_process(
     format_: AbstractFormatProvider,
     file: SourceFile,
     chunk_size: int | None,
-    queue: mp.Queue,  # type: ignore[type-arg]
+    queue: mp.Queue,
 ) -> None:
     try:
         init_subprocess_logger()
@@ -34,7 +34,7 @@ def process_file_in_process(
 def convert_file_in_process(
     format_: AbstractFormatProvider,
     file: SourceFile,
-    queue: mp.Queue,  # type: ignore[type-arg]
+    queue: mp.Queue,
 ) -> None:
     try:
         init_subprocess_logger()
