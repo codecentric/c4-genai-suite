@@ -17,6 +17,7 @@ allow_licenses:
   - 'MPL-2.0'
   - 'PSF-2.0'
   - 'Python-2.0'
+  - 'Python-2.0.1'
   - 'CNRI-Python'
   - 'LGPL-2.1'
   - 'LGPL-2.1-or-later'
