@@ -9,14 +9,19 @@ import { texts } from 'src/texts';
 
 const SCHEME = z.object({
   name: z.string().min(1, texts.common.name),
-  monthlyTokens: z.number().positive().nullable()
+  monthlyTokens: z
+    .number()
+    .positive()
+    .nullable()
     .or(z.literal('').transform(() => null)),
-  monthlyUserTokens: z.number().positive().nullable()
+  monthlyUserTokens: z
+    .number()
+    .positive()
+    .nullable()
     .or(z.literal('').transform(() => null)),
 });
 type SchemaType = z.infer<typeof SCHEME>;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const RESOLVER = zodResolver(SCHEME) as any;
+const RESOLVER = zodResolver(SCHEME);
 
 export interface CreateUserGroupDialogProps {
   onClose: () => void;

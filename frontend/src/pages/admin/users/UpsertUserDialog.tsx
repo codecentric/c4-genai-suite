@@ -13,37 +13,41 @@ import { useUpsertUser } from 'src/pages/admin/users/hooks/useUpsertUser';
 import { texts } from 'src/texts';
 import { GenerateApiKeyButton } from './GenerateApiKeyButton';
 
-const SCHEME = z.object({
-  // Required name.
-  name: z.string().min(1, texts.common.name),
+const SCHEME = z
+  .object({
+    // Required name.
+    name: z.string().min(1, texts.common.name),
 
-  // Required email.
-  email: z.string().min(1, texts.common.email).email(),
+    // Required email.
+    email: z.string().min(1, texts.common.email).email(),
 
-  // Required user groups.
-  userGroupIds: z.array(z.string()).min(1, texts.common.userGroups),
+    // Required user groups.
+    userGroupIds: z.array(z.string()).min(1, texts.common.userGroups),
 
-  // Optional password fields
-  password: z.string().optional(),
-  passwordConfirm: z.string().optional(),
+    // Optional password fields
+    password: z.string().optional(),
+    passwordConfirm: z.string().optional(),
 
-  // Optional apiKey
-  apiKey: z.string().optional().nullable(),
+    // Optional apiKey
+    apiKey: z.string().optional().nullable(),
 
-  // Optional hasApiKey
-  hasApiKey: z.boolean().optional(),
-}).refine((data) => {
-  if (data.password || data.passwordConfirm) {
-    return data.password === data.passwordConfirm;
-  }
-  return true;
-}, {
-  message: texts.common.passwordsDoNotMatch,
-  path: ['passwordConfirm'],
-});
+    // Optional hasApiKey
+    hasApiKey: z.boolean().optional(),
+  })
+  .refine(
+    (data) => {
+      if (data.password || data.passwordConfirm) {
+        return data.password === data.passwordConfirm;
+      }
+      return true;
+    },
+    {
+      message: texts.common.passwordsDoNotMatch,
+      path: ['passwordConfirm'],
+    },
+  );
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const RESOLVER = zodResolver(SCHEME) as any;
+const RESOLVER = zodResolver(SCHEME);
 
 type BaseUserProps = {
   type: 'update' | 'create';
