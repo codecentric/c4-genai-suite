@@ -274,6 +274,8 @@ export const en = {
       'Failed to upload file {{fileName}}. Images can be uploaded via the 📎 symbol in the message window.',
     uploading: 'Uploading File',
     uploadMultiple: 'Uploading {{fileCount}} files...',
+    waitingMessage1: 'processing...',
+    waitingMessage2: 'a few minutes more',
     wholeFileTooLarge: 'The file is larger than the defined file size limit',
   },
   login: {

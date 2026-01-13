@@ -1629,7 +1629,7 @@ wheels = [
 
 [[package]]
 name = "langchain-core"
-version = "0.3.81"
+version = "0.3.82"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "jsonpatch" },
@@ -1640,9 +1640,9 @@ dependencies = [
     { name = "tenacity" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/63/7c/381a347292db3df93601ec8a5ff043a03ca1e2b1b210a94307390b9fbbba/langchain_core-0.3.81.tar.gz", hash = "sha256:0473e7cffbba06017393f2f1ee116da098c298e4ec478ada91d321f42dff921c", size = 594574, upload-time = "2025-12-23T01:02:28.321Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/51/33/02470853addf1223f4e3a095deab358c84ff463d56d8330d97e8ad8cf933/langchain_core-0.3.82.tar.gz", hash = "sha256:00025f369344d4f983cdc56fcad7cbd6fb73f8cccbc37d5cee93b21994588d5e", size = 596654, upload-time = "2026-01-09T18:32:46.063Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/b8/29/60802a71c4a0b573c0e9ecda1846404b04bdbc9bc805732b39261be4c376/langchain_core-0.3.81-py3-none-any.whl", hash = "sha256:d0f34c88254d78ccb1b9a038f860d13dea90186045026fd8fc3e1265eed73a4e", size = 457175, upload-time = "2025-12-23T01:02:27.008Z" },
+    { url = "https://files.pythonhosted.org/packages/59/20/27d6e138913bddbb35491ca9940b5bd48a83c0a082af288a140d3b15ed9e/langchain_core-0.3.82-py3-none-any.whl", hash = "sha256:e7e1c786229b35ed0e710852b08ceff6cf0db9635fd45b1c04d91b9eb75099b8", size = 457852, upload-time = "2026-01-09T18:32:44.296Z" },
 ]
 
 [[package]]
@@ -3305,7 +3305,7 @@ requires-dist = [
     { name = "ffmpeg-python", specifier = ">=0.2.0" },
     { name = "langchain-aws", specifier = ">=0.2.35" },
     { name = "langchain-community", specifier = "==0.3.31" },
-    { name = "langchain-core", specifier = "==0.3.81" },
+    { name = "langchain-core", specifier = "==0.3.82" },
     { name = "langchain-nvidia-ai-endpoints", specifier = ">=0.3.19" },
     { name = "langchain-ollama", specifier = ">=0.3.10" },
     { name = "langchain-openai", specifier = "==0.3.35" },
@@ -3318,7 +3318,7 @@ requires-dist = [
     { name = "pydantic", specifier = "==2.12.5" },
     { name = "pydantic-settings", specifier = ">=2.12.0" },
     { name = "pygments", specifier = ">=2.19.2" },
-    { name = "pypdf", specifier = ">=6.5.0" },
+    { name = "pypdf", specifier = ">=6.6.0" },
     { name = "python-oxmsg", specifier = ">=0.0.2" },
     { name = "weasyprint", specifier = ">=67.0" },
 ]

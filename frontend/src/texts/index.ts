@@ -301,6 +301,8 @@ function load() {
       uploadImageFailedUseThePaperclip: (fileName: string) => translate('files.uploadImageFailedUseThePaperclip', { fileName }),
       uploading: translate('files.uploading'),
       uploadMultiple: (fileCount: number) => translate('files.uploadMultiple', { fileCount }),
+      waitingMessage1: translate('files.waitingMessage1'),
+      waitingMessage2: translate('files.waitingMessage2'),
       wholeFileTooLarge: translate('files.wholeFileTooLarge'),
     },
     login: {
