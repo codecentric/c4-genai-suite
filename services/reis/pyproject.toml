@@ -14,7 +14,7 @@ dependencies = [
     "pydantic-settings>=2.12.0",
     "langchain-core==0.3.82",
     "langchain-community==0.3.31",
-    "langchain-openai==0.3.35",
+    "langchain-openai==1.1.7",
     "langchain-postgres==0.0.16",
     "psycopg[binary]>=3.3.2",
     "fastapi[standard]==0.128.0",
