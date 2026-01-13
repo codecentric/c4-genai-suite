@@ -1,11 +1,11 @@
-import { yupResolver } from '@hookform/resolvers/yup';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, Portal } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
 import { IconClipboard } from '@tabler/icons-react';
 import { useMemo, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
-import * as Yup from 'yup';
+import { z } from 'zod';
 import { instanceOfUserDto, UpsertUserDto, useApi, UserDto, UserGroupDto } from 'src/api';
 import { ConfirmDialog, FormAlert, Forms, Modal } from 'src/components';
 import { useDeleteUser } from 'src/pages/admin/users/hooks/useDeleteUser';
@@ -13,24 +13,37 @@ import { useUpsertUser } from 'src/pages/admin/users/hooks/useUpsertUser';
 import { texts } from 'src/texts';
 import { GenerateApiKeyButton } from './GenerateApiKeyButton';
 
-const SCHEME = Yup.object({
+const SCHEME = z.object({
   // Required name.
-  name: Yup.string().label(texts.common.name).required(),
+  name: z.string().min(1, texts.common.name),
 
   // Required email.
-  email: Yup.string().label(texts.common.email).required().email(),
+  email: z.string().min(1, texts.common.email).email(),
 
   // Required user groups.
-  userGroupIds: Yup.array(Yup.string()).label(texts.common.userGroups).required(),
+  userGroupIds: z.array(z.string()).min(1, texts.common.userGroups),
 
-  // The password to confirm.
-  passwordConfirm: Yup.string()
-    .label(texts.common.passwordConfirm)
-    .oneOf([Yup.ref('password'), '', undefined], texts.common.passwordsDoNotMatch),
+  // Optional password fields
+  password: z.string().optional(),
+  passwordConfirm: z.string().optional(),
+
+  // Optional apiKey
+  apiKey: z.string().optional().nullable(),
+
+  // Optional hasApiKey
+  hasApiKey: z.boolean().optional(),
+}).refine((data) => {
+  if (data.password || data.passwordConfirm) {
+    return data.password === data.passwordConfirm;
+  }
+  return true;
+}, {
+  message: texts.common.passwordsDoNotMatch,
+  path: ['passwordConfirm'],
 });
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const RESOLVER = yupResolver<any>(SCHEME);
+const RESOLVER = zodResolver(SCHEME) as any;
 
 type BaseUserProps = {
   type: 'update' | 'create';

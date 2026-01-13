@@ -1,10 +1,10 @@
-import { yupResolver } from '@hookform/resolvers/yup';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, Portal } from '@mantine/core';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { ChangeEvent, useEffect, useMemo, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
-import * as Yup from 'yup';
+import { z } from 'zod';
 import { BucketDto, BucketDtoTypeEnum, UpsertBucketDto, useApi } from 'src/api';
 import { FormAlert, Forms, Modal } from 'src/components';
 import { buildError } from 'src/lib';
@@ -24,14 +24,14 @@ function debounce<F extends (...args: never[]) => void>(func: F, wait: number): 
   };
 }
 
-const SCHEME = Yup.object().shape({
-  name: Yup.string().required().label(texts.common.name),
-  endpoint: Yup.string().required().label(texts.common.endpoint),
-  allowedFileNameExtensions: Yup.array().required().of(Yup.string()).min(1),
+const SCHEME = z.object({
+  name: z.string().min(1, texts.common.name),
+  endpoint: z.string().min(1, texts.common.endpoint),
+  allowedFileNameExtensions: z.array(z.string()).min(1),
 });
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const RESOLVER = yupResolver<any>(SCHEME);
+const RESOLVER = zodResolver(SCHEME) as any;
 
 interface UpsertBucketDialogProps {
   // The bucket to update.

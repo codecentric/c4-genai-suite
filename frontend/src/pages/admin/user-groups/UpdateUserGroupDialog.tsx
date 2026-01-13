@@ -1,33 +1,27 @@
-import { yupResolver } from '@hookform/resolvers/yup';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, Divider, Portal } from '@mantine/core';
 import { IconTrash } from '@tabler/icons-react';
 import { useEffect } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import * as Yup from 'yup';
+import { z } from 'zod';
 import { useApi, UserGroupDto } from 'src/api';
 import { ConfirmDialog, FormAlert, Forms, Modal } from 'src/components';
 import { useDeleteUserGroup } from 'src/pages/admin/user-groups/hooks/useDeleteUserGroup';
 import { useUpdateUserGroup } from 'src/pages/admin/user-groups/hooks/useUpdateUserGroup';
 import { texts } from 'src/texts';
 
-const SCHEME = Yup.object({
-  name: Yup.string().label(texts.common.name).required(),
-  monthlyTokens: Yup.number()
-    .positive()
-    .label(texts.common.monthlyTokens)
-    .nullable()
-    .transform((value: number, originalValue: string) => (originalValue === '' ? null : value)),
-  monthlyUserTokens: Yup.number()
-    .positive()
-    .label(texts.common.monthlyUserTokens)
-    .nullable()
-    .transform((value: number, originalValue: string) => (originalValue === '' ? null : value)),
+const SCHEME = z.object({
+  name: z.string().min(1, texts.common.name),
+  monthlyTokens: z.number().positive().nullable()
+    .or(z.literal('').transform(() => null)),
+  monthlyUserTokens: z.number().positive().nullable()
+    .or(z.literal('').transform(() => null)),
 });
 
-type SchemaType = Yup.InferType<typeof SCHEME>;
+type SchemaType = z.infer<typeof SCHEME>;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const RESOLVER = yupResolver<any>(SCHEME);
+const RESOLVER = zodResolver(SCHEME) as any;
 
 export interface UpdateUserGroupDialogProps {
   target: UserGroupDto;

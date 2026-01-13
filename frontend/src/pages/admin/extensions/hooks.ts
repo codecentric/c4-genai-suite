@@ -1,6 +1,6 @@
-import { yupResolver } from '@hookform/resolvers/yup';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useMemo } from 'react';
-import * as Yup from 'yup';
+import { z } from 'zod';
 import {
   BucketDto,
   type ExtensionArgumentObjectSpecDto,
@@ -48,13 +48,9 @@ export function useListValues(spec: ExtensionSpecDto, buckets: BucketDto[], exte
   }, [extension, buckets, spec.arguments]);
 }
 
-function getType(arg: ExtensionUserInfoDtoUserArgumentsValue): Yup.AnySchema | undefined {
+function getType(arg: ExtensionUserInfoDtoUserArgumentsValue): z.ZodTypeAny | undefined {
   if (arg.type === 'number') {
-    let type = Yup.number().label(arg.title).default(arg._default);
-
-    if (arg.required) {
-      type = type.required();
-    }
+    let type = z.number().default(arg._default as number);
 
     if (arg.minimum != null) {
       type = type.min(arg.minimum);
@@ -64,29 +60,34 @@ function getType(arg: ExtensionUserInfoDtoUserArgumentsValue): Yup.AnySchema | u
       type = type.max(arg.maximum);
     }
 
-    type = type.transform((value: number, originalValue: string) => (originalValue === '' ? undefined : value));
+    if (!arg.required) {
+      return type.optional().or(z.literal('').transform(() => undefined));
+    }
 
     return type;
   } else if (arg.type === 'boolean') {
-    let type = Yup.boolean().label(arg.title).default(arg._default);
-    if (arg.required) {
-      type = type.required();
+    let type = z.boolean().default(arg._default as boolean);
+
+    if (!arg.required) {
+      return type.optional();
     }
 
     return type;
   } else if (arg.type === 'string') {
-    let type = Yup.string().label(arg.title).default(arg._default);
-
-    if (arg.required) {
-      type = type.required();
-    }
-
-    if (arg.format === 'date' || arg.format === 'select') {
-      type = type.transform((value: string, originalValue: string) => (originalValue === '' ? undefined : value));
-    }
+    let type = z.string().default(arg._default as string);
 
     if (arg.format === 'email') {
       type = type.email();
+    }
+
+    if (arg.format === 'date' || arg.format === 'select') {
+      if (!arg.required) {
+        return type.optional().or(z.literal('').transform(() => undefined));
+      }
+    }
+
+    if (!arg.required) {
+      return type.optional();
     }
 
     return type;
@@ -96,9 +97,10 @@ function getType(arg: ExtensionUserInfoDtoUserArgumentsValue): Yup.AnySchema | u
       return;
     }
 
-    let arrayType = Yup.array().label(arg.title).of(itemType).default(arg._default);
-    if (arg.required) {
-      arrayType = arrayType.required();
+    let arrayType = z.array(itemType).default(arg._default as unknown[]);
+
+    if (!arg.required) {
+      return arrayType.optional();
     }
 
     return arrayType;
@@ -111,16 +113,19 @@ function getType(arg: ExtensionUserInfoDtoUserArgumentsValue): Yup.AnySchema | u
         values[name] = type;
       }
     }
-    let schema = Yup.object().label(arg.title).shape(values);
-    if (arg.required) {
-      schema = schema.required();
+    let schema = z.object(values);
+
+    if (!arg.required) {
+      return schema.optional();
     }
+
     return schema;
   }
 }
 
 function getSchema(args?: Record<string, ExtensionUserInfoDtoUserArgumentsValue>) {
-  const extensionValues: { [name: string]: Yup.AnySchema } = {};
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const extensionValues: { [name: string]: any } = {};
   for (const [name, arg] of Object.entries(args || {})) {
     const type = getType(arg);
     if (type != null) {
@@ -128,27 +133,29 @@ function getSchema(args?: Record<string, ExtensionUserInfoDtoUserArgumentsValue>
     }
   }
 
-  return Yup.object().shape(extensionValues);
+  return z.object(extensionValues);
 }
 
 export function useArgumentObjectSpecResolver(argumentObject: ExtensionArgumentObjectSpecDto | undefined) {
   return useMemo(() => {
     const schema = getSchema(argumentObject?.properties);
-    return yupResolver(schema);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return zodResolver(schema) as any;
   }, [argumentObject]);
 }
 
 export function useUserArgumentsSpecResolver(extensions: ExtensionUserInfoDto[]) {
   return useMemo(() => {
-    const values: { [name: string]: Yup.AnySchema } = {};
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const values: { [name: string]: any } = {};
 
     for (const extension of extensions) {
       values[extension.id] = getSchema(extension.userArguments ?? {});
     }
 
-    const schema = Yup.object().shape(values);
+    const schema = z.object(values);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return yupResolver<any>(schema);
+    return zodResolver(schema) as any;
   }, [extensions]);
 }
 
@@ -157,11 +164,11 @@ export function useSpecResolver(spec?: ExtensionSpecDto) {
     const schema = getSchema(spec?.arguments ?? {});
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return yupResolver<any>(
-      Yup.object().shape({
-        enabled: Yup.boolean().required(),
+    return zodResolver(
+      z.object({
+        enabled: z.boolean(),
         values: schema,
       }),
-    );
+    ) as any;
   }, [spec]);
 }
