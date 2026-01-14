@@ -2,12 +2,42 @@ import { Button, Fieldset, Portal } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { PropsWithChildren, useEffect } from 'react';
-import { ConfigurationDto, useApi } from 'src/api';
+import { ConfigurationDto, ExtensionArgumentObjectSpecDto, ExtensionArgumentObjectSpecDtoPropertiesValue, useApi } from 'src/api';
 import { Modal } from 'src/components';
 import { ExtensionContext } from 'src/hooks';
 import { Argument } from 'src/pages/admin/extensions/ExtensionForm';
 import { useArgumentObjectSpecResolver } from 'src/pages/admin/extensions/hooks';
 import { texts } from 'src/texts';
+
+type JSONValue = string | number | boolean | object | unknown[] | undefined;
+
+function getDefault(spec: ExtensionArgumentObjectSpecDtoPropertiesValue): JSONValue {
+  switch (spec.type) {
+    case 'array':
+      return spec._default ?? [];
+    case 'string':
+      return spec._default ?? '';
+    case 'number':
+    case 'boolean':
+      return spec._default;
+    case 'object':
+      return getInitialValuesFromSpec(spec);
+  }
+}
+
+function getInitialValuesFromSpec(spec?: ExtensionArgumentObjectSpecDto): Record<string, JSONValue> {
+  if (!spec?.properties) {
+    return {};
+  }
+
+  const initialValues: Record<string, JSONValue> = {};
+
+  for (const [key, property] of Object.entries(spec.properties)) {
+    initialValues[key] = getDefault(property);
+  }
+
+  return initialValues;
+}
 
 interface JsonFormProps {
   configuration: ConfigurationDto;
@@ -27,7 +57,7 @@ export function ConfigurationUserValuesModal(props: JsonFormProps & PropsWithChi
 
   const form = useForm<ExtensionContext>({
     mode: 'controlled',
-    initialValues: {},
+    initialValues: getInitialValuesFromSpec(configuration.configurableArguments) as ExtensionContext,
     validate: useArgumentObjectSpecResolver(configuration.configurableArguments),
   });
 

@@ -15,11 +15,13 @@ const SCHEME = z.object({
     .number()
     .positive()
     .nullable()
+    .optional()
     .or(z.literal('').transform(() => null)),
   monthlyUserTokens: z
     .number()
     .positive()
     .nullable()
+    .optional()
     .or(z.literal('').transform(() => null)),
 });
 
@@ -88,6 +90,7 @@ export function UpdateUserGroupDialog({ onClose, onDelete, onUpdate, target }: U
               id="monthlyTokens"
               label={texts.common.monthlyTokens}
               className="mb-4"
+              allowNegative={false}
               key={form.key('monthlyTokens')}
               {...form.getInputProps('monthlyTokens')}
             />
@@ -96,6 +99,7 @@ export function UpdateUserGroupDialog({ onClose, onDelete, onUpdate, target }: U
               id="monthlyUserTokens"
               label={texts.common.monthlyUserTokens}
               className="mb-4"
+              allowNegative={false}
               key={form.key('monthlyUserTokens')}
               {...form.getInputProps('monthlyUserTokens')}
             />

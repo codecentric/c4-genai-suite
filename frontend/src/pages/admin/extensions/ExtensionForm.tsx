@@ -65,6 +65,7 @@ export function ExtensionForm(props: ExtensionFormProps) {
                 <p className="text-xs">{spec.description}</p>
               </div>
             }
+            className="mb-4"
           >
             {Object.entries(spec.arguments).map(([name, argumentSpec]) => (
               <Argument namePrefix={'values.'} key={name} buckets={buckets} name={name} argument={argumentSpec} form={form} />
@@ -329,7 +330,7 @@ function FormRow({
   return (
     <div className="form-row mb-4 flex flex-row" data-testid={name}>
       {label && (
-        <label htmlFor={name} className="mt-3 w-48 shrink-0 text-sm font-semibold">
+        <label htmlFor={name} className="w-48 shrink-0 pt-1 text-sm font-semibold">
           {label}
         </label>
       )}
