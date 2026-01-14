@@ -53,7 +53,7 @@
     "@nestjs/cqrs": "^11.0.3",
     "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-express": "^11.1.11",
-    "@nestjs/swagger": "^11.2.4",
+    "@nestjs/swagger": "^11.2.5",
     "@nestjs/terminus": "^11.0.0",
     "@nestjs/typeorm": "^11.0.0",
     "@opentelemetry/auto-instrumentations-node": "^0.67.3",
