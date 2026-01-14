@@ -89,6 +89,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
       <form onSubmit={passwordForm.onSubmit(handlePasswordSubmit)} className="space-y-4">
         <div className="space-y-4">
           <PasswordInput
+            id="currentPassword"
             label={texts.chat.settings.currentPassword}
             placeholder={texts.chat.settings.enterCurrentPassword}
             key={passwordForm.key('currentPassword')}
@@ -96,6 +97,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
           />
 
           <PasswordInput
+            id="password"
             label={texts.common.password}
             placeholder={texts.chat.settings.enterNewPassword}
             key={passwordForm.key('password')}
@@ -103,6 +105,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
           />
 
           <PasswordInput
+            id="passwordConfirm"
             label={texts.common.passwordConfirm}
             placeholder={texts.chat.settings.enterConfirmNewPassword}
             key={passwordForm.key('passwordConfirm')}

@@ -70,6 +70,7 @@ export function ThemeForm() {
 
         <FormRow label={texts.theme.language}>
           <Select
+            id="language"
             data={[
               { label: texts.theme.languages.de, value: 'de' },
               { label: texts.theme.languages.en, value: 'en' },
@@ -80,35 +81,39 @@ export function ThemeForm() {
         </FormRow>
 
         <FormRow label={texts.theme.appName} hints={texts.theme.appNameHints}>
-          <TextInput key={form.key('name')} {...form.getInputProps('name')} />
+          <TextInput id="name" key={form.key('name')} {...form.getInputProps('name')} />
         </FormRow>
 
         <FormRow label={texts.theme.welcomeText} hints={texts.theme.welcomeTextHints}>
-          <Textarea autosize minRows={3} key={form.key('welcomeText')} {...form.getInputProps('welcomeText')} />
+          <Textarea id="welcomeText" autosize minRows={3} key={form.key('welcomeText')} {...form.getInputProps('welcomeText')} />
         </FormRow>
 
         <div className="h-4" />
 
         <FormRow label={texts.theme.primaryColor}>
-          <ColorInput key={form.key('primaryColor')} {...form.getInputProps('primaryColor')} />
+          <ColorInput id="primaryColor" key={form.key('primaryColor')} {...form.getInputProps('primaryColor')} />
         </FormRow>
 
         <FormRow label={texts.theme.primaryContentColor}>
-          <ColorInput key={form.key('primaryContentColor')} {...form.getInputProps('primaryContentColor')} />
+          <ColorInput
+            id="primaryContentColor"
+            key={form.key('primaryContentColor')}
+            {...form.getInputProps('primaryContentColor')}
+          />
         </FormRow>
 
         <FormRow label={texts.theme.customCss}>
-          <Textarea autosize minRows={3} key={form.key('customCss')} {...form.getInputProps('customCss')} />
+          <Textarea id="customCss" autosize minRows={3} key={form.key('customCss')} {...form.getInputProps('customCss')} />
         </FormRow>
 
         <div className="h-4" />
 
         <FormRow label={texts.theme.agentName} hints={texts.theme.agentNameHints}>
-          <TextInput key={form.key('agentName')} {...form.getInputProps('agentName')} />
+          <TextInput id="agentName" key={form.key('agentName')} {...form.getInputProps('agentName')} />
         </FormRow>
 
         <FormRow label={texts.theme.footer} hints={texts.theme.footerHints}>
-          <TextInput key={form.key('chatFooter')} {...form.getInputProps('chatFooter')} />
+          <TextInput id="chatFooter" key={form.key('chatFooter')} {...form.getInputProps('chatFooter')} />
         </FormRow>
 
         <FormRow label={texts.theme.suggestions} hints={texts.theme.suggestionsHints(MAX_SUGGESTIONS)}>

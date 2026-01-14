@@ -157,6 +157,7 @@ function UpsertUserDialog(props: UpsertUserDialogProps) {
             <FormAlert common={texts.users.updateFailed} error={userUpsert.error} />
 
             <TextInput
+              id="name"
               withAsterisk
               label={texts.common.name}
               className="mb-4"
@@ -165,6 +166,7 @@ function UpsertUserDialog(props: UpsertUserDialogProps) {
             />
 
             <TextInput
+              id="email"
               withAsterisk
               label={texts.common.email}
               className="mb-4"
@@ -173,6 +175,7 @@ function UpsertUserDialog(props: UpsertUserDialogProps) {
             />
 
             <MultiSelect
+              id="userGroupIds"
               withAsterisk
               label={texts.common.userGroups}
               data={userGroupsOptions ?? []}
@@ -182,6 +185,7 @@ function UpsertUserDialog(props: UpsertUserDialogProps) {
             />
 
             <PasswordInput
+              id="password"
               label={texts.common.password}
               className="mb-4"
               key={form.key('password')}
@@ -189,6 +193,7 @@ function UpsertUserDialog(props: UpsertUserDialogProps) {
             />
 
             <PasswordInput
+              id="passwordConfirm"
               label={texts.common.passwordConfirm}
               className="mb-4"
               key={form.key('passwordConfirm')}
@@ -213,6 +218,7 @@ function UpsertUserDialog(props: UpsertUserDialogProps) {
                 )}
                 <div className="grow">
                   <TextInput
+                    id="apiKey"
                     label={texts.common.apiKey}
                     disabled={true}
                     key={form.key('apiKey')}
