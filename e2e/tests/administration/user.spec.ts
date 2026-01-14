@@ -59,7 +59,8 @@ test.describe('User management', () => {
     await navigateToUserAdministration(page);
 
     await page.getByRole('button', { name: 'Create User' }).click();
-    const groupIdsValue = await page.locator('input[type="hidden"][name="userGroupIds"]').first().inputValue();
+
+    const groupIdsValue = await page.locator('#userGroupIds').inputValue();
 
     expect(groupIdsValue).toEqual('default');
   });
