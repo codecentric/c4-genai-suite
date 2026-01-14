@@ -27,7 +27,7 @@ test('When using suggestions c4', async ({ page }) => {
     // page can glitch the language setting.
     // At human speeds this issue could not be reproduced.
     await navigateToThemeAdministration(page);
-    await selectOption(page, 'Language', /^Eng.+/);
+    await selectOption(page, 'language', /^Eng.+/);
     await page.getByRole('group').getByRole('button', { name: 'Save' }).click();
   });
 

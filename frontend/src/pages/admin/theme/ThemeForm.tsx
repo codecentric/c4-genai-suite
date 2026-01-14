@@ -49,6 +49,14 @@ export function ThemeForm() {
     mode: 'controlled',
   });
 
+  // Update form values when settings are loaded
+  useEffect(() => {
+    if (settings) {
+      form.setValues(settings);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [settings]);
+
   // Sync theme preview
   const formValues = form.getValues();
   useEffect(() => {

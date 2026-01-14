@@ -89,7 +89,6 @@ export function CreateUserGroupDialog({ onClose, onCreate }: CreateUserGroupDial
               id="monthlyTokens"
               label={texts.common.monthlyTokens}
               className="mb-4"
-              allowNegative={false}
               key={form.key('monthlyTokens')}
               {...form.getInputProps('monthlyTokens')}
             />
@@ -98,7 +97,6 @@ export function CreateUserGroupDialog({ onClose, onCreate }: CreateUserGroupDial
               id="monthlyUserTokens"
               label={texts.common.monthlyUserTokens}
               className="mb-4"
-              allowNegative={false}
               key={form.key('monthlyUserTokens')}
               {...form.getInputProps('monthlyUserTokens')}
             />

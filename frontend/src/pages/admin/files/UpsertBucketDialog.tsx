@@ -86,6 +86,14 @@ export function UpsertBucketDialog(props: UpsertBucketDialogProps) {
     },
     mode: 'controlled',
   });
+
+  useEffect(() => {
+    if (target) {
+      form.setValues(target as UpsertBucketDto);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [target]);
+
   const watchIsUser = form.getValues().type === 'user';
 
   const [{ endpoint, headers }, setConnection] = useState(target ?? { endpoint: '', headers: '' });
