@@ -42,6 +42,7 @@ export const Configuration = ({ canEditConfiguration }: ConfigurationProps) => {
   return (
     <div className="flex flex-row gap-x-4">
       <Select
+        id="configuration-select"
         className={isMobile() ? 'w-full' : 'max-w-56'}
         radius={'md'}
         comboboxProps={{

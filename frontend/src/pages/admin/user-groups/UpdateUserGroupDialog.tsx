@@ -76,6 +76,7 @@ export function UpdateUserGroupDialog({ onClose, onDelete, onUpdate, target }: U
             <FormAlert common={texts.userGroups.updateFailed} error={userGroupUpdate.error} />
 
             <TextInput
+              id="name"
               withAsterisk
               label={texts.common.groupName}
               className="mb-4"
@@ -84,6 +85,7 @@ export function UpdateUserGroupDialog({ onClose, onDelete, onUpdate, target }: U
             />
 
             <NumberInput
+              id="monthlyTokens"
               label={texts.common.monthlyTokens}
               className="mb-4"
               key={form.key('monthlyTokens')}
@@ -91,6 +93,7 @@ export function UpdateUserGroupDialog({ onClose, onDelete, onUpdate, target }: U
             />
 
             <NumberInput
+              id="monthlyUserTokens"
               label={texts.common.monthlyUserTokens}
               className="mb-4"
               key={form.key('monthlyUserTokens')}

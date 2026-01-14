@@ -707,7 +707,9 @@ export async function duplicateActiveConversation(page: Page, renameBeforeDuplic
 }
 
 export async function selectOption(page: Page, name: string, value: string | RegExp) {
-  await page.getByRole('textbox', { name: name }).click();
+  // TODO: there needs to be a better way
+  const input = page.getByLabel(name).locator('xpath=ancestor::*[contains(@class, "mantine-Select-input")]').first();
+  await input.click();
   if (typeof value === 'string') {
     await page.getByRole('option', { name: value, exact: true }).click();
   } else {
@@ -716,11 +718,13 @@ export async function selectOption(page: Page, name: string, value: string | Reg
 }
 
 export async function selectMultipleOptions(page: Page, name: string, values: string[]) {
-  await page.getByRole('textbox', { name: name }).click();
+  // TODO: there needs to be a better way
+  const input = page.getByLabel(name).locator('xpath=ancestor::*[contains(@class, "mantine-MultiSelect-input")]').first();
+  await input.click();
   for (const value of values) {
     await page.getByRole('option', { name: value, exact: true }).click();
   }
-  await page.getByRole('textbox', { name: name }).click();
+  await input.click();
 }
 
 export async function expectElementInYRange(element: Locator, min: number, max: number) {

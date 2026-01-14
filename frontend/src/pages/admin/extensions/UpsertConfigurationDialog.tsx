@@ -78,20 +78,30 @@ export function UpsertConfigurationDialog(props: UpsertConfigurationDialogProps)
             ) : (
               <FormAlert common={texts.extensions.createConfigurationFailed} error={creating.error} />
             )}
-            <TextInput withAsterisk label={texts.common.name} key={form.key('name')} {...form.getInputProps('name')} autoFocus />
             <TextInput
+              id="name"
+              withAsterisk
+              label={texts.common.name}
+              key={form.key('name')}
+              {...form.getInputProps('name')}
+              autoFocus
+            />
+            <TextInput
+              id="description"
               withAsterisk
               label={texts.common.description}
               key={form.key('description')}
               {...form.getInputProps('description')}
             />
             <Switch
+              id="enabled"
               label={texts.common.enabled}
               key={form.key('enabled')}
               {...form.getInputProps('enabled', { type: 'checkbox' })}
             />
             <UserGroupTagsInput form={form} />
             <TextInput
+              id="executorEndpoint"
               classNames={{ input: 'font-mono' }}
               label={texts.extensions.executorEndpoint}
               description={texts.extensions.executorEndpointHints}
@@ -99,6 +109,7 @@ export function UpsertConfigurationDialog(props: UpsertConfigurationDialogProps)
               {...form.getInputProps('executorEndpoint')}
             />
             <Textarea
+              id="executorHeaders"
               classNames={{ input: 'font-mono' }}
               label={texts.extensions.executorHeaders}
               key={form.key('executorHeaders')}
@@ -106,6 +117,7 @@ export function UpsertConfigurationDialog(props: UpsertConfigurationDialogProps)
               resize="vertical"
             />
             <TextInput
+              id="chatFooter"
               label={texts.theme.footer}
               description={texts.theme.footerHints}
               key={form.key('chatFooter')}

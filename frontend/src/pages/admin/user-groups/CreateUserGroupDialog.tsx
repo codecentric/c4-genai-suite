@@ -77,6 +77,7 @@ export function CreateUserGroupDialog({ onClose, onCreate }: CreateUserGroupDial
             <FormAlert common={texts.userGroups.updateFailed} error={updating.error} />
 
             <TextInput
+              id="name"
               withAsterisk
               label={texts.common.groupName}
               className="mb-4"
@@ -85,6 +86,7 @@ export function CreateUserGroupDialog({ onClose, onCreate }: CreateUserGroupDial
             />
 
             <NumberInput
+              id="monthlyTokens"
               label={texts.common.monthlyTokens}
               className="mb-4"
               key={form.key('monthlyTokens')}
@@ -92,6 +94,7 @@ export function CreateUserGroupDialog({ onClose, onCreate }: CreateUserGroupDial
             />
 
             <NumberInput
+              id="monthlyUserTokens"
               label={texts.common.monthlyUserTokens}
               className="mb-4"
               key={form.key('monthlyUserTokens')}

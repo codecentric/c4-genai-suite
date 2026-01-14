@@ -164,6 +164,7 @@ export function UpsertBucketDialog(props: UpsertBucketDialogProps) {
             />
 
             <TextInput
+              id="name"
               label={texts.common.name}
               autoFocus
               required
@@ -173,6 +174,7 @@ export function UpsertBucketDialog(props: UpsertBucketDialogProps) {
             />
 
             <TextInput
+              id="indexName"
               label={texts.common.indexName}
               placeholder="[use default index name]"
               description="Only change the default index name if you are sure you need a separate index."
@@ -182,6 +184,7 @@ export function UpsertBucketDialog(props: UpsertBucketDialogProps) {
             />
 
             <TextInput
+              id="endpoint"
               label={texts.common.endpoint}
               type="url"
               required
@@ -192,6 +195,7 @@ export function UpsertBucketDialog(props: UpsertBucketDialogProps) {
             />
 
             <Textarea
+              id="headers"
               label={texts.common.headers}
               key={form.key('headers')}
               {...form.getInputProps('headers')}
@@ -201,6 +205,7 @@ export function UpsertBucketDialog(props: UpsertBucketDialogProps) {
 
             {!target && (
               <Select
+                id="type"
                 data={bucketTypeOptions}
                 label={texts.files.bucketType}
                 required
@@ -212,6 +217,7 @@ export function UpsertBucketDialog(props: UpsertBucketDialogProps) {
 
             {watchIsUser && (
               <NumberInput
+                id="perUserQuota"
                 label={texts.files.perUserQuota}
                 key={form.key('perUserQuota')}
                 {...form.getInputProps('perUserQuota')}
@@ -220,6 +226,7 @@ export function UpsertBucketDialog(props: UpsertBucketDialogProps) {
             )}
 
             <MultiSelect
+              id="allowedFileNameExtensions"
               data={fileTypes?.items ?? []}
               disabled={!fileTypes?.items?.length}
               label={texts.files.allowedFileTypes}

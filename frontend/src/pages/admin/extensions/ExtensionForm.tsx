@@ -73,10 +73,11 @@ export function ExtensionForm(props: ExtensionFormProps) {
         </>
       )}
       <FormRow name="enabled" label={texts.common.enabled}>
-        <Checkbox key={form.key('enabled')} {...form.getInputProps('enabled', { type: 'checkbox' })} />
+        <Checkbox id="enabled" key={form.key('enabled')} {...form.getInputProps('enabled', { type: 'checkbox' })} />
       </FormRow>
       <FormRow name="configurableArguments" label={texts.common.configurableArguments}>
         <MultiSelect
+          id="configurableArguments"
           data={userConfigurableArgumentOptions}
           key={form.key('configurableArguments')}
           value={Object.keys(form.getValues().configurableArguments?.properties ?? {})}
