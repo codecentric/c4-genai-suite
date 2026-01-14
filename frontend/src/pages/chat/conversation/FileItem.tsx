@@ -39,11 +39,11 @@ export const FileItemComponent = ({ file, onRemove, loading }: FileItemProps) =>
         <div className="min-w-0 flex-grow">
           <div className="flex flex-col">
             <span className="truncate text-sm font-medium">{fileName}</span>
-            <div className="animate-show-after-7s relative">
-              <span className="animate-alternate-first truncate text-sm font-medium text-orange-800 italic">
+            <div className="animate-show-after-7s relative h-5">
+              <span className="animate-alternate-first absolute top-0 right-0 left-0 truncate text-sm font-medium text-orange-800 italic">
                 {texts.files.waitingMessage1}
               </span>
-              <span className="animate-alternate-second absolute top-0 left-0 truncate text-sm font-medium text-orange-800 italic">
+              <span className="animate-alternate-second absolute top-0 right-0 left-0 truncate text-sm font-medium text-orange-800 italic">
                 {texts.files.waitingMessage2}
               </span>
             </div>
