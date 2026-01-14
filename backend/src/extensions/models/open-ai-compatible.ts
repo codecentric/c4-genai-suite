@@ -67,6 +67,13 @@ export class OpenAICompatibleModelExtension implements Extension<OpenAICompatibl
           format: 'slider',
           description: this.i18n.t('texts.extensions.common.frequencyPenaltyHint'),
         },
+        maxOutputTokens: {
+          type: 'number',
+          title: this.i18n.t('texts.extensions.common.maxOutputTokens'),
+          minimum: 0,
+          required: false,
+          description: this.i18n.t('texts.extensions.common.maxOutputTokensHint'),
+        },
         effort: {
           type: 'string',
           title: this.i18n.t('texts.extensions.common.reasoningEffort'),
@@ -111,7 +118,8 @@ export class OpenAICompatibleModelExtension implements Extension<OpenAICompatibl
   }
 
   private createModel(configuration: OpenAICompatibleModelExtensionConfiguration, streaming = false) {
-    const { apiKey, baseUrl, modelName, frequencyPenalty, presencePenalty, temperature, seed, effort, summary } = configuration;
+    const { apiKey, baseUrl, modelName, frequencyPenalty, maxOutputTokens, presencePenalty, temperature, seed, effort, summary } =
+      configuration;
 
     const open = createOpenAICompatible({
       name: 'openai-compatible',
@@ -129,6 +137,7 @@ export class OpenAICompatibleModelExtension implements Extension<OpenAICompatibl
         temperature,
         seed,
         streaming,
+        maxOutputTokens,
         providerOptions: {
           openai: effort
             ? {
@@ -152,6 +161,7 @@ type OpenAICompatibleModelExtensionConfiguration = ExtensionConfiguration & {
   seed?: number;
   presencePenalty?: number;
   frequencyPenalty?: number;
+  maxOutputTokens?: number;
   effort?: 'low' | 'medium' | 'high';
   summary?: 'detailed' | 'auto';
 };

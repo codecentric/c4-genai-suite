@@ -12,6 +12,7 @@
       "seed": "Seed",
       "presencePenalty": "Presence Penalty",
       "frequencyPenalty": "Frequency Penalty",
+      "maxOutputTokens": "Max Output Tokens",
       "modelName": "Modell-Name",
       "endpoint": "Endpunkt",
       "index": "Index",
@@ -43,6 +44,7 @@
       "seedHint": "Dieses Feature befindet sich in der Beta-Phase. Wenn angegeben, wird OpenAI versuchen, deterministisch zu arbeiten, sodass wiederholte Anfragen mit demselben Seed und denselben Parametern das gleiche Ergebnis liefern sollten.",
       "presencePenaltyHint": "Positive Werte bestrafen neue Tokens basierend darauf, ob sie bisher im Text vorkommen, und erhöhen die Wahrscheinlichkeit, dass das Modell über neue Themen spricht.",
       "frequencyPenaltyHint": "Positive Werte bestrafen neue Tokens basierend auf ihrer bisherigen Häufigkeit im Text und verringern die Wahrscheinlichkeit, dass das Modell dieselbe Zeile wörtlich wiederholt.",
+      "maxOutputTokensHint": "Die maximale Anzahl von Tokens, die im Antworttext generiert werden sollen. Ebenfalls bekannt als max_tokens.",
       "topPHint": "Tokens werden von den wahrscheinlichsten bis zu den unwahrscheinlichsten ausgewählt, bis die Summe ihrer Wahrscheinlichkeiten dem Top-p-Wert entspricht.\nBeispielsweise, wenn die Tokens A, B und C eine Wahrscheinlichkeit von 0,3, 0,2 und 0,1 haben und der Top-p-Wert 0,5 beträgt, dann wählt das Modell entweder A oder B als nächstes Token aus (unter Verwendung der Temperatur)."
     },
     "azure": {
