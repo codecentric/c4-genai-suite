@@ -23,7 +23,10 @@ async function bootstrap() {
 
   await app.listen(config.get('PORT') || 3000);
 
-  const exporterApp = await NestFactory.create<NestExpressApplication>(PrometheusModule.external());
-  await exporterApp.listen(config.get('METRICS_PORT') || 9100);
+  const metricsPort: string | undefined = config.get('METRICS_PORT');
+  if (metricsPort !== '0') {
+    const exporterApp = await NestFactory.create<NestExpressApplication>(PrometheusModule.external());
+    await exporterApp.listen(metricsPort || 9100);
+  }
 }
 void bootstrap();
