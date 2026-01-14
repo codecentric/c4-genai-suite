@@ -186,12 +186,23 @@ export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEm
         {isEmpty && <Suggestions configuration={configuration} theme={theme} onSelect={setInput} />}
 
         <div className="flex flex-wrap gap-2">
-          {chatFiles.map((file) => (
-            <FileItemComponent key={file.id} file={file} onRemove={remove} />
-          ))}
-          {uploadingFiles.map((file, n) => (
-            <FileItemComponent key={`${n}-${file.name}`} file={{ fileName: file.name }} loading={true} />
-          ))}
+          {(() => {
+            const visibleFiles = [
+              ...uploadingFiles.map((file) => ({ fileName: file.name, isUploading: true, originalFile: file })),
+              ...chatFiles.map((file) => ({ fileName: file.fileName, isUploading: false, originalFile: file })),
+            ]
+              .sort((a, b) => a.fileName.localeCompare(b.fileName))
+              .filter((file, index, array) => array.findIndex((f) => f.fileName === file.fileName) === index);
+
+            return visibleFiles.map((file) => (
+              <FileItemComponent
+                key={file.isUploading ? `upload-${file.fileName}` : (file.originalFile as FileDto).id}
+                file={file.isUploading ? { fileName: file.fileName } : (file.originalFile as FileDto)}
+                onRemove={file.isUploading ? undefined : remove}
+                loading={file.isUploading}
+              />
+            ));
+          })()}
         </div>
 
         {extensionFilterChips.map(
