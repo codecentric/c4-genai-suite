@@ -9,6 +9,7 @@ import { BucketDto, BucketDtoFileSizeLimits, BucketDtoTypeEnum, UpsertBucketDto,
 import { FormAlert, Icon, Modal } from 'src/components';
 import { buildError, cn } from 'src/lib';
 import { texts } from 'src/texts';
+import { TestButton } from './TestButton';
 
 function debounce<F extends (...args: never[]) => void>(func: F, wait: number): (...args: Parameters<F>) => void {
   let timeoutId: ReturnType<typeof setTimeout> | undefined;
@@ -83,7 +84,7 @@ export function UpsertBucketDialog(props: UpsertBucketDialogProps) {
       allowedFileNameExtensions: [],
       fileSizeLimits: { general: 1, pdf: 10, pptx: 10 },
     },
-    mode: 'uncontrolled',
+    mode: 'controlled',
   });
   const watchIsUser = form.getValues().type === 'user';
 
@@ -142,13 +143,16 @@ export function UpsertBucketDialog(props: UpsertBucketDialogProps) {
           header={<div className="flex items-center gap-4">{target ? texts.files.updateBucket : texts.files.createBucket}</div>}
           footer={
             <fieldset disabled={updating.isPending || creating.isPending}>
-              <div className="flex flex-row justify-end gap-2">
-                <Button type="button" variant={'subtle'} onClick={onClose}>
-                  {texts.common.cancel}
-                </Button>
-                <Button type="submit" disabled={isDisabled}>
-                  {texts.common.save}
-                </Button>
+              <div className="flex flex-row justify-between">
+                <TestButton form={form} />
+                <div className="flex flex-row gap-2">
+                  <Button type="button" variant={'subtle'} onClick={onClose}>
+                    {texts.common.cancel}
+                  </Button>
+                  <Button type="submit" disabled={isDisabled}>
+                    {texts.common.save}
+                  </Button>
+                </div>
               </div>
             </fieldset>
           }

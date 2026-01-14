@@ -2,7 +2,6 @@ import { Button, Divider, NumberInput, Portal, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconTrash } from '@tabler/icons-react';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
-import { useEffect } from 'react';
 import { z } from 'zod';
 import { useApi, UserGroupDto } from 'src/api';
 import { ConfirmDialog, FormAlert, Modal } from 'src/components';
@@ -42,13 +41,9 @@ export function UpdateUserGroupDialog({ onClose, onDelete, onUpdate, target }: U
 
   const form = useForm<SchemaType>({
     validate: zod4Resolver(SCHEME),
-    initialValues: { name: '', monthlyUserTokens: null, monthlyTokens: null },
-    mode: 'uncontrolled',
+    initialValues: target as SchemaType,
+    mode: 'controlled',
   });
-  useEffect(() => {
-    form.setValues(target as SchemaType);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [target]);
   return (
     <Portal>
       <form

@@ -419,6 +419,44 @@ export async function wait(timeout: number) {
   await new Promise((resolve) => setTimeout(resolve, timeout));
 }
 
+async function setSliderValue(page: Page, label: string, value: number) {
+  // Find the slider container by its label
+  const sliderLabel = page.locator('label').filter({ hasText: label });
+  const sliderContainer = sliderLabel.locator('..').locator('.mantine-Slider-root');
+  const thumb = sliderContainer.locator('[role="slider"]');
+
+  // Read min and max from the slider's aria attributes
+  const min = parseFloat((await thumb.getAttribute('aria-valuemin')) || '0');
+  const max = parseFloat((await thumb.getAttribute('aria-valuemax')) || '100');
+
+  const thumbBoundingBox = await thumb.boundingBox();
+  const sliderBoundingBox = await sliderContainer.boundingBox();
+
+  if (thumbBoundingBox === null || sliderBoundingBox === null) {
+    throw new Error(`Could not find slider for label: ${label}`);
+  }
+
+  // Calculate the target percentage based on min/max/value
+  const targetPercentage = (value - min) / (max - min);
+
+  // Start from the middle of the slider's thumb
+  const startPoint = {
+    x: thumbBoundingBox.x + thumbBoundingBox.width / 2,
+    y: thumbBoundingBox.y + thumbBoundingBox.height / 2,
+  };
+
+  // Slide it to the endpoint determined by the target percentage
+  const endPoint = {
+    x: sliderBoundingBox.x + sliderBoundingBox.width * targetPercentage,
+    y: thumbBoundingBox.y + thumbBoundingBox.height / 2,
+  };
+
+  await page.mouse.move(startPoint.x, startPoint.y);
+  await page.mouse.down();
+  await page.mouse.move(endPoint.x, endPoint.y);
+  await page.mouse.up();
+}
+
 export async function addAzureModelToConfiguration(
   page: Page,
   configuration: { name: string },
@@ -440,7 +478,7 @@ export async function addAzureModelToConfiguration(
   await page.getByLabel('Deployment Name').fill(azure.deployment);
   await page.getByLabel('Instance Name').fill('cccc-testing');
   await page.getByLabel('Seed').fill('42');
-  await page.getByLabel('Temperature').fill('0');
+  await setSliderValue(page, 'Temperature', 0);
   await page.getByRole('button', { name: 'Test' }).click();
 
   if (azure.configurable?.length) {

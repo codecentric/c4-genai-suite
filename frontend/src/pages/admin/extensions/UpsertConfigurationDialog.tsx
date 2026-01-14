@@ -55,7 +55,7 @@ export function UpsertConfigurationDialog(props: UpsertConfigurationDialogProps)
   });
 
   const form = useForm<UpsertConfigurationDto>({
-    mode: 'uncontrolled',
+    mode: 'controlled',
     initialValues: target ?? {
       name: '',
       description: '',

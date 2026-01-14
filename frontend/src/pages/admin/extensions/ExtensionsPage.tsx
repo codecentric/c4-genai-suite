@@ -295,7 +295,7 @@ export function ExtensionsPage() {
                       <div className="text-sm text-slate-500">
                         {Object.entries(x.configurableArguments!.properties).map(([name, spec]) => (
                           <div key={`${x.id}-${name}`} className="mb-2">
-                            <strong>{spec.title}:</strong> {spec.description}
+                            <strong>{spec.title}:</strong> TODO: show the form again?
                           </div>
                         ))}
                       </div>

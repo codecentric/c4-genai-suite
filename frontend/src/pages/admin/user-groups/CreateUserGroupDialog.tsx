@@ -43,7 +43,7 @@ export function CreateUserGroupDialog({ onClose, onCreate }: CreateUserGroupDial
   const form = useForm<SchemaType>({
     validate: zod4Resolver(SCHEME),
     initialValues: { name: '', monthlyUserTokens: null, monthlyTokens: null },
-    mode: 'uncontrolled',
+    mode: 'controlled',
   });
 
   return (
