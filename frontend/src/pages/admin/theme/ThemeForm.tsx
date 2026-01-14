@@ -46,15 +46,8 @@ export function ThemeForm() {
       chatSuggestions: [],
       siteLinks: [],
     },
-    mode: 'uncontrolled',
+    mode: 'controlled',
   });
-
-  useEffect(() => {
-    if (settings) {
-      form.setValues(settings);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [settings]);
 
   // Sync theme preview
   const formValues = form.getValues();

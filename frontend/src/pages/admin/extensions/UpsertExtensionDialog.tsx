@@ -89,7 +89,7 @@ export function UpsertExtensionDialog(props: UpsertExtensionDialogProps) {
   const form = useForm<CreateExtensionDto>({
     validate: resolver as unknown as (values: CreateExtensionDto) => Record<string, string | null>,
     initialValues: defaultValues,
-    mode: 'uncontrolled',
+    mode: 'controlled',
   });
 
   const rebuildTriggered = useRef(false);
@@ -103,6 +103,15 @@ export function UpsertExtensionDialog(props: UpsertExtensionDialogProps) {
   useEffect(() => {
     if (spec) {
       form.setFieldValue('name', spec.name);
+
+      // Set default values for fields when creating a new extension
+      if (!selected && spec.arguments) {
+        Object.entries(spec.arguments).forEach(([key, arg]) => {
+          if ('_default' in arg && arg._default !== undefined) {
+            form.setFieldValue(`values.${key}`, arg._default as number | string | boolean);
+          }
+        });
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [spec]);

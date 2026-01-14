@@ -105,7 +105,7 @@ function UpsertUserDialog(props: UpsertUserDialogProps) {
   const form = useForm<UpsertUserDto>({
     validate: zod4Resolver(SCHEME) as unknown as (values: UpsertUserDto) => Record<string, string | null>,
     initialValues: defaultValues as UpsertUserDto,
-    mode: 'uncontrolled',
+    mode: 'controlled',
   });
 
   // Watch for changes to update state
