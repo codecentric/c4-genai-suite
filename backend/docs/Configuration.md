@@ -21,9 +21,9 @@
 
 ## Metrics
 
-| Env Variable             | Required  | Default | Description |
-|--------------------------|-----------|---------|-------------|
-| METRICS_PORT             | No        | 9100    |             |
+| Env Variable             | Required  | Default | Description                     |
+|--------------------------|-----------|---------|---------------------------------|
+| METRICS_PORT             | No        | 9100    | Can be disabled by setting to 0 |
 
 ## Authentication
 
