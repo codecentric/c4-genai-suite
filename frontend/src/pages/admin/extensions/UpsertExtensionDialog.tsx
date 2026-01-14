@@ -98,7 +98,6 @@ export function UpsertExtensionDialog(props: UpsertExtensionDialogProps) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selected]);
-
   const rebuildTriggered = useRef(false);
   useEffect(() => {
     if (selected && spec?.triggers && !rebuildTriggered.current) {
@@ -106,19 +105,62 @@ export function UpsertExtensionDialog(props: UpsertExtensionDialogProps) {
       rebuildTriggered.current = true;
     }
   }, [spec, selected, rebuild, form]);
+  // Recursively initialize a value for a given argument spec
+  type SchemaArg = {
+    _default?: unknown;
+    type?: string;
+    properties?: Record<string, SchemaArg>;
+  };
+
+  function getInitialValue(arg: SchemaArg): unknown {
+    if (typeof arg !== 'object' || arg === null) return undefined;
+    if (Object.prototype.hasOwnProperty.call(arg, '_default') && arg._default !== undefined) {
+      return arg._default;
+    }
+    if (arg.type === 'object' && arg.properties) {
+      const obj: Record<string, unknown> = {};
+      for (const [k, v] of Object.entries(arg.properties)) {
+        obj[k] = getInitialValue(v);
+      }
+      return obj;
+    }
+    if (arg.type === 'array') {
+      return [];
+    }
+    if (arg.type === 'boolean') {
+      return undefined;
+    }
+    if (arg.type === 'number' || arg.type === 'integer') {
+      return undefined;
+    }
+    if (arg.type === 'string') {
+      return undefined;
+    }
+    return undefined;
+  }
 
   useEffect(() => {
     if (spec) {
-      form.setFieldValue('name', spec.name);
+      // Build the complete values object with all fields from the spec
+      const currentFormValues = form.getValues();
+      const currentValues = currentFormValues.values ?? {};
+      const newValues: Record<string, unknown> = { ...currentValues };
 
-      // Set default values for fields when creating a new extension
-      if (!selected && spec.arguments) {
+      // Initialize all argument fields from the spec
+      if (spec.arguments) {
         Object.entries(spec.arguments).forEach(([key, arg]) => {
-          if ('_default' in arg && arg._default !== undefined) {
-            form.setFieldValue(`values.${key}`, arg._default as number | string | boolean);
+          if (newValues[key] === undefined) {
+            newValues[key] = getInitialValue(arg);
           }
         });
       }
+
+      // Set all values at once to ensure the form structure is correct
+      form.setValues({
+        ...currentFormValues,
+        name: spec.name,
+        values: newValues,
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [spec]);
