@@ -1,6 +1,7 @@
 import { Button, Flex, Portal, Switch, Textarea, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useMutation } from '@tanstack/react-query';
+import { useEffect } from 'react';
 import z from 'zod';
 import { ConfigurationDto, UpsertConfigurationDto, useApi } from 'src/api';
 import { FormAlert, MAX_SUGGESTIONS, Modal } from 'src/components';
@@ -68,6 +69,14 @@ export function UpsertConfigurationDialog(props: UpsertConfigurationDialogProps)
     },
     validate: typedZodResolver(schema),
   });
+
+  useEffect(() => {
+    if (target) {
+      form.setValues(target);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [target]);
+
   return (
     <Portal>
       <Modal onClose={onClose} title={target ? texts.extensions.updateConfiguration : texts.extensions.createConfiguration}>

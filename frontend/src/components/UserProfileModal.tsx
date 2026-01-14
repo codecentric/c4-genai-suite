@@ -67,61 +67,6 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
 
   if (!isOpen) return null;
 
-  const PersonalInfoSection = () => (
-    <div>
-      <h3 className="mb-4 text-lg font-semibold text-gray-900">{texts.chat.settings.personalInformation}</h3>
-      <div className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700">{texts.common.name}</label>
-          <p className="mt-1 text-sm text-gray-900">{profile.name}</p>
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700">{texts.common.email}</label>
-          <p className="mt-1 text-sm text-gray-900">{profile.email}</p>
-        </div>
-      </div>
-    </div>
-  );
-
-  const SecuritySection = () => (
-    <div>
-      <h3 className="mb-4 text-lg font-semibold text-gray-900">{texts.chat.settings.security}</h3>
-      <form onSubmit={passwordForm.onSubmit(handlePasswordSubmit)} className="space-y-4">
-        <div className="space-y-4">
-          <PasswordInput
-            id="currentPassword"
-            label={texts.chat.settings.currentPassword}
-            placeholder={texts.chat.settings.enterCurrentPassword}
-            key={passwordForm.key('currentPassword')}
-            {...passwordForm.getInputProps('currentPassword')}
-          />
-
-          <PasswordInput
-            id="password"
-            label={texts.common.password}
-            placeholder={texts.chat.settings.enterNewPassword}
-            key={passwordForm.key('password')}
-            {...passwordForm.getInputProps('password')}
-          />
-
-          <PasswordInput
-            id="passwordConfirm"
-            label={texts.common.passwordConfirm}
-            placeholder={texts.chat.settings.enterConfirmNewPassword}
-            key={passwordForm.key('passwordConfirm')}
-            {...passwordForm.getInputProps('passwordConfirm')}
-          />
-        </div>
-
-        <div className="flex justify-end pt-4">
-          <Button type="submit" disabled={updatePassword.isPending}>
-            {updatePassword.isPending ? texts.chat.settings.updatingPassword : texts.chat.settings.updatePassword}
-          </Button>
-        </div>
-      </form>
-    </div>
-  );
-
   return (
     <Modal
       size="xl"
@@ -160,8 +105,59 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
         </div>
 
         <div className="w-2/3 pl-4">
-          {activeTab === 'personal' && <PersonalInfoSection />}
-          {activeTab === 'security' && <SecuritySection />}
+          {activeTab === 'personal' && (
+            <div>
+              <h3 className="mb-4 text-lg font-semibold text-gray-900">{texts.chat.settings.personalInformation}</h3>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">{texts.common.name}</label>
+                  <p className="mt-1 text-sm text-gray-900">{profile.name}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">{texts.common.email}</label>
+                  <p className="mt-1 text-sm text-gray-900">{profile.email}</p>
+                </div>
+              </div>
+            </div>
+          )}
+          {activeTab === 'security' && (
+            <div>
+              <h3 className="mb-4 text-lg font-semibold text-gray-900">{texts.chat.settings.security}</h3>
+              <form onSubmit={passwordForm.onSubmit(handlePasswordSubmit)} className="space-y-4">
+                <div className="space-y-4">
+                  <PasswordInput
+                    id="currentPassword"
+                    label={texts.chat.settings.currentPassword}
+                    placeholder={texts.chat.settings.enterCurrentPassword}
+                    key={passwordForm.key('currentPassword')}
+                    {...passwordForm.getInputProps('currentPassword')}
+                  />
+
+                  <PasswordInput
+                    id="password"
+                    label={texts.common.password}
+                    placeholder={texts.chat.settings.enterNewPassword}
+                    key={passwordForm.key('password')}
+                    {...passwordForm.getInputProps('password')}
+                  />
+
+                  <PasswordInput
+                    id="passwordConfirm"
+                    label={texts.common.passwordConfirm}
+                    placeholder={texts.chat.settings.enterConfirmNewPassword}
+                    key={passwordForm.key('passwordConfirm')}
+                    {...passwordForm.getInputProps('passwordConfirm')}
+                  />
+                </div>
+
+                <div className="flex justify-end pt-4">
+                  <Button type="submit" disabled={updatePassword.isPending}>
+                    {updatePassword.isPending ? texts.chat.settings.updatingPassword : texts.chat.settings.updatePassword}
+                  </Button>
+                </div>
+              </form>
+            </div>
+          )}
         </div>
       </div>
     </Modal>
