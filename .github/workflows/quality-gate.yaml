@@ -18,4 +18,4 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           self: quality-gate
           timeout: 1200
-          ignored: dependabot
+          ignored: dependabot, Cleanup artifacts
