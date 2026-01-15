@@ -5,7 +5,7 @@ import { Repository } from 'typeorm';
 import { ConfigurationEntity, ConfigurationStatus, ExtensionEntity } from '../../database';
 import { ConfigurationModel } from '../interfaces';
 import { ExplorerService } from '../services';
-import { buildConfiguration, validateConfiguration } from './utils';
+import { buildConfiguration, unmaskExtensionValues, validateConfiguration } from './utils';
 
 export interface ImportedExtension {
   name: string;
@@ -117,7 +117,8 @@ export class ImportConfigurationHandler implements ICommandHandler<ImportConfigu
       const extensionEntity = new ExtensionEntity();
       extensionEntity.name = ext.name;
       extensionEntity.enabled = ext.enabled;
-      extensionEntity.values = { ...ext.values };
+      // Unmask extension values to remove masked passwords before saving
+      extensionEntity.values = unmaskExtensionValues({ ...ext.values });
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       extensionEntity.configurableArguments = ext.configurableArguments;
       extensionEntity.configuration = savedConfiguration;

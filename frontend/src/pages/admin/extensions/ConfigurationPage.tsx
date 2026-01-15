@@ -92,10 +92,14 @@ export function ConfigurationPage() {
 
     try {
       const text = await file.text();
-      const data = JSON.parse(text) as ExportedConfigurationDto;
+      let data: ExportedConfigurationDto;
+      try {
+        data = JSON.parse(text) as ExportedConfigurationDto;
+      } catch {
+        toast.error(texts.extensions.importConfigurationInvalidJson);
+        return;
+      }
       importConfig.mutate(data);
-    } catch {
-      toast.error(texts.extensions.importConfigurationInvalidJson);
     } finally {
       // Reset file input
       if (fileInputRef.current) {

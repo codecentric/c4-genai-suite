@@ -80,6 +80,125 @@ describe(ImportConfiguration.name, () => {
     );
   });
 
+  it('should throw BadRequestException when extension configuration has missing required field', async () => {
+    jest.spyOn(explorer, 'getExtension').mockReturnValue({
+      spec: {
+        name: 'test-extension',
+        arguments: {
+          requiredField: {
+            type: 'string',
+            required: true,
+          } as ExtensionStringArgument,
+        },
+        title: 'Test Extension',
+        description: 'Test',
+        type: 'tool',
+      },
+      getMiddlewares: () => Promise.resolve([]),
+    } as Extension);
+
+    const importData: ImportConfigurationData = {
+      name: 'Test Config',
+      description: 'Test',
+      enabled: true,
+      userGroupIds: [],
+      extensions: [
+        {
+          name: 'test-extension',
+          enabled: true,
+          values: {}, // Missing required field
+        },
+      ],
+    };
+
+    await expect(handler.execute(new ImportConfiguration(importData))).rejects.toThrow(BadRequestException);
+    await expect(handler.execute(new ImportConfiguration(importData))).rejects.toThrow(
+      'Invalid configuration for extension "test-extension"',
+    );
+  });
+
+  it('should throw BadRequestException when extension configuration has invalid data type', async () => {
+    jest.spyOn(explorer, 'getExtension').mockReturnValue({
+      spec: {
+        name: 'test-extension',
+        arguments: {
+          numericField: {
+            type: 'number',
+            title: 'Numeric Field',
+            required: true,
+          },
+        },
+        title: 'Test Extension',
+        description: 'Test',
+        type: 'tool',
+      },
+      getMiddlewares: () => Promise.resolve([]),
+    } as Extension);
+
+    const importData: ImportConfigurationData = {
+      name: 'Test Config',
+      description: 'Test',
+      enabled: true,
+      userGroupIds: [],
+      extensions: [
+        {
+          name: 'test-extension',
+          enabled: true,
+          values: {
+            numericField: 'not-a-number', // Wrong type
+          },
+        },
+      ],
+    };
+
+    await expect(handler.execute(new ImportConfiguration(importData))).rejects.toThrow(BadRequestException);
+    await expect(handler.execute(new ImportConfiguration(importData))).rejects.toThrow(
+      'Invalid configuration for extension "test-extension"',
+    );
+  });
+
+  it('should throw BadRequestException when extension configuration violates constraints', async () => {
+    jest.spyOn(explorer, 'getExtension').mockReturnValue({
+      spec: {
+        name: 'test-extension',
+        arguments: {
+          limitedNumber: {
+            type: 'number',
+            title: 'Limited Number',
+            required: true,
+            minimum: 1,
+            maximum: 10,
+          },
+        },
+        title: 'Test Extension',
+        description: 'Test',
+        type: 'tool',
+      },
+      getMiddlewares: () => Promise.resolve([]),
+    } as Extension);
+
+    const importData: ImportConfigurationData = {
+      name: 'Test Config',
+      description: 'Test',
+      enabled: true,
+      userGroupIds: [],
+      extensions: [
+        {
+          name: 'test-extension',
+          enabled: true,
+          values: {
+            limitedNumber: 100, // Exceeds maximum
+          },
+        },
+      ],
+    };
+
+    await expect(handler.execute(new ImportConfiguration(importData))).rejects.toThrow(BadRequestException);
+    await expect(handler.execute(new ImportConfiguration(importData))).rejects.toThrow(
+      'Invalid configuration for extension "test-extension"',
+    );
+  });
+
   it('should successfully import configuration with valid data', async () => {
     const savedConfiguration: Partial<ConfigurationEntity> = {
       id: 1,

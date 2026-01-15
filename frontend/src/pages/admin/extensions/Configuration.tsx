@@ -1,6 +1,7 @@
 import { ActionIcon, Menu } from '@mantine/core';
 import { IconCopy, IconDots, IconDownload, IconEdit, IconTrash } from '@tabler/icons-react';
 import { memo } from 'react';
+import { toast } from 'react-toastify';
 import { ConfigurationDto, useApi } from 'src/api';
 import { ConfirmDialog, TransientNavLink } from 'src/components';
 import { cn } from 'src/lib';
@@ -41,8 +42,8 @@ export const Configuration = memo((props: ConfigurationProps) => {
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
-    } catch {
-      // Silently fail for export errors
+    } catch (_error) {
+      toast.error(texts.extensions.exportConfigurationFailed);
     }
   };
 
