@@ -1,4 +1,4 @@
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, Logger } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -37,6 +37,8 @@ export interface ImportConfigurationResponse {
 
 @CommandHandler(ImportConfiguration)
 export class ImportConfigurationHandler implements ICommandHandler<ImportConfiguration, ImportConfigurationResponse> {
+  private readonly logger = new Logger(ImportConfigurationHandler.name);
+
   constructor(
     @InjectRepository(ConfigurationEntity)
     private readonly repository: Repository<ConfigurationEntity>,
@@ -58,6 +60,9 @@ export class ImportConfigurationHandler implements ICommandHandler<ImportConfigu
     }
 
     if (unavailableExtensions.length > 0) {
+      this.logger.error(
+        `Failed to import configuration "${data.name}": Extensions not available: ${unavailableExtensions.join(', ')}`,
+      );
       throw new BadRequestException(
         `The following extensions are not available in this system: ${unavailableExtensions.join(', ')}`,
       );
@@ -75,6 +80,9 @@ export class ImportConfigurationHandler implements ICommandHandler<ImportConfigu
           validateConfiguration(unmaskedValues, extension.spec);
         } catch (error) {
           const errorMessage = error instanceof Error ? error.message : String(error);
+          this.logger.error(
+            `Failed to import configuration "${data.name}": Invalid configuration for extension "${ext.name}": ${errorMessage}`,
+          );
           throw new BadRequestException(`Invalid configuration for extension "${ext.name}": ${errorMessage}`);
         }
       }
@@ -120,11 +128,16 @@ export class ImportConfigurationHandler implements ICommandHandler<ImportConfigu
     });
 
     if (!reloadedConfiguration) {
+      this.logger.error(`Failed to import configuration "${data.name}": Could not reload configuration after save`);
       throw new BadRequestException('Failed to reload imported configuration');
     }
 
     // Build configuration model
     const configuration = await buildConfiguration(reloadedConfiguration, this.extensionExplorer, true, false);
+
+    this.logger.log(
+      `Successfully imported configuration "${data.name}" (ID: ${savedConfiguration.id}) with ${extensionEntities.length} extension(s)`,
+    );
 
     return { configuration };
   }
