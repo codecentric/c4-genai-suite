@@ -17,12 +17,23 @@ interface JsonFormProps {
   defaultValues?: ExtensionContext;
 }
 
+function mergeWithDefaults(values: ExtensionContext | undefined, defaultValues: ExtensionContext | undefined): ExtensionContext {
+  if (!defaultValues) return values ?? {};
+  if (!values) return defaultValues;
+
+  const result: ExtensionContext = {};
+  for (const extId of Object.keys(defaultValues)) {
+    result[extId] = { ...defaultValues[extId], ...values[extId] };
+  }
+  return result;
+}
+
 export function FilterModal(props: JsonFormProps & PropsWithChildren) {
   const { extensions, onClose, values, defaultValues } = props;
 
   const form = useForm<ExtensionContext>({
     mode: 'controlled',
-    initialValues: values ?? defaultValues ?? {},
+    initialValues: mergeWithDefaults(values, defaultValues),
     validate: useUserArgumentsSpecResolver(extensions),
   });
 
@@ -34,7 +45,12 @@ export function FilterModal(props: JsonFormProps & PropsWithChildren) {
         footer={
           <fieldset>
             <div className="flex flex-row justify-between">
-              <Button type="button" variant="outline" leftSection={<IconRotate className="w-4" />} onClick={() => form.reset()}>
+              <Button
+                type="button"
+                variant="outline"
+                leftSection={<IconRotate className="w-4" />}
+                onClick={() => form.setValues(defaultValues ?? {})}
+              >
                 {texts.chat.filterResetAll}
               </Button>
               <div className="flex gap-2">

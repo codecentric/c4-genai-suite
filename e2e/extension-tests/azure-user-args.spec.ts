@@ -143,7 +143,8 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
       const result = JSON.parse(textContent || '') as TUserArgs;
 
       expect({
-        dateRangeUserArgument: {},
+        dateRangeUserArgument: { from: '', until: '' },
+        dateUserArgument: '',
         singleSelectUserArgument: 'value4',
         multiSelectUserArgument: ['value2', 'value3'],
         stringUserArgument: '',
