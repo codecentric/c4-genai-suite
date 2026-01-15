@@ -21,11 +21,14 @@ export function SiteLinks(props: SiteLinkProps) {
   const fields = ((form.getValues() as Record<string, unknown>)[name] as SiteLink[] | undefined) ?? [];
 
   const addItem = () => {
-    form.insertListItem(name, { text: '', link: '' });
+    form.setFieldValue(name, [...fields, { text: '', link: '' }]);
   };
 
   const removeItem = (index: number) => {
-    form.removeListItem(name, index);
+    form.setFieldValue(
+      name,
+      fields.filter((_, i) => i !== index),
+    );
   };
 
   return (

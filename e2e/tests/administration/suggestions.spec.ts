@@ -7,11 +7,12 @@ import {
   newChat,
   selectConfiguration,
   selectOption,
+  uniqueName,
 } from '../utils/helper';
 
 const MAX_SUGGESTIONS = 12;
-const ASSISTANT_NAME = 'Assistant Suggestions';
-const ASSISTANT_NAME_GLOBAL = 'Global Suggestions';
+const ASSISTANT_NAME = uniqueName('Assistant Suggestions');
+const ASSISTANT_NAME_GLOBAL = uniqueName('Global Suggestions');
 
 test('When using suggestions c4', async ({ page }) => {
   await test.step('will login', async () => {
