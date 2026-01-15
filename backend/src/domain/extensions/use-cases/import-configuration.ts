@@ -1,0 +1,131 @@
+import { BadRequestException } from '@nestjs/common';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { ConfigurationEntity, ConfigurationStatus, ExtensionEntity } from '../../database';
+import { ConfigurationModel } from '../interfaces';
+import { ExplorerService } from '../services';
+import { buildConfiguration, unmaskExtensionValues, validateConfiguration } from './utils';
+
+export interface ImportedExtension {
+  name: string;
+  enabled: boolean;
+  values: Record<string, any>;
+  configurableArguments?: any;
+}
+
+export interface ImportConfigurationData {
+  name: string;
+  description: string;
+  enabled: boolean;
+  agentName?: string;
+  chatFooter?: string;
+  chatSuggestions?: any[];
+  executorEndpoint?: string;
+  executorHeaders?: string;
+  userGroupIds?: string[];
+  extensions: ImportedExtension[];
+}
+
+export class ImportConfiguration {
+  constructor(public readonly data: ImportConfigurationData) {}
+}
+
+export interface ImportConfigurationResponse {
+  configuration: ConfigurationModel;
+}
+
+@CommandHandler(ImportConfiguration)
+export class ImportConfigurationHandler implements ICommandHandler<ImportConfiguration, ImportConfigurationResponse> {
+  constructor(
+    @InjectRepository(ConfigurationEntity)
+    private readonly repository: Repository<ConfigurationEntity>,
+    @InjectRepository(ExtensionEntity)
+    private readonly extensionRepository: Repository<ExtensionEntity>,
+    private readonly extensionExplorer: ExplorerService,
+  ) {}
+
+  async execute(command: ImportConfiguration): Promise<ImportConfigurationResponse> {
+    const { data } = command;
+
+    // Validate that all extensions exist in the system
+    const unavailableExtensions: string[] = [];
+    for (const ext of data.extensions) {
+      const extension = this.extensionExplorer.getExtension(ext.name);
+      if (!extension) {
+        unavailableExtensions.push(ext.name);
+      }
+    }
+
+    if (unavailableExtensions.length > 0) {
+      throw new BadRequestException(
+        `The following extensions are not available in this system: ${unavailableExtensions.join(', ')}`,
+      );
+    }
+
+    // Validate extension configurations
+    for (const ext of data.extensions) {
+      const extension = this.extensionExplorer.getExtension(ext.name);
+      if (extension) {
+        try {
+          // Unmask values (remove masked placeholders)
+          const unmaskedValues = unmaskExtensionValues({ ...ext.values });
+
+          // Validate configuration against extension spec
+          validateConfiguration(unmaskedValues, extension.spec);
+        } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : String(error);
+          throw new BadRequestException(`Invalid configuration for extension "${ext.name}": ${errorMessage}`);
+        }
+      }
+    }
+
+    // Create new configuration
+    const configurationEntity = new ConfigurationEntity();
+    configurationEntity.name = data.name;
+    configurationEntity.description = data.description;
+    configurationEntity.status = data.enabled ? ConfigurationStatus.ENABLED : ConfigurationStatus.DISABLED;
+    configurationEntity.agentName = data.agentName;
+    configurationEntity.chatFooter = data.chatFooter;
+    configurationEntity.chatSuggestions = data.chatSuggestions;
+    configurationEntity.executorEndpoint = data.executorEndpoint;
+    configurationEntity.executorHeaders = data.executorHeaders;
+    configurationEntity.userGroupIds = data.userGroupIds || [];
+
+    // Save configuration first
+    const savedConfiguration = await this.repository.save(configurationEntity);
+
+    // Create extensions
+    const extensionEntities: ExtensionEntity[] = [];
+    for (const ext of data.extensions) {
+      const extensionEntity = new ExtensionEntity();
+      extensionEntity.name = ext.name;
+      extensionEntity.enabled = ext.enabled;
+      extensionEntity.values = unmaskExtensionValues({ ...ext.values });
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      extensionEntity.configurableArguments = ext.configurableArguments;
+      extensionEntity.configuration = savedConfiguration;
+      extensionEntity.externalId = `${savedConfiguration.id}-${ext.name}`;
+
+      extensionEntities.push(extensionEntity);
+    }
+
+    // Save all extensions
+    await this.extensionRepository.save(extensionEntities);
+
+    // Reload configuration with extensions
+    const reloadedConfiguration = await this.repository.findOne({
+      where: { id: savedConfiguration.id },
+      relations: ['extensions'],
+    });
+
+    if (!reloadedConfiguration) {
+      throw new BadRequestException('Failed to reload imported configuration');
+    }
+
+    // Build configuration model
+    const configuration = await buildConfiguration(reloadedConfiguration, this.extensionExplorer, true, false);
+
+    return { configuration };
+  }
+}

@@ -27,6 +27,8 @@ models/ConversationsDto.ts
 models/CreateConversationDto.ts
 models/CreateExtensionDto.ts
 models/DocumentDto.ts
+models/ExportedConfigurationDto.ts
+models/ExportedExtensionDto.ts
 models/ExtensionArgumentArraySpecDto.ts
 models/ExtensionArgumentArraySpecDtoItems.ts
 models/ExtensionArgumentBooleanSpecDto.ts
@@ -45,6 +47,7 @@ models/FileTypeDto.ts
 models/FileTypesDto.ts
 models/FilesDto.ts
 models/ImageUrlDto.ts
+models/ImportConfigurationDto.ts
 models/LoginDto.ts
 models/MessageContentDto.ts
 models/MessageContentImageUrlDto.ts

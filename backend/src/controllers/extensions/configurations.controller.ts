@@ -13,6 +13,8 @@ import {
   DeleteConfiguration,
   DeleteExtension,
   DuplicateConfiguration,
+  ExportConfiguration,
+  ExportConfigurationResponse,
   GetBucketAvailability,
   GetBucketAvailabilityResponse,
   GetConfiguration,
@@ -21,6 +23,8 @@ import {
   GetConfigurationsResponse,
   GetExtensions,
   GetExtensionsResponse,
+  ImportConfiguration,
+  ImportConfigurationResponse,
   UpdateConfiguration,
   UpdateConfigurationResponse,
   UpdateExtension,
@@ -39,8 +43,10 @@ import {
   ConfigurationsDto,
   ConfigurationUserValuesDto,
   CreateExtensionDto,
+  ExportedConfigurationDto,
   ExtensionDto,
   ExtensionsDto,
+  ImportConfigurationDto,
   UpdateExtensionDto,
   UpsertConfigurationDto,
 } from './dtos';
@@ -293,6 +299,34 @@ export class ConfigurationsController {
 
     const result: DuplicateConfigurationResponse = await this.commandBus.execute(command);
 
+    return ConfigurationDto.fromDomain(result.configuration);
+  }
+
+  @Get(':id/export')
+  @ApiOperation({ operationId: 'exportConfiguration', description: 'Export a configuration as JSON with masked sensitive data.' })
+  @ApiParam({
+    name: 'id',
+    description: 'The ID of the configuration to export.',
+    required: true,
+    type: Number,
+  })
+  @ApiOkResponse({ type: ExportedConfigurationDto })
+  @Role(BUILTIN_USER_GROUP_ADMIN)
+  @UseGuards(RoleGuard)
+  async exportConfiguration(@Param('id', ParseIntPipe) id: number) {
+    const query = new ExportConfiguration(id);
+    const result: ExportConfigurationResponse = await this.queryBus.execute(query);
+    return result;
+  }
+
+  @Post('/import')
+  @ApiOperation({ operationId: 'importConfiguration', description: 'Import a configuration from JSON data.' })
+  @ApiOkResponse({ type: ConfigurationDto })
+  @Role(BUILTIN_USER_GROUP_ADMIN)
+  @UseGuards(RoleGuard)
+  async importConfiguration(@Body() body: ImportConfigurationDto) {
+    const command = new ImportConfiguration(body.data);
+    const result: ImportConfigurationResponse = await this.commandBus.execute(command);
     return ConfigurationDto.fromDomain(result.configuration);
   }
 }
