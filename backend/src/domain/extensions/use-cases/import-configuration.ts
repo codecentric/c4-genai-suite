@@ -5,7 +5,7 @@ import { Repository } from 'typeorm';
 import { ConfigurationEntity, ConfigurationStatus, ExtensionEntity } from '../../database';
 import { ConfigurationModel } from '../interfaces';
 import { ExplorerService } from '../services';
-import { buildConfiguration, unmaskExtensionValues, validateConfiguration } from './utils';
+import { buildConfiguration, validateConfiguration } from './utils';
 
 export interface ImportedExtension {
   name: string;
@@ -15,6 +15,8 @@ export interface ImportedExtension {
 }
 
 export interface ImportConfigurationData {
+  version?: string;
+  exportedAt?: string;
   name: string;
   description: string;
   enabled: boolean;
@@ -50,6 +52,14 @@ export class ImportConfigurationHandler implements ICommandHandler<ImportConfigu
   async execute(command: ImportConfiguration): Promise<ImportConfigurationResponse> {
     const { data } = command;
 
+    // Check version and warn if different
+    const currentVersion = process.env.VERSION || 'unknown';
+    if (data.version && data.version !== currentVersion) {
+      this.logger.warn(
+        `Importing configuration "${data.name}" from version ${data.version}, but current version is ${currentVersion}. Proceeding with import, but compatibility issues may occur.`,
+      );
+    }
+
     // Validate that all extensions exist in the system
     const unavailableExtensions: string[] = [];
     for (const ext of data.extensions) {
@@ -73,11 +83,9 @@ export class ImportConfigurationHandler implements ICommandHandler<ImportConfigu
       const extension = this.extensionExplorer.getExtension(ext.name);
       if (extension) {
         try {
-          // Unmask values (remove masked placeholders)
-          const unmaskedValues = unmaskExtensionValues({ ...ext.values });
-
+          const values = { ...ext.values };
           // Validate configuration against extension spec
-          validateConfiguration(unmaskedValues, extension.spec);
+          validateConfiguration(values, extension.spec);
         } catch (error) {
           const errorMessage = error instanceof Error ? error.message : String(error);
           this.logger.error(
@@ -88,7 +96,7 @@ export class ImportConfigurationHandler implements ICommandHandler<ImportConfigu
       }
     }
 
-    // Create new configuration
+    // Create a new configuration
     const configurationEntity = new ConfigurationEntity();
     configurationEntity.name = data.name;
     configurationEntity.description = data.description;
@@ -109,7 +117,7 @@ export class ImportConfigurationHandler implements ICommandHandler<ImportConfigu
       const extensionEntity = new ExtensionEntity();
       extensionEntity.name = ext.name;
       extensionEntity.enabled = ext.enabled;
-      extensionEntity.values = unmaskExtensionValues({ ...ext.values });
+      extensionEntity.values = { ...ext.values };
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       extensionEntity.configurableArguments = ext.configurableArguments;
       extensionEntity.configuration = savedConfiguration;

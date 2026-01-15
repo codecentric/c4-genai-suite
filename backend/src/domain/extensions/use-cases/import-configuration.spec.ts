@@ -388,4 +388,238 @@ describe(ImportConfiguration.name, () => {
     const savedExtensions = extensionRepository.save.mock.calls[0][0];
     expect(savedExtensions[0].configurableArguments).toEqual({ temperature: 0.7 });
   });
+
+  it('should warn when importing configuration from different version', async () => {
+    const savedConfiguration: Partial<ConfigurationEntity> = {
+      id: 7,
+      name: 'Config from different version',
+      description: 'Test',
+      status: ConfigurationStatus.ENABLED,
+      agentName: undefined,
+      chatFooter: undefined,
+      chatSuggestions: undefined,
+      executorEndpoint: undefined,
+      executorHeaders: undefined,
+      userGroupIds: [],
+      extensions: [],
+    };
+
+    jest.spyOn(configRepository, 'save').mockResolvedValue(savedConfiguration);
+    jest.spyOn(extensionRepository, 'save').mockResolvedValue([]);
+    jest.spyOn(configRepository, 'findOne').mockResolvedValue(savedConfiguration);
+    jest.spyOn(explorer, 'getExtension').mockReturnValue({
+      spec: {
+        name: 'test',
+        arguments: {},
+        title: 'Test',
+        description: 'Test',
+        type: 'tool',
+      },
+      getMiddlewares: () => Promise.resolve([]),
+    } as Extension);
+
+    // Set current VERSION
+    process.env.VERSION = '2.0.0';
+
+    const importData: ImportConfigurationData = {
+      version: '1.0.0', // Different version
+      name: 'Config from different version',
+      description: 'Test',
+      enabled: true,
+      userGroupIds: [],
+      extensions: [],
+    };
+
+    const loggerWarnSpy = jest.spyOn(handler['logger'], 'warn');
+
+    await handler.execute(new ImportConfiguration(importData));
+
+    expect(loggerWarnSpy).toHaveBeenCalledWith(expect.stringContaining('from version 1.0.0, but current version is 2.0.0'));
+
+    // Clean up
+    delete process.env.VERSION;
+  });
+
+  it('should not warn when importing configuration from same version', async () => {
+    const savedConfiguration: Partial<ConfigurationEntity> = {
+      id: 8,
+      name: 'Config from same version',
+      description: 'Test',
+      status: ConfigurationStatus.ENABLED,
+      agentName: undefined,
+      chatFooter: undefined,
+      chatSuggestions: undefined,
+      executorEndpoint: undefined,
+      executorHeaders: undefined,
+      userGroupIds: [],
+      extensions: [],
+    };
+
+    jest.spyOn(configRepository, 'save').mockResolvedValue(savedConfiguration);
+    jest.spyOn(extensionRepository, 'save').mockResolvedValue([]);
+    jest.spyOn(configRepository, 'findOne').mockResolvedValue(savedConfiguration);
+    jest.spyOn(explorer, 'getExtension').mockReturnValue({
+      spec: {
+        name: 'test',
+        arguments: {},
+        title: 'Test',
+        description: 'Test',
+        type: 'tool',
+      },
+      getMiddlewares: () => Promise.resolve([]),
+    } as Extension);
+
+    // Set current VERSION
+    process.env.VERSION = '2.0.0';
+
+    const importData: ImportConfigurationData = {
+      version: '2.0.0', // Same version
+      name: 'Config from same version',
+      description: 'Test',
+      enabled: true,
+      userGroupIds: [],
+      extensions: [],
+    };
+
+    const loggerWarnSpy = jest.spyOn(handler['logger'], 'warn');
+
+    await handler.execute(new ImportConfiguration(importData));
+
+    expect(loggerWarnSpy).not.toHaveBeenCalled();
+
+    // Clean up
+    delete process.env.VERSION;
+  });
+
+  it('should properly remove masked values without using unmaskExtensionValues', async () => {
+    const savedConfiguration: Partial<ConfigurationEntity> = {
+      id: 9,
+      name: 'Config with masked nested values',
+      description: 'Test',
+      status: ConfigurationStatus.ENABLED,
+      agentName: undefined,
+      chatFooter: undefined,
+      chatSuggestions: undefined,
+      executorEndpoint: undefined,
+      executorHeaders: undefined,
+      userGroupIds: [],
+      extensions: [],
+    };
+
+    jest.spyOn(configRepository, 'save').mockResolvedValue(savedConfiguration);
+    jest.spyOn(extensionRepository, 'save').mockImplementation((entities) => Promise.resolve(entities));
+    jest.spyOn(configRepository, 'findOne').mockResolvedValue({
+      ...savedConfiguration,
+      extensions: [],
+    });
+
+    jest.spyOn(explorer, 'getExtension').mockReturnValue({
+      spec: {
+        name: 'test-extension',
+        arguments: {
+          apiKey: {
+            type: 'string',
+            format: 'password',
+            required: false,
+          } as ExtensionStringArgument,
+          nested: {
+            type: 'object',
+            title: 'Nested Object',
+            properties: {
+              secretKey: {
+                type: 'string',
+                format: 'password',
+                required: false,
+              } as ExtensionStringArgument,
+              publicValue: {
+                type: 'string',
+                required: true,
+              } as ExtensionStringArgument,
+            },
+            required: false,
+          },
+        },
+        title: 'Test',
+        description: 'Test',
+        type: 'tool',
+      },
+      getMiddlewares: () => Promise.resolve([]),
+    } as Extension);
+
+    const importData: ImportConfigurationData = {
+      name: 'Config with masked nested values',
+      description: 'Test',
+      enabled: true,
+      userGroupIds: [],
+      extensions: [
+        {
+          name: 'test-extension',
+          enabled: true,
+          values: {
+            apiKey: '********************', // Masked - should be removed
+            endpoint: 'https://api.example.com', // Not masked - should remain
+            nested: {
+              secretKey: '********************', // Masked - should be removed
+              publicValue: 'public', // Not masked - should remain
+            },
+          },
+        },
+      ],
+    };
+
+    await handler.execute(new ImportConfiguration(importData));
+
+    const savedExtensions = extensionRepository.save.mock.calls[0][0];
+    expect(savedExtensions[0].values.apiKey).toBeUndefined(); // Masked value removed
+    expect(savedExtensions[0].values.endpoint).toBe('https://api.example.com'); // Kept
+    expect(savedExtensions[0].values.nested.secretKey).toBeUndefined(); // Nested masked removed
+    expect(savedExtensions[0].values.nested.publicValue).toBe('public'); // Nested kept
+  });
+
+  it('should include exportedAt timestamp in import data', async () => {
+    const savedConfiguration: Partial<ConfigurationEntity> = {
+      id: 10,
+      name: 'Config with timestamp',
+      description: 'Test',
+      status: ConfigurationStatus.ENABLED,
+      agentName: undefined,
+      chatFooter: undefined,
+      chatSuggestions: undefined,
+      executorEndpoint: undefined,
+      executorHeaders: undefined,
+      userGroupIds: [],
+      extensions: [],
+    };
+
+    jest.spyOn(configRepository, 'save').mockResolvedValue(savedConfiguration);
+    jest.spyOn(extensionRepository, 'save').mockResolvedValue([]);
+    jest.spyOn(configRepository, 'findOne').mockResolvedValue(savedConfiguration);
+    jest.spyOn(explorer, 'getExtension').mockReturnValue({
+      spec: {
+        name: 'test',
+        arguments: {},
+        title: 'Test',
+        description: 'Test',
+        type: 'tool',
+      },
+      getMiddlewares: () => Promise.resolve([]),
+    } as Extension);
+
+    const exportedAt = new Date().toISOString();
+
+    const importData: ImportConfigurationData = {
+      version: '1.0.0',
+      exportedAt,
+      name: 'Config with timestamp',
+      description: 'Test',
+      enabled: true,
+      userGroupIds: [],
+      extensions: [],
+    };
+
+    const result = await handler.execute(new ImportConfiguration(importData));
+
+    expect(result).toBeDefined();
+    expect(result.configuration.name).toBe('Config with timestamp');
+  });
 });

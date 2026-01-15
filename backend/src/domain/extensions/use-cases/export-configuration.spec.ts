@@ -81,9 +81,15 @@ describe(ExportConfiguration.name, () => {
       } as Extension;
     });
 
+    // Set VERSION for test
+    process.env.VERSION = '1.0.0';
+
     const result = await handler.execute(new ExportConfiguration(1));
 
     expect(result).toBeDefined();
+    expect(result.version).toBe('1.0.0');
+    expect(result.exportedAt).toBeDefined();
+    expect(new Date(result.exportedAt).getTime()).toBeLessThanOrEqual(new Date().getTime());
     expect(result.name).toBe('Test Config');
     expect(result.description).toBe('Test Description');
     expect(result.enabled).toBe(true);
@@ -96,6 +102,9 @@ describe(ExportConfiguration.name, () => {
     expect(result.extensions[0].enabled).toBe(true);
     expect(result.extensions[0].values.apiKey).toBe('********************');
     expect(result.extensions[0].values.endpoint).toBe('https://api.example.com');
+
+    // Clean up
+    delete process.env.VERSION;
   });
 
   it('should export configuration without extensions', async () => {
