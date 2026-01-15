@@ -100,6 +100,9 @@ export function ConfigurationPage() {
         return;
       }
       importConfig.mutate(data);
+    } catch (error) {
+      // Handle file reading errors
+      toast.error(await buildError(texts.extensions.importConfigurationFailed, error as Error));
     } finally {
       // Reset file input
       if (fileInputRef.current) {
