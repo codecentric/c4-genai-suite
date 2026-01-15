@@ -1,7 +1,7 @@
 import { ActionIcon, Menu } from '@mantine/core';
-import { IconCopy, IconDots, IconEdit, IconTrash } from '@tabler/icons-react';
+import { IconCopy, IconDots, IconDownload, IconEdit, IconTrash } from '@tabler/icons-react';
 import { memo } from 'react';
-import { ConfigurationDto } from 'src/api';
+import { ConfigurationDto, useApi } from 'src/api';
 import { ConfirmDialog, TransientNavLink } from 'src/components';
 import { cn } from 'src/lib';
 import { texts } from 'src/texts';
@@ -21,6 +21,30 @@ interface ConfigurationProps {
 
 export const Configuration = memo((props: ConfigurationProps) => {
   const { configuration, onDelete, onUpdate, onDuplicate } = props;
+  const api = useApi();
+
+  const handleExport = async () => {
+    try {
+      const exportedData = await api.extensions.exportConfiguration(configuration.id);
+
+      // Sanitize filename: keep alphanumerics, hyphens, underscores, spaces
+      const sanitizedName = configuration.name.replace(/[^a-zA-Z0-9\-_ ]/g, '_');
+      const filename = `${sanitizedName}_config.json`;
+
+      // Create blob and download
+      const blob = new Blob([JSON.stringify(exportedData, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch {
+      // Silently fail for export errors
+    }
+  };
 
   return (
     <li className="group flex items-center !px-0">
@@ -44,6 +68,9 @@ export const Configuration = memo((props: ConfigurationProps) => {
           </Menu.Item>
           <Menu.Item leftSection={<IconCopy size={14} />} onClick={() => onDuplicate(configuration)}>
             {texts.common.duplicate}
+          </Menu.Item>
+          <Menu.Item leftSection={<IconDownload size={14} />} onClick={handleExport}>
+            {texts.common.export}
           </Menu.Item>
           <ConfirmDialog
             title={texts.extensions.removeConfigurationConfirmTitle}

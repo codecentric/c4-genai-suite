@@ -1,9 +1,9 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Route, Routes } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { ConfigurationDto, useApi } from 'src/api';
+import { ConfigurationDto, ExportedConfigurationDto, useApi } from 'src/api';
 import { Icon, Page } from 'src/components';
 import { useEventCallback, useTransientNavigate } from 'src/hooks';
 import { buildError } from 'src/lib';
@@ -17,6 +17,7 @@ import { useConfigurationStore } from './state';
 export function ConfigurationPage() {
   const api = useApi();
   const { i18n } = useTranslation();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const navigate = useTransientNavigate();
   const [toCreate, setToCreate] = useState<boolean>();
@@ -60,6 +61,21 @@ export function ConfigurationPage() {
     },
   });
 
+  const importConfig = useMutation({
+    mutationFn: (data: ExportedConfigurationDto) => {
+      return api.extensions.importConfiguration({ data });
+    },
+    onSuccess: (configuration) => {
+      setConfiguration(configuration);
+
+      toast.success(texts.extensions.importConfigurationSuccess);
+      navigate(`/admin/assistants/${configuration.id}`);
+    },
+    onError: async (error) => {
+      toast.error(await buildError(texts.extensions.importConfigurationFailed, error));
+    },
+  });
+
   const doCreate = useEventCallback((configuration: ConfigurationDto) => {
     setConfiguration(configuration);
     navigate(`/admin/assistants/${configuration.id}`);
@@ -70,18 +86,56 @@ export function ConfigurationPage() {
     setToCreate(false);
   });
 
+  const handleFileChange = useEventCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const text = await file.text();
+      const data = JSON.parse(text) as ExportedConfigurationDto;
+      importConfig.mutate(data);
+    } catch {
+      toast.error(texts.extensions.importConfigurationInvalidJson);
+    } finally {
+      // Reset file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  });
+
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
+  };
+
   return (
     <Page
       menu={
         <div className="flex flex-col overflow-y-hidden">
-          <div className="flex p-8 pb-4">
+          <div className="flex gap-x-2 p-8 pb-4">
             <h3 id={texts.extensions.configurations} className="grow text-xl">
               {texts.extensions.configurations}
             </h3>
 
+            <button
+              className="btn btn-square btn-sm text-sm"
+              onClick={handleImportClick}
+              title={texts.extensions.importConfiguration}
+            >
+              <Icon icon="arrow-up" size={16} />
+            </button>
+
             <button className="btn btn-square btn-sm text-sm" onClick={() => setToCreate(true)}>
               <Icon icon="plus" size={16} />
             </button>
+
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".json,application/json"
+              onChange={handleFileChange}
+              style={{ display: 'none' }}
+            />
           </div>
 
           <div className="grow overflow-y-auto p-4 pt-4">
