@@ -23,11 +23,14 @@ export function ChatSuggestions(props: ChatSuggestionsProps) {
   const fields = ((form.getValues() as Record<string, unknown>)[name] as ChatSuggestion[] | undefined) ?? [];
 
   const addItem = () => {
-    form.insertListItem(name, { title: '', subtitle: '', text: '' });
+    form.setFieldValue(name, [...fields, { title: '', subtitle: '', text: '' }]);
   };
 
   const removeItem = (index: number) => {
-    form.removeListItem(name, index);
+    form.setFieldValue(
+      name,
+      fields.filter((_, i) => i !== index),
+    );
   };
 
   return (

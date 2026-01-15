@@ -24,6 +24,32 @@ import { texts } from 'src/texts';
 
 type ExtensionUserInfoDtoUserArgumentsValue = ExtensionArgumentObjectSpecDtoPropertiesValue;
 
+function formatDateOnly(date: Date | null): string | null {
+  if (!date) return null;
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function setNestedFieldValue(form: UseFormReturnType<any>, path: string, value: unknown) {
+  const parts = path.split('.');
+  if (parts.length === 1) {
+    form.setFieldValue(path, value);
+    return;
+  }
+  const formValues = form.getValues() as Record<string, unknown>;
+  const setAtPath = (obj: Record<string, unknown>, keys: string[]): void => {
+    const [key, ...rest] = keys;
+    if (rest.length === 0) {
+      obj[key] = value;
+    } else {
+      obj[key] = obj[key] ?? {};
+      setAtPath(obj[key] as Record<string, unknown>, rest);
+    }
+  };
+  setAtPath(formValues, parts);
+  form.setValues(formValues);
+}
+
 interface ExtensionFormProps {
   // The buckets.
   buckets: BucketDto[];
@@ -145,9 +171,17 @@ export function Argument({
   };
 
   if (type === 'string' && argument.format === 'date') {
+    const { value } = form.getInputProps(fieldName) as { value: string | undefined };
     return (
       <FormRow name={fieldName} label={title} hints={hints()}>
-        <DateInput id={fieldName} required={required} key={form.key(fieldName)} {...form.getInputProps(fieldName)} />
+        <DateInput
+          id={fieldName}
+          required={required}
+          key={form.key(fieldName)}
+          {...form.getInputProps(fieldName)}
+          value={value ? new Date(value) : null}
+          onChange={(date) => setNestedFieldValue(form, fieldName, formatDateOnly(date))}
+        />
       </FormRow>
     );
   }
