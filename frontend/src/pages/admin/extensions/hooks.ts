@@ -14,6 +14,10 @@ import { texts } from 'src/texts';
 
 type ExtensionUserInfoDtoUserArgumentsValue = ExtensionArgumentObjectSpecDtoPropertiesValue;
 
+function optionalWithEmptyString<T extends z.ZodTypeAny>(type: T) {
+  return type.optional().or(z.literal('').transform(() => undefined));
+}
+
 export function useListValues(spec: ExtensionSpecDto, buckets: BucketDto[], extension?: ExtensionDto) {
   return useMemo(() => {
     const result: string[] = [];
@@ -65,7 +69,7 @@ function getType(arg: ExtensionUserInfoDtoUserArgumentsValue): z.ZodTypeAny | un
     const type = defaultValue !== undefined ? baseType.default(defaultValue) : baseType;
 
     if (!arg.required) {
-      return type.optional().or(z.literal('').transform(() => undefined));
+      return optionalWithEmptyString(type);
     }
 
     return type;
@@ -90,7 +94,7 @@ function getType(arg: ExtensionUserInfoDtoUserArgumentsValue): z.ZodTypeAny | un
 
     if (arg.format === 'date' || arg.format === 'select') {
       if (!arg.required) {
-        return type.optional().or(z.literal('').transform(() => undefined));
+        return optionalWithEmptyString(type);
       }
     }
 
