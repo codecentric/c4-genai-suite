@@ -282,9 +282,9 @@ export function Argument({
   }
 
   if (type === 'number' && argument.format === 'slider') {
-    const min = argument.minimum ?? 0;
-    const max = argument.maximum ?? 100;
-    const step = argument.multipleOf ?? (max - min) / 100;
+    const min = argument.minimum;
+    const max = argument.maximum;
+    const step = argument.multipleOf ?? ((max || 100) - (min || 0)) / 100;
 
     return (
       <FormRow name={fieldName} label={title} hints={hints()}>

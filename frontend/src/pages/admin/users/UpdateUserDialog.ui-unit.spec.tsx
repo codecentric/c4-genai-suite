@@ -41,7 +41,6 @@ describe('UpdateUserDialog', () => {
 
     expect(screen.getByLabelText(required(texts.common.name))).toHaveValue(mockUser.name);
     expect(screen.getByLabelText(required(texts.common.email))).toHaveValue(mockUser.email);
-    // Check that the Admin pill is shown in the MultiSelect (using Mantine Pill class)
     expect(document.querySelector('.mantine-Pill-label')).toHaveTextContent('Admin');
   });
 

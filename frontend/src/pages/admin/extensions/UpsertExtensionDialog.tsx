@@ -92,12 +92,6 @@ export function UpsertExtensionDialog(props: UpsertExtensionDialogProps) {
     mode: 'controlled',
   });
 
-  useEffect(() => {
-    if (selected) {
-      form.setValues(selected);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selected]);
   const rebuildTriggered = useRef(false);
   useEffect(() => {
     if (selected && spec?.triggers && !rebuildTriggered.current) {
