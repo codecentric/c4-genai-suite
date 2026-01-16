@@ -187,14 +187,26 @@ export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEm
 
         <div className="flex flex-wrap gap-2">
           {(() => {
-            const visibleFiles = [
-              ...uploadingFiles.map((file) => ({ fileName: file.name, isUploading: true, originalFile: file })),
-              ...chatFiles.map((file) => ({ fileName: file.fileName, isUploading: false, originalFile: file })),
-            ]
-              .sort((a, b) => a.fileName.localeCompare(b.fileName))
-              .filter((file, index, array) => array.findIndex((f) => f.fileName === file.fileName) === index);
+            const filesWithMetadata = [
+              ...uploadingFiles.map((file) => ({
+                fileName: file.name,
+                isUploading: true,
+                originalFile: file,
+                uploadTime: new Date(),
+              })),
+              ...chatFiles.map((file) => ({
+                fileName: file.fileName,
+                isUploading: false,
+                originalFile: file,
+                uploadTime: new Date(file.uploadedAt),
+              })),
+            ].sort((a, b) => {
+              const alphabeticalOrder = a.fileName.localeCompare(b.fileName);
+              if (alphabeticalOrder !== 0) return alphabeticalOrder;
+              return a.uploadTime.getTime() - b.uploadTime.getTime();
+            });
 
-            return visibleFiles.map((file) => (
+            return filesWithMetadata.map((file) => (
               <FileItemComponent
                 key={file.isUploading ? `upload-${file.fileName}` : (file.originalFile as FileDto).id}
                 file={file.isUploading ? { fileName: file.fileName } : (file.originalFile as FileDto)}

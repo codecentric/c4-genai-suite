@@ -31,8 +31,7 @@ export const useChatDropzone = () => {
     .filter((m) => m.status === 'pending')
     .map((m) => m.variables?.file)
     .filter(Boolean)
-    .map((f) => f!)
-    .filter((f) => !chatFiles?.some((chatFile) => chatFile?.fileName === f?.name));
+    .map((f) => f!);
 
   const getFileSlots = () => {
     return userBucket?.extensions.map((x) => {
