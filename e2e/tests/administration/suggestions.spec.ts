@@ -7,11 +7,12 @@ import {
   newChat,
   selectConfiguration,
   selectOption,
+  uniqueName,
 } from '../utils/helper';
 
 const MAX_SUGGESTIONS = 12;
-const ASSISTANT_NAME = 'Assistant Suggestions';
-const ASSISTANT_NAME_GLOBAL = 'Global Suggestions';
+const ASSISTANT_NAME = uniqueName('Assistant Suggestions');
+const ASSISTANT_NAME_GLOBAL = uniqueName('Global Suggestions');
 
 test('When using suggestions c4', async ({ page }) => {
   await test.step('will login', async () => {
@@ -27,7 +28,7 @@ test('When using suggestions c4', async ({ page }) => {
     // page can glitch the language setting.
     // At human speeds this issue could not be reproduced.
     await navigateToThemeAdministration(page);
-    await selectOption(page, 'Language', /^Eng.+/);
+    await selectOption(page, 'language', /^Eng.+/);
     await page.getByRole('group').getByRole('button', { name: 'Save' }).click();
   });
 

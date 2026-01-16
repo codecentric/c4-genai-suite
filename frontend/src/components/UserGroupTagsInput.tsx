@@ -51,6 +51,7 @@ export function UserGroupTagsInput<T extends UserGroupTagsInputFormValues>({ for
   const suggestions = userGroups?.items.map((group) => group.name) ?? [];
   return (
     <TagsInput
+      id="userGroupIds"
       description={texts.extensions.userGroupsHints}
       label={texts.common.userGroups}
       {...inputProps}

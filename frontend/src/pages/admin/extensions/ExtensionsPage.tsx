@@ -2,7 +2,6 @@ import { Button, Fieldset, Tabs } from '@mantine/core';
 import { IconBlocks, IconBrain, IconCopy, IconEdit, IconPlus, IconTool, IconTrash } from '@tabler/icons-react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
-import { FormProvider, useForm } from 'react-hook-form';
 import { useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useApi } from 'src/api';
@@ -10,7 +9,6 @@ import { BucketDto, ConfigurationDto, ExtensionDto } from 'src/api/generated';
 import { Alert, ConfirmDialog, Icon } from 'src/components';
 import { useEventCallback, useTransientNavigate } from 'src/hooks';
 import { buildError } from 'src/lib';
-import { Argument } from 'src/pages/admin/extensions/ExtensionForm';
 import { texts } from 'src/texts';
 import { ExtensionCard } from './ExtensionCard';
 import { UpsertConfigurationDialog } from './UpsertConfigurationDialog';
@@ -152,8 +150,6 @@ export function ExtensionsPage() {
     incompatibleToolPairs.map(([tool, otherTool]) => [tool.spec.title, otherTool.spec.title]),
   );
 
-  const form = useForm<Record<string, unknown>>({});
-
   return (
     <>
       {thisConfiguration && (
@@ -281,39 +277,36 @@ export function ExtensionsPage() {
             </div>
 
             {extensions.some((x) => x.configurableArguments) && (
-              <FormProvider {...form}>
-                <form>
-                  <div className="flex flex-col gap-2">
-                    <h3 className="text-xl">{texts.common.configurableArguments}</h3>
+              <div className="flex flex-col gap-2">
+                <h3 className="text-xl">{texts.common.configurableArguments}</h3>
 
-                    {extensions
-                      .filter((x) => x.configurableArguments)
-                      .map((x) => (
-                        <Fieldset
-                          key={x.id}
-                          legend={
-                            <div className="flex items-center">
-                              <h4 className="mr-2.5 font-bold">{x.configurableArguments?.title}</h4>
-                              <p className="text-xs">{x.configurableArguments?.description}</p>
+                {extensions
+                  .filter((x) => x.configurableArguments)
+                  .map((x) => (
+                    <Fieldset
+                      key={x.id}
+                      legend={
+                        <div className="flex items-center">
+                          <h4 className="mr-2.5 font-bold">{x.configurableArguments?.title}</h4>
+                          <p className="text-xs">{x.configurableArguments?.description}</p>
+                        </div>
+                      }
+                    >
+                      <ul className="list-none space-y-2 text-sm">
+                        {Object.entries(x.configurableArguments!.properties).map(([name, spec]) => (
+                          <li key={`${x.id}-${name}`} className="flex flex-col gap-0.5 border-l-2 border-slate-300 pl-3">
+                            <div className="flex items-center gap-2">
+                              <span className="font-semibold text-slate-700">{spec.title}</span>
+                              <span className="rounded bg-slate-100 px-1.5 py-0.5 text-xs text-slate-500">{spec.type}</span>
+                              {spec.required && <span className="text-xs text-red-500">*</span>}
                             </div>
-                          }
-                        >
-                          {Object.entries(x.configurableArguments!.properties).map(([name, spec]) => (
-                            <Argument
-                              namePrefix={`${x.id}.`}
-                              refreshable
-                              vertical
-                              key={`${x.id}-${name}`}
-                              buckets={[]}
-                              name={name}
-                              argument={spec}
-                            />
-                          ))}
-                        </Fieldset>
-                      ))}
-                  </div>
-                </form>
-              </FormProvider>
+                            {spec.description && <p className="text-slate-500">{spec.description}</p>}
+                          </li>
+                        ))}
+                      </ul>
+                    </Fieldset>
+                  ))}
+              </div>
             )}
           </div>
 

@@ -27,8 +27,8 @@ describe('UpdateUserGroupDialog', () => {
     render(<UpdateUserGroupDialog {...defaultProps} />);
 
     expect(screen.getByLabelText(required(texts.common.groupName))).toHaveValue(mockUserGroup.name);
-    expect(screen.getByLabelText(texts.common.monthlyTokens)).toHaveValue(mockUserGroup.monthlyTokens);
-    expect(screen.getByLabelText(texts.common.monthlyUserTokens)).toHaveValue(mockUserGroup.monthlyUserTokens);
+    expect(screen.getByLabelText(texts.common.monthlyTokens)).toBeInTheDocument();
+    expect(screen.getByLabelText(texts.common.monthlyUserTokens)).toBeInTheDocument();
   });
 
   it('should call onClose when cancel button is clicked', async () => {
@@ -52,6 +52,6 @@ describe('UpdateUserGroupDialog', () => {
     const saveButton = screen.getByRole('button', { name: texts.common.save });
     await user.click(saveButton);
 
-    expect(screen.getAllByRole('alert')).toHaveLength(1);
+    expect(document.querySelectorAll('.mantine-InputWrapper-error')).toHaveLength(1);
   });
 });

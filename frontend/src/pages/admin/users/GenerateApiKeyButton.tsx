@@ -1,9 +1,8 @@
-import { useFormContext } from 'react-hook-form';
+import { UseFormReturnType } from '@mantine/form';
 import { texts } from 'src/texts';
 
-export function GenerateApiKeyButton({ disabled }: { disabled?: boolean }) {
-  const { setValue } = useFormContext();
-
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function GenerateApiKeyButton({ disabled, form }: { disabled?: boolean; form: UseFormReturnType<any> }) {
   const generateKey = async () => {
     const encoder = new TextEncoder();
 
@@ -15,7 +14,7 @@ export function GenerateApiKeyButton({ disabled }: { disabled?: boolean }) {
 
     const keyResult = hashArray.map((c) => c.toString(16).padStart(2, '0')).join('');
 
-    setValue('apiKey', keyResult);
+    form.setFieldValue('apiKey', keyResult);
   };
 
   return (

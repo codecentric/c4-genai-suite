@@ -1,13 +1,43 @@
 import { Button, Fieldset, Portal } from '@mantine/core';
+import { useForm } from '@mantine/form';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { PropsWithChildren, useEffect } from 'react';
-import { FormProvider, useForm } from 'react-hook-form';
-import { ConfigurationDto, useApi } from 'src/api';
+import { ConfigurationDto, ExtensionArgumentObjectSpecDto, ExtensionArgumentObjectSpecDtoPropertiesValue, useApi } from 'src/api';
 import { Modal } from 'src/components';
 import { ExtensionContext } from 'src/hooks';
 import { Argument } from 'src/pages/admin/extensions/ExtensionForm';
 import { useArgumentObjectSpecResolver } from 'src/pages/admin/extensions/hooks';
 import { texts } from 'src/texts';
+
+type JSONValue = string | number | boolean | object | unknown[] | undefined;
+
+function getDefault(spec: ExtensionArgumentObjectSpecDtoPropertiesValue): JSONValue {
+  switch (spec.type) {
+    case 'array':
+      return spec._default ?? [];
+    case 'string':
+      return spec._default ?? '';
+    case 'number':
+    case 'boolean':
+      return spec._default;
+    case 'object':
+      return getInitialValuesFromSpec(spec);
+  }
+}
+
+function getInitialValuesFromSpec(spec?: ExtensionArgumentObjectSpecDto): Record<string, JSONValue> {
+  if (!spec?.properties) {
+    return {};
+  }
+
+  const initialValues: Record<string, JSONValue> = {};
+
+  for (const [key, property] of Object.entries(spec.properties)) {
+    initialValues[key] = getDefault(property);
+  }
+
+  return initialValues;
+}
 
 interface JsonFormProps {
   configuration: ConfigurationDto;
@@ -26,8 +56,9 @@ export function ConfigurationUserValuesModal(props: JsonFormProps & PropsWithChi
   });
 
   const form = useForm<ExtensionContext>({
-    resolver: useArgumentObjectSpecResolver(configuration.configurableArguments),
-    defaultValues: fetchedValues?.values ?? {},
+    mode: 'controlled',
+    initialValues: getInitialValuesFromSpec(configuration.configurableArguments) as ExtensionContext,
+    validate: useArgumentObjectSpecResolver<ExtensionContext>(configuration.configurableArguments),
   });
 
   const updateValues = useMutation({
@@ -35,71 +66,68 @@ export function ConfigurationUserValuesModal(props: JsonFormProps & PropsWithChi
       return api.extensions.updateConfigurationUserValues(configuration.id, { values });
     },
     onSuccess: (data) => {
-      form.reset(data.values);
+      form.setValues(data.values);
       onSubmit();
     },
   });
 
   useEffect(() => {
     if (fetchedValues) {
-      form.reset(fetchedValues.values);
+      form.setValues(fetchedValues.values);
     }
-  }, [fetchedValues, form]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fetchedValues]);
 
   return (
     <>
       {configuration.configurableArguments && (
         <Portal>
-          <FormProvider {...form}>
-            <form onSubmit={form.handleSubmit((v) => updateValues.mutate(v))}>
-              <Modal
-                onClose={onClose}
-                header={configuration.name}
-                footer={
-                  <fieldset>
-                    <div className="flex flex-row justify-end">
-                      <div className="flex gap-2">
-                        <Button type="button" variant="subtle" onClick={onClose}>
-                          {texts.common.cancel}
-                        </Button>
-                        <Button type="submit">{texts.common.save}</Button>
-                      </div>
+          <form onSubmit={form.onSubmit((v) => updateValues.mutate(v))}>
+            <Modal
+              onClose={onClose}
+              header={configuration.name}
+              footer={
+                <fieldset>
+                  <div className="flex flex-row justify-end">
+                    <div className="flex gap-2">
+                      <Button type="button" variant="subtle" onClick={onClose}>
+                        {texts.common.cancel}
+                      </Button>
+                      <Button type="submit">{texts.common.save}</Button>
                     </div>
-                  </fieldset>
-                }
-              >
-                <div className="flex flex-col">
-                  {Object.entries(configuration.configurableArguments?.properties ?? {}).map(([id, x]) => (
-                    <>
-                      {x.type === 'object' && (
-                        <Fieldset
-                          key={x.title}
-                          legend={
-                            <div className="flex items-center">
-                              <h4 className="mr-2.5 font-bold">{x.title}</h4>
-                              <p className="text-xs">{x.description}</p>
-                            </div>
-                          }
-                        >
-                          {Object.entries(x.properties).map(([name, spec]) => (
-                            <Argument
-                              namePrefix={`${id}.`}
-                              refreshable
-                              vertical
-                              key={`${id}-${name}`}
-                              buckets={[]}
-                              name={name}
-                              argument={spec}
-                            />
-                          ))}
-                        </Fieldset>
-                      )}
-                    </>
-                  ))}
-                </div>
-              </Modal>
-            </form>
-          </FormProvider>
+                  </div>
+                </fieldset>
+              }
+            >
+              <div className="flex flex-col">
+                {Object.entries(configuration.configurableArguments?.properties ?? {}).map(([id, x]) => (
+                  <div key={id}>
+                    {x.type === 'object' && (
+                      <Fieldset
+                        legend={
+                          <div className="flex items-center">
+                            <h4 className="mr-2.5 font-bold">{x.title}</h4>
+                            <p className="text-xs">{x.description}</p>
+                          </div>
+                        }
+                      >
+                        {Object.entries(x.properties).map(([name, spec]) => (
+                          <Argument
+                            namePrefix={`${id}.`}
+                            key={`${id}-${name}`}
+                            buckets={[]}
+                            name={name}
+                            argument={spec}
+                            form={form}
+                          />
+                        ))}
+                      </Fieldset>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </Modal>
+          </form>
         </Portal>
       )}
     </>

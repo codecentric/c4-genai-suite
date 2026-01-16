@@ -6,8 +6,6 @@ export * from './CollapseButton';
 export * from './ConfirmDialog';
 export * from './FilterableTable';
 export * from './FormAlert';
-export * from './FormControlError';
-export * from './Forms';
 export * from './Icon';
 export * from './InfoByte';
 export * from './Logo';

@@ -59,9 +59,11 @@ test.describe('User management', () => {
     await navigateToUserAdministration(page);
 
     await page.getByRole('button', { name: 'Create User' }).click();
-    const groupIdsValue = await page.locator('input[type="hidden"][name="userGroupIds"]').first().inputValue();
 
-    expect(groupIdsValue).toEqual('default');
+    const allPills = page.locator('.mantine-MultiSelect-pill');
+    await expect(allPills).toHaveCount(1);
+    const defaultPill = allPills.getByText('Default');
+    await expect(defaultPill).toBeVisible();
   });
 
   test('should alert when username and email is empty', async ({ page }) => {

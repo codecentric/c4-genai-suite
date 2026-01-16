@@ -2,7 +2,8 @@ import { render, renderHook, RenderOptions, screen } from '@testing-library/reac
 import { Theme } from 'src/hooks';
 import { AllTheProviders } from './mock/AllTheProviders';
 
-export const required = (label: string) => `${label}*`;
+// Mantine adds a space before the asterisk in required labels
+export const required = (label: string) => `${label} *`;
 
 const customRender = (ui: React.ReactElement, options?: Omit<RenderOptions, 'wrapper'> & { theme: Theme }) => {
   return render(ui, {

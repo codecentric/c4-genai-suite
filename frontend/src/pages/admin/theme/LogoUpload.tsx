@@ -2,7 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { useApi } from 'src/api';
-import { Alert, Forms, Logo } from 'src/components';
+import { Alert, Logo, Markdown } from 'src/components';
 import { useTheme } from 'src/hooks';
 import { buildError } from 'src/lib';
 import { texts } from 'src/texts';
@@ -73,7 +73,9 @@ export function LogoUpload({ imageType }: LogoUploadProps) {
               <SaveButton onClick={upload} disabled={updating.isPending || !previewLogo} />
               <DeleteButton onClick={deleteLogo} disabled={!theme[`${imageType}Url`] || deleting.isPending} />
             </div>
-            <Forms.Hints className="mt-2" hints={texts.theme[`${imageType}Hint`]} />
+            <div className="mt-2 text-sm leading-6 text-slate-500">
+              <Markdown>{texts.theme[`${imageType}Hint`]}</Markdown>
+            </div>
           </div>
         </div>
       </div>
