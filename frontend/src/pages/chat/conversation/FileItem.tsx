@@ -59,6 +59,9 @@ export const FileItemComponent = ({ file, onRemove, loading }: FileItemProps) =>
                 </span>
               </div>
             )}
+            {!loading && 'uploadedAt' in file && file.uploadedAt && (
+              <div className="text-xs text-gray-500">{new Date(file.uploadedAt).toLocaleString()}</div>
+            )}
           </div>
         </div>
 
