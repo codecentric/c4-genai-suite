@@ -83,11 +83,11 @@ export function UpsertExtensionDialog(props: UpsertExtensionDialogProps) {
       onClose();
     },
   });
-  const resolver = useSpecResolver(spec);
+  const resolver = useSpecResolver<CreateExtensionDto>(spec);
 
   const defaultValues: CreateExtensionDto = selected ?? { name: '', enabled: true, values: {} };
   const form = useForm<CreateExtensionDto>({
-    validate: resolver as unknown as (values: CreateExtensionDto) => Record<string, string | null>,
+    validate: resolver,
     initialValues: defaultValues,
     mode: 'controlled',
   });
@@ -191,8 +191,7 @@ export function UpsertExtensionDialog(props: UpsertExtensionDialogProps) {
               <fieldset disabled={creating.isPending || updating.isPending || rebuild.isPending}>
                 <div className="flex flex-row justify-between">
                   <div className="flex flex-row gap-4">
-                    {/* eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment */}
-                    {spec.testable ? <TestButton extensionId={selected?.id} form={form as any} /> : <div />}
+                    {spec.testable ? <TestButton extensionId={selected?.id} form={form} /> : <div />}
                   </div>
                   <div className="flex flex-row gap-4">
                     <Button type="button" variant="subtle" onClick={onClose}>
@@ -231,8 +230,7 @@ export function UpsertExtensionDialog(props: UpsertExtensionDialogProps) {
 
             {spec ? (
               <>
-                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment */}
-                <ExtensionForm buckets={buckets} spec={spec} form={form as any} />
+                <ExtensionForm buckets={buckets} spec={spec} form={form} />
 
                 {selected && <Divider my="xs" label={texts.common.dangerZone} labelPosition="left" />}
 

@@ -34,7 +34,7 @@ export function FilterModal(props: JsonFormProps & PropsWithChildren) {
   const form = useForm<ExtensionContext>({
     mode: 'controlled',
     initialValues: mergeWithDefaults(values, defaultValues),
-    validate: useUserArgumentsSpecResolver(extensions),
+    validate: useUserArgumentsSpecResolver<ExtensionContext>(extensions),
   });
 
   return (

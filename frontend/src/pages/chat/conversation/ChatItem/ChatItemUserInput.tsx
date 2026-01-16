@@ -8,9 +8,9 @@ import { useArgumentObjectSpecResolver } from 'src/pages/admin/extensions/hooks'
 import { texts } from 'src/texts';
 import { useConfirmAiAction } from '../../state/chat';
 
-type DynamicFormProps = { schema: ExtensionArgumentObjectSpecDto; form: UseFormReturnType<unknown> };
+type DynamicFormProps<T> = { schema: ExtensionArgumentObjectSpecDto; form: UseFormReturnType<T> };
 
-function DynamicForm(props: DynamicFormProps) {
+function DynamicForm<T>(props: DynamicFormProps<T>) {
   const { schema, form } = props;
 
   return (
@@ -26,12 +26,14 @@ function DynamicForm(props: DynamicFormProps) {
   );
 }
 
+type FormValues = Record<string, unknown>;
+
 export const ChatItemUserInput = memo(({ request }: { request: StreamUIRequestDto }) => {
   const confirmAiAction = useConfirmAiAction(request.id);
-  const form = useForm<object>({
+  const form = useForm<FormValues>({
     mode: 'controlled',
     initialValues: {},
-    validate: useArgumentObjectSpecResolver(request.schema),
+    validate: useArgumentObjectSpecResolver<FormValues>(request.schema),
   });
 
   const onSubmit = (data: ChatUICallbackResultDto['data']) => {
@@ -48,7 +50,7 @@ export const ChatItemUserInput = memo(({ request }: { request: StreamUIRequestDt
         <div>
           <Markdown>{request.text}</Markdown>
         </div>
-        <DynamicForm schema={request.schema} form={form as UseFormReturnType<unknown>} />
+        <DynamicForm schema={request.schema} form={form} />
         <fieldset>
           <div className="flex flex-row justify-between">
             <div></div>

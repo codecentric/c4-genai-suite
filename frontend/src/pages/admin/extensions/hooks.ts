@@ -1,3 +1,4 @@
+import { FormErrors } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useMemo } from 'react';
 import { z } from 'zod';
@@ -142,14 +143,16 @@ function getSchema(args?: Record<string, ExtensionUserInfoDtoUserArgumentsValue>
   return z.object(extensionValues);
 }
 
-export function useArgumentObjectSpecResolver(argumentObject: ExtensionArgumentObjectSpecDto | undefined) {
+export function useArgumentObjectSpecResolver<T>(
+  argumentObject: ExtensionArgumentObjectSpecDto | undefined,
+): (values: T) => FormErrors {
   return useMemo(() => {
     const schema = getSchema(argumentObject?.properties);
-    return zod4Resolver(schema);
+    return zod4Resolver(schema) as (values: T) => FormErrors;
   }, [argumentObject]);
 }
 
-export function useUserArgumentsSpecResolver(extensions: ExtensionUserInfoDto[]) {
+export function useUserArgumentsSpecResolver<T>(extensions: ExtensionUserInfoDto[]): (values: T) => FormErrors {
   return useMemo(() => {
     const values: Record<string, z.ZodTypeAny> = {};
 
@@ -158,11 +161,11 @@ export function useUserArgumentsSpecResolver(extensions: ExtensionUserInfoDto[])
     }
 
     const schema = z.object(values);
-    return zod4Resolver(schema);
+    return zod4Resolver(schema) as (values: T) => FormErrors;
   }, [extensions]);
 }
 
-export function useSpecResolver(spec?: ExtensionSpecDto) {
+export function useSpecResolver<T>(spec?: ExtensionSpecDto): (values: T) => FormErrors {
   return useMemo(() => {
     const schema = getSchema(spec?.arguments ?? {});
 
@@ -171,6 +174,6 @@ export function useSpecResolver(spec?: ExtensionSpecDto) {
         enabled: z.boolean(),
         values: schema,
       }),
-    );
+    ) as (values: T) => FormErrors;
   }, [spec]);
 }
