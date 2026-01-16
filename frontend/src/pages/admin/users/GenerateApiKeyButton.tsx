@@ -1,7 +1,6 @@
 import { UseFormReturnType } from '@mantine/form';
 import { texts } from 'src/texts';
 
-/** Generic component that works with any form containing an apiKey field */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function GenerateApiKeyButton({ disabled, form }: { disabled?: boolean; form: UseFormReturnType<any> }) {
   const generateKey = async () => {

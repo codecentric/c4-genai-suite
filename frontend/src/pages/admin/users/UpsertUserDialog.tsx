@@ -3,10 +3,10 @@ import { useForm } from '@mantine/form';
 import { useClipboard } from '@mantine/hooks';
 import { IconClipboard } from '@tabler/icons-react';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { toast } from 'react-toastify';
 import { z } from 'zod';
-import { instanceOfUserDto, UpsertUserDto, useApi, UserDto, UserGroupDto } from 'src/api';
+import { UpsertUserDto, useApi, UserDto, UserGroupDto } from 'src/api';
 import { ConfirmDialog, FormAlert, Modal } from 'src/components';
 import { useDeleteUser } from 'src/pages/admin/users/hooks/useDeleteUser';
 import { useUpsertUser } from 'src/pages/admin/users/hooks/useUpsertUser';
@@ -96,26 +96,17 @@ function UpsertUserDialog(props: UpsertUserDialogProps) {
     return sorted.map((g) => ({ label: g.name, value: g.id }));
   }, [userGroups]);
 
-  const containsAdminGroup = (userGroupIds: (string | undefined)[]) => userGroupIds?.includes('admin') ?? false;
-  const [userIsAdmin, setUserIsAdmin] = useState(
-    !isCreating && instanceOfUserDto(props.target) && containsAdminGroup(props.target['userGroupIds'] ?? []),
-  );
-  const [hasApiKey, setHasApiKey] = useState(false);
-
   const form = useForm<UpsertUserDto>({
     validate: zod4Resolver(SCHEME) as unknown as (values: UpsertUserDto) => Record<string, string | null>,
     initialValues: defaultValues as UpsertUserDto,
     mode: 'controlled',
   });
 
-  // Watch for changes to update state
   const userGroupIds = form.getValues().userGroupIds;
   const apiKey = form.getValues().apiKey;
 
-  useEffect(() => {
-    setUserIsAdmin(containsAdminGroup(userGroupIds ?? []));
-    setHasApiKey(Boolean(apiKey) || (!isCreating && 'target' in props && props.target.hasApiKey));
-  }, [userGroupIds, apiKey, isCreating, props]);
+  const userIsAdmin = userGroupIds?.includes('admin') ?? false;
+  const hasApiKey = Boolean(apiKey) || (!isCreating && 'target' in props && props.target.hasApiKey);
 
   return (
     <Portal>

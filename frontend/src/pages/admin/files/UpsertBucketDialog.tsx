@@ -87,13 +87,6 @@ export function UpsertBucketDialog(props: UpsertBucketDialogProps) {
     mode: 'controlled',
   });
 
-  useEffect(() => {
-    if (target) {
-      form.setValues(target as UpsertBucketDto);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [target]);
-
   const watchIsUser = form.getValues().type === 'user';
 
   const [{ endpoint, headers }, setConnection] = useState(target ?? { endpoint: '', headers: '' });
@@ -337,20 +330,26 @@ export function FileSizeDynamicFields({ form, name: _name, label, suffix, classN
       <label className="text-sm font-medium">{label}</label>
       <div className="mt-1 space-y-2">
         <div className={cn('form-row flex flex-row items-center space-x-2', className)}>
-          <button type="button" data-testid="fileSizeLimitsDynamic.add" onClick={handleAddField}>
+          <button type="button" className="cursor-pointer" data-testid="fileSizeLimitsDynamic.add" onClick={handleAddField}>
             <Icon icon="plus" />
           </button>
           <input placeholder="general" disabled className={cn('input input-bordered w-full', className)} />
-          <input
-            type="number"
-            placeholder="10"
-            step="0.1"
-            value={generalValue}
-            onChange={(e) => handleGeneralChange(parseFloat(e.target.value) || 0)}
-            className={cn('input input-bordered w-full', className)}
-            data-testid="fileSizeLimitsGeneral.value"
-          />
-          {suffix && <span>{suffix}</span>}
+          <div className="relative w-full">
+            <input
+              type="number"
+              placeholder="10"
+              step="0.1"
+              value={generalValue}
+              onChange={(e) => handleGeneralChange(parseFloat(e.target.value) || 0)}
+              className={cn('input input-bordered w-full pr-10', className)}
+              data-testid="fileSizeLimitsGeneral.value"
+            />
+            {suffix && (
+              <span className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-sm text-gray-500">
+                {suffix}
+              </span>
+            )}
+          </div>
         </div>
         {dynamicFields.map((field, index) => (
           <div
@@ -358,7 +357,12 @@ export function FileSizeDynamicFields({ form, name: _name, label, suffix, classN
             className={cn('form-row flex flex-row items-center space-x-2', className)}
             data-testid={`fileSizeLimitsDynamic.${index}.row`}
           >
-            <button type="button" data-testid={`fileSizeLimitsDynamic.${index}.remove`} onClick={() => handleRemoveField(index)}>
+            <button
+              type="button"
+              className="cursor-pointer"
+              data-testid={`fileSizeLimitsDynamic.${index}.remove`}
+              onClick={() => handleRemoveField(index)}
+            >
               <Icon icon="trash" />
             </button>
             <input
@@ -368,17 +372,23 @@ export function FileSizeDynamicFields({ form, name: _name, label, suffix, classN
               className={cn('input input-bordered w-full', className)}
               data-testid={`fileSizeLimitsDynamic.${index}.key`}
             />
-            <input
-              type="number"
-              placeholder="10"
-              step="0.1"
-              required
-              value={field.value}
-              onChange={(e) => handleFieldValueChange(index, parseFloat(e.target.value) || 0)}
-              className={cn('input input-bordered w-full', className)}
-              data-testid={`fileSizeLimitsDynamic.${index}.value`}
-            />
-            {suffix && <span>{suffix}</span>}
+            <div className="relative w-full">
+              <input
+                type="number"
+                placeholder="10"
+                step="0.1"
+                required
+                value={field.value}
+                onChange={(e) => handleFieldValueChange(index, parseFloat(e.target.value) || 0)}
+                className={cn('input input-bordered w-full pr-10', className)}
+                data-testid={`fileSizeLimitsDynamic.${index}.value`}
+              />
+              {suffix && (
+                <span className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-sm text-gray-500">
+                  {suffix}
+                </span>
+              )}
+            </div>
           </div>
         ))}
       </div>

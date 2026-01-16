@@ -70,7 +70,6 @@ describe('User Page', () => {
   it('should select the user group default on initial state', () => {
     render(<CreateUserDialog userGroups={mockUserGroups} onCreate={() => {}} onClose={() => {}} />);
 
-    // Check that the Default pill is shown in the MultiSelect (using Mantine Pill class)
     expect(document.querySelector('.mantine-Pill-label')).toHaveTextContent('Default');
   });
 
@@ -84,7 +83,6 @@ describe('User Page', () => {
     const groupOption = screen.getByRole('option', { name: /Group/i });
     await user.click(groupOption);
 
-    // Check that both pills are shown in the MultiSelect
     const pills = document.querySelectorAll('.mantine-Pill-label');
     const pillTexts = Array.from(pills).map((p) => p.textContent);
     expect(pillTexts).toContain('Default');
@@ -97,7 +95,6 @@ describe('User Page', () => {
     const user = userEvent.setup();
     const saveBtn = screen.getAllByRole('button', { name: 'Save' });
     await user.click(saveBtn[0]);
-    // Mantine form errors use InputWrapper-error class, not role="alert"
     expect(document.querySelectorAll('.mantine-InputWrapper-error')).toHaveLength(2);
   });
 
@@ -115,7 +112,6 @@ describe('User Page', () => {
     await user.type(confirmPwd, 'abd');
     const saveBtn = screen.getAllByRole('button', { name: 'Save' });
     await user.click(saveBtn[0]);
-    // Mantine form errors use InputWrapper-error class, not role="alert"
     expect(document.querySelectorAll('.mantine-InputWrapper-error')).toHaveLength(1);
   });
 });
