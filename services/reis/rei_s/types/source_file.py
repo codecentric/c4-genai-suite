@@ -2,7 +2,7 @@ from contextlib import contextmanager
 import os
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from typing import Generator
+from typing import Generator, Optional
 import uuid
 
 from pydantic import BaseModel, Field
@@ -18,9 +18,17 @@ class SourceFile(BaseModel):
     # flag to signal that the parent directory should be deleted when deleting the file
     delete_dir: bool = False
 
+    # this can be used to cache a pdf version of the file as microoptimization
+    # some format providers work by converting the file to pdf first, so this avoids repeated conversions
+    preview_pdf_cache: Optional["SourceFile"] = None
+
     @property
     def size(self) -> int:
         return os.path.getsize(self.path)
+
+    @property
+    def exists(self) -> bool:
+        return os.path.exists(self.path)
 
     @property
     def buffer(self) -> bytes:
@@ -46,8 +54,12 @@ class SourceFile(BaseModel):
         return SourceFile(id=id_, path=path, mime_type="", file_name=file_name)
 
     def delete(self) -> None:
-        os.remove(self.path)
-        if self.delete_dir:
+        if self.preview_pdf_cache:
+            self.preview_pdf_cache.delete()
+            self.preview_pdf_cache = None
+        if self.exists:
+            os.remove(self.path)
+        if self.delete_dir and os.path.isdir(os.path.dirname(self.path)):
             os.rmdir(os.path.dirname(self.path))
 
     def ext(self) -> str:

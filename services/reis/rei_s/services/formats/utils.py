@@ -81,6 +81,10 @@ def generate_pdf_from_md(markdown_text: str, doc_id: str, file_name: str) -> Sou
 
 
 def convert_office_to_pdf(file: SourceFile) -> SourceFile:
+    # If we already have a preview PDF, use it
+    if file.preview_pdf_cache is not None and file.preview_pdf_cache.exists:
+        return file.preview_pdf_cache
+
     output_dir = Path(tempfile.gettempdir()) / uuid4().hex
     output_dir.mkdir(parents=True, exist_ok=True)
     libreoffice_home = Path(tempfile.gettempdir()) / uuid4().hex
@@ -121,4 +125,7 @@ def convert_office_to_pdf(file: SourceFile) -> SourceFile:
     pdf_name = os.path.splitext(base)[0] + ".pdf"
     pdf_path = os.path.join(output_dir, pdf_name)
 
-    return SourceFile(id=file.id, path=pdf_path, mime_type="application/pdf", file_name=file.file_name, delete_dir=True)
+    pdf = SourceFile(id=file.id, path=pdf_path, mime_type="application/pdf", file_name=file.file_name, delete_dir=True)
+    file.preview_pdf_cache = pdf
+
+    return pdf
