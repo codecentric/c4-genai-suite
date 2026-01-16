@@ -58,7 +58,7 @@ export function ConfigurationUserValuesModal(props: JsonFormProps & PropsWithChi
   const form = useForm<ExtensionContext>({
     mode: 'controlled',
     initialValues: getInitialValuesFromSpec(configuration.configurableArguments) as ExtensionContext,
-    validate: useArgumentObjectSpecResolver(configuration.configurableArguments),
+    validate: useArgumentObjectSpecResolver<ExtensionContext>(configuration.configurableArguments),
   });
 
   const updateValues = useMutation({
