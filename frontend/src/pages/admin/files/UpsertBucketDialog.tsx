@@ -141,8 +141,7 @@ export function UpsertBucketDialog(props: UpsertBucketDialogProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fileTypes]);
 
-  const hasErrors = Object.keys(form.errors).length > 0;
-  const isDisabled = hasErrors || creating.isPending || updating.isPending;
+  const isDisabled = !form.isValid() || creating.isPending || updating.isPending;
 
   return (
     <Portal>
