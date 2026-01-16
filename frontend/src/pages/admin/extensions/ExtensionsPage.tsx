@@ -292,13 +292,18 @@ export function ExtensionsPage() {
                         </div>
                       }
                     >
-                      <div className="text-sm text-slate-500">
+                      <ul className="list-none space-y-2 text-sm">
                         {Object.entries(x.configurableArguments!.properties).map(([name, spec]) => (
-                          <div key={`${x.id}-${name}`} className="mb-2">
-                            <strong>{spec.title}:</strong> TODO: show the form again?
-                          </div>
+                          <li key={`${x.id}-${name}`} className="flex flex-col gap-0.5 border-l-2 border-slate-300 pl-3">
+                            <div className="flex items-center gap-2">
+                              <span className="font-semibold text-slate-700">{spec.title}</span>
+                              <span className="rounded bg-slate-100 px-1.5 py-0.5 text-xs text-slate-500">{spec.type}</span>
+                              {spec.required && <span className="text-xs text-red-500">*</span>}
+                            </div>
+                            {spec.description && <p className="text-slate-500">{spec.description}</p>}
+                          </li>
                         ))}
-                      </div>
+                      </ul>
                     </Fieldset>
                   ))}
               </div>
