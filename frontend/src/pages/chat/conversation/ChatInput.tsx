@@ -33,7 +33,6 @@ export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEm
   const { updateContext, context } = useExtensionContext(chatId);
   const [defaultValues, setDefaultValues] = useState<UserArgumentDefaultValueByExtensionIDAndName>({});
   const {
-    uploadingFiles,
     fullFileSlots,
     allowedFileNameExtensions,
     chatFiles,
@@ -187,18 +186,24 @@ export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEm
 
         <div className="flex flex-wrap gap-2">
           {(() => {
-            const filesWithMetadata = [
-              ...uploadingFiles.map((file) => ({
-                fileName: file.name,
+            const uploadingFilesWithMetadata = uploadMutations
+              .filter((m) => m.status === 'pending')
+              .map((m, index) => ({
+                fileName: m.variables?.file?.name || '',
                 isUploading: true,
-                originalFile: file,
+                originalFile: m.variables?.file,
                 uploadTime: new Date(),
-              })),
+                uniqueKey: `${m.submittedAt}-${index}`,
+              }));
+
+            const filesWithMetadata = [
+              ...uploadingFilesWithMetadata,
               ...chatFiles.map((file) => ({
                 fileName: file.fileName,
                 isUploading: false,
                 originalFile: file,
                 uploadTime: new Date(file.uploadedAt),
+                uniqueKey: `chat-${file.id}`,
               })),
             ].sort((a, b) => {
               const alphabeticalOrder = a.fileName.localeCompare(b.fileName);
@@ -208,7 +213,7 @@ export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEm
 
             return filesWithMetadata.map((file) => (
               <FileItemComponent
-                key={file.isUploading ? `upload-${file.fileName}` : (file.originalFile as FileDto).id}
+                key={file.uniqueKey}
                 file={file.isUploading ? { fileName: file.fileName } : (file.originalFile as FileDto)}
                 onRemove={file.isUploading ? undefined : remove}
                 loading={file.isUploading}
