@@ -12,6 +12,8 @@ export interface User {
   picture?: string;
 
   // The user group IDs.
+  // FIXME migrate this to use UserGroups instead of UserGroupIds
+  userGroups?: UserGroup[];
   userGroupIds: string[];
 
   // Indicates if the user has a password configured.
