@@ -1,0 +1,77 @@
+# Docker Compose for C4 Development - Infrastructure Services Only
+# This starts only the infrastructure (DB, RabbitMQ, MinIO)
+# Run backend, frontend, and Python services manually for development with hot reload
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    hostname: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=secret
+      - POSTGRES_DB=cccc
+      - PGPORT=5432
+    volumes:
+      - postgres-dev-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d cccc"]
+      interval: 1s
+      timeout: 1s
+      retries: 20
+
+  rabbitmq:
+    image: rabbitmq:4.0-management
+    hostname: rabbitmq
+    ports:
+      - "5672:5672"   # AMQP port
+      - "15672:15672" # Management UI
+    environment:
+      - RABBITMQ_DEFAULT_USER=rabbit
+      - RABBITMQ_DEFAULT_PASS=rabbit
+    volumes:
+      - rabbitmq-dev-data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  minio:
+    image: minio/minio:RELEASE.2025-09-07T16-13-09Z
+    hostname: minio
+    ports:
+      - "9000:9000"   # API
+      - "9001:9001"   # Console
+    environment:
+      - MINIO_ROOT_USER=admin
+      - MINIO_ROOT_PASSWORD=secretsecret
+    volumes:
+      - minio-dev-data:/data
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  ollama:
+    image: ollama/ollama:0.13.5
+    hostname: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-dev-data:/root/.ollama
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 10s
+      timeout: 30s
+      retries: 5
+      start_period: 60s
+
+volumes:
+  postgres-dev-data:
+  rabbitmq-dev-data:
+  minio-dev-data:
+  ollama-dev-data:

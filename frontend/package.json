@@ -19,7 +19,8 @@
     "copy:pdfjs-wasm": "node copy-pdfjs-wasm.mjs",
     "predev": "npm run copy:pdfjs-wasm",
     "prestart": "npm run copy:pdfjs-wasm",
-    "prebuild": "npm run copy:pdfjs-wasm"
+    "prebuild": "npm run copy:pdfjs-wasm",
+    "generate-eval-api": "npx rimraf ./src/api/generated-eval && npx @openapitools/openapi-generator-cli generate --generator-key eval && node gen-helper.mjs"
   },
   "dependencies": {
     "@floating-ui/react-dom": "^2.1.8",

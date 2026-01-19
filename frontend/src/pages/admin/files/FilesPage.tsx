@@ -1,5 +1,5 @@
 import { ActionIcon, Button, Checkbox, NativeSelect } from '@mantine/core';
-import { IconEdit, IconLoader, IconTrash, IconUpload } from '@tabler/icons-react';
+import { IconEdit, IconLoader, IconSparkles, IconTrash, IconUpload } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
 import {
   ColumnDef,
@@ -19,6 +19,7 @@ import { useEventCallback, useTransientNavigate } from 'src/hooks';
 import { formatFileSize } from 'src/lib';
 import { extractType } from 'src/pages/utils';
 import { texts } from 'src/texts';
+import { GenerateQACatalogDialog } from './GenerateQACatalogDialog';
 import { UpsertBucketDialog } from './UpsertBucketDialog';
 import { useDeletingBucket, useDeletingFile, useUploadingFile } from './hooks';
 import { useBucketstore, useFilesStore } from './state';
@@ -33,6 +34,7 @@ export function FilesPage() {
 
   const navigate = useTransientNavigate();
   const [toUpdate, setToUpdate] = useState<boolean>();
+  const [showGenerateDialog, setShowGenerateDialog] = useState(false);
   const [thisBucket, setThisBucket] = useState<BucketDto | null>(null);
   const { buckets, removeBucket, setBucket } = useBucketstore();
 
@@ -252,6 +254,16 @@ export function FilesPage() {
             <div className="flex flex-row items-center justify-between gap-x-2">
               <div className="flex flex-row items-center gap-x-2 p-2 text-sm">
                 <div className="text-gray-500">{texts.common.rowsSelected(table.getSelectedRowModel().rows.length)}</div>
+                <Button
+                  variant="light"
+                  color="blue"
+                  onClick={() => setShowGenerateDialog(true)}
+                  size="xs"
+                  leftSection={<IconSparkles size={14} />}
+                  disabled={table.getSelectedRowModel().rows.length == 0 ? true : false}
+                >
+                  Generate QA Catalog
+                </Button>
                 <ConfirmDialog
                   title={texts.files.removeFilesConfirmTitle}
                   text={texts.files.removeFilesConfirmText(table.getSelectedRowModel().rows.length)}
@@ -277,6 +289,15 @@ export function FilesPage() {
       )}
 
       {toUpdate && <UpsertBucketDialog onClose={doClose} onCreate={() => {}} target={thisBucket} onUpdate={setBucket} />}
+
+      {showGenerateDialog && (
+        <GenerateQACatalogDialog
+          bucketId={bucketId}
+          selectedFiles={table.getSelectedRowModel().rows.map((row) => row.original)}
+          opened={showGenerateDialog}
+          onClose={() => setShowGenerateDialog(false)}
+        />
+      )}
     </>
   );
 }
