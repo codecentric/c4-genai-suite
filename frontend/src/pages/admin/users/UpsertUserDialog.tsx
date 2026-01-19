@@ -193,7 +193,16 @@ function UpsertUserDialog(props: UpsertUserDialogProps) {
 
             <div className="mb-4">
               {!userIsAdmin && <div className="text-sm text-slate-500">{texts.users.apiKeyHint}</div>}
-              <div className="flex items-center gap-2">
+              <div className="flex items-end gap-2">
+                <div className="grow">
+                  <TextInput
+                    id="apiKey"
+                    label={texts.common.apiKey}
+                    disabled={true}
+                    key={form.key('apiKey')}
+                    {...form.getInputProps('apiKey')}
+                  />
+                </div>
                 {form.getValues().apiKey && (
                   <div
                     className="btn btn-square"
@@ -207,15 +216,6 @@ function UpsertUserDialog(props: UpsertUserDialogProps) {
                     <IconClipboard />
                   </div>
                 )}
-                <div className="grow">
-                  <TextInput
-                    id="apiKey"
-                    label={texts.common.apiKey}
-                    disabled={true}
-                    key={form.key('apiKey')}
-                    {...form.getInputProps('apiKey')}
-                  />
-                </div>
                 <GenerateApiKeyButton disabled={!userIsAdmin} form={form} />
               </div>
             </div>
