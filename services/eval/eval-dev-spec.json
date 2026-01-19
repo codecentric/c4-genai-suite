@@ -1,0 +1,5511 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "LLM Eval Service",
+    "description": "Internal evaluation service for C4 GenAI Suite",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "tags": [
+          "healthcheck"
+        ],
+        "summary": "Health",
+        "operationId": "healthcheck_health",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/eval/evaluations": {
+      "get": {
+        "tags": [
+          "evaluations"
+        ],
+        "summary": "Get All",
+        "description": "Get all evaluations.",
+        "operationId": "evaluations_Get all",
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Query"
+            }
+          },
+          {
+            "name": "from_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "From Date"
+            }
+          },
+          {
+            "name": "to_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "To Date"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0,
+              "title": "Offset"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 50,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GetAllEvaluationResult"
+                  },
+                  "title": "Response Get All V1 Eval Evaluations Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "evaluations"
+        ],
+        "summary": "Post",
+        "description": "Performing the evaluation using a QA catalogue. The test cases are created on the basis of the QA catalogue and evaluated in the background.",
+        "operationId": "evaluations_post",
+        "parameters": [
+          {
+            "name": "x-user-id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-User-Id"
+            }
+          },
+          {
+            "name": "x-user-name",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-User-Name"
+            }
+          },
+          {
+            "name": "x-user-email",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-User-Email"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/RunEvaluationByQaCatalog"
+                  },
+                  {
+                    "$ref": "#/components/schemas/RunEvaluationByTestCases"
+                  }
+                ],
+                "title": "Dto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/llm_eval__eval__evaluations__models__EvaluationResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/eval/evaluations/{evaluation_id}": {
+      "get": {
+        "tags": [
+          "evaluations"
+        ],
+        "summary": "Get",
+        "operationId": "evaluations_get",
+        "parameters": [
+          {
+            "name": "evaluation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Evaluation Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/llm_eval__eval__evaluations__models__EvaluationResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "evaluations"
+        ],
+        "summary": "Delete",
+        "operationId": "evaluations_delete",
+        "parameters": [
+          {
+            "name": "evaluation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Evaluation Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EvaluationDelete"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "evaluations"
+        ],
+        "summary": "Patch",
+        "operationId": "evaluations_patch",
+        "parameters": [
+          {
+            "name": "evaluation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Evaluation Id"
+            }
+          },
+          {
+            "name": "x-user-id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-User-Id"
+            }
+          },
+          {
+            "name": "x-user-name",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-User-Name"
+            }
+          },
+          {
+            "name": "x-user-email",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-User-Email"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EvaluationUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/llm_eval__eval__evaluations__models__EvaluationResult"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericError"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/eval/evaluations/{evaluation_id}/summary": {
+      "get": {
+        "tags": [
+          "evaluations"
+        ],
+        "summary": "Get Evaluation Detail Summary",
+        "operationId": "evaluations_get_evaluation_detail_summary",
+        "parameters": [
+          {
+            "name": "evaluation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Evaluation Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EvaluationDetailSummary"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericError"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/eval/evaluations/{evaluation_id}/results-export": {
+      "get": {
+        "tags": [
+          "evaluations"
+        ],
+        "summary": "Get Results Export",
+        "operationId": "evaluations_get_results_export",
+        "parameters": [
+          {
+            "name": "evaluation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Evaluation Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/eval/evaluation-results/grouped": {
+      "get": {
+        "tags": [
+          "evaluation-results"
+        ],
+        "summary": "Get Grouped",
+        "operationId": "evaluation-results_get_grouped",
+        "parameters": [
+          {
+            "name": "evaluation_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Evaluation Id"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0,
+              "title": "Offset"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 50,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GroupedEvaluationResult"
+                  },
+                  "title": "Response Get Grouped V1 Eval Evaluation Results Grouped Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/eval/evaluation-results/{result_id}": {
+      "get": {
+        "tags": [
+          "evaluation-results"
+        ],
+        "summary": "Get",
+        "operationId": "evaluation-results_get",
+        "parameters": [
+          {
+            "name": "result_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Result Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/llm_eval__eval__evaluate_results__router__EvaluationResult"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericError"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/dashboard": {
+      "get": {
+        "tags": [
+          "dashboard"
+        ],
+        "summary": "Get Data",
+        "operationId": "dashboard_get_data",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardData"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/qa-catalog": {
+      "get": {
+        "tags": [
+          "qa-catalog"
+        ],
+        "summary": "Get All",
+        "operationId": "qa-catalog_get_all",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Name"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0,
+              "title": "Offset"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 50,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/QACatalogPreview"
+                  },
+                  "title": "Response Get All V1 Qa Catalog Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/qa-catalog/upload": {
+      "post": {
+        "tags": [
+          "qa-catalog"
+        ],
+        "summary": "Upload",
+        "operationId": "qa-catalog_upload",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_upload_v1_qa_catalog_upload_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QACatalog"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/qa-catalog/{catalog_id}/upload": {
+      "put": {
+        "tags": [
+          "qa-catalog"
+        ],
+        "summary": "Update",
+        "operationId": "qa-catalog_update",
+        "parameters": [
+          {
+            "name": "catalog_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Catalog Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_update_v1_qa_catalog__catalog_id__upload_put"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QACatalog"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/qa-catalog/{catalog_id}": {
+      "get": {
+        "tags": [
+          "qa-catalog"
+        ],
+        "summary": "Get",
+        "operationId": "qa-catalog_get",
+        "parameters": [
+          {
+            "name": "catalog_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Catalog Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QACatalog"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericError"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "qa-catalog"
+        ],
+        "summary": "Edit Qa Catalog",
+        "operationId": "qa-catalog_edit_qa_catalog",
+        "parameters": [
+          {
+            "name": "catalog_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Catalog Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QACatalogUpdateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QACatalog"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "qa-catalog"
+        ],
+        "summary": "Delete",
+        "operationId": "qa-catalog_delete",
+        "parameters": [
+          {
+            "name": "catalog_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Catalog Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteCatalogResult"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericError"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/qa-catalog/{catalog_id}/preview": {
+      "get": {
+        "tags": [
+          "qa-catalog"
+        ],
+        "summary": "Get Preview",
+        "operationId": "qa-catalog_get_preview",
+        "parameters": [
+          {
+            "name": "catalog_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Catalog Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QACatalogPreview"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/qa-catalog/{catalog_id}/qa-pairs": {
+      "get": {
+        "tags": [
+          "qa-catalog"
+        ],
+        "summary": "Get Catalog Qa Pairs",
+        "operationId": "qa-catalog_get_catalog_qa_pairs",
+        "parameters": [
+          {
+            "name": "catalog_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Catalog Id"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0,
+              "title": "Offset"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 50,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/QAPair"
+                  },
+                  "title": "Response Get Catalog Qa Pairs V1 Qa Catalog  Catalog Id  Qa Pairs Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/qa-catalog/generator/upload": {
+      "post": {
+        "tags": [
+          "qa-catalog"
+        ],
+        "summary": "Create Data Source Config",
+        "operationId": "qa-catalog_create_data_source_config",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_create_data_source_config_v1_qa_catalog_generator_upload_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "title": "Response Create Data Source Config V1 Qa Catalog Generator Upload Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/qa-catalog/generator/catalog": {
+      "post": {
+        "tags": [
+          "qa-catalog"
+        ],
+        "summary": "Generate",
+        "description": "Start a new qa catalog generation",
+        "operationId": "qa-catalog_generate",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QACatalogGenerationData"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QACatalogGenerationResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/qa-catalog/generator/from-c4-bucket": {
+      "post": {
+        "tags": [
+          "qa-catalog"
+        ],
+        "summary": "Generate From C4 Bucket",
+        "description": "Generate QA catalog from files in a C4 bucket",
+        "operationId": "qa-catalog_generate_from_c4_bucket",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QACatalogGenerationFromC4BucketRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QACatalogGenerationResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/qa-catalog/generator/types": {
+      "get": {
+        "tags": [
+          "qa-catalog"
+        ],
+        "summary": "Get Generator Types",
+        "description": "Currently active generator types to select from for catalog creation",
+        "operationId": "qa-catalog_get_generator_types",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ActiveQACatalogGeneratorType"
+                  },
+                  "type": "array",
+                  "title": "Response Get Generator Types V1 Qa Catalog Generator Types Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/qa-catalog/download": {
+      "post": {
+        "tags": [
+          "qa-catalog"
+        ],
+        "summary": "Download",
+        "operationId": "qa-catalog_download",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DownloadQACatalogOptions"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DownloadQACatalogResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/qa-catalog/{catalog_id}/history": {
+      "get": {
+        "tags": [
+          "qa-catalog"
+        ],
+        "summary": "Get History",
+        "operationId": "qa-catalog_get_history",
+        "parameters": [
+          {
+            "name": "catalog_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Catalog Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QACatalogVersionHistory"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/llm-endpoints": {
+      "get": {
+        "tags": [
+          "llm-endpoints"
+        ],
+        "summary": "Get All",
+        "operationId": "llm-endpoints_get_all",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Q"
+            }
+          },
+          {
+            "name": "supported_features",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PluginFeature"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Supported Features"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0,
+              "title": "Offset"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 50,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LLMEndpoint"
+                  },
+                  "title": "Response Get All V1 Llm Endpoints Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "llm-endpoints"
+        ],
+        "summary": "Post",
+        "operationId": "llm-endpoints_post",
+        "parameters": [
+          {
+            "name": "x-user-id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-User-Id"
+            }
+          },
+          {
+            "name": "x-user-name",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-User-Name"
+            }
+          },
+          {
+            "name": "x-user-email",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-User-Email"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LLMEndpointCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LLMEndpoint"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/llm-endpoints/types": {
+      "get": {
+        "tags": [
+          "llm-endpoints"
+        ],
+        "summary": "Get Types",
+        "operationId": "llm-endpoints_get_types",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LLMEndpointTypesResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/llm-endpoints/{llm_endpoint_id}": {
+      "get": {
+        "tags": [
+          "llm-endpoints"
+        ],
+        "summary": "Get",
+        "operationId": "llm-endpoints_get",
+        "parameters": [
+          {
+            "name": "llm_endpoint_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Llm Endpoint Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LLMEndpoint"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "llm-endpoints"
+        ],
+        "summary": "Delete",
+        "operationId": "llm-endpoints_delete",
+        "parameters": [
+          {
+            "name": "llm_endpoint_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Llm Endpoint Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LLMEndpointDelete"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "llm-endpoints"
+        ],
+        "summary": "Patch",
+        "operationId": "llm-endpoints_patch",
+        "parameters": [
+          {
+            "name": "llm_endpoint_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Llm Endpoint Id"
+            }
+          },
+          {
+            "name": "x-user-id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-User-Id"
+            }
+          },
+          {
+            "name": "x-user-name",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-User-Name"
+            }
+          },
+          {
+            "name": "x-user-email",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-User-Email"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LLMEndpointUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LLMEndpoint"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericError"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/metrics": {
+      "get": {
+        "tags": [
+          "metrics"
+        ],
+        "summary": "Get All",
+        "operationId": "metrics_get_all",
+        "parameters": [
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0,
+              "title": "Offset"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 50,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Metric"
+                  },
+                  "title": "Response Get All V1 Metrics Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "metrics"
+        ],
+        "summary": "Post",
+        "operationId": "metrics_post",
+        "parameters": [
+          {
+            "name": "x-user-id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-User-Id"
+            }
+          },
+          {
+            "name": "x-user-name",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-User-Name"
+            }
+          },
+          {
+            "name": "x-user-email",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-User-Email"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MetricCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Metric"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/metrics/types": {
+      "get": {
+        "tags": [
+          "metrics"
+        ],
+        "summary": "Get Types",
+        "operationId": "metrics_get_types",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MetricTypesResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/metrics/{metric_id}": {
+      "get": {
+        "tags": [
+          "metrics"
+        ],
+        "summary": "Get",
+        "operationId": "metrics_get",
+        "parameters": [
+          {
+            "name": "metric_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Metric Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Metric"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "metrics"
+        ],
+        "summary": "Delete",
+        "operationId": "metrics_delete",
+        "parameters": [
+          {
+            "name": "metric_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Metric Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MetricDelete"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "metrics"
+        ],
+        "summary": "Patch",
+        "operationId": "metrics_patch",
+        "parameters": [
+          {
+            "name": "metric_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Metric Id"
+            }
+          },
+          {
+            "name": "x-user-id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-User-Id"
+            }
+          },
+          {
+            "name": "x-user-name",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-User-Name"
+            }
+          },
+          {
+            "name": "x-user-email",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-User-Email"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MetricUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Metric"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericError"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ActiveQACatalogGeneratorType": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "RAGAS",
+            "title": "Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "type"
+        ],
+        "title": "ActiveQACatalogGeneratorType"
+      },
+      "AnswerRelevancyMetricConfigurationCreate": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "ANSWER_RELEVANCY",
+            "title": "Type"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "threshold": {
+            "type": "number",
+            "title": "Threshold"
+          },
+          "includeReason": {
+            "type": "boolean",
+            "title": "Includereason"
+          },
+          "chatModelId": {
+            "type": "string",
+            "title": "Chatmodelid"
+          },
+          "strictMode": {
+            "type": "boolean",
+            "title": "Strictmode"
+          }
+        },
+        "type": "object",
+        "required": [
+          "type",
+          "name",
+          "threshold",
+          "includeReason",
+          "chatModelId",
+          "strictMode"
+        ],
+        "title": "AnswerRelevancyMetricConfigurationCreate"
+      },
+      "AnswerRelevancyMetricConfigurationRead": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "ANSWER_RELEVANCY",
+            "title": "Type"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "threshold": {
+            "type": "number",
+            "title": "Threshold"
+          },
+          "includeReason": {
+            "type": "boolean",
+            "title": "Includereason"
+          },
+          "chatModelId": {
+            "type": "string",
+            "title": "Chatmodelid"
+          },
+          "strictMode": {
+            "type": "boolean",
+            "title": "Strictmode"
+          }
+        },
+        "type": "object",
+        "required": [
+          "type",
+          "name",
+          "threshold",
+          "includeReason",
+          "chatModelId",
+          "strictMode"
+        ],
+        "title": "AnswerRelevancyMetricConfigurationRead"
+      },
+      "AnswerRelevancyMetricConfigurationUpdate": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "ANSWER_RELEVANCY",
+            "title": "Type"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "threshold": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Threshold"
+          },
+          "includeReason": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Includereason"
+          },
+          "chatModelId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Chatmodelid"
+          },
+          "strictMode": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Strictmode"
+          }
+        },
+        "type": "object",
+        "required": [
+          "type"
+        ],
+        "title": "AnswerRelevancyMetricConfigurationUpdate"
+      },
+      "AzureOpenAILLMEndpointConfigurationCreate": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "AZURE_OPENAI",
+            "title": "Type"
+          },
+          "parallelQueries": {
+            "type": "integer",
+            "title": "Parallelqueries"
+          },
+          "maxRetries": {
+            "type": "integer",
+            "title": "Maxretries"
+          },
+          "endpoint": {
+            "type": "string",
+            "title": "Endpoint"
+          },
+          "apiKey": {
+            "type": "string",
+            "title": "Apikey"
+          },
+          "apiVersion": {
+            "type": "string",
+            "title": "Apiversion"
+          },
+          "deployment": {
+            "type": "string",
+            "title": "Deployment"
+          },
+          "requestTimeout": {
+            "type": "integer",
+            "title": "Requesttimeout"
+          },
+          "language": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Language"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "type",
+          "parallelQueries",
+          "maxRetries",
+          "endpoint",
+          "apiKey",
+          "apiVersion",
+          "deployment",
+          "requestTimeout",
+          "language"
+        ],
+        "title": "AzureOpenAILLMEndpointConfigurationCreate"
+      },
+      "AzureOpenAILLMEndpointConfigurationRead": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "AZURE_OPENAI",
+            "title": "Type"
+          },
+          "parallelQueries": {
+            "type": "integer",
+            "title": "Parallelqueries"
+          },
+          "maxRetries": {
+            "type": "integer",
+            "title": "Maxretries"
+          },
+          "endpoint": {
+            "type": "string",
+            "title": "Endpoint"
+          },
+          "apiVersion": {
+            "type": "string",
+            "title": "Apiversion"
+          },
+          "deployment": {
+            "type": "string",
+            "title": "Deployment"
+          },
+          "requestTimeout": {
+            "type": "integer",
+            "title": "Requesttimeout"
+          },
+          "language": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Language"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "type",
+          "parallelQueries",
+          "maxRetries",
+          "endpoint",
+          "apiVersion",
+          "deployment",
+          "requestTimeout",
+          "language"
+        ],
+        "title": "AzureOpenAILLMEndpointConfigurationRead"
+      },
+      "AzureOpenAILLMEndpointConfigurationUpdate": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "AZURE_OPENAI",
+            "title": "Type"
+          },
+          "parallelQueries": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parallelqueries"
+          },
+          "maxRetries": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Maxretries"
+          },
+          "endpoint": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Endpoint"
+          },
+          "apiKey": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Apikey"
+          },
+          "apiVersion": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Apiversion"
+          },
+          "deployment": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deployment"
+          },
+          "requestTimeout": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Requesttimeout"
+          },
+          "language": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Language"
+              },
+              {
+                "type": "string",
+                "const": "UNSET_VALUE"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Language"
+          }
+        },
+        "type": "object",
+        "required": [
+          "type"
+        ],
+        "title": "AzureOpenAILLMEndpointConfigurationUpdate"
+      },
+      "Base64DownloadURL": {
+        "type": "string"
+      },
+      "Body_create_data_source_config_v1_qa_catalog_generator_upload_post": {
+        "properties": {
+          "generator_type": {
+            "type": "string",
+            "const": "RAGAS",
+            "title": "Generator Type"
+          },
+          "files": {
+            "items": {
+              "type": "string",
+              "format": "binary"
+            },
+            "type": "array",
+            "title": "Files"
+          }
+        },
+        "type": "object",
+        "required": [
+          "generator_type",
+          "files"
+        ],
+        "title": "Body_create_data_source_config_v1_qa_catalog_generator_upload_post"
+      },
+      "Body_update_v1_qa_catalog__catalog_id__upload_put": {
+        "properties": {
+          "file": {
+            "type": "string",
+            "format": "binary",
+            "title": "File"
+          }
+        },
+        "type": "object",
+        "required": [
+          "file"
+        ],
+        "title": "Body_update_v1_qa_catalog__catalog_id__upload_put"
+      },
+      "Body_upload_v1_qa_catalog_upload_post": {
+        "properties": {
+          "file": {
+            "type": "string",
+            "format": "binary",
+            "title": "File"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "file",
+          "name"
+        ],
+        "title": "Body_upload_v1_qa_catalog_upload_post"
+      },
+      "C4LLMEndpointConfigurationCreate": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "C4",
+            "title": "Type"
+          },
+          "parallelQueries": {
+            "type": "integer",
+            "title": "Parallelqueries"
+          },
+          "maxRetries": {
+            "type": "integer",
+            "title": "Maxretries"
+          },
+          "endpoint": {
+            "type": "string",
+            "title": "Endpoint"
+          },
+          "configurationId": {
+            "type": "integer",
+            "title": "Configurationid"
+          },
+          "apiKey": {
+            "type": "string",
+            "title": "Apikey"
+          },
+          "requestTimeout": {
+            "type": "integer",
+            "title": "Requesttimeout"
+          }
+        },
+        "type": "object",
+        "required": [
+          "type",
+          "parallelQueries",
+          "maxRetries",
+          "endpoint",
+          "configurationId",
+          "apiKey",
+          "requestTimeout"
+        ],
+        "title": "C4LLMEndpointConfigurationCreate"
+      },
+      "C4LLMEndpointConfigurationRead": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "C4",
+            "title": "Type"
+          },
+          "parallelQueries": {
+            "type": "integer",
+            "title": "Parallelqueries"
+          },
+          "maxRetries": {
+            "type": "integer",
+            "title": "Maxretries"
+          },
+          "endpoint": {
+            "type": "string",
+            "title": "Endpoint"
+          },
+          "configurationId": {
+            "type": "integer",
+            "title": "Configurationid"
+          },
+          "requestTimeout": {
+            "type": "integer",
+            "title": "Requesttimeout"
+          }
+        },
+        "type": "object",
+        "required": [
+          "type",
+          "parallelQueries",
+          "maxRetries",
+          "endpoint",
+          "configurationId",
+          "requestTimeout"
+        ],
+        "title": "C4LLMEndpointConfigurationRead"
+      },
+      "C4LLMEndpointConfigurationUpdate": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "C4",
+            "title": "Type"
+          },
+          "parallelQueries": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parallelqueries"
+          },
+          "maxRetries": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Maxretries"
+          },
+          "endpoint": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Endpoint"
+          },
+          "apiKey": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Apikey"
+          },
+          "configurationId": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Configurationid"
+          },
+          "requestTimeout": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Requesttimeout"
+          }
+        },
+        "type": "object",
+        "required": [
+          "type"
+        ],
+        "title": "C4LLMEndpointConfigurationUpdate"
+      },
+      "DashboardData": {
+        "properties": {
+          "lastEvaluation": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DashboardLastEvaluationResult"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "statistics": {
+            "$ref": "#/components/schemas/DashboardStatistics"
+          }
+        },
+        "type": "object",
+        "required": [
+          "lastEvaluation",
+          "statistics"
+        ],
+        "title": "DashboardData"
+      },
+      "DashboardEvaluationResult": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Createdat"
+          },
+          "metricResults": {
+            "items": {
+              "$ref": "#/components/schemas/MetricResult"
+            },
+            "type": "array",
+            "title": "Metricresults"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "createdAt",
+          "metricResults"
+        ],
+        "title": "DashboardEvaluationResult"
+      },
+      "DashboardLastEvaluationCatalogHistory": {
+        "properties": {
+          "catalogId": {
+            "type": "string",
+            "title": "Catalogid"
+          },
+          "catalogName": {
+            "type": "string",
+            "title": "Catalogname"
+          },
+          "evaluationResults": {
+            "items": {
+              "$ref": "#/components/schemas/DashboardEvaluationResult"
+            },
+            "type": "array",
+            "title": "Evaluationresults"
+          }
+        },
+        "type": "object",
+        "required": [
+          "catalogId",
+          "catalogName",
+          "evaluationResults"
+        ],
+        "title": "DashboardLastEvaluationCatalogHistory"
+      },
+      "DashboardLastEvaluationResult": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Createdat"
+          },
+          "metricResults": {
+            "items": {
+              "$ref": "#/components/schemas/MetricResult"
+            },
+            "type": "array",
+            "title": "Metricresults"
+          },
+          "catalogHistory": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DashboardLastEvaluationCatalogHistory"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "createdAt",
+          "metricResults",
+          "catalogHistory"
+        ],
+        "title": "DashboardLastEvaluationResult"
+      },
+      "DashboardStatistics": {
+        "properties": {
+          "numberOfCatalogs": {
+            "type": "integer",
+            "title": "Numberofcatalogs"
+          },
+          "numberOfEvaluations": {
+            "type": "integer",
+            "title": "Numberofevaluations"
+          }
+        },
+        "type": "object",
+        "required": [
+          "numberOfCatalogs",
+          "numberOfEvaluations"
+        ],
+        "title": "DashboardStatistics"
+      },
+      "DeleteCatalogResult": {
+        "properties": {
+          "previousRevisionId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Previousrevisionid"
+          }
+        },
+        "type": "object",
+        "required": [
+          "previousRevisionId"
+        ],
+        "title": "DeleteCatalogResult"
+      },
+      "DownloadQACatalogOptions": {
+        "properties": {
+          "format": {
+            "$ref": "#/components/schemas/SupportedQACatalogDownloadFormat"
+          },
+          "parentCatalogId": {
+            "type": "string",
+            "title": "Parentcatalogid"
+          },
+          "versionIds": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Versionids"
+          },
+          "includeAll": {
+            "type": "boolean",
+            "title": "Includeall",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "format",
+          "parentCatalogId"
+        ],
+        "title": "DownloadQACatalogOptions"
+      },
+      "DownloadQACatalogResponse": {
+        "properties": {
+          "downloadUrl": {
+            "$ref": "#/components/schemas/Base64DownloadURL"
+          },
+          "filename": {
+            "type": "string",
+            "title": "Filename"
+          }
+        },
+        "type": "object",
+        "required": [
+          "downloadUrl",
+          "filename"
+        ],
+        "title": "DownloadQACatalogResponse"
+      },
+      "EvaluationDelete": {
+        "properties": {
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "version"
+        ],
+        "title": "EvaluationDelete"
+      },
+      "EvaluationDetailSummary": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Createdat"
+          },
+          "qaCatalog": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/EvaluationDetailSummaryQaCatalog"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "metrics": {
+            "items": {
+              "$ref": "#/components/schemas/EvaluationDetailSummaryMetric"
+            },
+            "type": "array",
+            "title": "Metrics"
+          },
+          "metricResults": {
+            "items": {
+              "$ref": "#/components/schemas/MetricResult"
+            },
+            "type": "array",
+            "title": "Metricresults"
+          },
+          "metricScores": {
+            "items": {
+              "$ref": "#/components/schemas/MetricScores"
+            },
+            "type": "array",
+            "title": "Metricscores"
+          },
+          "status": {
+            "$ref": "#/components/schemas/EvaluationStatus"
+          },
+          "testCaseProgress": {
+            "$ref": "#/components/schemas/TestCaseProgress"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "createdAt",
+          "qaCatalog",
+          "metrics",
+          "metricResults",
+          "metricScores",
+          "status",
+          "testCaseProgress",
+          "version"
+        ],
+        "title": "EvaluationDetailSummary"
+      },
+      "EvaluationDetailSummaryMetric": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "type": {
+            "type": "string",
+            "title": "Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "type"
+        ],
+        "title": "EvaluationDetailSummaryMetric"
+      },
+      "EvaluationDetailSummaryQaCatalog": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "qaPairCount": {
+            "type": "integer",
+            "title": "Qapaircount",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name"
+        ],
+        "title": "EvaluationDetailSummaryQaCatalog"
+      },
+      "EvaluationStatus": {
+        "type": "string",
+        "enum": [
+          "PENDING",
+          "RUNNING",
+          "SUCCESS",
+          "FAILURE"
+        ],
+        "title": "EvaluationStatus"
+      },
+      "EvaluationUpdate": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "version"
+        ],
+        "title": "EvaluationUpdate"
+      },
+      "FaithfulnessMetricConfigurationCreate": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "FAITHFULNESS",
+            "title": "Type"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "threshold": {
+            "type": "number",
+            "title": "Threshold"
+          },
+          "includeReason": {
+            "type": "boolean",
+            "title": "Includereason"
+          },
+          "strictMode": {
+            "type": "boolean",
+            "title": "Strictmode"
+          },
+          "chatModelId": {
+            "type": "string",
+            "title": "Chatmodelid"
+          }
+        },
+        "type": "object",
+        "required": [
+          "type",
+          "name",
+          "threshold",
+          "includeReason",
+          "strictMode",
+          "chatModelId"
+        ],
+        "title": "FaithfulnessMetricConfigurationCreate"
+      },
+      "FaithfulnessMetricConfigurationRead": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "FAITHFULNESS",
+            "title": "Type"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "threshold": {
+            "type": "number",
+            "title": "Threshold"
+          },
+          "includeReason": {
+            "type": "boolean",
+            "title": "Includereason"
+          },
+          "strictMode": {
+            "type": "boolean",
+            "title": "Strictmode"
+          },
+          "chatModelId": {
+            "type": "string",
+            "title": "Chatmodelid"
+          }
+        },
+        "type": "object",
+        "required": [
+          "type",
+          "name",
+          "threshold",
+          "includeReason",
+          "strictMode",
+          "chatModelId"
+        ],
+        "title": "FaithfulnessMetricConfigurationRead"
+      },
+      "FaithfulnessMetricConfigurationUpdate": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "FAITHFULNESS",
+            "title": "Type"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "threshold": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Threshold"
+          },
+          "includeReason": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Includereason"
+          },
+          "strictMode": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Strictmode"
+          },
+          "chatModelId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Chatmodelid"
+          }
+        },
+        "type": "object",
+        "required": [
+          "type"
+        ],
+        "title": "FaithfulnessMetricConfigurationUpdate"
+      },
+      "GEvalMetricConfigurationCreate": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "G_EVAL",
+            "title": "Type"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "evaluationSteps": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Evaluationsteps"
+          },
+          "evaluationParams": {
+            "items": {
+              "$ref": "#/components/schemas/LLMTestCaseParams"
+            },
+            "type": "array",
+            "title": "Evaluationparams"
+          },
+          "chatModelId": {
+            "type": "string",
+            "title": "Chatmodelid"
+          },
+          "strictMode": {
+            "type": "boolean",
+            "title": "Strictmode"
+          },
+          "threshold": {
+            "type": "number",
+            "title": "Threshold"
+          }
+        },
+        "type": "object",
+        "required": [
+          "type",
+          "name",
+          "evaluationSteps",
+          "evaluationParams",
+          "chatModelId",
+          "strictMode",
+          "threshold"
+        ],
+        "title": "GEvalMetricConfigurationCreate"
+      },
+      "GEvalMetricConfigurationRead": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "G_EVAL",
+            "title": "Type"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "evaluationSteps": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Evaluationsteps"
+          },
+          "evaluationParams": {
+            "items": {
+              "$ref": "#/components/schemas/LLMTestCaseParams"
+            },
+            "type": "array",
+            "title": "Evaluationparams"
+          },
+          "chatModelId": {
+            "type": "string",
+            "title": "Chatmodelid"
+          },
+          "strictMode": {
+            "type": "boolean",
+            "title": "Strictmode"
+          },
+          "threshold": {
+            "type": "number",
+            "title": "Threshold"
+          }
+        },
+        "type": "object",
+        "required": [
+          "type",
+          "name",
+          "evaluationSteps",
+          "evaluationParams",
+          "chatModelId",
+          "strictMode",
+          "threshold"
+        ],
+        "title": "GEvalMetricConfigurationRead"
+      },
+      "GEvalMetricConfigurationUpdate": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "G_EVAL",
+            "title": "Type"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "evaluationSteps": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Evaluationsteps"
+          },
+          "evaluationParams": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/LLMTestCaseParams"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Evaluationparams"
+          },
+          "chatModelId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Chatmodelid"
+          },
+          "strictMode": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Strictmode"
+          },
+          "threshold": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Threshold"
+          }
+        },
+        "type": "object",
+        "required": [
+          "type"
+        ],
+        "title": "GEvalMetricConfigurationUpdate"
+      },
+      "GenericError": {
+        "properties": {
+          "details": {
+            "$ref": "#/components/schemas/JSONVal"
+          }
+        },
+        "type": "object",
+        "required": [
+          "details"
+        ],
+        "title": "GenericError"
+      },
+      "GetAllEvaluationResult": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Createdat"
+          },
+          "catalog": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/QaCatalogEvaluationResult"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "metricResults": {
+            "items": {
+              "$ref": "#/components/schemas/MetricResult"
+            },
+            "type": "array",
+            "title": "Metricresults"
+          },
+          "status": {
+            "$ref": "#/components/schemas/EvaluationStatus"
+          },
+          "testCaseProgress": {
+            "$ref": "#/components/schemas/TestCaseProgress"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "createdAt",
+          "catalog",
+          "metricResults",
+          "status",
+          "testCaseProgress",
+          "version"
+        ],
+        "title": "GetAllEvaluationResult"
+      },
+      "GroupedEvaluationResult": {
+        "properties": {
+          "configurationId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Configurationid"
+          },
+          "configurationName": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Configurationname"
+          },
+          "configurationVersion": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Configurationversion"
+          },
+          "input": {
+            "type": "string",
+            "title": "Input"
+          },
+          "expectedOutput": {
+            "type": "string",
+            "title": "Expectedoutput"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Createdat"
+          },
+          "groupingKey": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Groupingkey"
+          },
+          "metaData": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/JSONObject"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "metricResults": {
+            "items": {
+              "$ref": "#/components/schemas/MetricResult"
+            },
+            "type": "array",
+            "title": "Metricresults"
+          },
+          "testCases": {
+            "items": {
+              "$ref": "#/components/schemas/GroupedEvaluationTestCase"
+            },
+            "type": "array",
+            "title": "Testcases"
+          }
+        },
+        "type": "object",
+        "required": [
+          "configurationId",
+          "configurationName",
+          "configurationVersion",
+          "input",
+          "expectedOutput",
+          "createdAt",
+          "groupingKey",
+          "metaData",
+          "metricResults",
+          "testCases"
+        ],
+        "title": "GroupedEvaluationResult"
+      },
+      "GroupedEvaluationTestCase": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "index": {
+            "type": "integer",
+            "title": "Index"
+          },
+          "testCaseStatus": {
+            "$ref": "#/components/schemas/TestCaseStatus"
+          },
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/GroupedEvaluationTestCaseResult"
+            },
+            "type": "array",
+            "title": "Results"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "index",
+          "testCaseStatus",
+          "results"
+        ],
+        "title": "GroupedEvaluationTestCase"
+      },
+      "GroupedEvaluationTestCaseResult": {
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "title": "Success"
+          },
+          "metricId": {
+            "type": "string",
+            "title": "Metricid"
+          },
+          "score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Score"
+          },
+          "threashold": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Threashold"
+          }
+        },
+        "type": "object",
+        "required": [
+          "success",
+          "metricId",
+          "score",
+          "threashold"
+        ],
+        "title": "GroupedEvaluationTestCaseResult"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "HallucinationMetricConfigurationCreate": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "HALLUCINATION",
+            "title": "Type"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "threshold": {
+            "type": "number",
+            "title": "Threshold"
+          },
+          "includeReason": {
+            "type": "boolean",
+            "title": "Includereason"
+          },
+          "strictMode": {
+            "type": "boolean",
+            "title": "Strictmode"
+          },
+          "chatModelId": {
+            "type": "string",
+            "title": "Chatmodelid"
+          }
+        },
+        "type": "object",
+        "required": [
+          "type",
+          "name",
+          "threshold",
+          "includeReason",
+          "strictMode",
+          "chatModelId"
+        ],
+        "title": "HallucinationMetricConfigurationCreate"
+      },
+      "HallucinationMetricConfigurationRead": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "HALLUCINATION",
+            "title": "Type"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "threshold": {
+            "type": "number",
+            "title": "Threshold"
+          },
+          "includeReason": {
+            "type": "boolean",
+            "title": "Includereason"
+          },
+          "strictMode": {
+            "type": "boolean",
+            "title": "Strictmode"
+          },
+          "chatModelId": {
+            "type": "string",
+            "title": "Chatmodelid"
+          }
+        },
+        "type": "object",
+        "required": [
+          "type",
+          "name",
+          "threshold",
+          "includeReason",
+          "strictMode",
+          "chatModelId"
+        ],
+        "title": "HallucinationMetricConfigurationRead"
+      },
+      "HallucinationMetricConfigurationUpdate": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "HALLUCINATION",
+            "title": "Type"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "threshold": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Threshold"
+          },
+          "includeReason": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Includereason"
+          },
+          "strictMode": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Strictmode"
+          },
+          "chatModelId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Chatmodelid"
+          }
+        },
+        "type": "object",
+        "required": [
+          "type"
+        ],
+        "title": "HallucinationMetricConfigurationUpdate"
+      },
+      "JSONArray": {
+        "items": {
+          "$ref": "#/components/schemas/JSONVal"
+        },
+        "type": "array"
+      },
+      "JSONObject": {
+        "additionalProperties": {
+          "$ref": "#/components/schemas/JSONVal"
+        },
+        "type": "object"
+      },
+      "JSONVal": {
+        "anyOf": [
+          {
+            "type": "boolean"
+          },
+          {
+            "type": "string"
+          },
+          {
+            "type": "number"
+          },
+          {
+            "type": "integer"
+          },
+          {
+            "$ref": "#/components/schemas/JSONArray"
+          },
+          {
+            "$ref": "#/components/schemas/JSONObject"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "LLMEndpoint": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Createdat"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updatedat"
+          },
+          "supportedFeatures": {
+            "items": {
+              "$ref": "#/components/schemas/PluginFeature"
+            },
+            "type": "array",
+            "title": "Supportedfeatures"
+          },
+          "configuration": {
+            "$ref": "#/components/schemas/LLMEndpointConfigurationRead"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "createdAt",
+          "updatedAt",
+          "supportedFeatures",
+          "configuration",
+          "version"
+        ],
+        "title": "LLMEndpoint"
+      },
+      "LLMEndpointConfigurationCreate": {
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/C4LLMEndpointConfigurationCreate"
+          },
+          {
+            "$ref": "#/components/schemas/AzureOpenAILLMEndpointConfigurationCreate"
+          },
+          {
+            "$ref": "#/components/schemas/OpenAILLMEndpointConfigurationCreate"
+          }
+        ]
+      },
+      "LLMEndpointConfigurationRead": {
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/C4LLMEndpointConfigurationRead"
+          },
+          {
+            "$ref": "#/components/schemas/AzureOpenAILLMEndpointConfigurationRead"
+          },
+          {
+            "$ref": "#/components/schemas/OpenAILLMEndpointConfigurationRead"
+          }
+        ]
+      },
+      "LLMEndpointConfigurationUpdate": {
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/C4LLMEndpointConfigurationUpdate"
+          },
+          {
+            "$ref": "#/components/schemas/AzureOpenAILLMEndpointConfigurationUpdate"
+          },
+          {
+            "$ref": "#/components/schemas/OpenAILLMEndpointConfigurationUpdate"
+          }
+        ]
+      },
+      "LLMEndpointCreate": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "configuration": {
+            "$ref": "#/components/schemas/LLMEndpointConfigurationCreate"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "configuration"
+        ],
+        "title": "LLMEndpointCreate"
+      },
+      "LLMEndpointDelete": {
+        "properties": {
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "version"
+        ],
+        "title": "LLMEndpointDelete"
+      },
+      "LLMEndpointType": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "supportedFeatures": {
+            "items": {
+              "$ref": "#/components/schemas/PluginFeature"
+            },
+            "type": "array",
+            "title": "Supportedfeatures"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "supportedFeatures"
+        ],
+        "title": "LLMEndpointType"
+      },
+      "LLMEndpointTypesResponse": {
+        "properties": {
+          "types": {
+            "items": {
+              "$ref": "#/components/schemas/LLMEndpointType"
+            },
+            "type": "array",
+            "title": "Types"
+          }
+        },
+        "type": "object",
+        "required": [
+          "types"
+        ],
+        "title": "LLMEndpointTypesResponse"
+      },
+      "LLMEndpointUpdate": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "configuration": {
+            "$ref": "#/components/schemas/LLMEndpointConfigurationUpdate"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "configuration",
+          "version"
+        ],
+        "title": "LLMEndpointUpdate"
+      },
+      "LLMTestCaseParams": {
+        "type": "string",
+        "enum": [
+          "input",
+          "actual_output",
+          "expected_output",
+          "context",
+          "retrieval_context",
+          "tools_called",
+          "expected_tools"
+        ],
+        "title": "LLMTestCaseParams"
+      },
+      "Language": {
+        "type": "string",
+        "enum": [
+          "english",
+          "german"
+        ],
+        "title": "Language"
+      },
+      "Metric": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Createdat"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updatedat"
+          },
+          "configuration": {
+            "$ref": "#/components/schemas/MetricConfigurationRead"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "createdAt",
+          "updatedAt",
+          "configuration",
+          "version"
+        ],
+        "title": "Metric"
+      },
+      "MetricConfigurationCreate": {
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/GEvalMetricConfigurationCreate"
+          },
+          {
+            "$ref": "#/components/schemas/AnswerRelevancyMetricConfigurationCreate"
+          },
+          {
+            "$ref": "#/components/schemas/HallucinationMetricConfigurationCreate"
+          },
+          {
+            "$ref": "#/components/schemas/FaithfulnessMetricConfigurationCreate"
+          }
+        ]
+      },
+      "MetricConfigurationRead": {
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/GEvalMetricConfigurationRead"
+          },
+          {
+            "$ref": "#/components/schemas/AnswerRelevancyMetricConfigurationRead"
+          },
+          {
+            "$ref": "#/components/schemas/HallucinationMetricConfigurationRead"
+          },
+          {
+            "$ref": "#/components/schemas/FaithfulnessMetricConfigurationRead"
+          }
+        ]
+      },
+      "MetricConfigurationUpdate": {
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/GEvalMetricConfigurationUpdate"
+          },
+          {
+            "$ref": "#/components/schemas/AnswerRelevancyMetricConfigurationUpdate"
+          },
+          {
+            "$ref": "#/components/schemas/HallucinationMetricConfigurationUpdate"
+          },
+          {
+            "$ref": "#/components/schemas/FaithfulnessMetricConfigurationUpdate"
+          }
+        ]
+      },
+      "MetricCreate": {
+        "properties": {
+          "configuration": {
+            "$ref": "#/components/schemas/MetricConfigurationCreate"
+          }
+        },
+        "type": "object",
+        "required": [
+          "configuration"
+        ],
+        "title": "MetricCreate"
+      },
+      "MetricDelete": {
+        "properties": {
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "version"
+        ],
+        "title": "MetricDelete"
+      },
+      "MetricResult": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "type": {
+            "type": "string",
+            "title": "Type"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "successes": {
+            "type": "integer",
+            "title": "Successes"
+          },
+          "failures": {
+            "type": "integer",
+            "title": "Failures"
+          },
+          "errors": {
+            "type": "integer",
+            "title": "Errors"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "type",
+          "total",
+          "successes",
+          "failures",
+          "errors"
+        ],
+        "title": "MetricResult"
+      },
+      "MetricScore": {
+        "properties": {
+          "testCaseId": {
+            "type": "string",
+            "title": "Testcaseid"
+          },
+          "score": {
+            "type": "number",
+            "title": "Score"
+          }
+        },
+        "type": "object",
+        "required": [
+          "testCaseId",
+          "score"
+        ],
+        "title": "MetricScore"
+      },
+      "MetricScores": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "type": {
+            "type": "string",
+            "title": "Type"
+          },
+          "scores": {
+            "items": {
+              "$ref": "#/components/schemas/MetricScore"
+            },
+            "type": "array",
+            "title": "Scores"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "type",
+          "scores"
+        ],
+        "title": "MetricScores"
+      },
+      "MetricTypesResponse": {
+        "properties": {
+          "types": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Types"
+          }
+        },
+        "type": "object",
+        "required": [
+          "types"
+        ],
+        "title": "MetricTypesResponse"
+      },
+      "MetricUpdate": {
+        "properties": {
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "configuration": {
+            "$ref": "#/components/schemas/MetricConfigurationUpdate"
+          }
+        },
+        "type": "object",
+        "required": [
+          "version",
+          "configuration"
+        ],
+        "title": "MetricUpdate"
+      },
+      "MetricsData": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "threshold": {
+            "type": "number",
+            "title": "Threshold"
+          },
+          "success": {
+            "type": "boolean",
+            "title": "Success"
+          },
+          "score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Score"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "strictMode": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Strictmode"
+          },
+          "evaluationModel": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Evaluationmodel"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "threshold",
+          "success",
+          "score",
+          "reason",
+          "strictMode",
+          "evaluationModel",
+          "error"
+        ],
+        "title": "MetricsData"
+      },
+      "NewQAPair": {
+        "properties": {
+          "question": {
+            "type": "string",
+            "title": "Question"
+          },
+          "expectedOutput": {
+            "type": "string",
+            "title": "Expectedoutput"
+          },
+          "contexts": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Contexts"
+          }
+        },
+        "type": "object",
+        "required": [
+          "question",
+          "expectedOutput",
+          "contexts"
+        ],
+        "title": "NewQAPair"
+      },
+      "OpenAILLMEndpointConfigurationCreate": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "OPENAI",
+            "title": "Type"
+          },
+          "parallelQueries": {
+            "type": "integer",
+            "title": "Parallelqueries"
+          },
+          "maxRetries": {
+            "type": "integer",
+            "title": "Maxretries"
+          },
+          "baseUrl": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Baseurl"
+          },
+          "apiKey": {
+            "type": "string",
+            "title": "Apikey"
+          },
+          "model": {
+            "type": "string",
+            "title": "Model"
+          },
+          "temperature": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Temperature"
+          },
+          "requestTimeout": {
+            "type": "integer",
+            "title": "Requesttimeout"
+          },
+          "language": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Language"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "type",
+          "parallelQueries",
+          "maxRetries",
+          "baseUrl",
+          "apiKey",
+          "model",
+          "temperature",
+          "requestTimeout",
+          "language"
+        ],
+        "title": "OpenAILLMEndpointConfigurationCreate"
+      },
+      "OpenAILLMEndpointConfigurationRead": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "OPENAI",
+            "title": "Type"
+          },
+          "parallelQueries": {
+            "type": "integer",
+            "title": "Parallelqueries"
+          },
+          "maxRetries": {
+            "type": "integer",
+            "title": "Maxretries"
+          },
+          "baseUrl": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Baseurl"
+          },
+          "model": {
+            "type": "string",
+            "title": "Model"
+          },
+          "temperature": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Temperature"
+          },
+          "requestTimeout": {
+            "type": "integer",
+            "title": "Requesttimeout"
+          },
+          "language": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Language"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "type",
+          "parallelQueries",
+          "maxRetries",
+          "baseUrl",
+          "model",
+          "temperature",
+          "requestTimeout",
+          "language"
+        ],
+        "title": "OpenAILLMEndpointConfigurationRead"
+      },
+      "OpenAILLMEndpointConfigurationUpdate": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "OPENAI",
+            "title": "Type"
+          },
+          "parallelQueries": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parallelqueries"
+          },
+          "maxRetries": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Maxretries"
+          },
+          "baseUrl": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "string",
+                "const": "UNSET_VALUE"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Baseurl"
+          },
+          "apiKey": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Apikey"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "temperature": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string",
+                "const": "UNSET_VALUE"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Temperature"
+          },
+          "requestTimeout": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Requesttimeout"
+          },
+          "language": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Language"
+              },
+              {
+                "type": "string",
+                "const": "UNSET_VALUE"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Language"
+          }
+        },
+        "type": "object",
+        "required": [
+          "type"
+        ],
+        "title": "OpenAILLMEndpointConfigurationUpdate"
+      },
+      "PluginFeature": {
+        "type": "string",
+        "enum": [
+          "LLM_QUERY",
+          "CHAT_MODEL"
+        ],
+        "title": "PluginFeature"
+      },
+      "QACatalog": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Createdat"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updatedat"
+          },
+          "revision": {
+            "type": "integer",
+            "title": "Revision"
+          },
+          "status": {
+            "$ref": "#/components/schemas/QACatalogStatus"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "createdAt",
+          "updatedAt",
+          "revision",
+          "status"
+        ],
+        "title": "QACatalog"
+      },
+      "QACatalogGenerationConfig": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "RAGAS",
+            "title": "Type"
+          },
+          "knowledgeGraphLocation": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "path"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Knowledgegraphlocation"
+          },
+          "sampleCount": {
+            "type": "integer",
+            "title": "Samplecount"
+          },
+          "queryDistribution": {
+            "items": {
+              "$ref": "#/components/schemas/RagasQACatalogQuerySynthesizer"
+            },
+            "type": "array",
+            "title": "Querydistribution"
+          },
+          "personas": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/RagasQACatalogGeneratorPersona"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Personas"
+          },
+          "useExistingKnowledgeGraph": {
+            "type": "boolean",
+            "title": "Useexistingknowledgegraph",
+            "default": true
+          }
+        },
+        "type": "object",
+        "required": [
+          "type",
+          "knowledgeGraphLocation",
+          "sampleCount",
+          "queryDistribution",
+          "personas"
+        ],
+        "title": "RagasQACatalogGeneratorConfig"
+      },
+      "QACatalogGenerationData": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "RAGAS",
+            "title": "Type"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "config": {
+            "$ref": "#/components/schemas/QACatalogGenerationConfig"
+          },
+          "dataSourceConfigId": {
+            "type": "string",
+            "title": "Datasourceconfigid"
+          },
+          "modelConfigSchema": {
+            "$ref": "#/components/schemas/QACatalogGenerationModelConfigurationSchema"
+          }
+        },
+        "type": "object",
+        "required": [
+          "type",
+          "name",
+          "config",
+          "dataSourceConfigId",
+          "modelConfigSchema"
+        ],
+        "title": "QACatalogGenerationData"
+      },
+      "QACatalogGenerationFromC4BucketRequest": {
+        "properties": {
+          "bucketId": {
+            "type": "integer",
+            "title": "Bucketid"
+          },
+          "fileIds": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "title": "Fileids"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "type": {
+            "type": "string",
+            "const": "RAGAS",
+            "title": "Type"
+          },
+          "config": {
+            "$ref": "#/components/schemas/QACatalogGenerationConfig"
+          },
+          "modelConfigSchema": {
+            "$ref": "#/components/schemas/QACatalogGenerationModelConfigurationSchema"
+          }
+        },
+        "type": "object",
+        "required": [
+          "bucketId",
+          "fileIds",
+          "name",
+          "type",
+          "config",
+          "modelConfigSchema"
+        ],
+        "title": "QACatalogGenerationFromC4BucketRequest",
+        "description": "Request to generate a QA catalog from files in a C4 bucket."
+      },
+      "QACatalogGenerationModelConfigurationSchema": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "RAGAS",
+            "title": "Type"
+          },
+          "llmEndpoint": {
+            "type": "string",
+            "title": "Llmendpoint"
+          }
+        },
+        "type": "object",
+        "required": [
+          "type",
+          "llmEndpoint"
+        ],
+        "title": "RagasQACatalogGeneratorModelConfigSchema"
+      },
+      "QACatalogGenerationResult": {
+        "properties": {
+          "catalogId": {
+            "type": "string",
+            "title": "Catalogid"
+          }
+        },
+        "type": "object",
+        "required": [
+          "catalogId"
+        ],
+        "title": "QACatalogGenerationResult"
+      },
+      "QACatalogPreview": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "length": {
+            "type": "integer",
+            "title": "Length"
+          },
+          "revision": {
+            "type": "integer",
+            "title": "Revision"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Createdat"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updatedat"
+          },
+          "status": {
+            "$ref": "#/components/schemas/QACatalogStatus"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "length",
+          "revision",
+          "createdAt",
+          "updatedAt",
+          "status"
+        ],
+        "title": "QACatalogPreview"
+      },
+      "QACatalogStatus": {
+        "type": "string",
+        "enum": [
+          "GENERATING",
+          "READY",
+          "FAILURE"
+        ],
+        "title": "QACatalogStatus"
+      },
+      "QACatalogUpdateRequest": {
+        "properties": {
+          "updates": {
+            "items": {
+              "$ref": "#/components/schemas/QAPair"
+            },
+            "type": "array",
+            "title": "Updates"
+          },
+          "additions": {
+            "items": {
+              "$ref": "#/components/schemas/NewQAPair"
+            },
+            "type": "array",
+            "title": "Additions"
+          },
+          "deletions": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Deletions"
+          }
+        },
+        "type": "object",
+        "required": [
+          "updates",
+          "additions",
+          "deletions"
+        ],
+        "title": "QACatalogUpdateRequest"
+      },
+      "QACatalogVersionHistory": {
+        "properties": {
+          "versions": {
+            "items": {
+              "$ref": "#/components/schemas/QACatalogVersionHistoryItem"
+            },
+            "type": "array",
+            "title": "Versions"
+          }
+        },
+        "type": "object",
+        "required": [
+          "versions"
+        ],
+        "title": "QACatalogVersionHistory"
+      },
+      "QACatalogVersionHistoryItem": {
+        "properties": {
+          "versionId": {
+            "type": "string",
+            "title": "Versionid"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Createdat"
+          },
+          "revision": {
+            "type": "integer",
+            "title": "Revision"
+          }
+        },
+        "type": "object",
+        "required": [
+          "versionId",
+          "createdAt",
+          "revision"
+        ],
+        "title": "QACatalogVersionHistoryItem"
+      },
+      "QAPair": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "question": {
+            "type": "string",
+            "title": "Question"
+          },
+          "expectedOutput": {
+            "type": "string",
+            "title": "Expectedoutput"
+          },
+          "contexts": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Contexts"
+          },
+          "metaData": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Metadata"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "question",
+          "expectedOutput",
+          "contexts",
+          "metaData"
+        ],
+        "title": "QAPair"
+      },
+      "QaCatalogEvaluationResult": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name"
+        ],
+        "title": "QaCatalogEvaluationResult"
+      },
+      "RagasQACatalogGeneratorPersona": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "description"
+        ],
+        "title": "RagasQACatalogGeneratorPersona"
+      },
+      "RagasQACatalogQuerySynthesizer": {
+        "type": "string",
+        "enum": [
+          "SINGLE_HOP_SPECIFIC",
+          "MULTI_HOP_SPECIFIC",
+          "MULTI_HOP_ABSTRACT"
+        ],
+        "title": "RagasQACatalogQuerySynthesizer"
+      },
+      "RunEvaluationByQaCatalog": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "catalogId": {
+            "type": "string",
+            "title": "Catalogid"
+          },
+          "llmEndpointId": {
+            "type": "string",
+            "title": "Llmendpointid"
+          },
+          "metrics": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Metrics"
+          },
+          "testCasesPerQaPair": {
+            "type": "integer",
+            "title": "Testcasesperqapair",
+            "default": 3
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "catalogId",
+          "llmEndpointId",
+          "metrics"
+        ],
+        "title": "RunEvaluationByQaCatalog"
+      },
+      "RunEvaluationByTestCases": {
+        "properties": {
+          "metrics": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Metrics"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "testCases": {
+            "items": {
+              "$ref": "#/components/schemas/RunEvaluationByTestCasesTestCase"
+            },
+            "type": "array",
+            "title": "Testcases"
+          }
+        },
+        "type": "object",
+        "required": [
+          "metrics",
+          "testCases"
+        ],
+        "title": "RunEvaluationByTestCases"
+      },
+      "RunEvaluationByTestCasesTestCase": {
+        "properties": {
+          "groupingKey": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Groupingkey"
+          },
+          "index": {
+            "type": "integer",
+            "title": "Index",
+            "default": 0
+          },
+          "input": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Input"
+          },
+          "actualOutput": {
+            "type": "string",
+            "title": "Actualoutput"
+          },
+          "expectedOutput": {
+            "type": "string",
+            "title": "Expectedoutput"
+          },
+          "context": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Context"
+          },
+          "retrievalContext": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Retrievalcontext"
+          },
+          "metaData": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Metadata"
+          },
+          "llmConfigurationId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Llmconfigurationid"
+          },
+          "llmConfigurationName": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Llmconfigurationname"
+          },
+          "llmConfigurationVersion": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Llmconfigurationversion"
+          }
+        },
+        "type": "object",
+        "required": [
+          "actualOutput",
+          "expectedOutput"
+        ],
+        "title": "RunEvaluationByTestCasesTestCase"
+      },
+      "SupportedQACatalogDownloadFormat": {
+        "type": "string",
+        "enum": [
+          "csv",
+          "json",
+          "yaml",
+          "xlsx"
+        ]
+      },
+      "TestCaseProgress": {
+        "properties": {
+          "done": {
+            "type": "integer",
+            "title": "Done"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          }
+        },
+        "type": "object",
+        "required": [
+          "done",
+          "total"
+        ],
+        "title": "TestCaseProgress"
+      },
+      "TestCaseStatus": {
+        "type": "string",
+        "enum": [
+          "PENDING",
+          "RETRIEVING_ANSWER",
+          "EVALUATING",
+          "SUCCESS",
+          "FAILURE"
+        ],
+        "title": "TestCaseStatus"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      },
+      "llm_eval__eval__evaluate_results__router__EvaluationResult": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "configurationId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Configurationid"
+          },
+          "configurationName": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Configurationname"
+          },
+          "configurationVersion": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Configurationversion"
+          },
+          "input": {
+            "type": "string",
+            "title": "Input"
+          },
+          "expectedOutput": {
+            "type": "string",
+            "title": "Expectedoutput"
+          },
+          "context": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Context"
+          },
+          "actualOutput": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actualoutput"
+          },
+          "retrievalContext": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Retrievalcontext"
+          },
+          "metaData": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/JSONObject"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "metricsData": {
+            "items": {
+              "$ref": "#/components/schemas/MetricsData"
+            },
+            "type": "array",
+            "title": "Metricsdata"
+          },
+          "status": {
+            "$ref": "#/components/schemas/TestCaseStatus"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "configurationId",
+          "configurationName",
+          "configurationVersion",
+          "input",
+          "expectedOutput",
+          "context",
+          "actualOutput",
+          "retrievalContext",
+          "metaData",
+          "metricsData",
+          "status",
+          "error"
+        ],
+        "title": "EvaluationResult"
+      },
+      "llm_eval__eval__evaluations__models__EvaluationResult": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Createdat"
+          },
+          "status": {
+            "$ref": "#/components/schemas/EvaluationStatus"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "createdAt",
+          "status",
+          "version"
+        ],
+        "title": "EvaluationResult"
+      }
+    }
+  }
+}
