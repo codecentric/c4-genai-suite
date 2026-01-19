@@ -1,0 +1,87 @@
+[tool.poetry]
+name = "rag-eval"
+version = "0.1.0"
+description = "Rag-Eval Pipeline including QA-Catalog, DeepEval and visualization"
+authors = [
+    "Johannes Widera <johannes.widera@codecentric.de>",
+    "Benjamin Bauer <benjamin.bauer@codecentric.de>",
+    "Ahmet Tolga Erdönmez <tolga.erdoenmez@codecentric.de>",
+    "Dominik Fladung <dominik.fladung@codecentric.de>",
+    "Daniel Ladischenski <daniel.ladischenski@codecentric.de>",
+    "Karl Södler <karl.soedler@codecentric.de>",
+]
+packages = [{ include = "llm_eval" }]
+
+[tool.poetry.dependencies]
+python = "^3.12, <3.13"
+python-dotenv = "^1.1.0"
+pydantic = "^2.11.1"
+loguru = "^0.7.3"
+pypdf = "^5.4.0"
+deepeval = "2.7.1"
+langchain-openai = "^0.3.11"
+pyyaml = "^6.0.2"
+sqlalchemy = "^2.0.40"
+alembic = "^1.15.2"
+asyncpg = "^0.30.0"
+greenlet = "^3.0.3"
+anyio = "^4.9.0"
+httpx = "^0.28.1"
+fastapi = { extras = ["standard"], version = "^0.115.12" }
+langchain-core = "^0.3.49"
+email-validator = "^2.2.0"
+cryptography = "^44.0.2"
+pyjwt = "^2.10.1"
+openpyxl = "^3.1.5"
+celery = { extras = ["redis"], version = "^5.4.0" }
+pydantic-settings = "^2.9.1"
+rapidfuzz = "^3.13.0"
+ragas = "^0.3.0"
+boto3 = "^1.35.0"
+boto3-stubs = { extras = ["s3"], version = "^1.35.0" }
+
+[tool.poetry.group.dev.dependencies]
+psycopg2-binary = "^2.9.9"
+pre-commit = "^4.2.0"
+ruff = "^0.11.2"
+langchain-chroma = "^0.1.2" # just needed for local query
+debugpy = "^1.8.8"
+black = "^24.10.0"
+flower = "^2.0.1"
+
+
+[tool.poetry.group.test.dependencies]
+pytest = "^8.3.2"
+pytest-asyncio = "^0.24.0"
+pytest-cov = "^6.0.0"
+pytest-dotenv = "^0.5.2"
+sqlalchemy-utils = "^0.41.2"
+pytest-env = "^1.1.5"
+pytest-mock = "^3.14.0"
+
+[tool.poetry.scripts]
+generate-api-spec = "generate_openapi:generate"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+lint.select = ["E", "F", "ANN"]
+lint.ignore = ["ANN101", "ANN102"]
+
+[tool.ruff.lint.flake8-annotations]
+allow-star-arg-any = true
+
+[tool.pytest.ini_options]
+addopts = "--cov=alembic --cov=database --cov=config --cov=utils --cov=llm_eval --cov-report=term-missing"
+testpaths = "tests"
+env_override_existing_values = 1
+env_files = [".env", ".env.local"]
+
+[tool.pyright]
+typeCheckingMode = "basic"
+exclude = ["alembic/versions", ".cache", ".history", "frontend", "data"]
+
+[tool.coverage.run]
+omit = ["tests/*"]
