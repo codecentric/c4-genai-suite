@@ -29,5 +29,16 @@ class AbstractFormatProvider(ABC):
         return True
 
     @property
-    def multiprocessable(self) -> bool:
+    def previewable(self) -> bool:
+        """Whether this provider offers a sensible pdf preview."""
+        return True
+
+    @property
+    def may_start_separate_process_for_chunking(self) -> bool:
+        """Whether this provider benefits from processing in a separate process."""
+        return True
+
+    @property
+    def may_start_separate_process_for_converting(self) -> bool:
+        """Whether this provider benefits from converting to a pdf preview in a separate process."""
         return True

@@ -33,7 +33,12 @@ class OfficeProvider(AbstractFormatProvider):
         return PdfProvider().process_file(pdf, chunk_size, chunk_overlap)
 
     @property
-    def multiprocessable(self) -> bool:
+    def may_start_separate_process_for_chunking(self) -> bool:
+        # office files are converted to pdf and then processed with the pdf provider
+        return PdfProvider().may_start_separate_process_for_chunking
+
+    @property
+    def may_start_separate_process_for_converting(self) -> bool:
         # office files are converted in libreoffice, which is already a subprocess
         # no need to wrap it in our own subprocess
         return False

@@ -103,7 +103,7 @@ class VoiceTranscriptionProvider(AbstractFormatProvider):
         return self.parser is not None
 
     @property
-    def multiprocessable(self) -> bool:
+    def may_start_separate_process_for_chunking(self) -> bool:
         return False
 
     @staticmethod
@@ -223,6 +223,11 @@ class VoiceTranscriptionProvider(AbstractFormatProvider):
 
         chunks = self.splitter(chunk_size, chunk_overlap).split_documents(results)
         return chunks
+
+    @property
+    def previewable(self) -> bool:
+        # a plaintext audio transcription is not a sensible pdf preview
+        return False
 
     def convert_file_to_pdf(self, file: SourceFile) -> SourceFile:
         docs = self.parse_file(file)
