@@ -34,13 +34,12 @@ export const FileItemComponent = ({ file, onRemove, loading }: FileItemProps) =>
       )}
       data-testid="file-chip"
     >
-      <div className="flex w-full items-center gap-2" data-testid={loading ? 'file-chip-uploading' : 'file-chip-uploaded'}>
+      <div
+        className={cn('flex w-full items-center gap-2', isDeleting && 'opacity-50')}
+        data-testid={loading ? 'file-chip-uploading' : 'file-chip-uploaded'}
+      >
         <div className="relative h-10 w-10 flex-shrink-0 p-1">
-          {loading ? (
-            <IconRotate2 className="loading h-full w-full" />
-          ) : (
-            <IconFile className={cn('h-full w-full', isDeleting && 'opacity-50')} />
-          )}
+          {loading ? <IconRotate2 className="loading h-full w-full" /> : <IconFile className="h-full w-full" />}
           {fileType && (
             <span className="absolute right-0 bottom-0 truncate rounded-md bg-black px-[3px] py-[1px] text-[8px] text-white">
               {fileType}
@@ -50,7 +49,7 @@ export const FileItemComponent = ({ file, onRemove, loading }: FileItemProps) =>
 
         <div className="min-w-0 flex-grow">
           <div className="flex flex-col">
-            <span className={cn('truncate text-sm font-medium', isDeleting && 'text-gray-400')}>{fileName}</span>
+            <span className="truncate text-sm font-medium">{fileName}</span>
             {loading && (
               <div className="animate-show-after-7s relative h-5">
                 <span className="animate-alternate-first absolute top-0 right-0 left-0 truncate text-sm font-medium text-orange-800 italic">
