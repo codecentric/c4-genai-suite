@@ -1,5 +1,6 @@
 import { IconFile, IconRotate2, IconTrash } from '@tabler/icons-react';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FileDto } from 'src/api';
 import { cn } from 'src/lib';
 import { extractType } from 'src/pages/utils';
@@ -13,6 +14,7 @@ type FileItemProps = {
 
 export const FileItemComponent = ({ file, onRemove, loading }: FileItemProps) => {
   const [isDeleting, setIsDeleting] = useState(false);
+  const { i18n } = useTranslation();
   const fileName = file.fileName;
   const fileType = 'mimeType' in file ? extractType(file) : undefined;
 
@@ -60,7 +62,9 @@ export const FileItemComponent = ({ file, onRemove, loading }: FileItemProps) =>
               </div>
             )}
             {!loading && 'uploadedAt' in file && file.uploadedAt && (
-              <div className="text-xs text-gray-500">{new Date(file.uploadedAt).toLocaleString()}</div>
+              <div className="text-xs text-gray-500">
+                {new Date(file.uploadedAt).toLocaleString(i18n.language === 'de' ? 'de-DE' : undefined)}
+              </div>
             )}
           </div>
         </div>
