@@ -684,6 +684,31 @@
                                 }
                             }
                         },
+                        "openAiCompatible": {
+                            "type": "object",
+                            "properties": {
+                                "apiKey": {
+                                    "type": "string",
+                                    "description": "API key for OpenAI Compatible.",
+                                    "default": "\"\""
+                                },
+                                "existingApiKeySecret": {
+                                    "type": "string",
+                                    "description": "Name of the Kubernetes Secret containing the OpenAI Compatible API Key. The key must be `openAiCompatibleApiKey`.",
+                                    "default": "\"\""
+                                },
+                                "endpoint": {
+                                    "type": "string",
+                                    "description": "The OpenAI Compatible endpoint.",
+                                    "default": "\"\""
+                                },
+                                "modelName": {
+                                    "type": "string",
+                                    "description": "The OpenAI Compatible model name.",
+                                    "default": "\"\""
+                                }
+                            }
+                        },
                         "bedrock": {
                             "type": "object",
                             "properties": {

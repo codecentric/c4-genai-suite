@@ -81,6 +81,13 @@ spec:
                   name: {{ .Values.reis.embeddings.openAi.existingApiKeySecret }}
                   key: openAiApiKey
             {{- end }}
+            {{- if .Values.reis.embeddings.openAiCompatible.existingApiKeySecret }}
+            - name: EMBEDDINGS_OPENAI_COMPATIBLE_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.reis.embeddings.openAiCompatible.existingApiKeySecret }}
+                  key: openAiCompatibleApiKey
+            {{- end }}
             {{- if .Values.reis.embeddings.bedrock.existingAccessKeySecret }}
             - name: EMBEDDINGS_BEDROCK_AWS_ACCESS_KEY_ID
               valueFrom:

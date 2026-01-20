@@ -279,6 +279,15 @@ reis:
       deploymentName: ""
       ## @param reis.embeddings.openAi.modelName [string] The OpenAI model name.
       modelName: ""
+    openAiCompatible:
+      ## @param reis.embeddings.openAiCompatible.apiKey [string] API key for OpenAI Compatible.
+      apiKey: ""
+      ## @param reis.embeddings.openAiCompatible.existingApiKeySecret [string] Name of the Kubernetes Secret containing the OpenAI Compatible API Key. The key must be `openAiCompatibleApiKey`.
+      existingApiKeySecret: ""
+      ## @param reis.embeddings.openAiCompatible.endpoint [string] The OpenAI Compatible endpoint.
+      endpoint: ""
+      ## @param reis.embeddings.openAiCompatible.modelName [string] The OpenAI Compatible model name.
+      modelName: ""
     bedrock:
       ## @param reis.embeddings.bedrock.modelId [string] The model ID.
       modelId: ""

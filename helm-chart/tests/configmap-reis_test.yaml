@@ -72,6 +72,14 @@ tests:
           path: data.EMBEDDINGS_TYPE
           value: openai
 
+  - it: has embeddings.type set openai-compatible
+    set:
+      reis.embeddings.type: openai-compatible
+    asserts:
+      - equal:
+          path: data.EMBEDDINGS_TYPE
+          value: openai-compatible
+
   - it: has embeddings.type set azure-openai
     set:
       reis.embeddings.type: azure-openai
@@ -92,6 +100,19 @@ tests:
       - equal:
           path: data.EMBEDDINGS_OPENAI_MODEL_NAME
           value: "unittest/modelname"
+
+  - it: sets OpenAI compatible embedding values if embeddings type is openai-compatible
+    set:
+      reis.embeddings.type: openai-compatible
+      reis.embeddings.openAiCompatible.endpoint: https://embeddings.example.com
+      reis.embeddings.openAiCompatible.modelName: unittest/cmodelname
+    asserts:
+      - equal:
+          path: data.EMBEDDINGS_OPENAI_COMPATIBLE_ENDPOINT
+          value: "https://embeddings.example.com"
+      - equal:
+          path: data.EMBEDDINGS_OPENAI_COMPATIBLE_MODEL_NAME
+          value: "unittest/cmodelname"
 
   - it: sets Azure OpenAI embedding values if embeddings type is azure-openai
     set:
