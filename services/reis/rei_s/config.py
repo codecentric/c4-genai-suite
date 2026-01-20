@@ -76,7 +76,9 @@ class Config(BaseSettings, frozen=True):
     batch_size: Annotated[int, Field(gt=0)] | None = None
     filesize_threshold: Annotated[int, Field(gt=0)] = 10**5
 
-    embeddings_type: Literal["azure-openai", "openai", "random-test-embeddings", "ollama", "bedrock", "nvidia"]
+    embeddings_type: Literal[
+        "azure-openai", "openai", "openai-compatible", "random-test-embeddings", "ollama", "bedrock", "nvidia"
+    ]
     # needed for Azure OpenAI
     embeddings_azure_openai_endpoint: str | None = None
     embeddings_azure_openai_api_key: SecretStr | None = None
@@ -92,6 +94,10 @@ class Config(BaseSettings, frozen=True):
     embeddings_openai_endpoint: str | None = None
     embeddings_openai_api_key: SecretStr | None = None
     embeddings_openai_model_name: str | None = None
+    # needed OpenAI-compatible
+    embeddings_openai_compatible_endpoint: str | None = None
+    embeddings_openai_compatible_api_key: SecretStr | None = None
+    embeddings_openai_compatible_model_name: str | None = None
     # needed for ollama
     embeddings_ollama_endpoint: str | None = None
     embeddings_ollama_model_name: str | None = None
@@ -171,6 +177,14 @@ class Config(BaseSettings, frozen=True):
                 "EMBEDDINGS_OPENAI_MODEL_NAME": self.embeddings_openai_model_name,
             }
             check_required_arguments(needed_for_openai, "EMBEDDINGS_TYPE", "openai")
+
+        if self.embeddings_type == "openai-compatible":
+            needed_for_openai_compatible = {
+                "EMBEDDINGS_OPENAI_COMPATIBLE_API_KEY": self.embeddings_openai_compatible_api_key,
+                "EMBEDDINGS_OPENAI_COMPATIBLE_MODEL_NAME": self.embeddings_openai_compatible_model_name,
+                "EMBEDDINGS_OPENAI_COMPATIBLE_ENDPOINT": self.embeddings_openai_compatible_endpoint,
+            }
+            check_required_arguments(needed_for_openai_compatible, "EMBEDDINGS_TYPE", "openai-compatible")
 
         if self.embeddings_type == "azure-openai":
             needed_for_azure_open_ai = {
