@@ -1,6 +1,7 @@
 import re
 from typing import Any
 
+import yaml
 from langchain_core.documents import Document
 from langchain_text_splitters import MarkdownTextSplitter
 
@@ -9,11 +10,10 @@ from rei_s.services.formats.utils import generate_pdf_from_md_file, validate_chu
 from rei_s.types.source_file import SourceFile
 
 
-def parse_frontmatter(text: str) -> tuple[dict[str, str], str]:
-    """Parse frontmatter from markdown text.
+def parse_frontmatter(text: str) -> tuple[dict[str, Any], str]:
+    """Parse YAML frontmatter from markdown text.
 
     Frontmatter is expected at the beginning of the file, enclosed by "---" on their own lines.
-    Each line within the frontmatter should be in the format "key: value".
 
     Args:
         text: The markdown text to parse.
@@ -21,23 +21,22 @@ def parse_frontmatter(text: str) -> tuple[dict[str, str], str]:
     Returns:
         A tuple of (metadata dict, remaining content without frontmatter).
     """
-    metadata: dict[str, str] = {}
-
-    if not text.startswith("---"):
-        return metadata, text
-
-    match = re.match(r"^---\r?\n(.*?)\r?\n---\r?\n?", text, re.DOTALL)
+    match = re.match(r"^\s*---\s*\r?\n(.*?)\r?\n\s*---\s*\r?\n?", text, re.DOTALL)
     if not match:
-        return metadata, text
+        return {}, text
 
     frontmatter_content = match.group(1)
     remaining_content = text[match.end() :]
 
-    for line in frontmatter_content.split("\n"):
-        if ":" not in line:
-            continue
-        key, value = line.split(":", 1)
-        metadata[key.strip()] = value.strip()
+    try:
+        parsed = yaml.safe_load(frontmatter_content)
+        if not isinstance(parsed, dict):
+            return {}, text
+    except yaml.YAMLError:
+        return {}, text
+
+    # Only keep top-level primitive values (exclude dicts and lists), our metadata concept is flat
+    metadata = {k: v for k, v in parsed.items() if not isinstance(v, (dict, list))}
 
     return metadata, remaining_content
 
