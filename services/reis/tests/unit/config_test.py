@@ -60,6 +60,14 @@ def test_env(empty_env: None, env_file: str, defined: list[str], undefined: list
         ("tests/data/env_vectorstore_missing_aisearch_key.env", ["STORE_AZURE_AI_SEARCH_SERVICE_API_KEY"]),
         ("tests/data/env_embeddings_missing_azure_deployment.env", ["EMBEDDINGS_AZURE_OPENAI_DEPLOYMENT_NAME"]),
         ("tests/data/env_embeddings_missing_openai_model.env", ["EMBEDDINGS_OPENAI_MODEL_NAME"]),
+        (
+            "tests/data/env_embeddings_missing_openai_compatible.env",
+            [
+                "EMBEDDINGS_OPENAI_COMPATIBLE_MODEL_NAME",
+                "EMBEDDINGS_OPENAI_COMPATIBLE_ENDPOINT",
+                "EMBEDDINGS_OPENAI_COMPATIBLE_API_KEY",
+            ],
+        ),
     ],
 )
 def test_env_missing(empty_env: None, env_file: str, expected_missing: list[str]) -> None:

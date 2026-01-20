@@ -26,6 +26,21 @@ def get_embeddings(config: Config) -> Embeddings:
             max_retries=max_retries,
             openai_api_base=config.embeddings_openai_endpoint,
         )
+    if config.embeddings_type.lower() == "openai-compatible":
+        # The only difference is that we send the plain text instead of a tokenized version.
+        # This can be used for models for which we do not have a tokenizer or which do not accept tokens
+        # (there were problems with vLLM)
+        # this is ensured by the config validation, the following lines are there to help the ty typechecker
+        if config.embeddings_openai_compatible_model_name is None:
+            raise ValueError("The env variable `EMBEDDINGS_OPENAI_MODEL_NAME` is missing.")
+
+        return OpenAIEmbeddings(
+            openai_api_key=config.embeddings_openai_compatible_api_key,
+            model=config.embeddings_openai_compatible_model_name,
+            max_retries=max_retries,
+            openai_api_base=config.embeddings_openai_compatible_endpoint,
+            check_embedding_ctx_length=False,
+        )
     elif config.embeddings_type.lower() == "ollama":
         # this is ensured by the config validation, the following lines are there to help the ty typechecker
         if config.embeddings_ollama_model_name is None:
