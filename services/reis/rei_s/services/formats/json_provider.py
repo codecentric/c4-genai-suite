@@ -27,6 +27,8 @@ class JsonProvider(AbstractFormatProvider):
         text = file.buffer.decode()
 
         json_dict = json.loads(text)
+        if not isinstance(json_dict, dict):
+            json_dict = {"data": json_dict}
 
         chunks = self.splitter(chunk_size).create_documents([json_dict])
         return chunks
