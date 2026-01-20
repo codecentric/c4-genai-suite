@@ -1,3 +1,4 @@
+import re
 from typing import Any
 
 from langchain_core.documents import Document
@@ -6,6 +7,48 @@ from langchain_text_splitters import MarkdownTextSplitter
 from rei_s.services.formats.abstract_format_provider import AbstractFormatProvider
 from rei_s.services.formats.utils import generate_pdf_from_md_file, validate_chunk_overlap, validate_chunk_size
 from rei_s.types.source_file import SourceFile
+
+
+def parse_frontmatter(text: str) -> tuple[dict[str, str], str]:
+    """Parse YAML-style frontmatter from markdown text.
+
+    Frontmatter is expected at the beginning of the file, enclosed by "---" on their own lines.
+    Each line within the frontmatter should be in the format "key: value".
+
+    Args:
+        text: The markdown text to parse.
+
+    Returns:
+        A tuple of (metadata dict, remaining content without frontmatter).
+    """
+    metadata: dict[str, str] = {}
+
+    # Check if the text starts with frontmatter delimiter
+    if not text.startswith("---"):
+        return metadata, text
+
+    # Find the closing delimiter
+    match = re.match(r"^---\r?\n(.*?)\r?\n---\r?\n?", text, re.DOTALL)
+    if not match:
+        return metadata, text
+
+    frontmatter_content = match.group(1)
+    remaining_content = text[match.end() :]
+
+    # Parse key: value pairs
+    for line in frontmatter_content.split("\n"):
+        line = line.strip()
+        if not line:
+            continue
+        # Split on first colon only
+        if ": " in line:
+            key, value = line.split(": ", 1)
+            metadata[key.strip()] = value.strip()
+        elif ":" in line:
+            key, value = line.split(":", 1)
+            metadata[key.strip()] = value.strip()
+
+    return metadata, remaining_content
 
 
 class MarkdownProvider(AbstractFormatProvider):
@@ -28,7 +71,16 @@ class MarkdownProvider(AbstractFormatProvider):
     ) -> list[Document]:
         text = file.buffer.decode()
 
-        chunks = self.splitter(chunk_size, chunk_overlap).create_documents([text])
+        # Parse frontmatter and extract metadata
+        frontmatter_metadata, content = parse_frontmatter(text)
+
+        chunks = self.splitter(chunk_size, chunk_overlap).create_documents([content])
+
+        # Add frontmatter metadata to each chunk
+        if frontmatter_metadata:
+            for chunk in chunks:
+                chunk.metadata.update(frontmatter_metadata)
+
         return chunks
 
     def convert_file_to_pdf(self, file: SourceFile) -> SourceFile:

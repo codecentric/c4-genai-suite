@@ -38,6 +38,26 @@ def test_markdown_provider() -> None:
     assert pdf.id == source_file.id
 
 
+def test_markdown_provider_with_frontmatter() -> None:
+    expected = "# Birthdays\n\n## Dagobert Duck"
+    source_file = SourceFile(
+        path="tests/data/birthdays.md",
+        mime_type="text/markdown",
+        file_name="text.md",
+    )
+
+    md = MarkdownProvider()
+    assert md.supports(source_file)
+    docs = md.process_file(source_file)
+    assert len(docs) > 0
+    assert docs[0].page_content.startswith(expected)
+    assert docs[0].metadata.get("url") == "http://example.com"
+
+    pdf = md.convert_file_to_pdf(source_file)
+    assert_pdf_contains_text(pdf, "Dagobert Duck")
+    assert pdf.id == source_file.id
+
+
 def test_html_provider() -> None:
     content = b"<h1>Hello World!</h1>"
     expected = content.decode()
