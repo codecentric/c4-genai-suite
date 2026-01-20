@@ -54,7 +54,7 @@ class TestHtmlToMarkdown:
         assert (
             result
             == """---
-url: https://confluence.example.com/pages/viewpage.action?pageId=12345
+link: https://confluence.example.com/pages/viewpage.action?pageId=12345
 lastUpdated: 2025-07-29T13:56:00.000Z
 ---
 # Test Page"""

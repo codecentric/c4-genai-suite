@@ -20,7 +20,7 @@ def html_to_markdown(page: ConfluencePage) -> str:
         The converted Markdown content
     """
     frontmatter = f"""---
-url: {page.url}
+link: {page.url}
 lastUpdated: {page.last_updated}
 ---
 """
