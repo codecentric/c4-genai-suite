@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { Request } from 'express';
-import { DeepPartial, In } from 'typeorm';
+import { DeepPartial, FindOptionsWhere, In } from 'typeorm';
 import * as uuid from 'uuid';
 import {
   BUILTIN_USER_GROUP_ADMIN,
@@ -50,13 +50,7 @@ export class AuthService implements OnModuleInit {
       if (!user) {
         req.session.destroy(resolve);
       } else {
-        req.session.user =
-          'userGroups' in user && Array.isArray(user.userGroups)
-            ? {
-                ...user,
-                userGroupIds: user.userGroups.map((g) => g.id),
-              }
-            : (user as User);
+        req.session.user = user as User;
         req.session.save(resolve);
       }
     });
@@ -248,7 +242,7 @@ export class AuthService implements OnModuleInit {
     return [mandatoryGroup];
   }
 
-  private async saveAndReloadUser(user: DeepPartial<UserEntity>, userFilter: Partial<User>) {
+  private async saveAndReloadUser(user: DeepPartial<UserEntity>, userFilter: FindOptionsWhere<UserEntity>) {
     await this.users.save(user);
     // Reload the user again to get the default values from the database.
     return await this.users.findOne({ where: userFilter, relations: ['userGroups'] });
