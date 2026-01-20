@@ -2,7 +2,7 @@
 
 from io import BytesIO
 
-from markitdown import MarkItDown
+from markitdown import MarkItDown, StreamInfo
 
 from confluence_importer.confluence import ConfluencePage
 
@@ -26,6 +26,6 @@ lastUpdated: {page.last_updated}
 """
     buffer = BytesIO(page.html_content.encode("utf-8"))
 
-    html_as_markdown = md.convert(buffer).text_content
+    html_as_markdown = md.convert(buffer, stream_info=StreamInfo(mimetype="text/html")).text_content
 
     return f"{frontmatter}{html_as_markdown}"
