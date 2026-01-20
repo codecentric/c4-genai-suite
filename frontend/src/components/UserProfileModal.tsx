@@ -51,7 +51,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
       void queryClient.invalidateQueries({
         queryKey: ['profile'],
       });
-      passwordForm.setValues({ currentPassword: '', password: '', passwordConfirm: '' });
+      passwordForm.reset();
       toast.success(texts.chat.settings.passwordUpdatedSuccessfully);
     },
     onError: () => {
@@ -72,7 +72,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
       size="xl"
       header={<div className="flex items-center gap-4">{texts.chat.settings.header}</div>}
       onClose={() => {
-        passwordForm.setValues({ currentPassword: '', password: '', passwordConfirm: '' });
+        passwordForm.reset();
         updatePassword.reset();
         onClose();
       }}
