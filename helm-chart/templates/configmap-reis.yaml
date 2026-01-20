@@ -17,6 +17,9 @@ data:
   {{- else if eq .Values.reis.embeddings.type "openai" }}
   EMBEDDINGS_OPENAI_ENDPOINT: {{ .Values.reis.embeddings.openAi.endpoint | quote }}
   EMBEDDINGS_OPENAI_MODEL_NAME: {{ .Values.reis.embeddings.openAi.modelName | quote }}
+  {{- else if eq .Values.reis.embeddings.type "openai-compatible" }}
+  EMBEDDINGS_OPENAI_COMPATIBLE_ENDPOINT: {{ .Values.reis.embeddings.openAiCompatible.endpoint | quote }}
+  EMBEDDINGS_OPENAI_COMPATIBLE_MODEL_NAME: {{ .Values.reis.embeddings.openAiCompatible.modelName | quote }}
   {{- else if eq .Values.reis.embeddings.type "ollama" }}
   EMBEDDINGS_OLLAMA_ENDPOINT: {{ .Values.reis.embeddings.ollama.endpoint | quote }}
   EMBEDDINGS_OLLAMA_MODEL_NAME: {{ .Values.reis.embeddings.ollama.modelName | quote }}
