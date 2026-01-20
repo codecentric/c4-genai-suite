@@ -41,7 +41,7 @@ def test_markdown_provider() -> None:
 def test_markdown_provider_with_frontmatter() -> None:
     expected = "# Birthdays\n\n## Dagobert Duck"
     source_file = SourceFile(
-        path="tests/data/birthdays.md",
+        path="tests/data/birthdays_frontmatter.md",
         mime_type="text/markdown",
         file_name="text.md",
     )
