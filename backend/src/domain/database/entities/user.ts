@@ -6,6 +6,7 @@ import {
   ManyToMany,
   OneToMany,
   PrimaryColumn,
+  RelationId,
   Repository,
   UpdateDateColumn,
 } from 'typeorm';
@@ -47,6 +48,9 @@ export class UserEntity {
     inverseJoinColumn: { name: 'userGroupId', referencedColumnName: 'id' },
   })
   userGroups!: UserGroupEntity[];
+
+  @RelationId('userGroups')
+  userGroupIds!: string[];
 
   @OneToMany(() => ConfigurationUserEntity, (uc) => uc.user)
   configurations!: ConfigurationUserEntity[];
