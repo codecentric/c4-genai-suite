@@ -26,12 +26,7 @@ export function ChatSuggestions(props: ChatSuggestionsProps) {
     form.setFieldValue(name, [...fields, { title: '', subtitle: '', text: '' }]);
   };
 
-  const removeItem = (index: number) => {
-    form.setFieldValue(
-      name,
-      fields.filter((_, i) => i !== index),
-    );
-  };
+  const removeItem = (index: number) => form.removeListItem(name, index);
 
   return (
     <div className="grid gap-6">
