@@ -1,5 +1,21 @@
 # Changelog
 
+## [9.10.0](https://github.com/codecentric/c4-genai-suite/compare/v9.9.1...v9.10.0) (2026-01-20)
+
+
+### Features
+
+* add `openai-compatible` embedding models ([#1102](https://github.com/codecentric/c4-genai-suite/issues/1102)) ([62e12dd](https://github.com/codecentric/c4-genai-suite/commit/62e12ddb7a99e7403ea9e7ff5c3d8b6c5194c1ea))
+* **backend:** disable metrics export when METRICS_PORT is set to 0 ([#1056](https://github.com/codecentric/c4-genai-suite/issues/1056)) ([f859e4f](https://github.com/codecentric/c4-genai-suite/commit/f859e4f3447d798af9e4ea71667d81cf756ab87c))
+* **backend:** make maxOutputTokens configurable ([#1057](https://github.com/codecentric/c4-genai-suite/issues/1057)) ([2527d20](https://github.com/codecentric/c4-genai-suite/commit/2527d203dccd8d9a0ea2a5a736558e168cdb7b51))
+* **extension:** add parameters to Brave Web Search extension (safesearch, freshness, country, search language) ([#1008](https://github.com/codecentric/c4-genai-suite/issues/1008)) ([4cf0c5e](https://github.com/codecentric/c4-genai-suite/commit/4cf0c5e4fd86d8c3cc21a29cfa7775b2be63656c))
+
+
+### Bug Fixes
+
+* add support for `openai-compatible` embeddings to helm charts ([#1103](https://github.com/codecentric/c4-genai-suite/issues/1103)) ([5d3b1ac](https://github.com/codecentric/c4-genai-suite/commit/5d3b1aca12ba20dc45843392c926b7f0dbb88bed))
+* **REIS:** do not process all file types with a detour over pdf  when previews are activated ([#659](https://github.com/codecentric/c4-genai-suite/issues/659)) ([f30b642](https://github.com/codecentric/c4-genai-suite/commit/f30b642347e257490e051646f95aa83e86b2eb0d))
+
 ## [9.9.1](https://github.com/codecentric/c4-genai-suite/compare/v9.9.0...v9.9.1) (2026-01-08)
 
 
