@@ -10,7 +10,7 @@ from rei_s.types.source_file import SourceFile
 
 
 def parse_frontmatter(text: str) -> tuple[dict[str, str], str]:
-    """Parse YAML-style frontmatter from markdown text.
+    """Parse frontmatter from markdown text.
 
     Frontmatter is expected at the beginning of the file, enclosed by "---" on their own lines.
     Each line within the frontmatter should be in the format "key: value".
@@ -23,11 +23,9 @@ def parse_frontmatter(text: str) -> tuple[dict[str, str], str]:
     """
     metadata: dict[str, str] = {}
 
-    # Check if the text starts with frontmatter delimiter
     if not text.startswith("---"):
         return metadata, text
 
-    # Find the closing delimiter
     match = re.match(r"^---\r?\n(.*?)\r?\n---\r?\n?", text, re.DOTALL)
     if not match:
         return metadata, text
@@ -35,18 +33,11 @@ def parse_frontmatter(text: str) -> tuple[dict[str, str], str]:
     frontmatter_content = match.group(1)
     remaining_content = text[match.end() :]
 
-    # Parse key: value pairs
     for line in frontmatter_content.split("\n"):
-        line = line.strip()
-        if not line:
+        if ":" not in line:
             continue
-        # Split on first colon only
-        if ": " in line:
-            key, value = line.split(": ", 1)
-            metadata[key.strip()] = value.strip()
-        elif ":" in line:
-            key, value = line.split(":", 1)
-            metadata[key.strip()] = value.strip()
+        key, value = line.split(":", 1)
+        metadata[key.strip()] = value.strip()
 
     return metadata, remaining_content
 
