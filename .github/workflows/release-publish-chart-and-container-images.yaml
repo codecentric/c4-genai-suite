@@ -5,9 +5,9 @@ permissions:
   packages: write
 
 on:
-  push:
-    tags:
-      - v*
+  release:
+    types:
+      - created
 
 jobs:
   backend:
@@ -115,3 +115,15 @@ jobs:
         run: |
           helm package helm-chart/
           helm push c4-genai-suite-*.tgz oci://ghcr.io/${{ github.repository }}/charts/
+
+  notify-slack:
+    runs-on: ubuntu-latest
+    name: Notify Slack on Release
+    needs:
+      - promote-images
+      - publish-helm-chart
+    steps:
+      - name: Notify Slack on Releases
+        uses: amendx/slackbot-release@1.0.1
+        with:
+          slack_webhook_url: ${{ secrets.SLACK_RELEASE_WEBHOOK_URL }}
