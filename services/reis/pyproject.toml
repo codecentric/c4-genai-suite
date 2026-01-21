@@ -36,6 +36,7 @@ dependencies = [
     "markdown>=3.10",
     "pygments>=2.19.2",
     "orjson>=3.11.5",
+    "pyyaml>=6.0",
 ]
 
 [dependency-groups]

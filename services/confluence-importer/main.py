@@ -95,7 +95,7 @@ def log_final_results(page_import_counter: PageImportCounter) -> None:
             page_import_counter=page_import_counter,
         )
     else:
-        logger.info("Synchronization Confluence to c4 completed.", page_import_counter)
+        logger.info("Synchronization Confluence to c4 completed.")
 
 
 def main() -> None:

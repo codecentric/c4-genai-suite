@@ -15,6 +15,7 @@ def sample_confluence_page() -> ConfluencePage:
         last_updated="2025-07-29T13:56:00.000Z",
         url="https://confluence.example.com/pages/viewpage.action?pageId=12345",
         html_content="<h1>Test Page</h1>",
+        title="Test Page",
     )
 
 
@@ -54,8 +55,9 @@ class TestHtmlToMarkdown:
         assert (
             result
             == """---
-url: https://confluence.example.com/pages/viewpage.action?pageId=12345
+link: https://confluence.example.com/pages/viewpage.action?pageId=12345
 lastUpdated: 2025-07-29T13:56:00.000Z
+title: Test Page
 ---
 # Test Page"""
         )

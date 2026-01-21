@@ -3275,6 +3275,7 @@ dependencies = [
     { name = "pygments" },
     { name = "pypdf" },
     { name = "python-oxmsg" },
+    { name = "pyyaml" },
     { name = "weasyprint" },
 ]
 
@@ -3321,6 +3322,7 @@ requires-dist = [
     { name = "pygments", specifier = ">=2.19.2" },
     { name = "pypdf", specifier = ">=6.6.0" },
     { name = "python-oxmsg", specifier = ">=0.0.2" },
+    { name = "pyyaml", specifier = ">=6.0" },
     { name = "weasyprint", specifier = ">=67.0" },
 ]
 

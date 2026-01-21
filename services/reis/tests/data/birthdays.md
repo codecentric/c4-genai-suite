@@ -1,3 +1,15 @@
+---
+url: http://example.com
+grandnephews:
+  - Tick
+  - Trick
+  - Track
+author:
+  first_name: Carl
+  last_name: Barks
+  birthday: 1901-03-27
+birtyhday: 1867-01-01
+---
 # Birthdays
 
 ## Dagobert Duck

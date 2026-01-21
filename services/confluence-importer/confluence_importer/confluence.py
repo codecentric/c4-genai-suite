@@ -21,6 +21,7 @@ class ConfluencePage:
     last_updated: str
     url: str
     html_content: str
+    title: str
 
 
 def get_page(page_id: int) -> ConfluencePage:
@@ -39,6 +40,7 @@ def get_page(page_id: int) -> ConfluencePage:
         page.get("history").get("lastUpdated").get("when"),
         f"{confluence_url}{page.get('_links').get('webui')}",
         page.get("body").get("storage").get("value"),
+        title=page.get("title"),
     )
 
 
@@ -77,6 +79,7 @@ def get_pages_for_space(space_key: str) -> Generator[ConfluencePage]:
                 r.get("history").get("lastUpdated").get("when"),
                 f"{confluence_url}{r.get('_links').get('webui')}",
                 r.get("body").get("storage").get("value"),
+                r.get("title"),
             )
 
         if len_result < batch_size:

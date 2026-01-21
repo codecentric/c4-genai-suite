@@ -1,11 +1,48 @@
+from datetime import datetime, date
+import json
+import re
 from typing import Any
 
+import yaml
 from langchain_core.documents import Document
 from langchain_text_splitters import MarkdownTextSplitter
 
 from rei_s.services.formats.abstract_format_provider import AbstractFormatProvider
 from rei_s.services.formats.utils import generate_pdf_from_md_file, validate_chunk_overlap, validate_chunk_size
 from rei_s.types.source_file import SourceFile
+
+
+def parse_frontmatter(text: str) -> tuple[dict[str, Any], str]:
+    """Parse YAML frontmatter from markdown text.
+
+    Frontmatter is expected at the beginning of the file, enclosed by "---" on their own lines.
+
+    Args:
+        text: The markdown text to parse.
+
+    Returns:
+        A tuple of (metadata dict, remaining content without frontmatter).
+    """
+    match = re.match(r"^\s*---\s*\r?\n(.*?)\r?\n\s*---\s*\r?\n", text, re.DOTALL)
+    if not match:
+        return {}, text
+
+    frontmatter_content = match.group(1)
+    remaining_content = text[match.end() :]
+
+    try:
+        parsed = yaml.safe_load(frontmatter_content)
+        if not isinstance(parsed, dict):
+            return {}, text
+    except Exception:
+        return {}, text
+
+    # Convert nested objects and lists to JSON strings, datetimes to isoformat, keep primitives as-is
+    metadata = {
+        k: json.dumps(v, default=str) if isinstance(v, (dict, list, date, datetime)) else v for k, v in parsed.items()
+    }
+
+    return metadata, remaining_content
 
 
 class MarkdownProvider(AbstractFormatProvider):
@@ -28,7 +65,16 @@ class MarkdownProvider(AbstractFormatProvider):
     ) -> list[Document]:
         text = file.buffer.decode()
 
-        chunks = self.splitter(chunk_size, chunk_overlap).create_documents([text])
+        # Parse frontmatter and extract metadata
+        frontmatter_metadata, content = parse_frontmatter(text)
+
+        chunks = self.splitter(chunk_size, chunk_overlap).create_documents([content])
+
+        # Add frontmatter metadata to each chunk
+        if frontmatter_metadata:
+            for chunk in chunks:
+                chunk.metadata.update(frontmatter_metadata)
+
         return chunks
 
     def convert_file_to_pdf(self, file: SourceFile) -> SourceFile:

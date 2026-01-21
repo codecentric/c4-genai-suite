@@ -32,6 +32,9 @@ def test_markdown_provider() -> None:
     docs = md.process_file(source_file)
     assert len(docs) > 0
     assert docs[0].page_content.startswith(expected)
+    assert docs[0].metadata.get("url") == "http://example.com"
+    assert docs[0].metadata.get("grandnephews") == '["Tick", "Trick", "Track"]'
+    assert docs[0].metadata.get("author") == '{"first_name": "Carl", "last_name": "Barks", "birthday": "1901-03-27"}'
 
     pdf = md.convert_file_to_pdf(source_file)
     assert_pdf_contains_text(pdf, "Dagobert Duck")
