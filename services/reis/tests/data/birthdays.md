@@ -7,6 +7,8 @@ grandnephews:
 author:
   first_name: Carl
   last_name: Barks
+  birthday: 1901-03-27
+birtyhday: 1867-01-01
 ---
 # Birthdays
 

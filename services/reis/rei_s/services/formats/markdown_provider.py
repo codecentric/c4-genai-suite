@@ -1,3 +1,4 @@
+from datetime import datetime, date
 import json
 import re
 from typing import Any
@@ -33,11 +34,13 @@ def parse_frontmatter(text: str) -> tuple[dict[str, Any], str]:
         parsed = yaml.safe_load(frontmatter_content)
         if not isinstance(parsed, dict):
             return {}, text
-    except yaml.YAMLError:
+    except Exception:
         return {}, text
 
-    # Convert nested objects and lists to JSON strings, keep primitives as-is
-    metadata = {k: json.dumps(v) if isinstance(v, (dict, list)) else v for k, v in parsed.items()}
+    # Convert nested objects and lists to JSON strings, datetimes to isoformat, keep primitives as-is
+    metadata = {
+        k: json.dumps(v, default=str) if isinstance(v, (dict, list, date, datetime)) else v for k, v in parsed.items()
+    }
 
     return metadata, remaining_content
 
