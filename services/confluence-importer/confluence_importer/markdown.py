@@ -22,6 +22,7 @@ def html_to_markdown(page: ConfluencePage) -> str:
     frontmatter = f"""---
 link: {page.url}
 lastUpdated: {page.last_updated}
+title: {page.title}
 ---
 """
     buffer = BytesIO(page.html_content.encode("utf-8"))
