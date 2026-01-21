@@ -1,5 +1,20 @@
 # Changelog
 
+## [9.11.0](https://github.com/codecentric/c4-genai-suite/compare/v9.10.0...v9.11.0) (2026-01-21)
+
+
+### Features
+
+* **confluence-importer,REIS:** parse frontmatter into metadata and improve html-to-markdown conversion ([#1106](https://github.com/codecentric/c4-genai-suite/issues/1106)) ([f08a9bc](https://github.com/codecentric/c4-genai-suite/commit/f08a9bcd76add05c277251a5c61e4bc50a9fea40))
+* **frontend:** complete migration from react hook forms to mantine forms ([#1046](https://github.com/codecentric/c4-genai-suite/issues/1046)) ([3b97f12](https://github.com/codecentric/c4-genai-suite/commit/3b97f121f658764900e0e2e9e326679a7b0963f3))
+
+
+### Bug Fixes
+
+* **backend:** re-add `userGroupIds` to User entity ([#1104](https://github.com/codecentric/c4-genai-suite/issues/1104)) ([9ae936c](https://github.com/codecentric/c4-genai-suite/commit/9ae936ce1eb0b7036fe15660457eafdb4daad2b6))
+* **frontend:** pdf viewer should start on first page if page is not a number ([#1109](https://github.com/codecentric/c4-genai-suite/issues/1109)) ([7850efc](https://github.com/codecentric/c4-genai-suite/commit/7850efcff55f2b98c8bfd02e95f752aa4809c527))
+* **REIS:** handle json lists correctly ([#1094](https://github.com/codecentric/c4-genai-suite/issues/1094)) ([70ef1fe](https://github.com/codecentric/c4-genai-suite/commit/70ef1fe28732f2349731c7c735dcf7e145eac996))
+
 ## [9.10.0](https://github.com/codecentric/c4-genai-suite/compare/v9.9.1...v9.10.0) (2026-01-20)
 
 
