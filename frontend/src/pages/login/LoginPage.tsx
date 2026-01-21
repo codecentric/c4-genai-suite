@@ -1,8 +1,9 @@
+import { Button, PasswordInput, TextInput } from '@mantine/core';
+import { useForm } from '@mantine/form';
 import { useMutation } from '@tanstack/react-query';
-import { FormProvider, useForm } from 'react-hook-form';
 import { AuthSettingsDto, useApi } from 'src/api';
 import { LoginDto } from 'src/api/generated';
-import { Forms, Logo } from 'src/components';
+import { Logo } from 'src/components';
 import { Theme, useLoginUrl, useTheme, useTransientNavigate } from 'src/hooks';
 import { useAuthSettings } from 'src/hooks/useAuthSettings';
 import { texts } from 'src/texts';
@@ -76,28 +77,35 @@ function LoginForm() {
     },
   });
 
-  const form = useForm<LoginDto>({});
+  const form = useForm<LoginDto>({
+    mode: 'controlled',
+    initialValues: {
+      email: '',
+      password: '',
+    },
+  });
 
   return (
-    <FormProvider {...form}>
-      {/* Form Section */}
-      <form className="flex w-full flex-col text-black" onSubmit={form.handleSubmit((v) => login.mutate(v))}>
-        {/* Error Message Placeholder */}
-        {login.isError && (
-          <div role={'alert'} className="alert alert-error mb-4">
-            {texts.common.loginFailed}
-          </div>
-        )}
+    <form className="flex w-full flex-col text-black" onSubmit={form.onSubmit((v) => login.mutate(v))}>
+      {/* Error Message Placeholder */}
+      {login.isError && (
+        <div role={'alert'} className="alert alert-error mb-4">
+          {texts.common.loginFailed}
+        </div>
+      )}
 
-        <Forms.Text vertical name="email" placeholder={texts.common.email} autoFocus />
+      <div className="mb-3">
+        <TextInput placeholder={texts.common.email} autoFocus key={form.key('email')} {...form.getInputProps('email')} />
+      </div>
 
-        <Forms.Password vertical name="password" placeholder={texts.common.password} />
+      <div className="mb-3">
+        <PasswordInput placeholder={texts.common.password} key={form.key('password')} {...form.getInputProps('password')} />
+      </div>
 
-        <button type="submit" className="btn btn-primary bg-primary w-full rounded px-4 py-1.5">
-          {texts.common.loginButton}
-        </button>
-      </form>
-    </FormProvider>
+      <Button type="submit" className="w-full">
+        {texts.common.loginButton}
+      </Button>
+    </form>
   );
 }
 

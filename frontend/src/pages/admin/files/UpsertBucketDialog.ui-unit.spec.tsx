@@ -1,15 +1,20 @@
-import { fireEvent, renderHook, screen, within } from '@testing-library/react';
-import { FormProvider, useForm } from 'react-hook-form';
+import { useForm } from '@mantine/form';
+import { fireEvent, screen, within } from '@testing-library/react';
+import { renderHook } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { UpsertBucketDto } from 'src/api';
-import { Forms } from 'src/components';
 import { render } from 'src/pages/admin/test-utils';
+import { FileSizeDynamicFields } from './UpsertBucketDialog';
 
-describe('Form components', () => {
-  it('FileSizeDynamicFields add new field', () => {
+describe('FileSizeDynamicFields component', () => {
+  it('should add a new field when clicking the add button', () => {
     const { result } = renderHook(() =>
       useForm<UpsertBucketDto>({
-        defaultValues: {
+        initialValues: {
+          name: '',
+          endpoint: '',
+          indexName: '',
+          headers: '',
           isDefault: false,
           perUserQuota: 20,
           allowedFileNameExtensions: [],
@@ -19,11 +24,7 @@ describe('Form components', () => {
     );
 
     const form = result.current;
-    render(
-      <FormProvider {...form}>
-        <Forms.FileSizeDynamicFields name="fileSizeLimits" label="File Size Limit" suffix="MB" />
-      </FormProvider>,
-    );
+    render(<FileSizeDynamicFields form={form} name="fileSizeLimits" label="File Size Limit" suffix="MB" />);
 
     const addButton = screen.getByTestId('fileSizeLimitsDynamic.add');
     fireEvent.click(addButton);
@@ -43,10 +44,14 @@ describe('Form components', () => {
     expect(formValues.fileSizeLimits.xlsx).toBe(13);
   });
 
-  it('FileSizeDynamicFields remove field', () => {
+  it('should remove a field when clicking the remove button', () => {
     const { result } = renderHook(() =>
       useForm<UpsertBucketDto>({
-        defaultValues: {
+        initialValues: {
+          name: '',
+          endpoint: '',
+          indexName: '',
+          headers: '',
           isDefault: false,
           perUserQuota: 20,
           allowedFileNameExtensions: [],
@@ -56,11 +61,7 @@ describe('Form components', () => {
     );
 
     const form = result.current;
-    render(
-      <FormProvider {...form}>
-        <Forms.FileSizeDynamicFields name="fileSizeLimits" label="File Size Limit" suffix="MB" />
-      </FormProvider>,
-    );
+    render(<FileSizeDynamicFields form={form} name="fileSizeLimits" label="File Size Limit" suffix="MB" />);
 
     const rows = screen.getAllByTestId(/fileSizeLimitsDynamic\.\d+\.row/);
     const rowToRemove = rows.find((row) => {

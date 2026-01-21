@@ -40,7 +40,8 @@ describe('User Page', () => {
     const user = userEvent.setup();
 
     // Because the Default user group is already selected, we do not have to add it.
-    const userGroups = screen.getByLabelText(required(texts.common.userGroups));
+    // Use the base label without asterisk for role-based queries since the asterisk is aria-hidden
+    const userGroups = screen.getByRole('textbox', { name: texts.common.userGroups });
     await user.click(userGroups);
     const adminOption = screen.getByRole('option', { name: /Admin/i });
     await user.click(adminOption); // add
@@ -55,7 +56,7 @@ describe('User Page', () => {
 
     const user = userEvent.setup();
 
-    const userGroup = screen.getByLabelText(required(texts.common.userGroups));
+    const userGroup = screen.getByRole('textbox', { name: texts.common.userGroups });
     await user.click(userGroup);
     const adminOption = screen.getByRole('option', { name: /Admin/i });
     await user.click(adminOption);
@@ -69,7 +70,7 @@ describe('User Page', () => {
   it('should select the user group default on initial state', () => {
     render(<CreateUserDialog userGroups={mockUserGroups} onCreate={() => {}} onClose={() => {}} />);
 
-    expect(document.querySelector('input[name="userGroupIds"]')).toHaveValue('default');
+    expect(document.querySelector('.mantine-Pill-label')).toHaveTextContent('Default');
   });
 
   it('should select multiple user groups', async () => {
@@ -77,12 +78,15 @@ describe('User Page', () => {
 
     const user = userEvent.setup();
 
-    const userGroup = screen.getByLabelText(required(texts.common.userGroups));
+    const userGroup = screen.getByRole('textbox', { name: texts.common.userGroups });
     await user.click(userGroup);
     const groupOption = screen.getByRole('option', { name: /Group/i });
     await user.click(groupOption);
 
-    expect(document.querySelector('input[name="userGroupIds"]')).toHaveValue('default,group');
+    const pills = document.querySelectorAll('.mantine-Pill-label');
+    const pillTexts = Array.from(pills).map((p) => p.textContent);
+    expect(pillTexts).toContain('Default');
+    expect(pillTexts).toContain('Group');
   });
 
   it('should alert when username and email are empty', async () => {
@@ -91,7 +95,7 @@ describe('User Page', () => {
     const user = userEvent.setup();
     const saveBtn = screen.getAllByRole('button', { name: 'Save' });
     await user.click(saveBtn[0]);
-    expect(screen.getAllByRole('alert')).toHaveLength(2);
+    expect(document.querySelectorAll('.mantine-InputWrapper-error')).toHaveLength(2);
   });
 
   it('should alert when password and confirm password do not match', async () => {
@@ -108,6 +112,6 @@ describe('User Page', () => {
     await user.type(confirmPwd, 'abd');
     const saveBtn = screen.getAllByRole('button', { name: 'Save' });
     await user.click(saveBtn[0]);
-    expect(screen.getAllByRole('alert')).toHaveLength(1);
+    expect(document.querySelectorAll('.mantine-InputWrapper-error')).toHaveLength(1);
   });
 });

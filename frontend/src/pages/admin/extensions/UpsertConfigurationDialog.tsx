@@ -68,6 +68,7 @@ export function UpsertConfigurationDialog(props: UpsertConfigurationDialogProps)
     },
     validate: typedZodResolver(schema),
   });
+
   return (
     <Portal>
       <Modal onClose={onClose} title={target ? texts.extensions.updateConfiguration : texts.extensions.createConfiguration}>

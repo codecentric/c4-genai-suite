@@ -1,33 +1,31 @@
-import { yupResolver } from '@hookform/resolvers/yup';
-import { Button, Divider, Portal } from '@mantine/core';
+import { Button, Divider, NumberInput, Portal, TextInput } from '@mantine/core';
+import { useForm } from '@mantine/form';
 import { IconTrash } from '@tabler/icons-react';
-import { useEffect } from 'react';
-import { FormProvider, useForm } from 'react-hook-form';
-import * as Yup from 'yup';
+import { zod4Resolver } from 'mantine-form-zod-resolver';
+import { z } from 'zod';
 import { useApi, UserGroupDto } from 'src/api';
-import { ConfirmDialog, FormAlert, Forms, Modal } from 'src/components';
+import { ConfirmDialog, FormAlert, Modal } from 'src/components';
 import { useDeleteUserGroup } from 'src/pages/admin/user-groups/hooks/useDeleteUserGroup';
 import { useUpdateUserGroup } from 'src/pages/admin/user-groups/hooks/useUpdateUserGroup';
 import { texts } from 'src/texts';
 
-const SCHEME = Yup.object({
-  name: Yup.string().label(texts.common.name).required(),
-  monthlyTokens: Yup.number()
+const SCHEME = z.object({
+  name: z.string().min(1, texts.common.name),
+  monthlyTokens: z
+    .number()
     .positive()
-    .label(texts.common.monthlyTokens)
     .nullable()
-    .transform((value: number, originalValue: string) => (originalValue === '' ? null : value)),
-  monthlyUserTokens: Yup.number()
+    .optional()
+    .or(z.literal('').transform(() => null)),
+  monthlyUserTokens: z
+    .number()
     .positive()
-    .label(texts.common.monthlyUserTokens)
     .nullable()
-    .transform((value: number, originalValue: string) => (originalValue === '' ? null : value)),
+    .optional()
+    .or(z.literal('').transform(() => null)),
 });
 
-type SchemaType = Yup.InferType<typeof SCHEME>;
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const RESOLVER = yupResolver<any>(SCHEME);
+type SchemaType = z.infer<typeof SCHEME>;
 
 export interface UpdateUserGroupDialogProps {
   target: UserGroupDto;
@@ -44,76 +42,85 @@ export function UpdateUserGroupDialog({ onClose, onDelete, onUpdate, target }: U
   const userGroupDelete = useDeleteUserGroup(api, target, onDelete, onClose);
 
   const form = useForm<SchemaType>({
-    resolver: RESOLVER,
-    defaultValues: { name: '', monthlyUserTokens: null, monthlyTokens: null },
+    validate: zod4Resolver(SCHEME),
+    initialValues: target as SchemaType,
+    mode: 'controlled',
   });
-  useEffect(() => {
-    form.reset(target);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [target]);
   return (
     <Portal>
-      <FormProvider {...form}>
-        <form
-          noValidate
-          onSubmit={form.handleSubmit((v) =>
-            userGroupUpdate.mutate({
-              name: v.name,
-              monthlyTokens: v.monthlyTokens ? v.monthlyTokens : undefined,
-              monthlyUserTokens: v.monthlyUserTokens ? v.monthlyUserTokens : undefined,
-            }),
-          )}
-        >
-          <Modal
-            size="lg"
-            onClose={onClose}
-            header={<div className="flex items-center gap-4">{texts.userGroups.update}</div>}
-            footer={
-              <fieldset disabled={userGroupUpdate.isPending || userGroupDelete.isPending || target.isBuiltIn}>
-                <div className="flex flex-row justify-end gap-4">
-                  <Button variant="subtle" type="button" onClick={onClose}>
-                    {texts.common.cancel}
-                  </Button>
-
-                  <Button type="submit">{texts.common.save}</Button>
-                </div>
-              </fieldset>
-            }
-          >
+      <form
+        noValidate
+        onSubmit={form.onSubmit((v) =>
+          userGroupUpdate.mutate({
+            name: v.name,
+            monthlyTokens: v.monthlyTokens ? v.monthlyTokens : undefined,
+            monthlyUserTokens: v.monthlyUserTokens ? v.monthlyUserTokens : undefined,
+          }),
+        )}
+      >
+        <Modal
+          size="lg"
+          onClose={onClose}
+          header={<div className="flex items-center gap-4">{texts.userGroups.update}</div>}
+          footer={
             <fieldset disabled={userGroupUpdate.isPending || userGroupDelete.isPending || target.isBuiltIn}>
-              <FormAlert common={texts.userGroups.updateFailed} error={userGroupUpdate.error} />
+              <div className="flex flex-row justify-end gap-4">
+                <Button variant="subtle" type="button" onClick={onClose}>
+                  {texts.common.cancel}
+                </Button>
 
-              <Forms.Text required name="name" label={texts.common.groupName} />
-
-              <Forms.Number name="monthlyTokens" label={texts.common.monthlyTokens} refreshable />
-
-              <Forms.Number name="monthlyUserTokens" label={texts.common.monthlyUserTokens} refreshable />
-
-              <Divider my="xs" label={texts.common.dangerZone} labelPosition="left" />
-
-              <Forms.Row name="danger" label={texts.common.remove}>
-                <ConfirmDialog
-                  title={texts.userGroups.removeConfirmTitle}
-                  text={texts.userGroups.removeConfirmText}
-                  onPerform={userGroupDelete.mutate}
-                >
-                  {({ onClick }) => (
-                    <Button
-                      type="button"
-                      variant="light"
-                      color="red"
-                      leftSection={<IconTrash className="w-4" />}
-                      onClick={onClick}
-                    >
-                      {texts.common.remove}
-                    </Button>
-                  )}
-                </ConfirmDialog>
-              </Forms.Row>
+                <Button type="submit">{texts.common.save}</Button>
+              </div>
             </fieldset>
-          </Modal>
-        </form>
-      </FormProvider>
+          }
+        >
+          <fieldset disabled={userGroupUpdate.isPending || userGroupDelete.isPending || target.isBuiltIn}>
+            <FormAlert common={texts.userGroups.updateFailed} error={userGroupUpdate.error} />
+
+            <TextInput
+              id="name"
+              withAsterisk
+              label={texts.common.groupName}
+              className="mb-4"
+              key={form.key('name')}
+              {...form.getInputProps('name')}
+            />
+
+            <NumberInput
+              id="monthlyTokens"
+              label={texts.common.monthlyTokens}
+              className="mb-4"
+              key={form.key('monthlyTokens')}
+              {...form.getInputProps('monthlyTokens')}
+            />
+
+            <NumberInput
+              id="monthlyUserTokens"
+              label={texts.common.monthlyUserTokens}
+              className="mb-4"
+              key={form.key('monthlyUserTokens')}
+              {...form.getInputProps('monthlyUserTokens')}
+            />
+
+            <Divider my="xs" label={texts.common.dangerZone} labelPosition="left" />
+
+            <div className="flex flex-row">
+              <label className="mt-3 w-48 shrink-0 text-sm font-semibold">{texts.common.remove}</label>
+              <ConfirmDialog
+                title={texts.userGroups.removeConfirmTitle}
+                text={texts.userGroups.removeConfirmText}
+                onPerform={userGroupDelete.mutate}
+              >
+                {({ onClick }) => (
+                  <Button type="button" variant="light" color="red" leftSection={<IconTrash className="w-4" />} onClick={onClick}>
+                    {texts.common.remove}
+                  </Button>
+                )}
+              </ConfirmDialog>
+            </div>
+          </fieldset>
+        </Modal>
+      </form>
     </Portal>
   );
 }

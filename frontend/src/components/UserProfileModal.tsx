@@ -1,27 +1,27 @@
-import { yupResolver } from '@hookform/resolvers/yup';
-import { Button, Tabs } from '@mantine/core';
+import { Button, PasswordInput, Tabs } from '@mantine/core';
+import { useForm } from '@mantine/form';
 import { IconLock, IconUser } from '@tabler/icons-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useState } from 'react';
-import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
-import * as Yup from 'yup';
+import { z } from 'zod';
 import { ChangePasswordDto, useApi } from 'src/api';
-import { Forms, Modal } from 'src/components';
+import { Modal } from 'src/components';
 import { useProfile } from 'src/hooks';
 import { texts } from 'src/texts';
 
-const PASSWORD_CHANGE_SCHEMA = Yup.object({
-  currentPassword: Yup.string().label(texts.chat.settings.currentPassword).required(texts.common.required),
-  password: Yup.string().label(texts.chat.settings.password).required(texts.common.required),
-  passwordConfirm: Yup.string()
-    .label(texts.chat.settings.passwordConfirm)
-    .oneOf([Yup.ref('password'), '', undefined], texts.common.passwordsDoNotMatch)
-    .required(texts.common.required),
-});
+const PASSWORD_CHANGE_SCHEMA = z
+  .object({
+    currentPassword: z.string().min(1, texts.common.required),
+    password: z.string().min(1, texts.common.required),
+    passwordConfirm: z.string().min(1, texts.common.required),
+  })
+  .refine((data) => data.password === data.passwordConfirm, {
+    message: texts.common.passwordsDoNotMatch,
+    path: ['passwordConfirm'],
+  });
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const PASSWORD_RESOLVER = yupResolver<any>(PASSWORD_CHANGE_SCHEMA);
 interface UserProfileModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -34,8 +34,9 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
   const [activeTab, setActiveTab] = useState<'personal' | 'security'>('personal');
 
   const passwordForm = useForm<{ currentPassword?: string; password?: string; passwordConfirm?: string }>({
-    resolver: PASSWORD_RESOLVER,
-    defaultValues: { currentPassword: '', password: '', passwordConfirm: '' },
+    validate: zod4Resolver(PASSWORD_CHANGE_SCHEMA),
+    initialValues: { currentPassword: '', password: '', passwordConfirm: '' },
+    mode: 'controlled',
   });
 
   const updatePassword = useMutation({
@@ -50,7 +51,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
       void queryClient.invalidateQueries({
         queryKey: ['profile'],
       });
-      passwordForm.reset({ currentPassword: '', password: '', passwordConfirm: '' });
+      passwordForm.reset();
       toast.success(texts.chat.settings.passwordUpdatedSuccessfully);
     },
     onError: () => {
@@ -66,57 +67,12 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
 
   if (!isOpen) return null;
 
-  const PersonalInfoSection = () => (
-    <div>
-      <h3 className="mb-4 text-lg font-semibold text-gray-900">{texts.chat.settings.personalInformation}</h3>
-      <div className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700">{texts.common.name}</label>
-          <p className="mt-1 text-sm text-gray-900">{profile.name}</p>
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700">{texts.common.email}</label>
-          <p className="mt-1 text-sm text-gray-900">{profile.email}</p>
-        </div>
-      </div>
-    </div>
-  );
-
-  const SecuritySection = () => (
-    <div>
-      <h3 className="mb-4 text-lg font-semibold text-gray-900">{texts.chat.settings.security}</h3>
-      <FormProvider {...passwordForm}>
-        <form onSubmit={passwordForm.handleSubmit(handlePasswordSubmit)} className="space-y-4">
-          <div className="space-y-4">
-            <Forms.Password
-              name="currentPassword"
-              label={texts.chat.settings.currentPassword}
-              placeholder={texts.chat.settings.enterCurrentPassword}
-            />
-            <Forms.Password name="password" label={texts.common.password} placeholder={texts.chat.settings.enterNewPassword} />
-            <Forms.Password
-              name="passwordConfirm"
-              label={texts.common.passwordConfirm}
-              placeholder={texts.chat.settings.enterConfirmNewPassword}
-            />
-          </div>
-
-          <div className="flex justify-end pt-4">
-            <Button type="submit" disabled={updatePassword.isPending}>
-              {updatePassword.isPending ? texts.chat.settings.updatingPassword : texts.chat.settings.updatePassword}
-            </Button>
-          </div>
-        </form>
-      </FormProvider>
-    </div>
-  );
-
   return (
     <Modal
       size="xl"
       header={<div className="flex items-center gap-4">{texts.chat.settings.header}</div>}
       onClose={() => {
-        passwordForm.reset({ currentPassword: '', password: '', passwordConfirm: '' });
+        passwordForm.reset();
         updatePassword.reset();
         onClose();
       }}
@@ -149,8 +105,59 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
         </div>
 
         <div className="w-2/3 pl-4">
-          {activeTab === 'personal' && <PersonalInfoSection />}
-          {activeTab === 'security' && <SecuritySection />}
+          {activeTab === 'personal' && (
+            <div>
+              <h3 className="mb-4 text-lg font-semibold text-gray-900">{texts.chat.settings.personalInformation}</h3>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">{texts.common.name}</label>
+                  <p className="mt-1 text-sm text-gray-900">{profile.name}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">{texts.common.email}</label>
+                  <p className="mt-1 text-sm text-gray-900">{profile.email}</p>
+                </div>
+              </div>
+            </div>
+          )}
+          {activeTab === 'security' && (
+            <div>
+              <h3 className="mb-4 text-lg font-semibold text-gray-900">{texts.chat.settings.security}</h3>
+              <form onSubmit={passwordForm.onSubmit(handlePasswordSubmit)} className="space-y-4">
+                <div className="space-y-4">
+                  <PasswordInput
+                    id="currentPassword"
+                    label={texts.chat.settings.currentPassword}
+                    placeholder={texts.chat.settings.enterCurrentPassword}
+                    key={passwordForm.key('currentPassword')}
+                    {...passwordForm.getInputProps('currentPassword')}
+                  />
+
+                  <PasswordInput
+                    id="password"
+                    label={texts.common.password}
+                    placeholder={texts.chat.settings.enterNewPassword}
+                    key={passwordForm.key('password')}
+                    {...passwordForm.getInputProps('password')}
+                  />
+
+                  <PasswordInput
+                    id="passwordConfirm"
+                    label={texts.common.passwordConfirm}
+                    placeholder={texts.chat.settings.enterConfirmNewPassword}
+                    key={passwordForm.key('passwordConfirm')}
+                    {...passwordForm.getInputProps('passwordConfirm')}
+                  />
+                </div>
+
+                <div className="flex justify-end pt-4">
+                  <Button type="submit" disabled={updatePassword.isPending}>
+                    {updatePassword.isPending ? texts.chat.settings.updatingPassword : texts.chat.settings.updatePassword}
+                  </Button>
+                </div>
+              </form>
+            </div>
+          )}
         </div>
       </div>
     </Modal>
