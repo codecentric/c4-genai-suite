@@ -32,7 +32,7 @@ function getFirstPageFromSource(source: SourceDto | undefined): number {
     if (isString(metadata.pages)) {
       // pages is a string like "1-2, 4"
       const pages = metadata.pages.split(',').flatMap((pageRange: string) => pageRange.split('-').map((p) => parseInt(p, 10)));
-      if (pages.length > 0) {
+      if (pages.length > 0 && !isNaN(pages[0])) {
         const firstPage = pages[0];
         return firstPage;
       }
