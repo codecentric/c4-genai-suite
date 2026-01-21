@@ -1,3 +1,4 @@
+import json
 import re
 from typing import Any
 
@@ -21,7 +22,7 @@ def parse_frontmatter(text: str) -> tuple[dict[str, Any], str]:
     Returns:
         A tuple of (metadata dict, remaining content without frontmatter).
     """
-    match = re.match(r"^\s*---\s*\r?\n(.*?)\r?\n\s*---\s*\r?\n?", text, re.DOTALL)
+    match = re.match(r"^\s*---\s*\r?\n(.*?)\r?\n\s*---\s*\r?\n", text, re.DOTALL)
     if not match:
         return {}, text
 
@@ -35,8 +36,8 @@ def parse_frontmatter(text: str) -> tuple[dict[str, Any], str]:
     except yaml.YAMLError:
         return {}, text
 
-    # Only keep top-level primitive values (exclude dicts and lists), our metadata concept is flat
-    metadata = {k: v for k, v in parsed.items() if not isinstance(v, (dict, list))}
+    # Convert nested objects and lists to JSON strings, keep primitives as-is
+    metadata = {k: json.dumps(v) if isinstance(v, (dict, list)) else v for k, v in parsed.items()}
 
     return metadata, remaining_content
 

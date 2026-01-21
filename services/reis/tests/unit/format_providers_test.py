@@ -32,26 +32,9 @@ def test_markdown_provider() -> None:
     docs = md.process_file(source_file)
     assert len(docs) > 0
     assert docs[0].page_content.startswith(expected)
-
-    pdf = md.convert_file_to_pdf(source_file)
-    assert_pdf_contains_text(pdf, "Dagobert Duck")
-    assert pdf.id == source_file.id
-
-
-def test_markdown_provider_with_frontmatter() -> None:
-    expected = "# Birthdays\n\n## Dagobert Duck"
-    source_file = SourceFile(
-        path="tests/data/birthdays_frontmatter.md",
-        mime_type="text/markdown",
-        file_name="text.md",
-    )
-
-    md = MarkdownProvider()
-    assert md.supports(source_file)
-    docs = md.process_file(source_file)
-    assert len(docs) > 0
-    assert docs[0].page_content.startswith(expected)
     assert docs[0].metadata.get("url") == "http://example.com"
+    assert docs[0].metadata.get("grandnephews") == '["Tick", "Trick", "Track"]'
+    assert docs[0].metadata.get("author") == '{"first_name": "Carl", "last_name": "Barks"}'
 
     pdf = md.convert_file_to_pdf(source_file)
     assert_pdf_contains_text(pdf, "Dagobert Duck")

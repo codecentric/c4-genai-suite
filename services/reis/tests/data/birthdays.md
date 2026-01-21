@@ -1,3 +1,13 @@
+---
+url: http://example.com
+grandnephews:
+  - Tick
+  - Trick
+  - Track
+author:
+  first_name: Carl
+  last_name: Barks
+---
 # Birthdays
 
 ## Dagobert Duck
