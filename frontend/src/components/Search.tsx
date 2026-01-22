@@ -1,10 +1,10 @@
-import { TextInput } from '@mantine/core';
+import { CloseButton, TextInput } from '@mantine/core';
 import { IconSearch } from '@tabler/icons-react';
-import { ChangeEvent, InputHTMLAttributes, KeyboardEvent, useEffect, useState } from 'react';
+import { ChangeEvent, KeyboardEvent, useEffect, useState } from 'react';
 import { useEventCallback } from 'src/hooks';
 import { texts } from 'src/texts';
 
-interface SearchProps extends InputHTMLAttributes<HTMLInputElement> {
+interface SearchProps {
   // The actual value.
   value?: string;
 
@@ -43,9 +43,18 @@ export const Search = (props: SearchProps) => {
     }
   });
 
+  const doClear = useEventCallback(() => {
+    setSearch('');
+    onSearch('');
+  });
+
   return (
     <TextInput
       leftSection={<IconSearch />}
+      rightSectionPointerEvents="all"
+      rightSection={
+        <CloseButton aria-label={texts.common.clearSearch} onClick={doClear} style={{ display: search ? undefined : 'none' }} />
+      }
       placeholder={texts.common.search}
       value={search || ''}
       onChange={doChange}

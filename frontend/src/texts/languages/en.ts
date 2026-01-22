@@ -56,6 +56,7 @@ export const en = {
     save: 'Save',
     saved: 'Saved successfully.',
     search: 'Search',
+    clearSearch: 'Clear search',
     send: 'Send',
     settings: 'Settings',
     hide: 'Hide {{thingToHide}}',
