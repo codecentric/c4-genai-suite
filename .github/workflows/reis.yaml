@@ -27,7 +27,7 @@ jobs:
           python-version: '3.13'
       - run: uv sync
       - run: |
-          uv run python rei_s/generate_open_api.py --no-dev
+          uv run generate-api-spec --no-dev
           # ensure that both files are formatted the same
           # (prettier is used on the commited file, which we do not have available here)
           uv run ruff format reis-spec.json

@@ -56,7 +56,12 @@ dev = [
 ]
 
 [project.scripts]
-generate-api-spec = "rei_s.generate_open_api:generate"
+dev = "rei_s.scripts:dev"
+format = "rei_s.scripts:format_code"
+generate-api-spec = "rei_s.scripts:generate_api_spec"
+lint = "rei_s.scripts:lint"
+stresstest = "rei_s.scripts:stresstest"
+test = "rei_s.scripts:test"
 
 [build-system]
 requires = ["hatchling"]
