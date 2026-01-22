@@ -86,6 +86,7 @@ function load() {
       save: translate('common.save'),
       saved: translate('common.saved'),
       search: translate('common.search'),
+      clearSearch: translate('common.clearSearch'),
       send: translate('common.send'),
       settings: translate('common.settings'),
       hide: (thingToHide: string) => translate('common.hide', { thingToHide }),

@@ -56,6 +56,7 @@ export const de: typeof en = {
     save: 'Speichern',
     saved: 'Erfolgreich gespeichert.',
     search: 'Suchen',
+    clearSearch: 'Suche löschen',
     send: 'Senden',
     settings: 'Einstellungen',
     hide: '{{thingToHide}} ausblenden',

@@ -1,10 +1,10 @@
-import { ChangeEvent, InputHTMLAttributes, KeyboardEvent, useEffect, useState } from 'react';
+import { CloseButton, TextInput } from '@mantine/core';
+import { IconSearch } from '@tabler/icons-react';
+import { ChangeEvent, KeyboardEvent, useEffect, useState } from 'react';
 import { useEventCallback } from 'src/hooks';
-import { cn } from 'src/lib';
 import { texts } from 'src/texts';
-import { Icon } from './Icon';
 
-interface SearchProps extends InputHTMLAttributes<HTMLInputElement> {
+interface SearchProps {
   // The actual value.
   value?: string;
 
@@ -13,7 +13,7 @@ interface SearchProps extends InputHTMLAttributes<HTMLInputElement> {
 }
 
 export const Search = (props: SearchProps) => {
-  const { onSearch, value, ...other } = props;
+  const { onSearch, value } = props;
 
   const [search, setSearch] = useState<string>();
 
@@ -44,21 +44,22 @@ export const Search = (props: SearchProps) => {
   });
 
   const doClear = useEventCallback(() => {
-    if (hasChanged(value, '') && onSearch) {
-      onSearch('');
-    }
+    setSearch('');
+    onSearch('');
   });
 
   return (
-    <label className="input input-bordered flex items-center gap-2 rounded-full pr-2">
-      <Icon icon="search" size={18} className="text-gray-500" />
-
-      <input {...other} value={search || ''} onChange={doChange} onKeyUp={doPress} placeholder={texts.common.search} />
-
-      <button type="button" className={cn('btn btn-ghost btn-sm rounded-full px-2', { invisible: !search })} onClick={doClear}>
-        <Icon icon="close" size={16} className="text-gray-500" />
-      </button>
-    </label>
+    <TextInput
+      leftSection={<IconSearch />}
+      rightSectionPointerEvents="all"
+      rightSection={
+        <CloseButton aria-label={texts.common.clearSearch} onClick={doClear} style={{ display: search ? undefined : 'none' }} />
+      }
+      placeholder={texts.common.search}
+      value={search || ''}
+      onChange={doChange}
+      onKeyUp={doPress}
+    />
   );
 };
 
