@@ -109,7 +109,7 @@
     "@types/express-session": "1.18.2",
     "@types/jest": "30.0.0",
     "@types/multer": "2.0.0",
-    "@types/node": "25.0.9",
+    "@types/node": "25.0.10",
     "@types/nunjucks": "3.2.6",
     "@types/passport-github2": "1.2.9",
     "@types/passport-google-oauth2": "0.1.10",
