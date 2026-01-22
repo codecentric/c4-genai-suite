@@ -230,7 +230,6 @@ export function FilesPage() {
               <Search value={globalFilter ?? ''} onSearch={(value) => setGlobalFilter(String(value))} />
               <NativeSelect
                 size="sm"
-                radius="lg"
                 data={['10', '15', '20', '25', '30']}
                 onChange={(e) => table.setPageSize(Number(e.target.value))}
                 value={String(table.getState().pagination.pageSize)}
