@@ -64,6 +64,11 @@ updates:
           - "@vitejs/*"
           - "vitest"
           - "@vitest/*"
+      patch-updates:
+        patterns:
+          - "*"
+        update-types:
+          - "patch"
 
   - package-ecosystem: "uv"
     directories:
@@ -81,3 +86,8 @@ updates:
       pydantic:
         patterns:
           - "pydantic*"
+      patch-updates:
+        patterns:
+          - "*"
+        update-types:
+          - "patch"
