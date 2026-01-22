@@ -1,7 +1,7 @@
 import { Button } from '@mantine/core';
 import { IconPlus } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useApi, UserDto, UserGroupDto } from 'src/api';
 import { Page, Pagination, Search } from 'src/components';
 import { useEventCallback } from 'src/hooks';
@@ -22,6 +22,11 @@ export function UsersPage() {
   const [toCreate, setToCreate] = useState<boolean>();
   const [toUpdate, setToUpdate] = useState<UserDto | null>(null);
 
+  const handleSearch = useCallback((newQuery: string | undefined) => {
+    setQuery(newQuery);
+    setPage(0);
+  }, []);
+
   const { data: loadedUsers, isFetched } = useQuery({
     queryKey: ['users', page, query],
     queryFn: () => api.users.getUsers(page, 20, query),
@@ -37,10 +42,6 @@ export function UsersPage() {
       setUsers(loadedUsers.items);
     }
   }, [loadedUsers, setUsers]);
-
-  useEffect(() => {
-    setPage(0);
-  }, [query]);
 
   const doChangePage = useEventCallback((page: number) => {
     setPage(page);
@@ -60,7 +61,7 @@ export function UsersPage() {
           <h2 className="text-3xl">{texts.users.headline}</h2>
 
           <div className="flex gap-4">
-            <Search value={query} onSearch={setQuery} />
+            <Search value={query} onSearch={handleSearch} />
 
             <Button onClick={() => setToCreate(true)}>
               <IconPlus className="mr-2" /> {texts.users.create}

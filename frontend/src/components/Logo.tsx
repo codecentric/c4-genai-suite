@@ -21,6 +21,7 @@ export function Logo(props: LogoProps) {
   const [path, setPath] = useState<string>('');
   const [loaded, setLoaded] = useState(false);
 
+  /* eslint-disable react-hooks/set-state-in-effect -- Resetting state and creating object URL when props change is a valid effect pattern */
   useEffect(() => {
     setLoaded(false);
 
@@ -38,6 +39,7 @@ export function Logo(props: LogoProps) {
 
     setPath(window.URL.createObjectURL(previewLogo));
   }, [url, previewLogo]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   return path ? (
     <img

@@ -38,6 +38,7 @@ export function ExtensionsPage() {
     queryFn: () => api.extensions.getConfiguration(configurationId),
   });
 
+  /* eslint-disable react-hooks/set-state-in-effect -- Keeping previous value during refetch avoids UI flicker */
   useEffect(() => {
     if (configuration) {
       const updatedConfiguration = configurations.find((c) => c.id == configuration.id);
@@ -46,6 +47,7 @@ export function ExtensionsPage() {
       }
     }
   }, [configuration, configurations]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const deletingConfiguration = useMutation({
     mutationFn: (configuration: ConfigurationDto) => {

@@ -2,13 +2,13 @@ import { Dispatch, SetStateAction, useCallback, useEffect, useState } from 'reac
 import { isMobile } from 'src/pages/utils';
 
 export function useSidebarState(key: string): [boolean, (value: boolean) => void] {
-  const [state, setState] = useState(!isMobile());
-
-  useEffect(() => {
+  const [state, setState] = useState(() => {
+    if (isMobile()) {
+      return false;
+    }
     const fromLocalStore = localStorage.getItem(key);
-
-    if (!isMobile()) setState(fromLocalStore !== 'false');
-  }, [key]);
+    return fromLocalStore !== 'false';
+  });
 
   const update = useCallback(
     (value: boolean) => {

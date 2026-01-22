@@ -79,9 +79,11 @@ export function PdfViewer({ selectedDocument, selectedSource, onClose }: PdfView
     setNumPages(numPages);
   }
 
+  /* eslint-disable react-hooks/set-state-in-effect -- Processing fetched document data is a valid effect pattern */
   useEffect(() => {
     handleSelectedPdfDocument();
   }, [data, handleSelectedPdfDocument]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const container = (children: ReactNode) => (
     <Card withBorder mt="sm" mr="xs" ml="6">
