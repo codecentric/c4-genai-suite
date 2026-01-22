@@ -19,7 +19,7 @@ export function GenerateApiKeyButton({ disabled, form }: { disabled?: boolean; f
   };
 
   return (
-    <Button onClick={generateKey} disabled={disabled}>
+    <Button onClick={generateKey} disabled={disabled} aria-label={texts.users.generateAPIKey}>
       {texts.common.generate}
     </Button>
   );
