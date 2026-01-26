@@ -206,6 +206,18 @@
       "title": "Spracheingabe",
       "description": "Erlaubt Spracheingaben über ein Mikrofon-Icon"
     },
+    "dictate": {
+      "title": "Azure Diktieren",
+      "description": "Audioaufnahmen in Text umwandeln mit Azure OpenAI Whisper",
+      "apiKey": "API-Schlüssel",
+      "apiKeyHint": "Ihr Azure OpenAI API-Schlüssel",
+      "instanceName": "Instanzname",
+      "instanceNameHint": "Name der Azure OpenAI-Ressource",
+      "deploymentName": "Bereitstellungsname",
+      "deploymentNameHint": "Name der Whisper-Bereitstellung in Ihrer Azure OpenAI-Ressource",
+      "language": "Sprache",
+      "languageHint": "Optionaler Sprachcode (z.B. de, en) für bessere Transkriptionsgenauigkeit. Leer lassen für automatische Erkennung."
+    },
     "filesInConversation": {
       "title": "Suche in Dateien im Chat",
       "description": "Ermöglicht dem LLM, Dateien zu durchsuchen, die in einem Chat über die Büroklammer hochgeladen wurden.",
