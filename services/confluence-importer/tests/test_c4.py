@@ -1,5 +1,7 @@
 """Tests for the C4 API interaction functionality."""
 
+from unittest.mock import call
+
 from pytest_mock import MockerFixture
 
 from confluence_importer.c4 import (
@@ -58,11 +60,13 @@ class TestC4:
         mock_requests.get.return_value = mock_response
 
         # act
-        result = fetch_bucket_files_list()
+        result = fetch_bucket_files_list(batch_size=50)
 
         # assert
         mock_requests.get.assert_called_once_with(
-            "http://test-url/api/buckets/test-bucket/files", headers={"x-api-key": "test-token"}
+            "http://test-url/api/buckets/test-bucket/files",
+            headers={"x-api-key": "test-token"},
+            params={"page": 0, "pageSize": 50},
         )
         assert len(result) == 2
         assert result[0]["id"] == 1
@@ -94,18 +98,31 @@ class TestC4:
         second_response = mocker.MagicMock()
         second_response.json.return_value = {"total": 3, "items": [{"id": 3, "fileName": "confluence_page_3.md"}]}
 
-        mock_requests.get.return_value = first_response
+        mock_requests.get.side_effect = [first_response, second_response]
 
         # act
-        result = fetch_bucket_files_list()
+        result = fetch_bucket_files_list(batch_size=2)
 
         # assert
-        mock_requests.get.assert_called_once_with(
-            "http://test-url/api/buckets/test-bucket/files", headers={"x-api-key": "test-token"}
+        assert mock_requests.get.call_count == 2
+        mock_requests.get.assert_has_calls(
+            [
+                call(
+                    "http://test-url/api/buckets/test-bucket/files",
+                    headers={"x-api-key": "test-token"},
+                    params={"page": 0, "pageSize": 2},
+                ),
+                call(
+                    "http://test-url/api/buckets/test-bucket/files",
+                    headers={"x-api-key": "test-token"},
+                    params={"page": 1, "pageSize": 2},
+                ),
+            ]
         )
-        assert len(result) == 2
+        assert len(result) == 3
         assert result[0]["id"] == 1
         assert result[1]["id"] == 2
+        assert result[2]["id"] == 3
 
     def test_import_confluence_page_success(self, mocker: MockerFixture) -> None:
         """Test that import_confluence_page correctly handles successful API responses.

@@ -75,27 +75,30 @@ class C4BucketFileItem(TypedDict):
     fileName: str
 
 
-def fetch_bucket_files_list() -> list[C4BucketFileItem]:
+def fetch_bucket_files_list(batch_size: int = 100) -> list[C4BucketFileItem]:
     """Fetches the list of all files in the C4 bucket.
 
     Returns:
         A list of dictionaries containing file information from the C4 bucket
     """
-    page = 1
-    batch_size = 50
+    page = 0
 
     items: list[C4BucketFileItem] = []
 
     while True:
         logger.debug("Fetching partial list of files from c4 ", bucket_id=bucket_id, page=page)
-        response = requests.get(f"{c4_base_url}/api/buckets/{bucket_id}/files", headers={"x-api-key": config.c4_token})
+        response = requests.get(
+            f"{c4_base_url}/api/buckets/{bucket_id}/files",
+            headers={"x-api-key": config.c4_token},
+            params={"page": page, "pageSize": batch_size},
+        )
 
         total = response.json().get("total", 0)
         items_in_page = response.json().get("items", [])
 
         items.extend(items_in_page)
 
-        if page * batch_size >= total or len(items_in_page) == 0:
+        if (page + 1) * batch_size >= total or len(items_in_page) == 0:
             break
         else:
             page += 1
