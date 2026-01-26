@@ -39,6 +39,7 @@ export async function enterUserArea(page: Page) {
   if (await hasMenuItem(page, { name: 'Chat' })) {
     await page.getByRole('menuitem', { name: 'Chat' }).click();
   }
+  await page.getByRole('button', { name: 'New chat' }).waitFor({ state: 'visible' });
 }
 
 export async function newChat(page: Page) {
@@ -152,7 +153,7 @@ export async function createBucketIfNotExist(
   performTest: boolean = false,
 ) {
   await page.getByRole('link', { name: 'Files' }).click();
-  await page.waitForLoadState('networkidle');
+  await page.waitForTimeout(1000);
   if ((await page.getByRole('link', { name: bucket.name }).count()) > 0) {
     // Bucket already exists
     return;
