@@ -5,7 +5,9 @@ import TextareaAutosize from 'react-textarea-autosize';
 import { ConfigurationDto, FileDto } from 'src/api';
 import { Icon, Markdown } from 'src/components';
 import { ExtensionContext, JSONObject, useEventCallback, useExtensionContext, usePersistentState, useTheme } from 'src/hooks';
+import { useDictate } from 'src/hooks/useDictate';
 import { useSpeechRecognitionToggle } from 'src/hooks/useSpeechRecognitionToggle';
+import { DictateButton } from 'src/pages/chat/conversation/DictateButton';
 import { FileItemComponent } from 'src/pages/chat/conversation/FileItem';
 import { FilterModal } from 'src/pages/chat/conversation/FilterModal';
 import { Language, SpeechRecognitionButton } from 'src/pages/chat/conversation/SpeechRecognitionButton';
@@ -174,6 +176,14 @@ export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEm
     onTranscriptUpdate: setInput,
   });
 
+  // Dictate extension setup
+  const dictateExtension = configuration?.extensions?.find((e) => e.name === 'dictate');
+  const dictateHook = useDictate({
+    extensionId: dictateExtension?.id ?? 0,
+    onTranscriptReceived: setInput,
+  });
+  const { isRecording, isTranscribing, toggleRecording } = dictateHook;
+
   return (
     <>
       <div className="flex flex-col gap-2">
@@ -278,6 +288,9 @@ export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEm
                     setSpeechLanguage={setSpeechLanguage}
                     languages={speechRecognitionLanguages}
                   />
+                )}
+                {dictateExtension && (
+                  <DictateButton isRecording={isRecording} isTranscribing={isTranscribing} onToggle={toggleRecording} />
                 )}
                 <ActionIcon
                   type="submit"
