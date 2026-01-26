@@ -89,7 +89,7 @@
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2",
     "typeorm": "^0.3.28",
-    "undici": "^7.19.0",
+    "undici": "^7.19.1",
     "uuid": "^11.1.0",
     "winston": "^3.19.0",
     "zod": "4.3.5"
