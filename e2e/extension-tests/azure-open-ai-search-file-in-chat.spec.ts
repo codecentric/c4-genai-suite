@@ -186,7 +186,7 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
       });
       await page.waitForSelector('[data-testid="chat-item"]:nth-of-type(2)');
 
-      const originalConversationName = uniqueName('ChatWithSourcesDuplicationTest');
+      const originalConversationName = uniqueName('SDup');
 
       await duplicateActiveConversation(page, originalConversationName);
 
@@ -199,6 +199,7 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
       await expect(duplicatedConversation).toBeVisible();
 
       await duplicatedConversation.click();
+      await page.waitForTimeout(1000);
 
       await sendMessage(page, configuration, {
         message: 'Welche Geburtstage stehen in der Datei?',
