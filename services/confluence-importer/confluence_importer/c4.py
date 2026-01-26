@@ -11,12 +11,24 @@ bucket_id = config.c4_bucket_id
 
 
 def clear_previous_ingests() -> None:
-    """Clears all previously ingested files from the C4 bucket."""
+    """Clears all previously ingested files from the C4 bucket.
+
+    Raises:
+        requests.HTTPError: If fetching the bucket files list fails
+    """
     logger.info("Starting deletion of all Confluence pages from c4", bucket_id=bucket_id)
 
     deletion_counter = {"success": 0, "error": 0}
 
-    files = fetch_bucket_files_list()
+    try:
+        files = fetch_bucket_files_list()
+    except requests.HTTPError as e:
+        logger.error(
+            "Failed to fetch bucket files list from c4",
+            bucket_id=bucket_id,
+            error=str(e),
+        )
+        raise
 
     for index, item in enumerate(files):
         num_items = len(files)
@@ -64,8 +76,14 @@ def delete_confluence_page(file_id: int) -> None:
 
     Args:
         file_id: The ID of the file to delete from the C4 bucket
+
+    Raises:
+        requests.HTTPError: If the API request fails
     """
-    requests.delete(f"{c4_base_url}/api/buckets/{bucket_id}/files/{file_id}", headers={"x-api-key": config.c4_token})
+    response = requests.delete(
+        f"{c4_base_url}/api/buckets/{bucket_id}/files/{file_id}", headers={"x-api-key": config.c4_token}
+    )
+    response.raise_for_status()
 
 
 class C4BucketFileItem(TypedDict):
@@ -80,6 +98,9 @@ def fetch_bucket_files_list(batch_size: int = 100) -> list[C4BucketFileItem]:
 
     Returns:
         A list of dictionaries containing file information from the C4 bucket
+
+    Raises:
+        requests.HTTPError: If the API request fails
     """
     page = 0
 
@@ -92,6 +113,7 @@ def fetch_bucket_files_list(batch_size: int = 100) -> list[C4BucketFileItem]:
             headers={"x-api-key": config.c4_token},
             params={"page": page, "pageSize": batch_size},
         )
+        response.raise_for_status()
 
         total = response.json().get("total", 0)
         items_in_page = response.json().get("items", [])
@@ -108,12 +130,21 @@ def fetch_bucket_files_list(batch_size: int = 100) -> list[C4BucketFileItem]:
     return items
 
 
+class C4ImportError(Exception):
+    """Exception raised when a C4 import operation fails."""
+
+    pass
+
+
 def import_confluence_page(page_id: int, page_markdown: str) -> None:
     """Ingests a Confluence page into the C4 bucket.
 
     Args:
-        page_markdown: The HTML content of the Confluence page to ingest
+        page_markdown: The Markdown content of the Confluence page to ingest
         page_id: The ID of the Confluence page to ingest
+
+    Raises:
+        C4ImportError: If the API request fails or returns a non-201 status code
     """
     files = {"file": (f"confluence_page_{page_id}.md", page_markdown, "text/markdown")}
     response = requests.post(
@@ -131,3 +162,4 @@ def import_confluence_page(page_id: int, page_markdown: str) -> None:
             c4_status_code=response.status_code,
             c4_error_response=response.text,
         )
+        raise C4ImportError(f"Failed to import page {page_id}: {response.status_code} - {response.text}")

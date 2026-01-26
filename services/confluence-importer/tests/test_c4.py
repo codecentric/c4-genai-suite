@@ -2,9 +2,11 @@
 
 from unittest.mock import call
 
+import pytest
 from pytest_mock import MockerFixture
 
 from confluence_importer.c4 import (
+    C4ImportError,
     clear_previous_ingests,
     delete_confluence_page,
     fetch_bucket_files_list,
@@ -28,6 +30,9 @@ class TestC4:
         mocker.patch("confluence_importer.c4.config.c4_token", "test-token")
         file_id = 23
 
+        mock_response = mocker.MagicMock()
+        mock_requests.delete.return_value = mock_response
+
         # act
         delete_confluence_page(file_id)
 
@@ -35,6 +40,7 @@ class TestC4:
         mock_requests.delete.assert_called_once_with(
             "http://test-url/api/buckets/test-bucket/files/23", headers={"x-api-key": "test-token"}
         )
+        mock_response.raise_for_status.assert_called_once()
 
     def test_fetch_bucket_files_list_single_page(self, mocker: MockerFixture) -> None:
         """Test that fetch_bucket_files_list correctly handles a single page of results.
@@ -68,6 +74,7 @@ class TestC4:
             headers={"x-api-key": "test-token"},
             params={"page": 0, "pageSize": 50},
         )
+        mock_response.raise_for_status.assert_called_once()
         assert len(result) == 2
         assert result[0]["id"] == 1
         assert result[1]["id"] == 2
@@ -158,7 +165,7 @@ class TestC4:
         mock_logger.error.assert_not_called()
 
     def test_import_confluence_page_error(self, mocker: MockerFixture) -> None:
-        """Test that import_confluence_page correctly handles error API responses.
+        """Test that import_confluence_page raises C4ImportError on error API responses.
 
         Args:
             mocker: Pytest fixture for mocking
@@ -178,10 +185,13 @@ class TestC4:
         mock_response.text = "Internal Server Error"
         mock_requests.post.return_value = mock_response
 
-        # act
-        import_confluence_page(page_id, page_markdown)
+        # act & assert
+        with pytest.raises(C4ImportError) as exc_info:
+            import_confluence_page(page_id, page_markdown)
 
-        # assert
+        assert "Failed to import page 12345" in str(exc_info.value)
+        assert "500" in str(exc_info.value)
+
         mock_requests.post.assert_called_once_with(
             "http://test-url/api/buckets/test-bucket/files",
             files={"file": (f"confluence_page_{page_id}.md", page_markdown, "text/markdown")},
@@ -271,3 +281,32 @@ class TestC4:
         mock_fetch_bucket_files.assert_called_once()
         assert mock_delete_confluence_page.call_count == 2
         mock_logger.error.assert_called()
+
+    def test_clear_previous_ingests_fetch_error(self, mocker: MockerFixture) -> None:
+        """Test that clear_previous_ingests logs and re-raises when fetch fails.
+
+        Args:
+            mocker: Pytest fixture for mocking
+        """
+        # arrange
+        from requests import HTTPError
+
+        mock_fetch_bucket_files = mocker.patch(
+            "confluence_importer.c4.fetch_bucket_files_list",
+            side_effect=HTTPError("401 Unauthorized"),
+        )
+        mock_delete_confluence_page = mocker.patch("confluence_importer.c4.delete_confluence_page")
+        mock_logger = mocker.patch("confluence_importer.c4.logger")
+        mocker.patch("confluence_importer.c4.bucket_id", "test-bucket")
+
+        # act & assert
+        with pytest.raises(HTTPError):
+            clear_previous_ingests()
+
+        mock_fetch_bucket_files.assert_called_once()
+        mock_delete_confluence_page.assert_not_called()
+        mock_logger.error.assert_called_once()
+        # Verify the error log contains the right context
+        error_call_kwargs = mock_logger.error.call_args[1]
+        assert error_call_kwargs["bucket_id"] == "test-bucket"
+        assert "401 Unauthorized" in error_call_kwargs["error"]
