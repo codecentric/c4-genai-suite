@@ -120,7 +120,7 @@ export function useDictate({ extensionId, onTranscriptReceived, maxDurationMs = 
         recorder.stop();
       }
     });
-  }, [state, transcription, extensionId, onTranscriptReceived]);
+  }, [state, transcription, extensionId, onTranscriptReceived, cleanup]);
 
   // Start recording
   const startRecording = useCallback(async () => {

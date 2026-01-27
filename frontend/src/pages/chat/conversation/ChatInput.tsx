@@ -176,8 +176,13 @@ export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEm
     onTranscriptUpdate: setInput,
   });
 
+  const voiceExtensions = configuration?.extensions?.filter((e) => e.name === 'speech-to-text' || e.name === 'dictate') ?? [];
+  const activeVoiceExtension = voiceExtensions[0];
+  const showSpeechToText = activeVoiceExtension?.name === 'speech-to-text';
+  const showDictate = activeVoiceExtension?.name === 'dictate';
+
   // Dictate extension setup
-  const dictateExtension = configuration?.extensions?.find((e) => e.name === 'dictate');
+  const dictateExtension = showDictate ? activeVoiceExtension : undefined;
   const dictateHook = useDictate({
     extensionId: dictateExtension?.id ?? 0,
     onTranscriptReceived: setInput,
@@ -280,7 +285,7 @@ export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEm
                 )}
               </div>
               <div className="flex items-center gap-1">
-                {configuration?.extensions?.some((e) => e.name === 'speech-to-text') && (
+                {showSpeechToText ? (
                   <SpeechRecognitionButton
                     listening={listening}
                     toggleSpeechRecognition={toggleSpeechRecognition}
@@ -288,10 +293,9 @@ export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEm
                     setSpeechLanguage={setSpeechLanguage}
                     languages={speechRecognitionLanguages}
                   />
-                )}
-                {dictateExtension && (
+                ) : showDictate ? (
                   <DictateButton isRecording={isRecording} isTranscribing={isTranscribing} onToggle={toggleRecording} />
-                )}
+                ) : null}
                 <ActionIcon
                   type="submit"
                   size="lg"
