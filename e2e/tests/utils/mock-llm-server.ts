@@ -25,25 +25,38 @@ interface MockResponse {
   toolCall?: {
     namePattern: RegExp; // Pattern to match available tool names
     arguments: Record<string, unknown>;
+    // Transform function to process the tool result before responding
+    // Default: echo the raw result back
+    transformResult?: (toolResult: string) => string;
   };
-  // Response to give after tool result is received
-  afterToolResponse?: string;
-  // If true, echo back the raw tool result as the response
-  echoToolResult?: boolean;
 }
 
 const DEFAULT_RESPONSES: MockResponse[] = [
   { match: /banane/i, response: 'banana' },
   { match: /capital.*germany/i, response: 'Berlin' },
-  { match: /how many files/i, response: '1 file' },
-  { match: /keine datei|no file/i, response: 'no files' },
+  // How many files - calls search tool and counts results
+  {
+    match: /how many files/i,
+    toolCall: {
+      namePattern: /files|search/i,
+      arguments: { query: '*' },
+      transformResult: (result: string) => {
+        try {
+          const parsed = JSON.parse(result) as unknown[];
+          const count = parsed.length;
+          return `${count} file${count === 1 ? '' : 's'}`;
+        } catch {
+          return 'failed';
+        }
+      },
+    },
+  },
   {
     match: /geburtstag|birthday/i,
     toolCall: {
       namePattern: /files|search/i,
       arguments: { query: 'birthday' },
     },
-    echoToolResult: true,
   },
   {
     match: /keyword|codeword/i,
@@ -51,7 +64,6 @@ const DEFAULT_RESPONSES: MockResponse[] = [
       namePattern: /files|search/i,
       arguments: { query: 'keyword codeword' },
     },
-    echoToolResult: true,
   },
   {
     match: /pudding/i,
@@ -59,7 +71,6 @@ const DEFAULT_RESPONSES: MockResponse[] = [
       namePattern: /files|search/i,
       arguments: { query: 'pudding' },
     },
-    echoToolResult: true,
   },
   {
     match: /two-column table/i,
@@ -100,7 +111,6 @@ interface FoundResponse {
   type: 'text' | 'tool_call';
   text?: string;
   toolCall?: ToolCall;
-  afterToolResponse?: string;
 }
 
 function findResponse(messages: ChatMessage[], tools?: Tool[]): FoundResponse {
@@ -113,15 +123,11 @@ function findResponse(messages: ChatMessage[], tools?: Tool[]): FoundResponse {
     const content = lastUserMessage?.content || '';
 
     for (const mockResponse of DEFAULT_RESPONSES) {
-      if (mockResponse.match.test(content)) {
-        if (mockResponse.echoToolResult) {
-          // Echo back the raw tool result
-          const toolResult = lastMessage.content || '';
-          return { type: 'text', text: toolResult };
-        }
-        if (mockResponse.afterToolResponse) {
-          return { type: 'text', text: mockResponse.afterToolResponse };
-        }
+      if (mockResponse.match.test(content) && mockResponse.toolCall) {
+        const toolResult = lastMessage.content || '';
+        // Apply transform function if provided, otherwise echo the raw result
+        const transform = mockResponse.toolCall.transformResult || ((r: string) => r);
+        return { type: 'text', text: transform(toolResult) };
       }
     }
     return { type: 'text', text: 'I processed the tool results.' };
@@ -148,7 +154,6 @@ function findResponse(messages: ChatMessage[], tools?: Tool[]): FoundResponse {
                 arguments: JSON.stringify(mockResponse.toolCall.arguments),
               },
             },
-            afterToolResponse: mockResponse.afterToolResponse,
           };
         }
       }
