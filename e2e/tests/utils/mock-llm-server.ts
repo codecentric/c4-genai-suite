@@ -80,6 +80,14 @@ const DEFAULT_RESPONSES: MockResponse[] = [
       arguments: { query: 'pudding' },
     },
   },
+  { match: /!\[Image\]/i, response: '![Image](fakeUrl)' },
+  {
+    match: /Amtsgericht_Ohligs/i,
+    toolCall: {
+      namePattern: /fetch/i,
+      arguments: { url: 'https://de.wikipedia.org/wiki/Amtsgericht_Ohligs' },
+    },
+  },
   {
     match: /two-column table/i,
     response: `| Letter | Word |
@@ -111,7 +119,17 @@ const DEFAULT_RESPONSES: MockResponse[] = [
 | y | yak |
 | z | zip |`,
   },
-  { match: /!\[Image\]/i, response: '![Image](fakeUrl)' },
+  // Assistant identity - responds with name from system prompt
+  {
+    match: /who are you/i,
+    matchSystem: /Bob/,
+    response: 'My name is Bob.',
+  },
+  {
+    match: /who are you/i,
+    matchSystem: /Alice/,
+    response: 'My name is Alice.',
+  },
   { match: /hello|hi|hey/i, response: 'Hello! How can I help you?' },
 ];
 
