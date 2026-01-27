@@ -241,9 +241,9 @@ test('chat with file search', async ({ page }) => {
 
     await test.step('should reply questions about not selected files', async () => {
       await sendMessage(page, configuration, {
-        message: 'Search the file for a codeword, if there are no source files, answer just and only "no files"',
+        message: 'Search the file for a codeword. Also how many files did you search?"',
       });
-      await page.waitForSelector(`:has-text("no files")`);
+      await page.waitForSelector(`:has-text("0 files")`);
     });
 
     await test.step('should select all files', async () => {
