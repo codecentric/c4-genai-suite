@@ -1,7 +1,6 @@
 import { expect, test } from '@playwright/test';
-import { config } from '../tests/utils/config';
 import {
-  addAzureModelToConfiguration,
+  addMockModelToConfiguration,
   addSystemPromptToConfiguration,
   createConfiguration,
   deleteConfiguration,
@@ -14,26 +13,27 @@ import {
   sendMessage,
   uniqueName,
 } from '../tests/utils/helper';
+import { startMockLLMServer } from '../tests/utils/mock-llm-server';
 
-if (!config.AZURE_OPEN_AI_API_KEY) {
-  test.skip('should configure Azure OpenAI-Open AI LLM for chats [skipped due to missing API_KEY in env]', () => {});
-} else {
-  test('chat', async ({ page }) => {
-    const firstAssistant = { name: uniqueName('E2E-Test-A'), description: 'Bob' };
-    const secondAssistant = { name: uniqueName('E2E-Test-B'), description: 'Alice' };
+test('chat', async ({ page }) => {
+  const mockServer = await startMockLLMServer(4103);
+  const firstAssistant = { name: uniqueName('E2E-Test-A'), description: 'Bob' };
+  const secondAssistant = { name: uniqueName('E2E-Test-B'), description: 'Alice' };
 
+  try {
     await test.step('should login', async () => {
       await login(page);
     });
+
     await test.step('should add two assistants', async () => {
       await enterAdminArea(page);
       await createConfiguration(page, firstAssistant);
-      await addAzureModelToConfiguration(page, firstAssistant, { deployment: 'gpt-4o-mini' });
+      await addMockModelToConfiguration(page, firstAssistant, { endpoint: mockServer.url });
       await addSystemPromptToConfiguration(page, firstAssistant, {
         text: 'Always tell that your name is {{assistant_description}}',
       });
       await createConfiguration(page, secondAssistant);
-      await addAzureModelToConfiguration(page, secondAssistant, { deployment: 'gpt-4o-mini' });
+      await addMockModelToConfiguration(page, secondAssistant, { endpoint: mockServer.url });
       await addSystemPromptToConfiguration(page, secondAssistant, {
         text: 'Always tell that your name is {{assistant_description}}',
       });
@@ -87,5 +87,7 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
       const firstResponse = await page.waitForSelector(`:has-text("Bob")`);
       expect(firstResponse).toBeDefined();
     });
-  });
-}
+  } finally {
+    mockServer.close();
+  }
+});
