@@ -10,6 +10,7 @@ import {
   SendMessageDto,
   SettingsApi,
   StreamEventDto,
+  TranscriptionApi,
   UsagesApi,
   UsersApi,
 } from 'src/api/generated';
@@ -29,6 +30,7 @@ export class AppClient {
   public readonly files: FilesApi;
   public readonly settings: SettingsApi;
   public readonly stream: StreamApi;
+  public readonly transcription: TranscriptionApi;
   public readonly usages: UsagesApi;
   public readonly users: UsersApi;
 
@@ -51,6 +53,8 @@ export class AppClient {
     this.files = new FilesApi(configuration).withMiddleware(middleware);
 
     this.settings = new SettingsApi(configuration).withMiddleware(middleware);
+
+    this.transcription = new TranscriptionApi(configuration).withMiddleware(middleware);
 
     this.usages = new UsagesApi(configuration).withMiddleware(middleware);
 

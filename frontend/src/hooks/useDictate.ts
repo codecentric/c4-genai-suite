@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
+import { useApi } from 'src/api';
 import { buildError } from 'src/lib';
 import { texts } from 'src/texts';
 
@@ -27,6 +28,8 @@ export function useDictate({ extensionId, onTranscriptReceived, maxDurationMs = 
   const timerRef = useRef<number | null>(null);
   const startTimeRef = useRef<number>(0);
   const mimeTypeRef = useRef<string>('audio/webm');
+
+  const { transcription } = useApi();
 
   // Cleanup function
   const cleanup = useCallback(() => {
@@ -87,8 +90,15 @@ export function useDictate({ extensionId, onTranscriptReceived, maxDurationMs = 
           const audioFile = new File([audioBlob], 'recording.webm', { type: mimeTypeRef.current });
           console.log(`Created audio file: ${audioFile.name}, size: ${audioFile.size} bytes, type: ${audioFile.type}`);
 
-          onTranscriptReceived('test-whisper-draft');
-          setState('idle');
+          // Call the transcription API
+          const result = await transcription.transcribeAudio(extensionId, audioFile);
+
+          if (result.text) {
+            onTranscriptReceived(result.text);
+            setState('idle');
+          } else {
+            throw new Error('No transcription text received');
+          }
         } catch (err) {
           console.error('Transcription error:', err);
           const errorMessage = await buildError(texts.chat.dictate.transcriptionFailed, err as Error);
@@ -110,7 +120,7 @@ export function useDictate({ extensionId, onTranscriptReceived, maxDurationMs = 
         recorder.stop();
       }
     });
-  }, [state, extensionId, onTranscriptReceived]);
+  }, [state, transcription, extensionId, onTranscriptReceived]);
 
   // Start recording
   const startRecording = useCallback(async () => {
