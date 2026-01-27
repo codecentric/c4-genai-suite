@@ -16,14 +16,16 @@ export class AzureTranscriptionProvider {
     if (!config.deploymentName) {
       throw new BadRequestException('Deployment name is required');
     }
+    if (!config.apiVersion) {
+      throw new BadRequestException('API version is required');
+    }
 
     const endpoint = `https://${config.instanceName}.openai.azure.com/`;
-    const apiVersion = '2024-06-01';
 
     this.client = new AzureOpenAI({
       apiKey: config.apiKey,
       endpoint: endpoint,
-      apiVersion: apiVersion,
+      apiVersion: config.apiVersion,
       deployment: config.deploymentName,
     });
   }

@@ -25,13 +25,13 @@ export class AzureDictateExtension implements Extension<DictateExtensionConfigur
         },
         instanceName: {
           type: 'string',
-          title: this.i18n.t('texts.extensions.dictate.instanceName'),
+          title: this.i18n.t('texts.extensions.common.instanceName'),
           required: true,
           description: this.i18n.t('texts.extensions.dictate.instanceNameHint'),
         },
         deploymentName: {
           type: 'string',
-          title: this.i18n.t('texts.extensions.dictate.deploymentName'),
+          title: this.i18n.t('texts.extensions.common.deploymentName'),
           required: true,
           description: this.i18n.t('texts.extensions.dictate.deploymentNameHint'),
         },
@@ -40,6 +40,14 @@ export class AzureDictateExtension implements Extension<DictateExtensionConfigur
           title: this.i18n.t('texts.extensions.dictate.language'),
           description: this.i18n.t('texts.extensions.dictate.languageHint'),
           required: false,
+        },
+        apiVersion: {
+          type: 'string',
+          title: this.i18n.t('texts.extensions.common.apiVersion'),
+          description: this.i18n.t('texts.extensions.dictate.apiVersionHint'),
+          required: true,
+          format: 'select',
+          examples: ['2024-06-01', '2025-03-01-preview'],
         },
       },
     };
@@ -55,4 +63,5 @@ export type DictateExtensionConfiguration = ExtensionConfiguration & {
   instanceName: string;
   deploymentName: string;
   language?: string;
+  apiVersion: string;
 };

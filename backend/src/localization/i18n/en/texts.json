@@ -216,7 +216,9 @@
       "deploymentName": "Deployment Name",
       "deploymentNameHint": "Whisper deployment name configured in your Azure OpenAI resource",
       "language": "Language",
-      "languageHint": "Optional language code (eg. de, en) for better transcription accuracy. Leave empty for automatic language detection."
+      "languageHint": "Optional language code (eg. de, en) for better transcription accuracy. Leave empty for automatic language detection.",
+      "apiVersion": "API Version",
+      "apiVersionHint": "Azure OpenAI API version"
     },
     "filesInConversation": {
       "title": "Search Files in Chat",
