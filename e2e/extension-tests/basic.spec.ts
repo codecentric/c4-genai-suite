@@ -1,11 +1,12 @@
 import { expect, test } from '@playwright/test';
 import { config } from '../tests/utils/config';
 import {
-  addAzureModelToConfiguration,
   addBucketToConfiguration,
+  addMockModelToConfiguration,
   addSystemPromptToConfiguration,
   createBucketIfNotExist,
   createConfiguration,
+  deleteConfiguration,
   editBucket,
   enterAdminArea,
   enterUserArea,
@@ -18,17 +19,19 @@ import {
   uniqueName,
   uploadFileWhileInChat,
 } from '../tests/utils/helper';
+import { startMockLLMServer } from '../tests/utils/mock-llm-server';
 
-if (!config.AZURE_OPEN_AI_API_KEY) {
-  test.skip('should configure Azure OpenAI-Open AI LLM for chats [skipped due to missing API_KEY in env]', () => {});
-} else {
-  test('chat', async ({ page }) => {
-    const configuration = { name: uniqueName('E2E-Test'), description: '' };
-    const bucket = { name: globalUserBucketName() };
+test('chat with file search', async ({ page }) => {
+  // Start mock LLM server
+  const mockServer = await startMockLLMServer(4100);
+  const configuration = { name: uniqueName('E2E-Test'), description: '' };
+  const bucket = { name: globalUserBucketName() };
 
+  try {
     await test.step('should login', async () => {
       await login(page);
     });
+
     await test.step('should not add Configuration without required fields', async () => {
       await enterAdminArea(page);
       await createConfiguration(page, configuration, { detached: false });
@@ -44,8 +47,10 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
       await createConfiguration(page, configuration);
     });
 
-    await test.step('should add OpenAI LLM Extension', async () => {
-      await addAzureModelToConfiguration(page, configuration, { deployment: 'gpt-4o-mini' }, true);
+    await test.step('should add Mock LLM Extension', async () => {
+      await addMockModelToConfiguration(page, configuration, {
+        endpoint: mockServer.url,
+      });
     });
 
     await test.step('add prompt', async () => {
@@ -99,8 +104,8 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
         message: 'Write a two-column table with the lower case letters from a to z followed by a random short word in the rows.',
       });
       await page.waitForTimeout(1000);
-      const element = page.getByText(/^What is the capital of Germany.+Friendly AI/);
-      await expectElementInYRange(element, -200, 116);
+      const element = page.getByText(/^What is the capital of Germany./);
+      await expectElementInYRange(element, -2000, 0);
     });
 
     await test.step('should create bucket', async () => {
@@ -265,5 +270,11 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
       await page.waitForSelector(`:has-text("codecentricE2E")`);
       await page.waitForSelector(`:has-text("c4-test")`);
     });
-  });
-}
+
+    await test.step('cleanup: delete configuration', async () => {
+      await deleteConfiguration(page, configuration);
+    });
+  } finally {
+    mockServer.close();
+  }
+});
