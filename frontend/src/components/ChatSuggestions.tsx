@@ -20,7 +20,8 @@ interface ChatSuggestionsProps {
 
 export function ChatSuggestions(props: ChatSuggestionsProps) {
   const { name, form } = props;
-  const fields = ((form.getValues() as Record<string, unknown>)[name] as ChatSuggestion[] | undefined) ?? [];
+  const { value } = form.getInputProps(name) as { value: ChatSuggestion[] | undefined };
+  const fields = value ?? [];
 
   const addItem = () => {
     form.setFieldValue(name, [...fields, { title: '', subtitle: '', text: '' }]);

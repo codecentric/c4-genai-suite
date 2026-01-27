@@ -18,7 +18,8 @@ interface SiteLinkProps {
 
 export function SiteLinks(props: SiteLinkProps) {
   const { name, form } = props;
-  const fields = ((form.getValues() as Record<string, unknown>)[name] as SiteLink[] | undefined) ?? [];
+  const { value } = form.getInputProps(name) as { value: SiteLink[] | undefined };
+  const fields = value ?? [];
 
   const addItem = () => {
     form.setFieldValue(name, [...fields, { text: '', link: '' }]);
