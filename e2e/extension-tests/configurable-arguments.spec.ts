@@ -1,7 +1,6 @@
 import { expect, test } from '@playwright/test';
-import { config } from '../tests/utils/config';
 import {
-  addAzureModelToConfiguration,
+  addMockModelToConfiguration,
   addSystemPromptToConfiguration,
   configureAssistantByUser,
   createConfiguration,
@@ -13,13 +12,13 @@ import {
   sendMessage,
   uniqueName,
 } from '../tests/utils/helper';
+import { startMockLLMServer } from '../tests/utils/mock-llm-server';
 
-if (!config.AZURE_OPEN_AI_API_KEY) {
-  test.skip('should configure Azure OpenAI-Open AI LLM for chats [skipped due to missing API_KEY in env]', () => {});
-} else {
-  test('configurable arguments', async ({ page }) => {
-    const configuration = { name: '', description: '' };
+test('configurable arguments', async ({ page }) => {
+  const mockServer = await startMockLLMServer(4101);
+  const configuration = { name: '', description: '' };
 
+  try {
     await test.step('should login', async () => {
       await login(page);
     });
@@ -32,7 +31,9 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
     });
 
     await test.step('add model', async () => {
-      await addAzureModelToConfiguration(page, configuration, { deployment: 'gpt-4o-mini' });
+      await addMockModelToConfiguration(page, configuration, {
+        endpoint: mockServer.url,
+      });
     });
 
     await test.step('add prompt', async () => {
@@ -56,5 +57,7 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
       const testoutput = await page.waitForSelector(`:has-text("parrot")`);
       expect(testoutput).toBeDefined();
     });
-  });
-}
+  } finally {
+    mockServer.close();
+  }
+});
