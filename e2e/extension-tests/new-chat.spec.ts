@@ -1,7 +1,6 @@
 import test, { expect } from '@playwright/test';
-import { config } from '../tests/utils/config';
 import {
-  addAzureModelToConfiguration,
+  addMockModelToConfiguration,
   checkSelectedConfiguration,
   createConfiguration,
   createUserIfNotExists,
@@ -14,28 +13,29 @@ import {
   sendMessage,
   uniqueName,
 } from '../tests/utils/helper';
+import { startMockLLMServer } from '../tests/utils/mock-llm-server';
 
-if (!config.AZURE_OPEN_AI_API_KEY) {
-  test.skip('should configure Azure OpenAI-Open AI LLM for chats [skipped due to missing API_KEY in env]', () => {});
-} else {
-  test('Chat workflow with Azure OpenAI LLM', async ({ page }) => {
-    const configuration = { name: '', description: '' };
+test('Chat workflow with Mock LLM', async ({ page }) => {
+  const mockServer = await startMockLLMServer(4104);
+  const configuration = { name: '', description: '' };
+  const secondAssistantName = uniqueName('Second Assistant');
+
+  try {
     await test.step('should login', async () => {
       await login(page);
     });
-    const secondAssistantName = uniqueName('Second Assistant');
 
     await test.step('add assistant', async () => {
       await enterAdminArea(page);
-      configuration.name = uniqueName('Azure-OpenAI-Chat');
+      configuration.name = uniqueName('Mock-LLM-Chat');
       configuration.description = `Description for ${configuration.name}`;
       await createConfiguration(page, configuration);
       await createConfiguration(page, { ...configuration, name: secondAssistantName });
     });
 
     await test.step('add model', async () => {
-      await addAzureModelToConfiguration(page, configuration, { deployment: 'gpt-4o-mini' });
-      await addAzureModelToConfiguration(page, { ...configuration, name: secondAssistantName }, { deployment: 'gpt-4o-mini' });
+      await addMockModelToConfiguration(page, configuration, { endpoint: mockServer.url });
+      await addMockModelToConfiguration(page, { ...configuration, name: secondAssistantName }, { endpoint: mockServer.url });
     });
 
     await test.step('switch user', async () => {
@@ -102,5 +102,7 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
       await welcomeText.waitFor();
       await checkSelectedConfiguration(page, assistant);
     });
-  });
-}
+  } finally {
+    mockServer.close();
+  }
+});
