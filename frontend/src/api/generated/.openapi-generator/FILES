@@ -4,6 +4,7 @@ apis/ConversationApi.ts
 apis/ExtensionsApi.ts
 apis/FilesApi.ts
 apis/SettingsApi.ts
+apis/TranscriptionApi.ts
 apis/UsagesApi.ts
 apis/UsersApi.ts
 apis/index.ts
@@ -80,6 +81,7 @@ models/StreamUIEventDto.ts
 models/StreamUIRequestDto.ts
 models/TestBucketDto.ts
 models/TestExtensionDto.ts
+models/TranscriptionDto.ts
 models/UpdateConversationDto.ts
 models/UpdateExtensionDto.ts
 models/UpsertBucketDto.ts
