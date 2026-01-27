@@ -91,7 +91,7 @@
     "eslint-plugin-react-refresh": "0.4.26",
     "eslint-plugin-testing-library": "7.15.4",
     "glob": "13.0.0",
-    "globals": "17.1.0",
+    "globals": "17.2.0",
     "jsdom": "27.4.0",
     "knip": "5.82.1",
     "msw": "2.12.7",
