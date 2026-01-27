@@ -500,6 +500,25 @@ export async function addAzureModelToConfiguration(
   await save(page);
 }
 
+export async function addMockModelToConfiguration(
+  page: Page,
+  configuration: { name: string },
+  mockServer: { endpoint: string; modelName?: string },
+) {
+  await page.getByRole('link', { name: 'Assistants' }).click();
+  await page.getByRole('link').filter({ hasText: configuration.name }).click();
+
+  await page.getByRole('button', { name: 'Add Extension' }).click();
+
+  await page.getByRole('heading', { name: 'OpenAI compatible' }).click();
+
+  await page.getByLabel('API Key').fill('mock-api-key');
+  await page.getByLabel('Endpoint').fill(mockServer.endpoint);
+  await page.getByLabel('Model Name').fill(mockServer.modelName ?? 'mock-gpt-4');
+
+  await save(page);
+}
+
 export async function configureAssistantByUser(page: Page, config: { values: { label: string; value: number | string }[] }) {
   await page.getByTestId('assistent-user-configuration').click();
 
