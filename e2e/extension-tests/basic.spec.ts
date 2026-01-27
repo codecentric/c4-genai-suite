@@ -6,7 +6,6 @@ import {
   addSystemPromptToConfiguration,
   createBucketIfNotExist,
   createConfiguration,
-  deleteConfiguration,
   editBucket,
   enterAdminArea,
   enterUserArea,
@@ -269,10 +268,6 @@ test('chat with file search', async ({ page }) => {
       });
       await page.waitForSelector(`:has-text("codecentricE2E")`);
       await page.waitForSelector(`:has-text("c4-test")`);
-    });
-
-    await test.step('cleanup: delete configuration', async () => {
-      await deleteConfiguration(page, configuration);
     });
   } finally {
     mockServer.close();

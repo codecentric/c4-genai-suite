@@ -20,7 +20,10 @@ interface ToolCall {
 }
 
 interface MockResponse {
+  // Pattern to match in the last user message
   match: RegExp;
+  // Optional pattern to match in system messages (for testing system prompt delivery)
+  matchSystem?: RegExp;
   response?: string;
   toolCall?: {
     namePattern: RegExp; // Pattern to match available tool names
@@ -31,10 +34,15 @@ interface MockResponse {
   };
 }
 
+// The responses are matched top to bottom. So more specific patterns should come first.
 const DEFAULT_RESPONSES: MockResponse[] = [
   { match: /banane/i, response: 'banana' },
+  {
+    match: /capital.*germany/i,
+    matchSystem: /pirate|parrot/i,
+    response: 'Arrr, the capital of Germany be Berlin, matey! Reminds me of me dear parrot who died there.',
+  },
   { match: /capital.*germany/i, response: 'Berlin' },
-  // How many files - calls search tool and counts results
   {
     match: /how many files/i,
     toolCall: {
@@ -133,35 +141,47 @@ function findResponse(messages: ChatMessage[], tools?: Tool[]): FoundResponse {
     return { type: 'text', text: 'I processed the tool results.' };
   }
 
-  // Find the last user message
+  // Find the last user message and system messages
   const lastUserMessage = [...messages].reverse().find((m) => m.role === 'user');
   const content = lastUserMessage?.content || '';
+  const systemContent = messages
+    .filter((m) => m.role === 'system')
+    .map((m) => m.content || '')
+    .join(' ');
 
   for (const mockResponse of DEFAULT_RESPONSES) {
-    if (mockResponse.match.test(content)) {
-      // Check if this should trigger a tool call
-      if (mockResponse.toolCall && tools && tools.length > 0) {
-        // Find a matching tool
-        const matchingTool = tools.find((t) => mockResponse.toolCall!.namePattern.test(t.function.name));
-        if (matchingTool) {
-          return {
-            type: 'tool_call',
-            toolCall: {
-              id: `call_${Date.now()}`,
-              type: 'function',
-              function: {
-                name: matchingTool.function.name,
-                arguments: JSON.stringify(mockResponse.toolCall.arguments),
-              },
-            },
-          };
-        }
-      }
+    // Check if user message matches
+    if (!mockResponse.match.test(content)) {
+      continue;
+    }
 
-      // Regular text response
-      if (mockResponse.response) {
-        return { type: 'text', text: mockResponse.response };
+    // If matchSystem is specified, also check system prompt
+    if (mockResponse.matchSystem && !mockResponse.matchSystem.test(systemContent)) {
+      continue;
+    }
+
+    // Check if this should trigger a tool call
+    if (mockResponse.toolCall && tools && tools.length > 0) {
+      // Find a matching tool
+      const matchingTool = tools.find((t) => mockResponse.toolCall!.namePattern.test(t.function.name));
+      if (matchingTool) {
+        return {
+          type: 'tool_call',
+          toolCall: {
+            id: `call_${Date.now()}`,
+            type: 'function',
+            function: {
+              name: matchingTool.function.name,
+              arguments: JSON.stringify(mockResponse.toolCall.arguments),
+            },
+          },
+        };
       }
+    }
+
+    // Regular text response
+    if (mockResponse.response) {
+      return { type: 'text', text: mockResponse.response };
     }
   }
 
