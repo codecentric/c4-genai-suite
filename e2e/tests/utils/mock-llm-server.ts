@@ -37,6 +37,63 @@ interface MockResponse {
 // The responses are matched top to bottom. So more specific patterns should come first.
 const DEFAULT_RESPONSES: MockResponse[] = [
   { match: /banane/i, response: 'banana' },
+  // Files in chat - search for birthdays
+  {
+    match: /welche geburtstage|what birthdays/i,
+    toolCall: {
+      namePattern: /files|search/i,
+      arguments: { query: 'birthday geburtstag' },
+      transformResult: (result: string) => {
+        // Return content mentioning names from the PDF
+        return 'Die Datei enthält folgende Geburtstage: Daniel Düsentrieb (02/07/2714), Daisy Duck, Donald Duck, und Quack.';
+      },
+    },
+  },
+  // Files in chat - no file found response
+  {
+    match: /welche dateien.*keine datei|what files.*no file/i,
+    response: 'Keine Datei gefunden',
+  },
+  // Files in chat - list visible files (when file exists)
+  {
+    match: /welche dateien|what files/i,
+    toolCall: {
+      namePattern: /files|search/i,
+      arguments: { query: '*' },
+      transformResult: (result: string) => {
+        try {
+          const parsed = JSON.parse(result) as { filename?: string }[];
+          if (parsed.length === 0) {
+            return 'Keine Datei gefunden';
+          }
+          const filenames = parsed.map((f) => f.filename || 'unknown').join(', ');
+          return filenames;
+        } catch {
+          return 'Keine Datei gefunden';
+        }
+      },
+    },
+  },
+  // Files in chat - page count
+  {
+    match: /wie viele seiten|how many pages/i,
+    toolCall: {
+      namePattern: /files|search/i,
+      arguments: { query: '*' },
+      transformResult: () => '2',
+    },
+  },
+  // Files in chat - describe content as table
+  {
+    match: /describe.*content.*table|content.*table/i,
+    toolCall: {
+      namePattern: /files|search/i,
+      arguments: { query: '*' },
+      transformResult: () => `| Content |
+|---------|
+| This PDF document contains a birthday sheet with names and dates including Daniel Düsentrieb, Daisy Duck, Donald Duck, and Quack with their respective birthdays. |`,
+    },
+  },
   {
     match: /capital.*germany/i,
     matchSystem: /pirate|parrot/i,
@@ -89,6 +146,13 @@ const DEFAULT_RESPONSES: MockResponse[] = [
     },
   },
   {
+    match: /user arguments/i,
+    toolCall: {
+      namePattern: /user.*arg|filter/i,
+      arguments: {},
+    },
+  },
+  {
     match: /two-column table/i,
     response: `| Letter | Word |
 |--------|------|
@@ -130,6 +194,7 @@ const DEFAULT_RESPONSES: MockResponse[] = [
     matchSystem: /Alice/,
     response: 'My name is Alice.',
   },
+  { match: /answer to life|universe|everything/i, response: '42' },
   { match: /hello|hi|hey/i, response: 'Hello! How can I help you?' },
 ];
 

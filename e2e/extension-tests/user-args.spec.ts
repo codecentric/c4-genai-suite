@@ -1,7 +1,6 @@
 import { expect, test } from '@playwright/test';
-import { config } from '../tests/utils/config';
 import {
-  addAzureModelToConfiguration,
+  addMockModelToConfiguration,
   addSystemPromptToConfiguration,
   addUserArgsToConfiguration,
   createConfiguration,
@@ -16,6 +15,7 @@ import {
   setFilter,
   uniqueName,
 } from '../tests/utils/helper';
+import { startMockLLMServer } from '../tests/utils/mock-llm-server';
 
 type TUserArgs = {
   dateUserArgument: string;
@@ -28,20 +28,19 @@ type TUserArgs = {
   };
 };
 
-if (!config.AZURE_OPEN_AI_API_KEY) {
-  test.skip('should configure Azure OpenAI-Open AI LLM for chats [skipped due to missing API_KEY in env]', () => {});
-} else {
-  test('user args', async ({ page }) => {
-    const configuration = { name: '', description: '' };
-    const filter = {
-      string: 'Test-String',
-      date: '2024-03-12',
-      dateFrom: '2025-01-01',
-      dateUntil: '2025-12-31',
-      singleSelect: 'value2',
-      multiSelect: ['value3', 'value4', 'value5'],
-    };
+test('user args', async ({ page }) => {
+  const mockServer = await startMockLLMServer(4105);
+  const configuration = { name: '', description: '' };
+  const filter = {
+    string: 'Test-String',
+    date: '2024-03-12',
+    dateFrom: '2025-01-01',
+    dateUntil: '2025-12-31',
+    singleSelect: 'value2',
+    multiSelect: ['value3', 'value4', 'value5'],
+  };
 
+  try {
     await test.step('should login', async () => {
       await login(page);
     });
@@ -54,7 +53,7 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
     });
 
     await test.step('add model', async () => {
-      await addAzureModelToConfiguration(page, configuration, { deployment: 'gpt-4o-mini' });
+      await addMockModelToConfiguration(page, configuration, { endpoint: mockServer.url });
     });
 
     await test.step('add prompt', async () => {
@@ -96,7 +95,7 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
     await test.step('send prompt', async () => {
       await sendMessage(page, configuration, { message: 'Give me the user arguments by executing a tool' });
 
-      const markdownResponse = page.locator('.markdown').last();
+      const markdownResponse = page.getByTestId('chat-item-debug').last();
       await markdownResponse.waitFor();
 
       const textContent = await markdownResponse.textContent();
@@ -136,7 +135,7 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
     await test.step('send prompt after reset', async () => {
       await sendMessage(page, configuration, { message: 'Give me the user arguments by executing a tool' });
 
-      const markdownResponse = page.locator('.markdown').last();
+      const markdownResponse = page.getByTestId('chat-item-debug').last();
       await markdownResponse.waitFor();
 
       const textContent = await markdownResponse.textContent();
@@ -164,5 +163,7 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
       const filterChip = await page.$(`:text-matches("Date:.*", "i")`);
       expect(filterChip).toBeNull();
     });
-  });
-}
+  } finally {
+    mockServer.close();
+  }
+});
