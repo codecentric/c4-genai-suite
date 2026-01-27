@@ -16,6 +16,7 @@ import { UserFilesController } from './controllers/files/user-files.controller';
 import { HealthController } from './controllers/health/health.controller';
 import { ApiResponsesController } from './controllers/responses/api.responses.controller';
 import { SettingsController } from './controllers/settings/settings.controller';
+import { TranscriptionController } from './controllers/transcription/transcription.controller';
 import { UsagesController } from './controllers/usages/usages.controller';
 import { UserGroupsController } from './controllers/users/user-groups.controller';
 import { UsersController } from './controllers/users/users.controller';
@@ -26,6 +27,7 @@ import { initSchemaIfNotExistsAndMoveMigrations, schema } from './domain/databas
 import { ExtensionModule } from './domain/extensions';
 import { FilesModule } from './domain/files';
 import { SettingsModule } from './domain/settings';
+import { TranscriptionModule } from './domain/transcription';
 import { UsersModule } from './domain/users/module';
 import { ExtensionLibraryModule } from './extensions';
 import { I18nModule } from './localization/i18n.module';
@@ -51,6 +53,7 @@ import { PrometheusModule } from './metrics/prometheus.module';
     PrometheusModule.forRoot(),
     OpenTelemetryModule,
     SettingsModule,
+    TranscriptionModule,
     UsersModule,
     TerminusModule,
     TypeOrmModule.forFeature([UserEntity]),
@@ -87,6 +90,7 @@ import { PrometheusModule } from './metrics/prometheus.module';
     ExtensionsController,
     FilesController,
     SettingsController,
+    TranscriptionController,
     UsagesController,
     UserFilesController,
     UserGroupsController,
