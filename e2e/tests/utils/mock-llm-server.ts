@@ -4,11 +4,12 @@
  *
  * Usage:
  *   const server = await startMockLLMServer(4100);
- *   // ... run tests with baseURL http://localhost:4100/v1
+ *   // ... run tests with baseURL http://{MOCK_LLM_HOST}:4100/v1
  *   server.close();
  */
 
 import * as http from 'http';
+import { config } from './config';
 
 interface ToolCall {
   id: string;
@@ -495,12 +496,13 @@ export async function startMockLLMServer(port = 4100): Promise<{ server: http.Se
       }
     });
 
-    server.listen(port, () => {
-      console.log(`[MockLLM] Running on http://localhost:${port}`);
+    server.listen(port, '0.0.0.0', () => {
+      const host = config.MOCK_LLM_HOST;
+      console.log(`[MockLLM] Running on http://0.0.0.0:${port}, accessible to backend at http://${host}:${port}`);
       resolve({
         server,
         close: () => server.close(),
-        url: `http://localhost:${port}/v1`,
+        url: `http://${host}:${port}/v1`,
       });
     });
   });
