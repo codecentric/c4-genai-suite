@@ -34,7 +34,7 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
     });
 
     await test.step('add model', async () => {
-      await addAzureModelToConfiguration(page, configuration, { deployment: 'gpt-4o-mini' });
+      await addAzureModelToConfiguration(page, configuration, { deployment: 'gpt-5-nano' });
     });
 
     await test.step('add prompt', async () => {
