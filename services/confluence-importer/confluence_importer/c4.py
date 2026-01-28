@@ -24,7 +24,7 @@ def clear_previous_ingests() -> None:
         files = fetch_bucket_files_list()
     except requests.HTTPError as e:
         logger.error(
-            "Failed to fetch bucket files list from c4",
+            "Failed to fetch bucket files list from c4 backend",
             bucket_id=bucket_id,
             error=str(e),
         )
