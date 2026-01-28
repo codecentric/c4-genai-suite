@@ -37,9 +37,9 @@ interface MockResponse {
 
 // The responses are matched top to bottom. So more specific patterns should come first.
 const DEFAULT_RESPONSES: MockResponse[] = [
+  // this is for the conversation title generation
+  { match: /Summarize the following content/i, response: 'Generic Title' },
   { match: /banane/i, response: 'banana' },
-  // Whole file extension - uses a tool call to load complete file content
-  // The tool has no arguments and returns pre-loaded content
   {
     match: /wann hat.*geburtstag|when.*birthday|welcher seite|which page/i,
     toolCall: {
@@ -75,7 +75,6 @@ const DEFAULT_RESPONSES: MockResponse[] = [
       transformResult: () => '42',
     },
   },
-  // Files in chat - describe content as table
   {
     match: /describe.*content.*table/i,
     toolCall: {
@@ -175,7 +174,6 @@ const DEFAULT_RESPONSES: MockResponse[] = [
 | y | yak |
 | z | zip |`,
   },
-  // Assistant identity - responds with name from system prompt
   {
     match: /who are you/i,
     matchSystem: /Bob/,
@@ -189,6 +187,47 @@ const DEFAULT_RESPONSES: MockResponse[] = [
   { match: /answer to life|universe|everything/i, response: '42' },
   { match: /hello|hi|hey/i, response: 'Hello! How can I help you?' },
 ];
+
+const TUTORIAL_RESPONSE = `## Mock LLM: No matching response found
+
+Your message does not match any predefined mock response.
+
+### How to add a new mock response:
+
+Edit \`e2e/tests/utils/mock-llm-server.ts\` and add to the \`DEFAULT_RESPONSES\` array:
+
+\`\`\`typescript
+// Simple text response
+{ match: /your pattern/i, response: 'Your response text' },
+
+// Response that checks system prompt
+{
+  match: /your pattern/i,
+  matchSystem: /some system prompt text/i,
+  response: 'Response when system prompt matches',
+},
+
+// Response that triggers a tool call
+{
+  match: /your pattern/i,
+  toolCall: {
+    namePattern: /tool_name/i,
+    arguments: { key: 'value' },
+  },
+},
+
+// Tool call with result transformation
+{
+  match: /your pattern/i,
+  toolCall: {
+    namePattern: /tool_name/i,
+    arguments: { query: '*' },
+    transformResult: (result) => \`Processed: \${result}\`,
+  },
+},
+\`\`\`
+
+**Note:** Responses are matched top-to-bottom. Place more specific patterns before general ones.`;
 
 interface FoundResponse {
   type: 'text' | 'tool_call';
@@ -260,7 +299,8 @@ function findResponse(messages: ChatMessage[], tools?: Tool[]): FoundResponse {
     }
   }
 
-  return { type: 'text', text: 'I understand your question.' };
+  // No matching response found - return a helpful tutorial
+  return { type: 'text', text: TUTORIAL_RESPONSE };
 }
 
 function parseBody(req: http.IncomingMessage): Promise<string> {
