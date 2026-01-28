@@ -26,7 +26,7 @@ def process_confluence_spaces(page_import_counter: PageImportCounter) -> None:
     Fetches all pages from each space and imports them into C4.
 
     Args:
-        page_import_counter: Dictionary to track successful and failed imports
+        page_import_counter: PageImportCounter dataclass to track successful and failed imports
     """
     logger.info("Starting import of Confluence Spaces", num_spaces=len(space_keys))
 
@@ -60,7 +60,7 @@ def process_individual_pages(page_import_counter: PageImportCounter) -> None:
     Fetches each page by ID and imports it into C4.
 
     Args:
-        page_import_counter: Dictionary to track successful and failed imports
+        page_import_counter: PageImportCounter dataclass to track successful and failed imports
     """
     num_pages = len(page_ids)
     logger.info("Starting import of individual Confluence pages", num_pages=num_pages)
@@ -87,7 +87,7 @@ def log_final_results(page_import_counter: PageImportCounter) -> None:
     Outputs either a success message or an error message based on the import counter.
 
     Args:
-        page_import_counter: Dictionary containing counts of successful and failed imports
+        page_import_counter: PageImportCounter dataclass containing counts of successful and failed imports
     """
     if page_import_counter.error > 0:
         logger.error(
@@ -118,4 +118,5 @@ def main() -> None:
     log_final_results(page_import_counter)
 
 
-main()
+if __name__ == "__main__":
+    main()

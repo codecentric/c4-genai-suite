@@ -1,13 +1,9 @@
 """Module for converting HTML content to Markdown format."""
 
-from io import BytesIO
-
-from markitdown import MarkItDown, StreamInfo
+import yaml
+from markdownify import markdownify
 
 from confluence_importer.confluence import ConfluencePage
-
-# Initialize MarkItDown
-md = MarkItDown(enable_plugins=False)
 
 
 def html_to_markdown(page: ConfluencePage) -> str:
@@ -19,14 +15,14 @@ def html_to_markdown(page: ConfluencePage) -> str:
     Returns:
         The converted Markdown content
     """
-    frontmatter = f"""---
-link: {page.url}
-lastUpdated: {page.last_updated}
-title: {page.title}
----
-"""
-    buffer = BytesIO(page.html_content.encode("utf-8"))
+    frontmatter_data = {
+        "link": page.url,
+        "lastUpdated": page.last_updated,
+        "title": page.title,
+    }
+    frontmatter_yaml = yaml.safe_dump(frontmatter_data, allow_unicode=True, default_flow_style=False, sort_keys=False)
+    frontmatter = f"---\n{frontmatter_yaml}---\n"
 
-    html_as_markdown = md.convert(buffer, stream_info=StreamInfo(mimetype="text/html")).text_content
+    html_as_markdown = markdownify(page.html_content, heading_style="ATX", strip=["script", "style"])
 
     return f"{frontmatter}{html_as_markdown}"

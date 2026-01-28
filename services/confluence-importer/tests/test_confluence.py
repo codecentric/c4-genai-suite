@@ -20,6 +20,7 @@ class TestConfluence:
             "body": {"storage": {"value": "<h1>Test Page</h1>"}},
             "history": {"lastUpdated": {"when": "2025-07-29T13:56:00.000Z"}},
             "_links": {"webui": "/rest/api/content/123456"},
+            "title": "Test Page",
         }
 
         mock_get_page_by_id = mocker.patch(
@@ -37,6 +38,7 @@ class TestConfluence:
         assert result.last_updated == "2025-07-29T13:56:00.000Z"
         assert result.url == f"{confluence_url}/rest/api/content/123456"
         assert result.html_content == "<h1>Test Page</h1>"
+        assert result.title == "Test Page"
 
     def test_get_pages_for_space(self, mocker: MockerFixture) -> None:
         """Test that get_pages_for_space correctly retrieves and parses pages from a Confluence space.
@@ -52,12 +54,14 @@ class TestConfluence:
                 "history": {"lastUpdated": {"when": "2025-07-29T13:56:00.000Z"}},
                 "_links": {"webui": "/rest/api/content/123456"},
                 "body": {"storage": {"value": "<h1>Test Page 1</h1>"}},
+                "title": "Test Page 1",
             },
             {
                 "id": 789012,
                 "history": {"lastUpdated": {"when": "2025-07-30T10:15:00.000Z"}},
                 "_links": {"webui": "/rest/api/content/789012"},
                 "body": {"storage": {"value": "<h1>Test Page 2</h1>"}},
+                "title": "Test Page 2",
             },
         ]
 
@@ -89,12 +93,14 @@ class TestConfluence:
         assert results[0].last_updated == "2025-07-29T13:56:00.000Z"
         assert results[0].url == f"{confluence_url}/rest/api/content/123456"
         assert results[0].html_content == "<h1>Test Page 1</h1>"
+        assert results[0].title == "Test Page 1"
 
         assert isinstance(results[1], ConfluencePage)
         assert results[1].id == 789012
         assert results[1].last_updated == "2025-07-30T10:15:00.000Z"
         assert results[1].url == f"{confluence_url}/rest/api/content/789012"
         assert results[1].html_content == "<h1>Test Page 2</h1>"
+        assert results[1].title == "Test Page 2"
 
     def test_get_pages_for_space_pagination(self, mocker: MockerFixture) -> None:
         """Test that get_pages_for_space correctly handles pagination of results.
@@ -111,6 +117,7 @@ class TestConfluence:
                 "history": {"lastUpdated": {"when": "2025-07-29T13:56:00.000Z"}},
                 "_links": {"webui": f"/rest/api/content/{i}"},
                 "body": {"storage": {"value": f"<h1>Page {i}</h1>"}},
+                "title": f"Page {i}",
             }
             for i in range(100)
         ]
@@ -121,6 +128,7 @@ class TestConfluence:
                 "history": {"lastUpdated": {"when": "2025-07-30T10:15:00.000Z"}},
                 "_links": {"webui": f"/rest/api/content/{i + 100}"},
                 "body": {"storage": {"value": f"<h1>Page {i + 100}</h1>"}},
+                "title": f"Page {i + 100}",
             }
             for i in range(50)
         ]

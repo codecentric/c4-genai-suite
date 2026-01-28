@@ -1,16 +1,16 @@
 [project]
-name = "confluencer-importer"
+name = "confluence-importer"
 version = "0.1.0"
 description = "Imports Confluence pages into c4 Buckets, enabling c4 Assistants to quickly and accurately answer questions using your organization's Confluence content."
 readme = "README.md"
 requires-python = ">=3.13.2"
 dependencies = [
     "atlassian-python-api==4.0.7",
-    "markitdown==0.1.4",
+    "markdownify>=0.14.1",
+    "pydantic-settings>=2.10.1",
+    "pyyaml>=6.0.1",
     "requests==2.32.5",
     "structlog==25.5.0",
-    "pytest==9.0.2",
-    "pydantic-settings>=2.10.1",
 ]
 
 [tool.ruff]
@@ -26,7 +26,7 @@ convention = "google"
 dev = [
     "mypy>=1.17.1",
     "pip>=25.2",
-    "pytest>=8.4.1",
+    "pytest>=9.0.2",
     "pytest-mock>=3.14.1",
     "ruff>=0.12.7",
 ]

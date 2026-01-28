@@ -72,15 +72,25 @@ def get_pages_for_space(space_key: str) -> Generator[ConfluencePage]:
         )  # type: ignore[no-untyped-call]
 
         len_result = 0
-        for r in result:
-            len_result += 1
-            yield ConfluencePage(
-                r.get("id"),
-                r.get("history").get("lastUpdated").get("when"),
-                f"{confluence_url}{r.get('_links').get('webui')}",
-                r.get("body").get("storage").get("value"),
-                r.get("title"),
+        try:
+            for r in result:
+                len_result += 1
+                yield ConfluencePage(
+                    r.get("id"),
+                    r.get("history").get("lastUpdated").get("when"),
+                    f"{confluence_url}{r.get('_links').get('webui')}",
+                    r.get("body").get("storage").get("value"),
+                    r.get("title"),
+                )
+        except Exception as e:
+            logger.error(
+                "Error fetching pages for Confluence Space. Abort further crawling of this space.",
+                error=str(e),
+                space_key=space_key,
+                offset=offset,
+                limit=batch_size,
             )
+            break
 
         if len_result < batch_size:
             crawling_done = True

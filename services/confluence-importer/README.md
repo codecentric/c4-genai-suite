@@ -5,3 +5,9 @@
 
 Imports Confluence pages into c4 Buckets, enabling c4 Assistants to quickly and accurately answer questions using your
 organization's Confluence content.
+
+Start an import with
+
+```bash
+uv run main.py
+```
