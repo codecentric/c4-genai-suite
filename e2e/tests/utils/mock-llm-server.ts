@@ -37,24 +37,15 @@ interface MockResponse {
 // The responses are matched top to bottom. So more specific patterns should come first.
 const DEFAULT_RESPONSES: MockResponse[] = [
   { match: /banane/i, response: 'banana' },
-  // Files in chat - search for birthdays
+  // Whole file extension - uses a tool call to load complete file content
+  // The tool has no arguments and returns pre-loaded content
   {
-    match: /welche geburtstage|what birthdays/i,
+    match: /wann hat.*geburtstag|when.*birthday|welcher seite|which page/i,
     toolCall: {
-      namePattern: /files|search/i,
-      arguments: { query: 'birthday geburtstag' },
-      transformResult: (result: string) => {
-        // Return content mentioning names from the PDF
-        return 'Die Datei enthält folgende Geburtstage: Daniel Düsentrieb (02/07/2714), Daisy Duck, Donald Duck, und Quack.';
-      },
+      namePattern: /whole|complete|file/i,
+      arguments: {},
     },
   },
-  // Files in chat - no file found response
-  {
-    match: /welche dateien.*keine datei|what files.*no file/i,
-    response: 'Keine Datei gefunden',
-  },
-  // Files in chat - list visible files (when file exists)
   {
     match: /welche dateien|what files/i,
     toolCall: {
@@ -74,24 +65,24 @@ const DEFAULT_RESPONSES: MockResponse[] = [
       },
     },
   },
-  // Files in chat - page count
+  // TODO: parse the page count from the tool response
   {
     match: /wie viele seiten|how many pages/i,
     toolCall: {
       namePattern: /files|search/i,
       arguments: { query: '*' },
-      transformResult: () => '2',
+      transformResult: () => '42',
     },
   },
   // Files in chat - describe content as table
   {
-    match: /describe.*content.*table|content.*table/i,
+    match: /describe.*content.*table/i,
     toolCall: {
       namePattern: /files|search/i,
       arguments: { query: '*' },
-      transformResult: () => `| Content |
+      transformResult: (content) => `| Content |
 |---------|
-| This PDF document contains a birthday sheet with names and dates including Daniel Düsentrieb, Daisy Duck, Donald Duck, and Quack with their respective birthdays. |`,
+| ${content} |`,
     },
   },
   {

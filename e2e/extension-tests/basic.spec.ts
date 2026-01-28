@@ -103,8 +103,8 @@ test('chat with file search', async ({ page }) => {
         message: 'Write a two-column table with the lower case letters from a to z followed by a random short word in the rows.',
       });
       await page.waitForTimeout(1000);
-      const element = page.getByText(/^What is the capital of Germany./);
-      await expectElementInYRange(element, -2000, 0);
+      const element = page.getByText(/^What is the capital of Germany.+Friendly AI/);
+      await expectElementInYRange(element, -200, 116);
     });
 
     await test.step('should create bucket', async () => {

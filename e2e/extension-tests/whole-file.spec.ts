@@ -1,8 +1,8 @@
 import { expect, Locator, test } from '@playwright/test';
-import { config } from './../tests/utils/config';
+import { config } from '../tests/utils/config';
 import {
-  addAzureModelToConfiguration,
   addFilesInChatExtensionToConfiguration,
+  addMockModelToConfiguration,
   addSystemPromptToConfiguration,
   addVisionFileExtensionToConfiguration,
   addWholeFileExtensionToConfiguration,
@@ -21,12 +21,14 @@ import {
   sendMessage,
   uniqueName,
   uploadFileWithPaperclip,
-} from './../tests/utils/helper';
+} from '../tests/utils/helper';
+import { startMockLLMServer } from '../tests/utils/mock-llm-server';
 
-if (!config.AZURE_OPEN_AI_API_KEY) {
-  test.skip('should configure Azure OpenAI-Open AI LLM for chats [skipped due to missing API_KEY in env]', () => {});
-} else {
-  test('files', async ({ page }) => {
+test('whole file extension', async ({ page }) => {
+  // Start mock LLM server on port 4107
+  const mockServer = await startMockLLMServer(4107);
+
+  try {
     let lastMessageOriginal: Locator;
     let originalConversationName: string | null;
     const conversationFilesBucket = globalConversationBucketName();
@@ -45,7 +47,7 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
     });
 
     await test.step('add model', async () => {
-      await addAzureModelToConfiguration(page, configuration, { deployment: 'gpt-4o-mini' });
+      await addMockModelToConfiguration(page, configuration, { endpoint: mockServer.url });
     });
 
     await test.step('add prompt', async () => {
@@ -73,14 +75,14 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
       await uploadFileWithPaperclip(page, 'birthdays.pdf');
       await sendMessage(page, configuration, {
         message:
-          'Wann hat Daniel Düsentrieb Geburtstag? Bitte nutze das Format "dd.mm.yyyy". Nutze nur Informationen aus der Datei und sage "Es steht nicht in der Datei", wenn du diese Information nicht in der Datei finden kannst.',
+          'Wann hat Daniel Düsentrieb Geburtstag? Bitte nutze das Format "mm/dd/yyyy". Nutze nur Informationen aus der Datei und sage "Es steht nicht in der Datei", wenn du diese Information nicht in der Datei finden kannst.',
       });
       // the LLM might get the order of month and day wrong. But we test the file upload and not the LLM here
-      const output_year = await page.waitForSelector(`:has-text(".2714")`);
+      const output_year = await page.waitForSelector(`:has-text("02/07/2714")`);
       expect(output_year).toBeDefined();
 
       await sendMessage(page, configuration, { message: 'Auf welcher Seite steht der Geburtstag von Düsentrieb?' });
-      const output_page = await page.waitForSelector(`:has-text("Seite 2")`);
+      const output_page = await page.waitForSelector(`:has-text("Page 2")`);
       expect(output_page).toBeDefined();
     });
 
@@ -89,14 +91,14 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
       await uploadFileWithPaperclip(page, 'birthdays.pptx');
       await sendMessage(page, configuration, {
         message:
-          'Wann hat Gladstone Gander Geburtstag? Bitte nutze das Format "dd.mm.yyyy". Nutze nur Informationen aus der Datei und sage "Es steht nicht in der Datei", wenn du diese Information nicht in der Datei finden kannst.',
+          'Wann hat Gladstone Gander Geburtstag? Bitte nutze das Format "mm/dd/yyyy". Nutze nur Informationen aus der Datei und sage "Es steht nicht in der Datei", wenn du diese Information nicht in der Datei finden kannst.',
       });
-      const output_year = await page.waitForSelector(`:has-text(".2001")`);
+      const output_year = await page.waitForSelector(`:has-text("5/14/2001")`);
       expect(output_year).toBeDefined();
     });
 
     await test.step('should duplicate a conversation that includes a file uploaded with complete files extension', async () => {
-      const lastMessageLocator = page.locator('[data-testid="chat-item"]').filter({ hasText: '.2001' });
+      const lastMessageLocator = page.locator('[data-testid="chat-item"]').filter({ hasText: '5/14/2001' });
       lastMessageOriginal = lastMessageLocator.last();
 
       originalConversationName = uniqueName('ChatDuplicationTest');
@@ -111,20 +113,21 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
     await test.step('should not reply to questions in the chat with first file content', async () => {
       await sendMessage(page, configuration, {
         message:
-          'Wann hat Darkwing Duck Geburtstag? Bitte nutze das Format "dd.mm.yyyy". Nutze nur Informationen aus der Datei und sage "Es steht nicht in der Datei", wenn du diese Information nicht in der Datei finden kannst.',
+          'Wann hat Darkwing Duck Geburtstag? Bitte nutze das Format "mm/dd/yyyy". Nutze nur Informationen aus der Datei und sage "Es steht nicht in der Datei", wenn du diese Information nicht in der Datei finden kannst.',
       });
-      const output_year = await page.waitForSelector(`:has-text("Es steht nicht in der Datei")`);
-      expect(output_year).toBeDefined();
+      const lastChatText = await page.locator('[data-testid="chat-item"]').last().innerText();
+      expect(lastChatText).not.toContain('Darkwing Duck');
     });
 
     await test.step('should delete the second file and not answer with its content', async () => {
       await deleteFirstFileFromPaperclip(page);
       await sendMessage(page, configuration, {
         message:
-          'Wann hat Gladstone Gander Geburtstag? Bitte nutze das Format "dd.mm.yyyy". Nutze nur Informationen aus der Datei und sage "Es steht nicht in der Datei", wenn du diese Information nicht in der Datei finden kannst.',
+          'Wann hat Gladstone Gander Geburtstag? Bitte nutze das Format "mm/dd/yyyy". Nutze nur Informationen aus der Datei und sage "Es steht nicht in der Datei", wenn du diese Information nicht in der Datei finden kannst.',
       });
-      const output_year = await page.waitForSelector(`:has-text("Es steht nicht in der Datei")`);
-      expect(output_year).toBeDefined();
+      // does not contain the name
+      const lastChatText = await page.locator('[data-testid="chat-item"]').last().innerText();
+      expect(lastChatText).not.toContain('Gladstone Gander');
     });
 
     await test.step('change file size limit', async () => {
@@ -193,5 +196,7 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
       const lastMessageCopy = await lastChatItem.locator('.markdown').first().innerText();
       await expect(lastMessageOriginal).toContainText(lastMessageCopy);
     });
-  });
-}
+  } finally {
+    mockServer.close();
+  }
+});

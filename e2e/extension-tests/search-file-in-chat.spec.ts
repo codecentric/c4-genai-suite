@@ -1,8 +1,8 @@
 import { expect, test } from '@playwright/test';
 import { config } from './../tests/utils/config';
 import {
-  addAzureModelToConfiguration,
   addFilesInChatExtensionToConfiguration,
+  addMockModelToConfiguration,
   addSystemPromptToConfiguration,
   createBucketIfNotExist,
   createConfiguration,
@@ -19,11 +19,13 @@ import {
   uniqueName,
   uploadFileWithPaperclip,
 } from './../tests/utils/helper';
+import { startMockLLMServer } from './../tests/utils/mock-llm-server';
 
-if (!config.AZURE_OPEN_AI_API_KEY) {
-  test.skip('should configure Azure OpenAI-Open AI LLM for chats [skipped due to missing API_KEY in env]', () => {});
-} else {
-  test('files', async ({ page }) => {
+test('files in chat', async ({ page }) => {
+  // Start mock LLM server on port 4106
+  const mockServer = await startMockLLMServer(4106);
+
+  try {
     let originalConversationWithChatWithFiles: string | null;
     const conversationFilesBucket = globalConversationBucketName();
 
@@ -38,7 +40,7 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
       configuration.description = `Description for ${configuration.name}`;
       await enterAdminArea(page);
       await createConfiguration(page, configuration);
-      await addAzureModelToConfiguration(page, configuration, { deployment: 'gpt-4o-mini' });
+      await addMockModelToConfiguration(page, configuration, { endpoint: mockServer.url });
       await addSystemPromptToConfiguration(page, configuration, { text: 'Your are a helpful assistant.' });
       await createBucketIfNotExist(page, {
         name: conversationFilesBucket,
@@ -95,7 +97,7 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
     });
 
     await test.step('should duplicate a conversation that includes a file uploaded with files in chat extension', async () => {
-      originalConversationWithChatWithFiles = uniqueName('ChatWithFilesDuplicationTest');
+      originalConversationWithChatWithFiles = uniqueName('unq');
 
       await duplicateActiveConversation(page, originalConversationWithChatWithFiles);
       const duplicatedName = `${originalConversationWithChatWithFiles} (2)`;
@@ -134,7 +136,7 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
 
       const originalConversationLocator = page
         .getByRole('navigation')
-        .filter({ hasText: originalConversationWithChatWithFiles! })
+        .filter({ hasText: new RegExp(`^${originalConversationWithChatWithFiles}$`) })
         .first();
 
       await expect(originalConversationLocator, 'Original conversation link should be visible').toBeVisible({
@@ -224,5 +226,7 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
       const source_panel = await page.waitForSelector(`:has-text("Source Content")`);
       expect(source_panel).toBeDefined();
     });
-  });
-}
+  } finally {
+    mockServer.close();
+  }
+});
