@@ -1,8 +1,9 @@
 import { expect, test } from '@playwright/test';
+import { config } from '../utils/config';
 import {
+  addMCPToConfiguration,
   addMockModelToConfiguration,
   addSystemPromptToConfiguration,
-  configureAssistantByUser,
   createConfiguration,
   enterAdminArea,
   enterUserArea,
@@ -11,11 +12,11 @@ import {
   selectConfiguration,
   sendMessage,
   uniqueName,
-} from '../tests/utils/helper';
-import { startMockLLMServer } from '../tests/utils/mock-llm-server';
+} from '../utils/helper';
+import { startMockLLMServer } from '../utils/mock-llm-server';
 
-test('configurable arguments', async ({ page }) => {
-  const mockServer = await startMockLLMServer(4101);
+test('mcp', async ({ page }) => {
+  const mockServer = await startMockLLMServer(4102);
   const configuration = { name: '', description: '' };
 
   try {
@@ -24,7 +25,7 @@ test('configurable arguments', async ({ page }) => {
     });
 
     await test.step('add assistant', async () => {
-      configuration.name = uniqueName('E2E-Test-Configurable-Arguments');
+      configuration.name = uniqueName('E2E-Test-MCP');
       configuration.description = `Description for ${configuration.name}`;
       await enterAdminArea(page);
       await createConfiguration(page, configuration);
@@ -37,7 +38,11 @@ test('configurable arguments', async ({ page }) => {
     });
 
     await test.step('add prompt', async () => {
-      await addSystemPromptToConfiguration(page, configuration, { text: 'You are a helpful assistant.', configurable: true });
+      await addSystemPromptToConfiguration(page, configuration, { text: 'You are a helpful assistant.' });
+    });
+
+    await test.step('add mcp extension', async () => {
+      await addMCPToConfiguration(page, configuration, { name: 'MCP Fetch', endpoint: config.MCP_SERVER_ENDPOINT });
     });
 
     await test.step('create new chat', async () => {
@@ -46,16 +51,14 @@ test('configurable arguments', async ({ page }) => {
       await selectConfiguration(page, configuration);
     });
 
-    await test.step('create configuration', async () => {
-      await configureAssistantByUser(page, {
-        values: [{ label: 'Text', value: 'Speak like a pirate and always mention that your parrot died.' }],
-      });
-    });
-
     await test.step('send prompt', async () => {
-      await sendMessage(page, configuration, { message: 'What is the capital of Germany?' });
-      const testoutput = await page.waitForSelector(`:has-text("parrot")`);
-      expect(testoutput).toBeDefined();
+      await sendMessage(page, configuration, {
+        message: 'When was the building built according to this Wikipedia page: https://de.wikipedia.org/wiki/Amtsgericht_Ohligs',
+      });
+      const tool = await page.waitForSelector(`:has-text("MCP Fetch: fetch")`);
+      expect(tool).toBeDefined();
+      const result = await page.waitForSelector(`:has-text("1895")`);
+      expect(result).toBeDefined();
     });
   } finally {
     mockServer.close();

@@ -28,7 +28,6 @@ jobs:
           - webkit
         testdir:
           - expensive-tests
-          - extension-tests
           - tests
     uses: ./.github/workflows/e2e-template.yaml
     with:
