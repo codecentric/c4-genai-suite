@@ -1,20 +1,20 @@
 import { I18nService } from '../../localization/i18n.service';
-import { AzureDictateExtension } from './azure-dictate';
+import { AzureTranscribeExtension } from './azure-transcribe';
 
-describe('AzureDictateExtension', () => {
-  let extension: AzureDictateExtension;
+describe('AzureTranscribeExtension', () => {
+  let extension: AzureTranscribeExtension;
 
   const i18n = {
     t: (val: string) => val,
   } as unknown as I18nService;
 
   beforeEach(() => {
-    extension = new AzureDictateExtension(i18n);
+    extension = new AzureTranscribeExtension(i18n);
   });
 
   describe('spec', () => {
     it('should have correct name', () => {
-      expect(extension.spec.name).toBe('dictate');
+      expect(extension.spec.name).toBe('transcribe');
     });
 
     it('should have group set to speech-to-text', () => {

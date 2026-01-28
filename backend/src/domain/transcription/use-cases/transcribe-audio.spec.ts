@@ -1,7 +1,7 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { QueryBus } from '@nestjs/cqrs';
 import { User } from 'src/domain/users';
-import { DictateExtensionConfiguration } from '../../../extensions/other/azure-dictate';
+import { TranscribeExtensionConfiguration } from '../../../extensions/other/azure-transcribe';
 import { AzureTranscriptionProvider } from '../providers';
 import { TranscribeAudio, TranscribeAudioHandler } from './transcribe-audio';
 
@@ -18,7 +18,7 @@ describe('Transcribe Audio', () => {
     userGroupIds: ['1'],
   };
 
-  const mockConfig: DictateExtensionConfiguration = {
+  const mockConfig: TranscribeExtensionConfiguration = {
     apiKey: 'test-api-key',
     instanceName: 'test-instance',
     deploymentName: 'whisper',
@@ -94,7 +94,7 @@ describe('Transcribe Audio', () => {
       });
 
       await expect(handler.execute(command)).rejects.toThrow(NotFoundException);
-      await expect(handler.execute(command)).rejects.toThrow('Dictate extension not found or not enabled');
+      await expect(handler.execute(command)).rejects.toThrow('Transcribe extension not found or not enabled');
     });
 
     it('should throw BadRequestException when audio file is too large', async () => {

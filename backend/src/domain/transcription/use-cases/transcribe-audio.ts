@@ -1,7 +1,7 @@
 import { BadRequestException, Logger, NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler, QueryBus } from '@nestjs/cqrs';
 import { User } from 'src/domain/users';
-import { DictateExtensionConfiguration } from '../../../extensions/other/azure-dictate';
+import { TranscribeExtensionConfiguration } from '../../../extensions/other/azure-transcribe';
 import { GetExtension, GetExtensionResponse } from '../../extensions';
 import { AzureTranscriptionProvider } from '../providers';
 
@@ -35,10 +35,10 @@ export class TranscribeAudioHandler implements ICommandHandler<TranscribeAudio, 
     const extensionResult: GetExtensionResponse = await this.queryBus.execute(new GetExtension({ id: extensionId }));
 
     if (!extensionResult.extension || !extensionResult.extension.enabled) {
-      throw new NotFoundException('Dictate extension not found or not enabled');
+      throw new NotFoundException('Transcribe extension not found or not enabled');
     }
 
-    const configuration = extensionResult.extension.values as DictateExtensionConfiguration;
+    const configuration = extensionResult.extension.values as TranscribeExtensionConfiguration;
 
     // Validate file size (Whisper has a 25MB limit)
     const maxSize = 25 * 1024 * 1024; // 25MB

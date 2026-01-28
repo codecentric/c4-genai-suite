@@ -5,12 +5,12 @@ import TextareaAutosize from 'react-textarea-autosize';
 import { ConfigurationDto, FileDto } from 'src/api';
 import { Icon, Markdown } from 'src/components';
 import { ExtensionContext, JSONObject, useEventCallback, useExtensionContext, usePersistentState, useTheme } from 'src/hooks';
-import { useDictate } from 'src/hooks/useDictate';
 import { useSpeechRecognitionToggle } from 'src/hooks/useSpeechRecognitionToggle';
-import { DictateButton } from 'src/pages/chat/conversation/DictateButton';
+import { useTranscribe } from 'src/hooks/useTranscribe';
 import { FileItemComponent } from 'src/pages/chat/conversation/FileItem';
 import { FilterModal } from 'src/pages/chat/conversation/FilterModal';
 import { Language, SpeechRecognitionButton } from 'src/pages/chat/conversation/SpeechRecognitionButton';
+import { TranscribeButton } from 'src/pages/chat/conversation/TranscribeButton';
 import { texts } from 'src/texts';
 import { useChatDropzone } from '../useChatDropzone';
 import { Suggestions } from './Suggestions';
@@ -176,18 +176,18 @@ export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEm
     onTranscriptUpdate: setInput,
   });
 
-  const voiceExtensions = configuration?.extensions?.filter((e) => e.name === 'speech-to-text' || e.name === 'dictate') ?? [];
+  const voiceExtensions = configuration?.extensions?.filter((e) => e.name === 'speech-to-text' || e.name === 'transcribe') ?? [];
   const activeVoiceExtension = voiceExtensions[0];
   const showSpeechToText = activeVoiceExtension?.name === 'speech-to-text';
-  const showDictate = activeVoiceExtension?.name === 'dictate';
+  const showTranscribe = activeVoiceExtension?.name === 'transcribe';
 
-  // Dictate extension setup
-  const dictateExtension = showDictate ? activeVoiceExtension : undefined;
-  const dictateHook = useDictate({
-    extensionId: dictateExtension?.id ?? 0,
+  // Transcribe extension setup
+  const transcribeExtension = showTranscribe ? activeVoiceExtension : undefined;
+  const transcribeHook = useTranscribe({
+    extensionId: transcribeExtension?.id ?? 0,
     onTranscriptReceived: setInput,
   });
-  const { isRecording, isTranscribing, toggleRecording } = dictateHook;
+  const { isRecording, isTranscribing, toggleRecording } = transcribeHook;
 
   return (
     <>
@@ -293,8 +293,8 @@ export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEm
                     setSpeechLanguage={setSpeechLanguage}
                     languages={speechRecognitionLanguages}
                   />
-                ) : showDictate ? (
-                  <DictateButton isRecording={isRecording} isTranscribing={isTranscribing} onToggle={toggleRecording} />
+                ) : showTranscribe ? (
+                  <TranscribeButton isRecording={isRecording} isTranscribing={isTranscribing} onToggle={toggleRecording} />
                 ) : null}
                 <ActionIcon
                   type="submit"

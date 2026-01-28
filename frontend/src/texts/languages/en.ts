@@ -146,7 +146,7 @@ export const en = {
       stopMicrophone: 'Stop using microphone',
       useMicrophone: 'Start using microphone',
     },
-    dictate: {
+    transcribe: {
       browserNotSupported: 'Browser does not support audio recording.',
       microphonePermissionDenied: 'Microphone permission denied. Please allow microphone access in your browser settings.',
       recordingStartFailed: 'Failed to start recording. Please check your microphone.',

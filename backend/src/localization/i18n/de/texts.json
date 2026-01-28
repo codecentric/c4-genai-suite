@@ -206,8 +206,8 @@
       "title": "Spracheingabe",
       "description": "Erlaubt Spracheingaben über ein Mikrofon-Icon"
     },
-    "dictate": {
-      "title": "Azure Diktieren",
+    "transcribe": {
+      "title": "Azure Transkription",
       "description": "Audioaufnahmen in Text umwandeln mit Azure OpenAI Whisper",
       "apiKey": "API-Schlüssel",
       "apiKeyHint": "Ihr Azure OpenAI API-Schlüssel",

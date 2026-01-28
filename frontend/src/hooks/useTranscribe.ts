@@ -4,20 +4,20 @@ import { useApi } from 'src/api';
 import { buildError } from 'src/lib';
 import { texts } from 'src/texts';
 
-interface UseDictateProps {
+interface UseTranscribeProps {
   extensionId: number;
   onTranscriptReceived: (transcript: string) => void;
   maxDurationMs?: number;
 }
 
-export type DictateState = 'idle' | 'recording' | 'transcribing' | 'error';
+export type TranscribeState = 'idle' | 'recording' | 'transcribing' | 'error';
 
 export function isBrowserSupported(): boolean {
   return typeof window !== 'undefined' && window.MediaRecorder && !!navigator.mediaDevices?.getUserMedia;
 }
 
-export function useDictate({ extensionId, onTranscriptReceived, maxDurationMs = 10 * 60 * 1000 }: UseDictateProps) {
-  const [state, setState] = useState<DictateState>('idle');
+export function useTranscribe({ extensionId, onTranscriptReceived, maxDurationMs = 10 * 60 * 1000 }: UseTranscribeProps) {
+  const [state, setState] = useState<TranscribeState>('idle');
   const [recordingDuration, setRecordingDuration] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [isSupported] = useState(() => isBrowserSupported());
@@ -55,12 +55,9 @@ export function useDictate({ extensionId, onTranscriptReceived, maxDurationMs = 
       const recorder = mediaRecorderRef.current!;
 
       recorder.onstop = async () => {
-        console.log(`Recording stopped. Total chunks: ${audioChunksRef.current.length}`);
-
-        // Check audio chunks BEFORE cleanup
         if (audioChunksRef.current.length === 0) {
           cleanup();
-          toast.error(texts.chat.dictate.noAudioRecorded);
+          toast.error(texts.chat.transcribe.noAudioRecorded);
           setState('idle');
           resolve();
           return;
@@ -70,43 +67,39 @@ export function useDictate({ extensionId, onTranscriptReceived, maxDurationMs = 
         const audioChunks = [...audioChunksRef.current];
 
         // Stop timer and stream
-        if (timerRef.current) {
-          clearInterval(timerRef.current);
-          timerRef.current = null;
-        }
-        if (streamRef.current) {
-          streamRef.current.getTracks().forEach((track) => track.stop());
-          streamRef.current = null;
-        }
+        cleanup();
 
         setState('transcribing');
 
         try {
-          // Create audio blob from recorded chunks
           const audioBlob = new Blob(audioChunks, { type: mimeTypeRef.current });
-          console.log(`Created audio blob: ${audioBlob.size} bytes, type: ${audioBlob.type}`);
 
-          // OpenAI needs the file extension to determine format
+          if (audioBlob.size === 0) {
+            toast.error(texts.chat.transcribe.noAudioRecorded);
+            setState('error');
+            resolve();
+            return;
+          }
+
           const audioFile = new File([audioBlob], 'recording.webm', { type: mimeTypeRef.current });
-          console.log(`Created audio file: ${audioFile.name}, size: ${audioFile.size} bytes, type: ${audioFile.type}`);
-
-          // Call the transcription API
           const result = await transcription.transcribeAudio(extensionId, audioFile);
 
-          if (result.text) {
-            onTranscriptReceived(result.text);
-            setState('idle');
-          } else {
-            throw new Error('No transcription text received');
+          if (!result.text || result.text.trim() === '') {
+            toast.error(texts.chat.transcribe.transcriptionFailed);
+            setError(texts.chat.transcribe.transcriptionFailed);
+            setState('error');
+            resolve();
+            return;
           }
+
+          onTranscriptReceived(result.text);
+          setState('idle');
         } catch (err) {
-          console.error('Transcription error:', err);
-          const errorMessage = await buildError(texts.chat.dictate.transcriptionFailed, err as Error);
+          const errorMessage = await buildError(texts.chat.transcribe.transcriptionFailed, err as Error);
           toast.error(errorMessage);
           setError(errorMessage);
           setState('error');
         } finally {
-          // Final cleanup
           audioChunksRef.current = [];
           setRecordingDuration(0);
         }
@@ -137,7 +130,7 @@ export function useDictate({ extensionId, onTranscriptReceived, maxDurationMs = 
 
       // Check if MediaRecorder is supported
       if (!window.MediaRecorder) {
-        toast.error(texts.chat.dictate.browserNotSupported);
+        toast.error(texts.chat.transcribe.browserNotSupported);
         cleanup();
         return;
       }
@@ -151,7 +144,8 @@ export function useDictate({ extensionId, onTranscriptReceived, maxDurationMs = 
 
       audioChunksRef.current = [];
 
-      // Collect audio data
+      // Collect audio data chunks as they become available
+      // Using 100ms timeslice to ensure we capture audio reliably
       mediaRecorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
           audioChunksRef.current.push(event.data);
@@ -160,12 +154,12 @@ export function useDictate({ extensionId, onTranscriptReceived, maxDurationMs = 
 
       // Handle recording errors
       mediaRecorder.onerror = (_event) => {
-        toast.error(texts.chat.dictate.recordingStartFailed);
+        toast.error(texts.chat.transcribe.recordingStartFailed);
         cleanup();
         setState('error');
       };
 
-      // TODO1: check if 100ms is fine
+      // Start recording with 100ms timeslice for reliable audio capture
       mediaRecorder.start(100);
       setState('recording');
       startTimeRef.current = Date.now();
@@ -178,15 +172,14 @@ export function useDictate({ extensionId, onTranscriptReceived, maxDurationMs = 
         // Auto-stop if max duration reached
         if (elapsed >= maxDurationMs) {
           void stopRecording();
-          toast.info(texts.chat.dictate.maxDurationReached);
+          toast.info(texts.chat.transcribe.maxDurationReached);
         }
       }, 100);
     } catch (err) {
-      console.error('Error starting recording:', err);
       if (err instanceof Error && err.name === 'NotAllowedError') {
-        toast.error(texts.chat.dictate.microphonePermissionDenied);
+        toast.error(texts.chat.transcribe.microphonePermissionDenied);
       } else {
-        toast.error(texts.chat.dictate.recordingStartFailed);
+        toast.error(texts.chat.transcribe.recordingStartFailed);
       }
       setState('error');
       cleanup();

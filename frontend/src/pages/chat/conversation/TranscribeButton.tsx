@@ -2,21 +2,21 @@ import { ActionIcon } from '@mantine/core';
 import { IconMicrophone } from '@tabler/icons-react';
 import { texts } from 'src/texts';
 
-interface DictateButtonProps {
+interface TranscribeButtonProps {
   isRecording: boolean;
   isTranscribing: boolean;
   onToggle: () => void;
 }
 
-export function DictateButton({ isRecording, isTranscribing, onToggle }: DictateButtonProps) {
+export function TranscribeButton({ isRecording, isTranscribing, onToggle }: TranscribeButtonProps) {
   const getButtonText = () => {
     if (isTranscribing) {
-      return texts.chat.dictate.transcribing;
+      return texts.chat.transcribe.transcribing;
     }
     if (isRecording) {
-      return texts.chat.dictate.stopRecording;
+      return texts.chat.transcribe.stopRecording;
     }
-    return texts.chat.dictate.startRecording;
+    return texts.chat.transcribe.startRecording;
   };
 
   const getButtonColor = () => {

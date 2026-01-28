@@ -18,7 +18,7 @@ import { NvidiaModelExtension } from './models/nvidia';
 import { OllamaModelExtension } from './models/ollama';
 import { OpenAIModelExtension } from './models/open-ai';
 import { OpenAICompatibleModelExtension } from './models/open-ai-compatible';
-import { AzureDictateExtension } from './other/azure-dictate';
+import { AzureTranscribeExtension } from './other/azure-transcribe';
 import { CustomPromptExtension } from './other/custom';
 import { SpeechToTextExtension } from './other/speech-to-text';
 import { SummaryPromptExtension } from './other/summary';
@@ -115,7 +115,7 @@ export class ExtensionLibraryModule {
         ContextExtension,
         CustomPromptExtension,
         DallEExtension,
-        AzureDictateExtension,
+        AzureTranscribeExtension,
         DuckduckgoWebSearchExtension,
         FilesConversationExtension,
         FilesExtension,

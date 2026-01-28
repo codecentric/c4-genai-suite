@@ -148,7 +148,7 @@ export const de: typeof en = {
       stopMicrophone: 'Mikrofon deaktivieren',
       useMicrophone: 'Mikrofon aktivieren',
     },
-    dictate: {
+    transcribe: {
       browserNotSupported: 'Der Browser unterstützt keine Audioaufnahme.',
       microphonePermissionDenied:
         'Mikrofonberechtigung verweigert. Bitte erlauben Sie den Mikrofonzugriff in Ihren Browsereinstellungen.',
@@ -158,7 +158,7 @@ export const de: typeof en = {
       maxDurationReached: 'Maximale Aufnahmedauer erreicht. Audio wird transkribiert...',
       startRecording: 'Aufnahme starten',
       stopRecording: 'Aufnahme stoppen und transkribieren',
-      transcribing: 'Wird transkribiert...',
+      transcribing: 'Transkrition läuft...',
     },
 
     thisMonth: 'Letzte 30 Tage',

@@ -1,12 +1,12 @@
 import { BadRequestException, Logger } from '@nestjs/common';
 import { AzureOpenAI } from 'openai';
-import { DictateExtensionConfiguration } from '../../../extensions/other/azure-dictate';
+import { TranscribeExtensionConfiguration } from '../../../extensions/other/azure-transcribe';
 
 export class AzureTranscriptionProvider {
   private readonly logger = new Logger(AzureTranscriptionProvider.name);
   private readonly client: AzureOpenAI;
 
-  constructor(config: DictateExtensionConfiguration) {
+  constructor(config: TranscribeExtensionConfiguration) {
     if (!config.apiKey) {
       throw new BadRequestException('API key is required');
     }

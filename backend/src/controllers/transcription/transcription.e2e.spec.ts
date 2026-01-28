@@ -142,7 +142,7 @@ async function createDictateExtension(dataSource: DataSource): Promise<number> {
   }
 
   const extension = extensionRepo.create({
-    name: 'dictate',
+    name: 'transcribe',
     enabled: true,
     configuration: config,
     values: {
