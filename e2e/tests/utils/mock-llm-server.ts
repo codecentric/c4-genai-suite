@@ -408,7 +408,7 @@ function handleChatCompletions(body: string, res: http.ServerResponse) {
             })}\n\n`,
           );
           i++;
-          setTimeout(sendNext, 100);
+          setTimeout(sendNext, 20);
         } else {
           // Final chunk
           res.write(
@@ -425,7 +425,7 @@ function handleChatCompletions(body: string, res: http.ServerResponse) {
         }
       };
 
-      setTimeout(sendNext, 100);
+      setTimeout(sendNext, 20);
     }
   } else {
     // Non-streaming response
