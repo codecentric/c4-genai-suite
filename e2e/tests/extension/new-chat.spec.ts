@@ -5,7 +5,6 @@ import {
   createConfiguration,
   createUserIfNotExists,
   enterAdminArea,
-  enterUserArea,
   login,
   logout,
   newChat,
@@ -53,13 +52,11 @@ test('Chat workflow with Mock LLM', async ({ page }) => {
     });
 
     await test.step('should start chat in new configuration', async () => {
-      await enterUserArea(page);
       await newChat(page);
       await selectConfiguration(page, configuration);
     });
 
     await test.step('should create a reference conversation', async () => {
-      await enterUserArea(page);
       await selectConfiguration(page, configuration);
 
       const userMessageContent = 'Hi!';
