@@ -30,7 +30,7 @@ export class AzureTranscriptionProvider {
     });
   }
 
-  async transcribe(audioBuffer: Buffer, fileName: string, mimeType: string, language?: string): Promise<string> {
+  async transcribe(audioBuffer: Buffer, fileName: string, mimeType: string): Promise<string> {
     try {
       // Create a File object from the buffer
       const audioFile = new File([new Uint8Array(audioBuffer)], fileName, { type: mimeType });
@@ -39,7 +39,6 @@ export class AzureTranscriptionProvider {
       const result = await this.client.audio.transcriptions.create({
         file: audioFile,
         model: '',
-        language: language || undefined,
       });
 
       this.logger.log(`Azure transcription successful, text length: ${result.text.length}`);

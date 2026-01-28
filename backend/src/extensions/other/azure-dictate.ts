@@ -35,12 +35,6 @@ export class AzureDictateExtension implements Extension<DictateExtensionConfigur
           required: true,
           description: this.i18n.t('texts.extensions.dictate.deploymentNameHint'),
         },
-        language: {
-          type: 'string',
-          title: this.i18n.t('texts.extensions.dictate.language'),
-          description: this.i18n.t('texts.extensions.dictate.languageHint'),
-          required: false,
-        },
         apiVersion: {
           type: 'string',
           title: this.i18n.t('texts.extensions.common.apiVersion'),
@@ -62,6 +56,5 @@ export type DictateExtensionConfiguration = ExtensionConfiguration & {
   apiKey: string;
   instanceName: string;
   deploymentName: string;
-  language?: string;
   apiVersion: string;
 };

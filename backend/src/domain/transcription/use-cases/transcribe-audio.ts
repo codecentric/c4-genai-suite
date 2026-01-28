@@ -57,7 +57,7 @@ export class TranscribeAudioHandler implements ICommandHandler<TranscribeAudio, 
     try {
       const provider = new AzureTranscriptionProvider(configuration);
 
-      const text = await provider.transcribe(audioBuffer, fileName, mimeType, configuration.language);
+      const text = await provider.transcribe(audioBuffer, fileName, mimeType);
 
       return new TranscribeAudioResponse(text);
     } catch (error) {

@@ -215,8 +215,6 @@
       "instanceNameHint": "Name der Azure OpenAI-Ressource",
       "deploymentName": "Bereitstellungsname",
       "deploymentNameHint": "Name der Whisper-Bereitstellung in Ihrer Azure OpenAI-Ressource",
-      "language": "Sprache",
-      "languageHint": "Optionaler Sprachcode (z.B. de, en) für bessere Transkriptionsgenauigkeit. Leer lassen für automatische Erkennung.",
       "apiVersion": "API-Version",
       "apiVersionHint": "Azure OpenAI API-Version"
     },
