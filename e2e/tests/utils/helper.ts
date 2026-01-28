@@ -17,9 +17,8 @@ export async function goto(page: Page, relativePath: `/${string}` | '') {
 }
 
 export async function enterAdminArea(page: Page) {
-  if (await hasMenuItem(page, { name: 'Admin' })) {
-    await page.getByRole('menuitem', { name: 'Admin' }).click();
-  }
+  await page.getByTestId('menu user').click();
+  await page.getByRole('menuitem', { name: 'Admin' }).click();
 }
 
 export async function logout(page: Page) {
@@ -36,9 +35,8 @@ export async function hasMenuItem(page: Page, item: { name: string }) {
 }
 
 export async function enterUserArea(page: Page) {
-  if (await hasMenuItem(page, { name: 'Chat' })) {
-    await page.getByRole('menuitem', { name: 'Chat' }).click();
-  }
+  await page.getByTestId('menu user').click();
+  await page.getByRole('menuitem', { name: 'Chat' }).click();
   await page.getByRole('button', { name: 'New chat' }).waitFor({ state: 'visible' });
 }
 
