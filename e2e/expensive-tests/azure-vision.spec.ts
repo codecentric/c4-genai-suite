@@ -42,7 +42,6 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
     });
 
     await test.step('should add vision extension', async () => {
-      await enterAdminArea(page);
       await addVisionFileExtensionToConfiguration(page, configuration);
     });
 
