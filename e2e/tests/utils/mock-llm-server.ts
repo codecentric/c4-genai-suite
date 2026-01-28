@@ -26,6 +26,8 @@ interface MockResponse {
   // Optional pattern to match in system messages (for testing system prompt delivery)
   matchSystem?: RegExp;
   response?: string;
+  // Dump the full context (messages + tools) as pretty-printed JSON - useful for debugging
+  dumpContext?: boolean;
   toolCall?: {
     namePattern: RegExp; // Pattern to match available tool names
     arguments: Record<string, unknown>;
@@ -39,6 +41,8 @@ interface MockResponse {
 const DEFAULT_RESPONSES: MockResponse[] = [
   // this is for the conversation title generation
   { match: /Summarize the following content/i, response: 'Generic Title' },
+  // Debug helper - dumps the full context as pretty-printed JSON
+  { match: /dump context|debug context|show context/i, dumpContext: true },
   { match: /banane/i, response: 'banana' },
   {
     match: /wann hat.*geburtstag|when.*birthday|welcher seite|which page/i,
@@ -227,7 +231,10 @@ Edit \`e2e/tests/utils/mock-llm-server.ts\` and add to the \`DEFAULT_RESPONSES\`
 },
 \`\`\`
 
-**Note:** Responses are matched top-to-bottom. Place more specific patterns before general ones.`;
+**Note:** Responses are matched top-to-bottom. Place more specific patterns before general ones.
+
+**Note:** You can type "debug context" to get a dump of the full context including the available tools.
+`;
 
 interface FoundResponse {
   type: 'text' | 'tool_call';
@@ -272,6 +279,25 @@ function findResponse(messages: ChatMessage[], tools?: Tool[]): FoundResponse {
     // If matchSystem is specified, also check system prompt
     if (mockResponse.matchSystem && !mockResponse.matchSystem.test(systemContent)) {
       continue;
+    }
+
+    // Dump the full context as pretty-printed JSON for debugging
+    if (mockResponse.dumpContext) {
+      const context = {
+        messages: messages.map((m) => ({
+          role: m.role,
+          content: m.content?.substring(0, 500) + (m.content && m.content.length > 500 ? '...' : ''),
+          ...(m.tool_calls ? { tool_calls: m.tool_calls } : {}),
+          ...(m.tool_call_id ? { tool_call_id: m.tool_call_id } : {}),
+        })),
+        tools: tools || [],
+      };
+      const dump = `## Context Dump
+
+\`\`\`json
+${JSON.stringify(context, null, 2)}
+\`\`\``;
+      return { type: 'text', text: dump };
     }
 
     // Check if this should trigger a tool call
