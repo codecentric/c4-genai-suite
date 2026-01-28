@@ -1,5 +1,5 @@
 import { expect, Locator, test } from '@playwright/test';
-import { config } from '../tests/utils/config';
+import { config } from '../utils/config';
 import {
   addFilesInChatExtensionToConfiguration,
   addMockModelToConfiguration,
@@ -21,8 +21,8 @@ import {
   sendMessage,
   uniqueName,
   uploadFileWithPaperclip,
-} from '../tests/utils/helper';
-import { startMockLLMServer } from '../tests/utils/mock-llm-server';
+} from '../utils/helper';
+import { startMockLLMServer } from '../utils/mock-llm-server';
 
 test('whole file extension', async ({ page }) => {
   // Start mock LLM server on port 4107

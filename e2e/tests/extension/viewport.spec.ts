@@ -1,5 +1,5 @@
 import test, { expect } from '@playwright/test';
-import { sseBodyABC, sseBodyBanana } from '../tests/utils/files/sse-responses';
+import { sseBodyABC, sseBodyBanana } from '../utils/files/sse-responses';
 import {
   addAzureModelToConfiguration,
   createConfiguration,
@@ -10,7 +10,7 @@ import {
   selectConfiguration,
   sendMessage,
   uniqueName,
-} from '../tests/utils/helper';
+} from '../utils/helper';
 
 test('Chat viewport scrolling', async ({ page }) => {
   // we do not actually need an LLM, so we mock the response

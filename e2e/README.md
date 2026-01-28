@@ -15,8 +15,8 @@ Note that the "extension tests" will be skipped if no `AZURE_OPEN_AI_API_KEY` en
 Examples:
 ```bash
 node scripts/run-tests.js --file tests/administration/permissions.spec.ts
-node scripts/run-tests.js --file extension-tests/azure-user-args.spec.ts --debug
-node scripts/run-tests.js --file extension-tests/azure-mcp-server.spec.ts --noAutoKill
+node scripts/run-tests.js --file tests/extension/user-args.spec.ts --debug
+node scripts/run-tests.js --file tests/extension/mcp-server.spec.ts --noAutoKill
 node scripts/run-tests.js --file expensive-tests/azure-vision.spec.ts
 ```
 ## Known Issues with E2Es running locally

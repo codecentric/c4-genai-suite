@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { config } from '../tests/utils/config';
+import { config } from '../utils/config';
 import {
   addBucketToConfiguration,
   addMockModelToConfiguration,
@@ -17,8 +17,8 @@ import {
   sendMessage,
   uniqueName,
   uploadFileWhileInChat,
-} from '../tests/utils/helper';
-import { startMockLLMServer } from '../tests/utils/mock-llm-server';
+} from '../utils/helper';
+import { startMockLLMServer } from '../utils/mock-llm-server';
 
 test('chat with file search', async ({ page }) => {
   // Start mock LLM server

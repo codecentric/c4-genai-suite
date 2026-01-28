@@ -12,8 +12,8 @@ import {
   selectConfiguration,
   sendMessage,
   uniqueName,
-} from '../tests/utils/helper';
-import { startMockLLMServer } from '../tests/utils/mock-llm-server';
+} from '../utils/helper';
+import { startMockLLMServer } from '../utils/mock-llm-server';
 
 test('chat', async ({ page }) => {
   const mockServer = await startMockLLMServer(4103);

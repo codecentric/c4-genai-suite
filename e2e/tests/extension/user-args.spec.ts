@@ -14,8 +14,8 @@ import {
   sendMessage,
   setFilter,
   uniqueName,
-} from '../tests/utils/helper';
-import { startMockLLMServer } from '../tests/utils/mock-llm-server';
+} from '../utils/helper';
+import { startMockLLMServer } from '../utils/mock-llm-server';
 
 type TUserArgs = {
   dateUserArgument: string;
