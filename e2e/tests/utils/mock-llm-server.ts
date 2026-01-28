@@ -40,21 +40,25 @@ interface MockResponse {
 // The responses are matched top to bottom. So more specific patterns should come first.
 const DEFAULT_RESPONSES: MockResponse[] = [
   // this is for the conversation title generation
-  { match: /Summarize the following content/i, response: 'Generic Title' },
+  {
+    match: /.*/i,
+    matchSystem: /Summarize the following content/i,
+    response: 'Generic Title',
+  },
   // Debug helper - dumps the full context as pretty-printed JSON
   { match: /dump context|debug context|show context/i, dumpContext: true },
   { match: /banane/i, response: 'banana' },
   {
     match: /wann hat.*geburtstag|when.*birthday|welcher seite|which page/i,
     toolCall: {
-      namePattern: /whole|complete|file/i,
+      namePattern: /files/i,
       arguments: {},
     },
   },
   {
     match: /welche dateien|what files/i,
     toolCall: {
-      namePattern: /files|search/i,
+      namePattern: /files/i,
       arguments: { query: '*' },
       transformResult: (result: string) => {
         try {
@@ -74,7 +78,7 @@ const DEFAULT_RESPONSES: MockResponse[] = [
   {
     match: /wie viele seiten|how many pages/i,
     toolCall: {
-      namePattern: /files|search/i,
+      namePattern: /files/i,
       arguments: { query: '*' },
       transformResult: () => '42',
     },
@@ -82,7 +86,7 @@ const DEFAULT_RESPONSES: MockResponse[] = [
   {
     match: /describe.*content.*table/i,
     toolCall: {
-      namePattern: /files|search/i,
+      namePattern: /files/i,
       arguments: { query: '*' },
       transformResult: (content) => `| Content |
 |---------|
@@ -98,7 +102,7 @@ const DEFAULT_RESPONSES: MockResponse[] = [
   {
     match: /how many files/i,
     toolCall: {
-      namePattern: /files|search/i,
+      namePattern: /files/i,
       arguments: { query: '*' },
       transformResult: (result: string) => {
         try {
@@ -114,21 +118,21 @@ const DEFAULT_RESPONSES: MockResponse[] = [
   {
     match: /geburtstag|birthday/i,
     toolCall: {
-      namePattern: /files|search/i,
+      namePattern: /files/i,
       arguments: { query: 'birthday' },
     },
   },
   {
     match: /keyword|codeword/i,
     toolCall: {
-      namePattern: /files|search/i,
+      namePattern: /files/i,
       arguments: { query: 'keyword codeword' },
     },
   },
   {
     match: /pudding/i,
     toolCall: {
-      namePattern: /files|search/i,
+      namePattern: /files/i,
       arguments: { query: 'pudding' },
     },
   },
@@ -143,7 +147,7 @@ const DEFAULT_RESPONSES: MockResponse[] = [
   {
     match: /user arguments/i,
     toolCall: {
-      namePattern: /user.*arg|filter/i,
+      namePattern: /user-args/i,
       arguments: {},
     },
   },
@@ -188,7 +192,7 @@ const DEFAULT_RESPONSES: MockResponse[] = [
     matchSystem: /Alice/,
     response: 'My name is Alice.',
   },
-  { match: /answer to life|universe|everything/i, response: '42' },
+  { match: /answer to life, the universe and everything/i, response: '42' },
   { match: /hello|hi|hey/i, response: 'Hello! How can I help you?' },
 ];
 
