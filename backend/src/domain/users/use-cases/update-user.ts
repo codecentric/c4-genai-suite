@@ -7,7 +7,7 @@ import { AuditLogService, PerformedBy } from 'src/domain/audit-log';
 import { UserEntity, UserGroupEntity, UserRepository } from 'src/domain/database';
 import { assignDefined, isNull } from 'src/lib';
 import { User } from '../interfaces';
-import { buildUser } from './utils';
+import { buildUser, buildUserSnapshot } from './utils';
 
 type Values = Partial<Pick<User, 'apiKey' | 'name' | 'email' | 'userGroupIds'> & { password: string; currentPassword?: string }>;
 
@@ -76,7 +76,7 @@ export class UpdateUserHandler implements ICommandHandler<UpdateUser, UpdateUser
         action: 'update',
         userId: performedBy.id,
         userName: performedBy.name,
-        snapshot: result,
+        snapshot: buildUserSnapshot(result),
       });
     }
 

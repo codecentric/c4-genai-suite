@@ -7,7 +7,7 @@ import { AuditLogService, PerformedBy } from 'src/domain/audit-log';
 import { UserEntity, UserGroupEntity, UserRepository } from 'src/domain/database';
 import { assignDefined } from 'src/lib';
 import { User } from '../interfaces';
-import { buildUser } from './utils';
+import { buildUser, buildUserSnapshot } from './utils';
 
 type Values = Pick<User, 'apiKey' | 'email' | 'name' | 'userGroupIds'> & { password?: string };
 
@@ -62,7 +62,7 @@ export class CreateUserHandler implements ICommandHandler<CreateUser, CreateUser
       action: 'create',
       userId: performedBy.id,
       userName: performedBy.name,
-      snapshot: result,
+      snapshot: buildUserSnapshot(result),
     });
 
     return new CreateUserResponse(result);

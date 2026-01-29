@@ -3,7 +3,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AuditLogService, PerformedBy } from 'src/domain/audit-log';
 import { UserGroupEntity, UserGroupRepository } from 'src/domain/database';
-import { buildUserGroup } from './utils';
+import { buildUserGroup, buildUserGroupSnapshot } from './utils';
 
 export class DeleteUserGroup {
   constructor(
@@ -38,7 +38,7 @@ export class DeleteUserGroupHandler implements ICommandHandler<DeleteUserGroup, 
     }
 
     // Capture snapshot before deletion for audit log
-    const userGroupSnapshot = buildUserGroup(entity);
+    const userGroupSnapshot = buildUserGroupSnapshot(buildUserGroup(entity));
 
     const result = await this.userGroups.delete({ id });
 
