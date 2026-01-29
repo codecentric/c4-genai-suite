@@ -2,12 +2,16 @@ import { BadRequestException, Logger, NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { JsonContains } from 'typeorm';
+import { AuditLogService, PerformedBy } from 'src/domain/audit-log';
 import { BucketEntity, BucketRepository, ExtensionEntity, ExtensionRepository } from 'src/domain/database';
 import { ResponseError } from './generated';
-import { buildClient } from './utils';
+import { buildBucket, buildClient } from './utils';
 
 export class DeleteBucket {
-  constructor(public readonly id: number) {}
+  constructor(
+    public readonly id: number,
+    public readonly performedBy: PerformedBy,
+  ) {}
 }
 
 export class DeleteBucketResponse {}
@@ -21,16 +25,20 @@ export class DeleteBucketHandler implements ICommandHandler<DeleteBucket, Delete
     private readonly buckets: BucketRepository,
     @InjectRepository(ExtensionEntity)
     private readonly extensions: ExtensionRepository,
+    private readonly auditLogService: AuditLogService,
   ) {}
 
   async execute(command: DeleteBucket): Promise<DeleteBucketResponse> {
-    const { id } = command;
+    const { id, performedBy } = command;
 
     const bucket = await this.buckets.findOneBy({ id });
 
     if (!bucket) {
       throw new NotFoundException();
     }
+
+    // Capture snapshot before deletion for audit log
+    const bucketSnapshot = buildBucket(bucket);
 
     const extensionUsingBucket = await this.extensions.findOne({
       where: { values: JsonContains({ bucket: Number(id) }) },
@@ -58,6 +66,15 @@ export class DeleteBucketHandler implements ICommandHandler<DeleteBucket, Delete
     }
 
     await this.buckets.delete({ id });
+
+    await this.auditLogService.createAuditLog({
+      entityType: 'bucket',
+      entityId: String(id),
+      action: 'delete',
+      userId: performedBy.id,
+      userName: performedBy.name,
+      snapshot: bucketSnapshot,
+    });
 
     return new DeleteBucketResponse();
   }

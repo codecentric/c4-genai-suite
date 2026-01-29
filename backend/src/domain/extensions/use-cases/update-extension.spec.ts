@@ -1,14 +1,19 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { DeepPartial } from 'typeorm';
+import { AuditLogService } from 'src/domain/audit-log';
 import { Extension, ExtensionStringArgument } from 'src/domain/extensions';
-import { ExtensionEntity, ExtensionRepository } from '../../database';
+import { ConfigurationRepository, ExtensionEntity, ExtensionRepository } from '../../database';
 import { ExplorerService } from '../services';
 import { UpdateExtension, UpdateExtensionHandler } from './update-extension';
+
+const mockPerformedBy = { id: 'test-user', name: 'Test User' };
 
 describe(UpdateExtension.name, () => {
   let handler: UpdateExtensionHandler;
   let repository: ExtensionRepository;
+  let configRepository: ConfigurationRepository;
   let explorer: ExplorerService;
+  let auditLogService: AuditLogService;
 
   beforeEach(() => {
     explorer = {
@@ -19,8 +24,14 @@ describe(UpdateExtension.name, () => {
       create: jest.fn(),
       save: jest.fn(),
     } as unknown as ExtensionRepository;
+    configRepository = {
+      findOneBy: jest.fn().mockResolvedValue({ id: 1, name: 'Test Config' }),
+    } as unknown as ConfigurationRepository;
+    auditLogService = {
+      createAuditLog: jest.fn(),
+    } as unknown as AuditLogService;
 
-    handler = new UpdateExtensionHandler(explorer, repository);
+    handler = new UpdateExtensionHandler(explorer, repository, configRepository, auditLogService);
   });
 
   it('should throw not found when extension entity does not exist', async () => {
@@ -36,7 +47,7 @@ describe(UpdateExtension.name, () => {
         new UpdateExtension(1, {
           enabled: true,
           values: {},
-        }),
+        }, mockPerformedBy),
       );
       expect(result).toBe(false);
     } catch (err) {
@@ -55,7 +66,7 @@ describe(UpdateExtension.name, () => {
         new UpdateExtension(1, {
           enabled: true,
           values: {},
-        }),
+        }, mockPerformedBy),
       );
       expect(result).toBe(false);
     } catch (err) {
@@ -77,7 +88,7 @@ describe(UpdateExtension.name, () => {
       new UpdateExtension(1, {
         enabled: true,
         values: {},
-      }),
+      }, mockPerformedBy),
     );
     expect(result).toBeDefined();
     expect(result.extension.enabled).toBe(true);
@@ -130,7 +141,7 @@ describe(UpdateExtension.name, () => {
         values: {
           bar: 'secure',
         },
-      }),
+      }, mockPerformedBy),
     );
 
     expect(saveArg).toEqual({

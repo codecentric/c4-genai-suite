@@ -1,6 +1,7 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
+import { AuditLogService, PerformedBy } from 'src/domain/audit-log';
 import { UserGroupEntity, UserGroupRepository } from 'src/domain/database';
 import { assignWithUndefined } from 'src/lib';
 import { UserGroup } from '../interfaces';
@@ -12,6 +13,7 @@ export class UpdateUserGroup {
   constructor(
     public readonly id: string,
     public readonly values: Values,
+    public readonly performedBy: PerformedBy,
   ) {}
 }
 
@@ -24,10 +26,11 @@ export class UpdateUserGroupHandler implements ICommandHandler<UpdateUserGroup, 
   constructor(
     @InjectRepository(UserGroupEntity)
     private readonly userGroups: UserGroupRepository,
+    private readonly auditLogService: AuditLogService,
   ) {}
 
   async execute(request: UpdateUserGroup): Promise<UpdateUserGroupResponse> {
-    const { id, values } = request;
+    const { id, values, performedBy } = request;
     const { monthlyTokens, monthlyUserTokens, name } = values;
 
     const entity = await this.userGroups.findOneBy({ id });
@@ -45,6 +48,15 @@ export class UpdateUserGroupHandler implements ICommandHandler<UpdateUserGroup, 
     // Use the save method otherwise we would not get previous values.
     const updated = await this.userGroups.save(entity);
     const result = buildUserGroup(updated);
+
+    await this.auditLogService.createAuditLog({
+      entityType: 'userGroup',
+      entityId: updated.id,
+      action: 'update',
+      userId: performedBy.id,
+      userName: performedBy.name,
+      snapshot: result,
+    });
 
     return new UpdateUserGroupResponse(result);
   }

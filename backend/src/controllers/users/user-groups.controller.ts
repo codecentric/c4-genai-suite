@@ -2,15 +2,12 @@ import { Body, Controller, Delete, Get, Param, Post, Put, Req, UseGuards } from 
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { ApiNoContentResponse, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
-import { AuditLogService } from 'src/domain/audit-log';
 import { LocalAuthGuard, Role, RoleGuard } from 'src/domain/auth';
 import { BUILTIN_USER_GROUP_ADMIN } from 'src/domain/database';
 import {
   CreateUserGroup,
   CreateUserGroupResponse,
   DeleteUserGroup,
-  GetUserGroup,
-  GetUserGroupResponse,
   GetUserGroups,
   GetUserGroupsResponse,
   UpdateUserGroup,
@@ -25,7 +22,6 @@ export class UserGroupsController {
   constructor(
     private readonly commandBus: CommandBus,
     private readonly queryBus: QueryBus,
-    private readonly auditLogService: AuditLogService,
   ) {}
 
   @Get('')
@@ -45,22 +41,11 @@ export class UserGroupsController {
   @Role(BUILTIN_USER_GROUP_ADMIN)
   @UseGuards(RoleGuard)
   async postUserGroup(@Body() body: UpsertUserGroupDto, @Req() req: Request) {
-    const command = new CreateUserGroup(body);
+    const command = new CreateUserGroup(body, req.user);
 
     const result: CreateUserGroupResponse = await this.commandBus.execute(command);
 
-    const userGroupDto = UserGroupDto.fromDomain(result.userGroup);
-
-    await this.auditLogService.createAuditLog({
-      entityType: 'userGroup',
-      entityId: result.userGroup.id,
-      action: 'create',
-      userId: req.user.id,
-      userName: req.user.name,
-      snapshot: JSON.parse(JSON.stringify(userGroupDto)),
-    });
-
-    return userGroupDto;
+    return UserGroupDto.fromDomain(result.userGroup);
   }
 
   @Put(':id')
@@ -74,22 +59,11 @@ export class UserGroupsController {
   @Role(BUILTIN_USER_GROUP_ADMIN)
   @UseGuards(RoleGuard)
   async putUserGroup(@Param('id') id: string, @Body() body: UpsertUserGroupDto, @Req() req: Request) {
-    const command = new UpdateUserGroup(id, body);
+    const command = new UpdateUserGroup(id, body, req.user);
 
     const result: UpdateUserGroupResponse = await this.commandBus.execute(command);
 
-    const userGroupDto = UserGroupDto.fromDomain(result.userGroup);
-
-    await this.auditLogService.createAuditLog({
-      entityType: 'userGroup',
-      entityId: result.userGroup.id,
-      action: 'update',
-      userId: req.user.id,
-      userName: req.user.name,
-      snapshot: JSON.parse(JSON.stringify(userGroupDto)),
-    });
-
-    return userGroupDto;
+    return UserGroupDto.fromDomain(result.userGroup);
   }
 
   @Delete(':id')
@@ -103,22 +77,7 @@ export class UserGroupsController {
   @Role(BUILTIN_USER_GROUP_ADMIN)
   @UseGuards(RoleGuard)
   async deleteUserGroup(@Param('id') id: string, @Req() req: Request) {
-    // Get user group before deletion for audit log
-    const userGroupResult: GetUserGroupResponse = await this.queryBus.execute(new GetUserGroup(id));
-    const userGroupDto = userGroupResult.userGroup ? UserGroupDto.fromDomain(userGroupResult.userGroup) : null;
-
-    const command = new DeleteUserGroup(id);
+    const command = new DeleteUserGroup(id, req.user);
     await this.commandBus.execute(command);
-
-    if (userGroupDto) {
-      await this.auditLogService.createAuditLog({
-        entityType: 'userGroup',
-        entityId: id,
-        action: 'delete',
-        userId: req.user.id,
-        userName: req.user.name,
-        snapshot: JSON.parse(JSON.stringify(userGroupDto)),
-      });
-    }
   }
 }
