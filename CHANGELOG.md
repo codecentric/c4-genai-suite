@@ -1,5 +1,13 @@
 # Changelog
 
+## [9.11.1](https://github.com/codecentric/c4-genai-suite/compare/v9.11.0...v9.11.1) (2026-01-29)
+
+
+### Bug Fixes
+
+* confluence importer uses less ram and reports a class of errors instead of terminating ([#1151](https://github.com/codecentric/c4-genai-suite/issues/1151)) ([0152bd3](https://github.com/codecentric/c4-genai-suite/commit/0152bd31dff423f013a47749b8c23166953ffed4))
+* **frontend:** when editing extensions the bucket dropdown shows the currently selected bucket ([#1158](https://github.com/codecentric/c4-genai-suite/issues/1158)) ([55aaead](https://github.com/codecentric/c4-genai-suite/commit/55aaead25f5eca743d6be00897f1c545ac954261))
+
 ## [9.11.0](https://github.com/codecentric/c4-genai-suite/compare/v9.10.0...v9.11.0) (2026-01-21)
 
 
