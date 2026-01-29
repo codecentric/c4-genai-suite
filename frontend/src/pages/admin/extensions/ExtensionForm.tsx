@@ -295,6 +295,7 @@ export function Argument({
 
   if (type === 'number' && argument.format === 'bucket') {
     const options = buckets.map((x) => ({ value: String(x.id), label: x.name }));
+    const { value } = form.getInputProps(fieldName) as { value: number | null | undefined };
 
     return (
       <FormRow name={fieldName} label={title} hints={hints()}>
@@ -303,11 +304,7 @@ export function Argument({
           data={options}
           required={required}
           key={form.key(fieldName)}
-          value={
-            (form.getValues() as Record<string, unknown>)[fieldName] != null
-              ? String((form.getValues() as Record<string, unknown>)[fieldName])
-              : undefined
-          }
+          value={value != null ? String(value) : undefined}
           onChange={(v) => form.setFieldValue(fieldName, v != null ? +v : v)}
         />
       </FormRow>

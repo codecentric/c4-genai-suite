@@ -54,6 +54,18 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
       });
     });
 
+    await test.step('should show current bucket value when editing extension', async () => {
+      await page.getByRole('link', { name: 'Assistants' }).click();
+      await page.getByRole('link', { name: configuration.name }).click();
+      await page.getByTestId('sidebar-admin').getByRole('tab', { name: 'Tools' }).click();
+      await page.getByRole('heading', { name: 'Search Files in Chat', exact: true }).click();
+
+      const bucketInput = page.getByRole('textbox', { name: 'Bucket' });
+      await expect(bucketInput).toHaveValue(conversationFilesBucket);
+
+      await page.getByRole('button', { name: 'Cancel' }).click();
+    });
+
     await test.step('should start chat in new configuration', async () => {
       await enterUserArea(page);
       await newChat(page);
