@@ -39,11 +39,15 @@ describe(CreateExtension.name, () => {
 
     try {
       const result = await handler.execute(
-        new CreateExtension(1, {
-          enabled: true,
-          name: 'test',
-          values: {},
-        }, mockPerformedBy),
+        new CreateExtension(
+          1,
+          {
+            enabled: true,
+            name: 'test',
+            values: {},
+          },
+          mockPerformedBy,
+        ),
       );
       expect(result).toBe(false);
     } catch (err) {
@@ -59,11 +63,15 @@ describe(CreateExtension.name, () => {
     });
 
     const result = await handler.execute(
-      new CreateExtension(1, {
-        enabled: true,
-        name: 'test',
-        values: {},
-      }, mockPerformedBy),
+      new CreateExtension(
+        1,
+        {
+          enabled: true,
+          name: 'test',
+          values: {},
+        },
+        mockPerformedBy,
+      ),
     );
     expect(result).toBeDefined();
     expect(result.extension.enabled).toBe(true);
@@ -106,14 +114,18 @@ describe(CreateExtension.name, () => {
     });
 
     const result = await handler.execute(
-      new CreateExtension(1, {
-        enabled: true,
-        name: 'test',
-        values: {
-          foo: 'test',
-          bar: 'secure',
+      new CreateExtension(
+        1,
+        {
+          enabled: true,
+          name: 'test',
+          values: {
+            foo: 'test',
+            bar: 'secure',
+          },
         },
-      }, mockPerformedBy),
+        mockPerformedBy,
+      ),
     );
 
     expect(saveArg).toEqual({

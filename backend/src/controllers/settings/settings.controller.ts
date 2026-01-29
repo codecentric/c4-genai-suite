@@ -86,9 +86,7 @@ export class SettingsController {
   @Role(BUILTIN_USER_GROUP_ADMIN)
   @UseGuards(LocalAuthGuard, RoleGuard)
   async postSettings(@Body() request: SettingsDto, @Req() req: Request) {
-    const result: UpdateSettingsResponse = await this.commandBus.execute(
-      new UpdateSettings(request, req.user),
-    );
+    const result: UpdateSettingsResponse = await this.commandBus.execute(new UpdateSettings(request, req.user));
 
     return SettingsDto.fromDomain(result.settings);
   }
@@ -129,9 +127,7 @@ export class SettingsController {
     await this.commandBus.execute(
       new UploadBlob(`__${imageType}`, file.buffer, file.mimetype, file.filename, file.size, BlobCategory.LOGO),
     );
-    await this.commandBus.execute(
-      new UpdateSettings({ [imageType]: `__${imageType}` }, req.user),
-    );
+    await this.commandBus.execute(new UpdateSettings({ [imageType]: `__${imageType}` }, req.user));
   }
 
   @Delete(':imageType')
@@ -141,8 +137,6 @@ export class SettingsController {
   @UseGuards(LocalAuthGuard, RoleGuard)
   async deleteLogo(@Param('imageType', new ParseEnumPipe(ImageTypeEnum)) imageType: ImageTypeEnum, @Req() req: Request) {
     await this.commandBus.execute(new DeleteBlob(`__${imageType}`));
-    await this.commandBus.execute(
-      new UpdateSettings({ [imageType]: null }, req.user),
-    );
+    await this.commandBus.execute(new UpdateSettings({ [imageType]: null }, req.user));
   }
 }
