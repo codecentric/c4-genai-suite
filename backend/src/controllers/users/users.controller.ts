@@ -15,6 +15,7 @@ import {
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { ApiNoContentResponse, ApiOkResponse, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
+import { AuditLogService } from 'src/domain/audit-log';
 import { LocalAuthGuard, Role, RoleGuard } from 'src/domain/auth';
 import { BUILTIN_USER_GROUP_ADMIN } from 'src/domain/database';
 import {
@@ -37,6 +38,7 @@ export class UsersController {
   constructor(
     private readonly commandBus: CommandBus,
     private readonly queryBus: QueryBus,
+    private readonly auditLogService: AuditLogService,
   ) {}
 
   @Get('')
@@ -96,12 +98,23 @@ export class UsersController {
   @ApiOkResponse({ type: UserDto })
   @Role(BUILTIN_USER_GROUP_ADMIN)
   @UseGuards(RoleGuard)
-  async postUser(@Body() body: UpsertUserDto) {
+  async postUser(@Body() body: UpsertUserDto, @Req() req: Request) {
     const command = new CreateUser(body);
 
     const result: CreateUserResponse = await this.commandBus.execute(command);
 
-    return UserDto.fromDomain(result.user);
+    const userDto = UserDto.fromDomain(result.user);
+
+    await this.auditLogService.createAuditLog({
+      entityType: 'user',
+      entityId: result.user.id,
+      action: 'create',
+      userId: req.user.id,
+      userName: req.user.name,
+      snapshot: JSON.parse(JSON.stringify(userDto)),
+    });
+
+    return userDto;
   }
 
   @Put(':id')
@@ -114,12 +127,23 @@ export class UsersController {
   @ApiOkResponse({ type: UserDto })
   @Role(BUILTIN_USER_GROUP_ADMIN)
   @UseGuards(RoleGuard)
-  async putUser(@Param('id') id: string, @Body() body: UpsertUserDto) {
+  async putUser(@Param('id') id: string, @Body() body: UpsertUserDto, @Req() req: Request) {
     const command = new UpdateUser(id, body);
 
     const result: UpdateUserResponse = await this.commandBus.execute(command);
 
-    return UserDto.fromDomain(result.user);
+    const userDto = UserDto.fromDomain(result.user);
+
+    await this.auditLogService.createAuditLog({
+      entityType: 'user',
+      entityId: result.user.id,
+      action: 'update',
+      userId: req.user.id,
+      userName: req.user.name,
+      snapshot: JSON.parse(JSON.stringify(userDto)),
+    });
+
+    return userDto;
   }
 
   @Put('me/password')
@@ -141,9 +165,23 @@ export class UsersController {
   @ApiNoContentResponse()
   @Role(BUILTIN_USER_GROUP_ADMIN)
   @UseGuards(RoleGuard)
-  async deleteUser(@Param('id') id: string) {
-    const command = new DeleteUser(id);
+  async deleteUser(@Param('id') id: string, @Req() req: Request) {
+    // Get user before deletion for audit log
+    const userResult: GetUserResponse = await this.queryBus.execute(new GetUser(id));
+    const userDto = userResult.user ? UserDto.fromDomain(userResult.user) : null;
 
+    const command = new DeleteUser(id);
     await this.commandBus.execute(command);
+
+    if (userDto) {
+      await this.auditLogService.createAuditLog({
+        entityType: 'user',
+        entityId: id,
+        action: 'delete',
+        userId: req.user.id,
+        userName: req.user.name,
+        snapshot: JSON.parse(JSON.stringify(userDto)),
+      });
+    }
   }
 }

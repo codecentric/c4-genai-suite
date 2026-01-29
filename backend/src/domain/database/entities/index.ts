@@ -1,3 +1,4 @@
+export * from './audit-log';
 export * from './blob';
 export * from './cache';
 export * from './conversation';

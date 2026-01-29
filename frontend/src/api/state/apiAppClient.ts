@@ -1,6 +1,7 @@
 import { fetchEventSource } from '@microsoft/fetch-event-source';
 import { Observable, ReplaySubject } from 'rxjs';
 import {
+  AuditLogsApi,
   AuthApi,
   Configuration,
   ConversationApi,
@@ -23,6 +24,7 @@ export function useApi() {
 }
 
 export class AppClient {
+  public readonly auditLogs: AuditLogsApi;
   public readonly auth: AuthApi;
   public readonly conversations: ConversationApi;
   public readonly extensions: ExtensionsApi;
@@ -41,6 +43,8 @@ export class AppClient {
     middleware: Middleware,
   ) {
     this.stream = new StreamApi(configuration);
+
+    this.auditLogs = new AuditLogsApi(configuration).withMiddleware(middleware);
 
     this.auth = new AuthApi(configuration).withMiddleware(middleware);
 

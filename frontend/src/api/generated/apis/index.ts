@@ -1,6 +1,7 @@
 //@ts-nocheck
 /* tslint:disable */
 /* eslint-disable */
+export * from './AuditLogsApi';
 export * from './AuthApi';
 export * from './ConversationApi';
 export * from './ExtensionsApi';
