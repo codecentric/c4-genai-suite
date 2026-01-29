@@ -38,6 +38,7 @@ export class AzureTranscriptionProvider {
       // Call Azure OpenAI Whisper API
       const result = await this.client.audio.transcriptions.create({
         file: audioFile,
+        // Azure OpenAI requires this field because it is a wrapper of OpenAI, but AzureOpenAI needs deployment and instance names.
         model: '',
       });
 

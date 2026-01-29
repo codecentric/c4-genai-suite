@@ -17,10 +17,7 @@ export function isBrowserSupported(): boolean {
 }
 
 export function useTranscribe({ extensionId, onTranscriptReceived, maxDurationMs = 10 * 60 * 1000 }: UseTranscribeProps) {
-  const [state, setState] = useState<TranscribeState>('idle');
-  const [recordingDuration, setRecordingDuration] = useState(0);
-  const [error, setError] = useState<string | null>(null);
-  const [isSupported] = useState(() => isBrowserSupported());
+  const [recordingState, setRecordingState] = useState<TranscribeState>('idle');
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
@@ -42,12 +39,11 @@ export function useTranscribe({ extensionId, onTranscriptReceived, maxDurationMs
       timerRef.current = null;
     }
     audioChunksRef.current = [];
-    setRecordingDuration(0);
   }, []);
 
   // Stop recording and transcribe
   const stopRecording = useCallback(async () => {
-    if (!mediaRecorderRef.current || state !== 'recording') {
+    if (!mediaRecorderRef.current || recordingState !== 'recording') {
       return;
     }
 
@@ -58,7 +54,7 @@ export function useTranscribe({ extensionId, onTranscriptReceived, maxDurationMs
         if (audioChunksRef.current.length === 0) {
           cleanup();
           toast.error(texts.chat.transcribe.noAudioRecorded);
-          setState('idle');
+          setRecordingState('idle');
           resolve();
           return;
         }
@@ -69,14 +65,14 @@ export function useTranscribe({ extensionId, onTranscriptReceived, maxDurationMs
         // Stop timer and stream
         cleanup();
 
-        setState('transcribing');
+        setRecordingState('transcribing');
 
         try {
           const audioBlob = new Blob(audioChunks, { type: mimeTypeRef.current });
 
           if (audioBlob.size === 0) {
             toast.error(texts.chat.transcribe.noAudioRecorded);
-            setState('error');
+            setRecordingState('error');
             resolve();
             return;
           }
@@ -86,22 +82,19 @@ export function useTranscribe({ extensionId, onTranscriptReceived, maxDurationMs
 
           if (!result.text || result.text.trim() === '') {
             toast.error(texts.chat.transcribe.transcriptionFailed);
-            setError(texts.chat.transcribe.transcriptionFailed);
-            setState('error');
+            setRecordingState('error');
             resolve();
             return;
           }
 
           onTranscriptReceived(result.text);
-          setState('idle');
+          setRecordingState('idle');
         } catch (err) {
           const errorMessage = await buildError(texts.chat.transcribe.transcriptionFailed, err as Error);
           toast.error(errorMessage);
-          setError(errorMessage);
-          setState('error');
+          setRecordingState('error');
         } finally {
           audioChunksRef.current = [];
-          setRecordingDuration(0);
         }
 
         resolve();
@@ -113,15 +106,15 @@ export function useTranscribe({ extensionId, onTranscriptReceived, maxDurationMs
         recorder.stop();
       }
     });
-  }, [state, transcription, extensionId, onTranscriptReceived, cleanup]);
+  }, [recordingState, transcription, extensionId, onTranscriptReceived, cleanup]);
 
   // Start recording
   const startRecording = useCallback(async () => {
-    if (state !== 'idle') {
+    if (recordingState !== 'idle' && recordingState !== 'error') {
       return;
     }
 
-    setError(null);
+    setRecordingState('idle');
 
     try {
       // Request microphone permission
@@ -145,7 +138,6 @@ export function useTranscribe({ extensionId, onTranscriptReceived, maxDurationMs
       audioChunksRef.current = [];
 
       // Collect audio data chunks as they become available
-      // Using 100ms timeslice to ensure we capture audio reliably
       mediaRecorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
           audioChunksRef.current.push(event.data);
@@ -156,18 +148,17 @@ export function useTranscribe({ extensionId, onTranscriptReceived, maxDurationMs
       mediaRecorder.onerror = (_event) => {
         toast.error(texts.chat.transcribe.recordingStartFailed);
         cleanup();
-        setState('error');
+        setRecordingState('error');
       };
 
       // Start recording with 100ms timeslice for reliable audio capture
       mediaRecorder.start(100);
-      setState('recording');
+      setRecordingState('recording');
       startTimeRef.current = Date.now();
 
       // Start duration timer
       timerRef.current = setInterval(() => {
         const elapsed = Date.now() - startTimeRef.current;
-        setRecordingDuration(elapsed);
 
         // Auto-stop if max duration reached
         if (elapsed >= maxDurationMs) {
@@ -181,19 +172,19 @@ export function useTranscribe({ extensionId, onTranscriptReceived, maxDurationMs
       } else {
         toast.error(texts.chat.transcribe.recordingStartFailed);
       }
-      setState('error');
+      setRecordingState('error');
       cleanup();
     }
-  }, [state, maxDurationMs, stopRecording, cleanup]);
+  }, [recordingState, maxDurationMs, stopRecording, cleanup]);
 
   // Toggle recording
   const toggleRecording = useCallback(async () => {
-    if (state === 'idle') {
+    if (recordingState === 'idle' || recordingState === 'error') {
       await startRecording();
-    } else if (state === 'recording') {
+    } else if (recordingState === 'recording') {
       await stopRecording();
     }
-  }, [state, startRecording, stopRecording]);
+  }, [recordingState, startRecording, stopRecording]);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -206,14 +197,8 @@ export function useTranscribe({ extensionId, onTranscriptReceived, maxDurationMs
   }, [cleanup]);
 
   return {
-    state,
-    isRecording: state === 'recording',
-    isTranscribing: state === 'transcribing',
-    recordingDuration,
-    error,
-    isSupported,
+    isRecording: recordingState === 'recording',
+    isTranscribing: recordingState === 'transcribing',
     toggleRecording,
-    startRecording,
-    stopRecording,
   };
 }
