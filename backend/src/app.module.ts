@@ -6,6 +6,7 @@ import { MulterModule } from '@nestjs/platform-express';
 import { TerminusModule } from '@nestjs/terminus';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
+import { AuditLogController } from './controllers/audit-log/audit-log.controller';
 import { AuthController } from './controllers/auth/auth.controller';
 import { BlobsController } from './controllers/blobs/blobs.controller';
 import { ConversationsController } from './controllers/conversations/conversations.controller';
@@ -20,6 +21,7 @@ import { TranscriptionController } from './controllers/transcription/transcripti
 import { UsagesController } from './controllers/usages/usages.controller';
 import { UserGroupsController } from './controllers/users/user-groups.controller';
 import { UsersController } from './controllers/users/users.controller';
+import { AuditLogModule } from './domain/audit-log';
 import { AuthModule } from './domain/auth/module';
 import { ChatModule } from './domain/chat';
 import { UserEntity } from './domain/database';
@@ -36,6 +38,7 @@ import { PrometheusModule } from './metrics/prometheus.module';
 
 @Module({
   imports: [
+    AuditLogModule,
     AuthModule,
     ChatModule,
     ConfigModule.forRoot(),
@@ -81,6 +84,7 @@ import { PrometheusModule } from './metrics/prometheus.module';
     }),
   ],
   controllers: [
+    AuditLogController,
     AuthController,
     BlobsController,
     HealthController,
