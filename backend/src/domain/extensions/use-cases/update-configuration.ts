@@ -2,6 +2,7 @@ import { NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Not } from 'typeorm';
+import { AuditLogService, PerformedBy } from 'src/domain/audit-log';
 import {
   ConfigurationEntity,
   ConfigurationRepository,
@@ -11,7 +12,7 @@ import {
 } from 'src/domain/database';
 import { assignDefined } from 'src/lib';
 import { ConfigurationModel } from '../interfaces';
-import { buildConfiguration } from './utils';
+import { buildConfiguration, buildConfigurationSnapshot } from './utils';
 
 type Values = Partial<
   Pick<
@@ -32,6 +33,7 @@ export class UpdateConfiguration {
   constructor(
     public readonly id: number,
     public readonly values: Values,
+    public readonly performedBy: PerformedBy,
   ) {}
 }
 
@@ -46,10 +48,11 @@ export class UpdateConfigurationHandler implements ICommandHandler<UpdateConfigu
     private readonly configurations: ConfigurationRepository,
     @InjectRepository(UserGroupEntity)
     private readonly userGroups: UserGroupRepository,
+    private readonly auditLogService: AuditLogService,
   ) {}
 
-  async execute(command: UpdateConfiguration): Promise<any> {
-    const { id, values } = command;
+  async execute(command: UpdateConfiguration): Promise<UpdateConfigurationResponse> {
+    const { id, values, performedBy } = command;
     const {
       agentName,
       chatFooter,
@@ -92,6 +95,15 @@ export class UpdateConfigurationHandler implements ICommandHandler<UpdateConfigu
     // Use the save method otherwise we would not get previous values.
     const updated = await this.configurations.save(entity);
     const result = await buildConfiguration(updated);
+
+    await this.auditLogService.createAuditLog({
+      entityType: 'configuration',
+      entityId: String(updated.id),
+      action: 'update',
+      userId: performedBy.id,
+      userName: performedBy.name,
+      snapshot: buildConfigurationSnapshot(result),
+    });
 
     return new UpdateConfigurationResponse(result);
   }

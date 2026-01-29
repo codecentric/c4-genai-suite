@@ -1,8 +1,11 @@
 import { HttpException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { AuditLogService } from 'src/domain/audit-log';
 import { BucketEntity, BucketRepository } from '../../database';
 import { CreateBucket, CreateBucketHandler, CreateBucketResponse } from './create-bucket';
+
+const mockPerformedBy = { id: 'test-user', name: 'Test User' };
 
 describe('Create Bucket', () => {
   let bucketRepository: BucketRepository;
@@ -20,6 +23,12 @@ describe('Create Bucket', () => {
             findOneBy: jest.fn(),
             create: jest.fn(),
             save: jest.fn(),
+          },
+        },
+        {
+          provide: AuditLogService,
+          useValue: {
+            createAuditLog: jest.fn(),
           },
         },
       ],
@@ -46,7 +55,7 @@ describe('Create Bucket', () => {
       perUserQuota: 20,
       isDefault: false,
       fileSizeLimits: { general: 1, pdf: 10 },
-    });
+    }, mockPerformedBy);
 
     const response = await handler.execute(command);
 
@@ -63,7 +72,7 @@ describe('Create Bucket', () => {
       perUserQuota: 20,
       isDefault: false,
       fileSizeLimits: { general: 1, pdf: 10 },
-    });
+    }, mockPerformedBy);
 
     await expect(handler.execute(command)).rejects.toThrow(HttpException);
   });
@@ -84,7 +93,7 @@ describe('Create Bucket', () => {
       perUserQuota: 20,
       isDefault: false,
       fileSizeLimits: { general: 1, pdf: 10 },
-    });
+    }, mockPerformedBy);
 
     const response = await handler.execute(command);
 
@@ -109,7 +118,7 @@ describe('Create Bucket', () => {
       perUserQuota: 0,
       isDefault: false,
       fileSizeLimits: { general: 1, pdf: 10 },
-    });
+    }, mockPerformedBy);
 
     const response = await handler.execute(command);
 
@@ -125,7 +134,7 @@ describe('Create Bucket', () => {
       perUserQuota: 0,
       isDefault: false,
       fileSizeLimits: { general: 1, pdf: 10 },
-    });
+    }, mockPerformedBy);
 
     await expect(handler.execute(command)).rejects.toThrow(HttpException);
   });

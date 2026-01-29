@@ -20,7 +20,6 @@ import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiConsumes, ApiNoContentResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
-import { AuditLogService } from 'src/domain/audit-log';
 import { LocalAuthGuard, Role, RoleGuard } from 'src/domain/auth';
 import { BlobCategory, BUILTIN_USER_GROUP_ADMIN } from 'src/domain/database';
 import {
@@ -47,7 +46,6 @@ export class SettingsController {
   constructor(
     private readonly commandBus: CommandBus,
     private readonly queryBus: QueryBus,
-    private readonly auditLogService: AuditLogService,
   ) {}
 
   @Get(':imageType')
@@ -88,20 +86,11 @@ export class SettingsController {
   @Role(BUILTIN_USER_GROUP_ADMIN)
   @UseGuards(LocalAuthGuard, RoleGuard)
   async postSettings(@Body() request: SettingsDto, @Req() req: Request) {
-    const result: UpdateSettingsResponse = await this.commandBus.execute(new UpdateSettings(request));
+    const result: UpdateSettingsResponse = await this.commandBus.execute(
+      new UpdateSettings(request, req.user),
+    );
 
-    const settingsDto = SettingsDto.fromDomain(result.settings);
-
-    await this.auditLogService.createAuditLog({
-      entityType: 'settings',
-      entityId: 'global',
-      action: 'update',
-      userId: req.user.id,
-      userName: req.user.name,
-      snapshot: JSON.parse(JSON.stringify(settingsDto)),
-    });
-
-    return settingsDto;
+    return SettingsDto.fromDomain(result.settings);
   }
 
   @Post(':imageType')
@@ -135,11 +124,14 @@ export class SettingsController {
     )
     file: Express.Multer.File,
     @Param('imageType', new ParseEnumPipe(ImageTypeEnum)) imageType: ImageTypeEnum,
+    @Req() req: Request,
   ) {
     await this.commandBus.execute(
       new UploadBlob(`__${imageType}`, file.buffer, file.mimetype, file.filename, file.size, BlobCategory.LOGO),
     );
-    await this.commandBus.execute(new UpdateSettings({ [imageType]: `__${imageType}` }));
+    await this.commandBus.execute(
+      new UpdateSettings({ [imageType]: `__${imageType}` }, req.user),
+    );
   }
 
   @Delete(':imageType')
@@ -147,8 +139,10 @@ export class SettingsController {
   @ApiNoContentResponse()
   @Role(BUILTIN_USER_GROUP_ADMIN)
   @UseGuards(LocalAuthGuard, RoleGuard)
-  async deleteLogo(@Param('imageType', new ParseEnumPipe(ImageTypeEnum)) imageType: ImageTypeEnum) {
+  async deleteLogo(@Param('imageType', new ParseEnumPipe(ImageTypeEnum)) imageType: ImageTypeEnum, @Req() req: Request) {
     await this.commandBus.execute(new DeleteBlob(`__${imageType}`));
-    await this.commandBus.execute(new UpdateSettings({ [imageType]: null }));
+    await this.commandBus.execute(
+      new UpdateSettings({ [imageType]: null }, req.user),
+    );
   }
 }

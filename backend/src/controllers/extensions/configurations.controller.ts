@@ -2,7 +2,6 @@ import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query, R
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { ApiNoContentResponse, ApiOkResponse, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
-import { AuditLogService } from 'src/domain/audit-log';
 import { LocalAuthGuard, Role, RoleGuard } from 'src/domain/auth';
 import { BUILTIN_USER_GROUP_ADMIN } from 'src/domain/database';
 import {
@@ -20,8 +19,6 @@ import {
   GetConfigurationResponse,
   GetConfigurations,
   GetConfigurationsResponse,
-  GetExtension,
-  GetExtensionResponse,
   GetExtensions,
   GetExtensionsResponse,
   UpdateConfiguration,
@@ -56,7 +53,6 @@ export class ConfigurationsController {
     private readonly queryBus: QueryBus,
     private readonly commandBus: CommandBus,
     private readonly explorer: ExplorerService,
-    private readonly auditLogService: AuditLogService,
   ) {}
 
   @Get('')
@@ -100,22 +96,11 @@ export class ConfigurationsController {
   @Role(BUILTIN_USER_GROUP_ADMIN)
   @UseGuards(RoleGuard)
   async postConfiguration(@Body() body: UpsertConfigurationDto, @Req() req: Request) {
-    const command = new CreateConfiguration(body);
+    const command = new CreateConfiguration(body, req.user);
 
     const result: CreateConfigurationResponse = await this.commandBus.execute(command);
 
-    const configurationDto = ConfigurationDto.fromDomain(result.configuration);
-
-    await this.auditLogService.createAuditLog({
-      entityType: 'configuration',
-      entityId: String(result.configuration.id),
-      action: 'create',
-      userId: req.user.id,
-      userName: req.user.name,
-      snapshot: JSON.parse(JSON.stringify(configurationDto)),
-    });
-
-    return configurationDto;
+    return ConfigurationDto.fromDomain(result.configuration);
   }
 
   @Put(':id')
@@ -130,22 +115,11 @@ export class ConfigurationsController {
   @Role(BUILTIN_USER_GROUP_ADMIN)
   @UseGuards(RoleGuard)
   async putConfiguration(@Param('id') id: number, @Body() body: UpsertConfigurationDto, @Req() req: Request) {
-    const command = new UpdateConfiguration(id, body);
+    const command = new UpdateConfiguration(id, body, req.user);
 
     const result: UpdateConfigurationResponse = await this.commandBus.execute(command);
 
-    const configurationDto = ConfigurationDto.fromDomain(result.configuration);
-
-    await this.auditLogService.createAuditLog({
-      entityType: 'configuration',
-      entityId: String(result.configuration.id),
-      action: 'update',
-      userId: req.user.id,
-      userName: req.user.name,
-      snapshot: JSON.parse(JSON.stringify(configurationDto)),
-    });
-
-    return configurationDto;
+    return ConfigurationDto.fromDomain(result.configuration);
   }
 
   @Delete(':id')
@@ -160,23 +134,8 @@ export class ConfigurationsController {
   @Role(BUILTIN_USER_GROUP_ADMIN)
   @UseGuards(RoleGuard)
   async deleteConfiguration(@Param('id') id: number, @Req() req: Request) {
-    // Get configuration before deletion for audit log
-    const configResult: GetConfigurationResponse = await this.queryBus.execute(new GetConfiguration(id));
-    const configurationDto = configResult.configuration ? ConfigurationDto.fromDomain(configResult.configuration) : null;
-
-    const command = new DeleteConfiguration(id);
+    const command = new DeleteConfiguration(id, req.user);
     await this.commandBus.execute(command);
-
-    if (configurationDto) {
-      await this.auditLogService.createAuditLog({
-        entityType: 'configuration',
-        entityId: String(id),
-        action: 'delete',
-        userId: req.user.id,
-        userName: req.user.name,
-        snapshot: JSON.parse(JSON.stringify(configurationDto)),
-      });
-    }
   }
 
   @Get(':id/user-values')
@@ -235,28 +194,10 @@ export class ConfigurationsController {
   @Role(BUILTIN_USER_GROUP_ADMIN)
   @UseGuards(RoleGuard)
   async postExtension(@Param('id') id: number, @Body() body: CreateExtensionDto, @Req() req: Request) {
-    const command = new CreateExtension(id, body);
+    const command = new CreateExtension(id, body, req.user);
     const result: CreateExtensionResponse = await this.commandBus.execute(command);
 
-    const extensionDto = ExtensionDto.fromDomain(result.extension);
-
-    // Get configuration info for audit log
-    const configResult: GetConfigurationResponse = await this.queryBus.execute(new GetConfiguration(id));
-
-    await this.auditLogService.createAuditLog({
-      entityType: 'extension',
-      entityId: String(result.extension.id),
-      action: 'create',
-      userId: req.user.id,
-      userName: req.user.name,
-      snapshot: {
-        ...JSON.parse(JSON.stringify(extensionDto)),
-        configurationId: id,
-        configurationName: configResult.configuration?.name,
-      },
-    });
-
-    return extensionDto;
+    return ExtensionDto.fromDomain(result.extension);
   }
 
   @Put(':id/extensions/:extensionId')
@@ -277,34 +218,15 @@ export class ConfigurationsController {
   @Role(BUILTIN_USER_GROUP_ADMIN)
   @UseGuards(RoleGuard)
   async putExtension(
-    @Param('id') id: number,
     @Param('extensionId') extensionId: number,
     @Body() body: UpdateExtensionDto,
     @Req() req: Request,
   ) {
-    const command = new UpdateExtension(+extensionId, body);
+    const command = new UpdateExtension(+extensionId, body, req.user);
 
     const result: UpdateExtensionResponse = await this.commandBus.execute(command);
 
-    const extensionDto = ExtensionDto.fromDomain(result.extension);
-
-    // Get configuration info for audit log
-    const configResult: GetConfigurationResponse = await this.queryBus.execute(new GetConfiguration(id));
-
-    await this.auditLogService.createAuditLog({
-      entityType: 'extension',
-      entityId: String(result.extension.id),
-      action: 'update',
-      userId: req.user.id,
-      userName: req.user.name,
-      snapshot: {
-        ...JSON.parse(JSON.stringify(extensionDto)),
-        configurationId: id,
-        configurationName: configResult.configuration?.name,
-      },
-    });
-
-    return extensionDto;
+    return ExtensionDto.fromDomain(result.extension);
   }
 
   @Delete(':id/extensions/:extensionId')
@@ -324,29 +246,9 @@ export class ConfigurationsController {
   @ApiNoContentResponse()
   @Role(BUILTIN_USER_GROUP_ADMIN)
   @UseGuards(RoleGuard)
-  async deleteExtension(@Param('id') id: number, @Param('extensionId') extensionId: number, @Req() req: Request) {
-    // Get extension and configuration before deletion for audit log
-    const extensionResult: GetExtensionResponse = await this.queryBus.execute(new GetExtension({ id: +extensionId }));
-    const configResult: GetConfigurationResponse = await this.queryBus.execute(new GetConfiguration(id));
-
-    const command = new DeleteExtension(+extensionId);
+  async deleteExtension(@Param('extensionId') extensionId: number, @Req() req: Request) {
+    const command = new DeleteExtension(+extensionId, req.user);
     await this.commandBus.execute(command);
-
-    if (extensionResult.extension) {
-      const extensionDto = ExtensionDto.fromDomain(extensionResult.extension);
-      await this.auditLogService.createAuditLog({
-        entityType: 'extension',
-        entityId: String(extensionId),
-        action: 'delete',
-        userId: req.user.id,
-        userName: req.user.name,
-        snapshot: {
-          ...JSON.parse(JSON.stringify(extensionDto)),
-          configurationId: id,
-          configurationName: configResult.configuration?.name,
-        },
-      });
-    }
   }
 
   @Get(':id/checkBucketAvailability/:type')

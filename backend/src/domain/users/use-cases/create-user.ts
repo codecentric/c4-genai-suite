@@ -3,6 +3,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import * as uuid from 'uuid';
+import { AuditLogService, PerformedBy } from 'src/domain/audit-log';
 import { UserEntity, UserGroupEntity, UserRepository } from 'src/domain/database';
 import { assignDefined } from 'src/lib';
 import { User } from '../interfaces';
@@ -11,7 +12,10 @@ import { buildUser } from './utils';
 type Values = Pick<User, 'apiKey' | 'email' | 'name' | 'userGroupIds'> & { password?: string };
 
 export class CreateUser {
-  constructor(public readonly values: Values) {}
+  constructor(
+    public readonly values: Values,
+    public readonly performedBy: PerformedBy,
+  ) {}
 }
 
 export class CreateUserResponse {
@@ -23,10 +27,11 @@ export class CreateUserHandler implements ICommandHandler<CreateUser, CreateUser
   constructor(
     @InjectRepository(UserEntity)
     private readonly users: UserRepository,
+    private readonly auditLogService: AuditLogService,
   ) {}
 
   async execute(request: CreateUser): Promise<CreateUserResponse> {
-    const { values } = request;
+    const { values, performedBy } = request;
     const { apiKey, email, name, password, userGroupIds } = values;
 
     const entity = this.users.create({ id: uuid.v4() });
@@ -50,6 +55,15 @@ export class CreateUserHandler implements ICommandHandler<CreateUser, CreateUser
     // Use the save method otherwise we would not get previous values.
     const created = await this.users.save(entity);
     const result = buildUser(created);
+
+    await this.auditLogService.createAuditLog({
+      entityType: 'user',
+      entityId: created.id,
+      action: 'create',
+      userId: performedBy.id,
+      userName: performedBy.name,
+      snapshot: result,
+    });
 
     return new CreateUserResponse(result);
   }
