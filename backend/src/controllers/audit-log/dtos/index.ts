@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { AuditAction, AuditEntityType } from 'src/domain/database';
 import { AuditLog } from 'src/domain/audit-log';
+import { AuditAction, AuditEntityType } from 'src/domain/database';
 
 export class AuditLogDto {
   @ApiProperty({
@@ -83,7 +83,7 @@ export class AuditLogsDto {
 
   static fromDomain(source: AuditLog[], total: number): AuditLogsDto {
     const result = new AuditLogsDto();
-    result.items = source.map(AuditLogDto.fromDomain);
+    result.items = source.map((item) => AuditLogDto.fromDomain(item));
     result.total = total;
     return result;
   }

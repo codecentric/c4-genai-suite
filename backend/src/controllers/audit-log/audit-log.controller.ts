@@ -1,9 +1,9 @@
 import { Controller, Get, ParseIntPipe, Query, UseGuards } from '@nestjs/common';
 import { QueryBus } from '@nestjs/cqrs';
 import { ApiOkResponse, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { GetAuditLogs, GetAuditLogsResponse } from 'src/domain/audit-log';
 import { LocalAuthGuard, Role, RoleGuard } from 'src/domain/auth';
 import { AuditEntityType, BUILTIN_USER_GROUP_ADMIN } from 'src/domain/database';
-import { GetAuditLogs, GetAuditLogsResponse } from 'src/domain/audit-log';
 import { AuditLogsDto } from './dtos';
 
 @Controller('audit-logs')
@@ -47,9 +47,7 @@ export class AuditLogController {
     @Query('page', new ParseIntPipe({ optional: true })) page?: number,
     @Query('pageSize', new ParseIntPipe({ optional: true })) pageSize?: number,
   ) {
-    const result: GetAuditLogsResponse = await this.queryBus.execute(
-      new GetAuditLogs({ entityType, entityId, page, pageSize }),
-    );
+    const result: GetAuditLogsResponse = await this.queryBus.execute(new GetAuditLogs({ entityType, entityId, page, pageSize }));
 
     return AuditLogsDto.fromDomain(result.auditLogs, result.total);
   }

@@ -181,20 +181,20 @@ export async function buildConfiguration(
   };
 }
 
-export function buildConfigurationSnapshot(configuration: ConfigurationModel): Record<string, any> {
+export function buildConfigurationSnapshot(configuration: ConfigurationModel): Record<string, unknown> {
   // Exclude extensions from snapshot to avoid circular references and keep it focused
-  const { extensions, ...rest } = configuration;
-  return JSON.parse(JSON.stringify(rest));
+  const { extensions: _extensions, ...rest } = configuration;
+  return JSON.parse(JSON.stringify(rest)) as Record<string, unknown>;
 }
 
 export function buildExtensionSnapshot(
   extension: ConfiguredExtension,
   configurationId: number,
   configurationName?: string,
-): Record<string, any> {
-  const { spec, ...rest } = extension;
+): Record<string, unknown> {
+  const { spec: _spec, ...rest } = extension;
   return {
-    ...JSON.parse(JSON.stringify(rest)),
+    ...(JSON.parse(JSON.stringify(rest)) as Record<string, unknown>),
     configurationId,
     configurationName,
   };

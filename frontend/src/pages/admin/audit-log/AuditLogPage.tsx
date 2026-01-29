@@ -1,14 +1,12 @@
 import { Badge, Modal, Select } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
-import { create, type Delta } from 'jsondiffpatch';
+import { create } from 'jsondiffpatch';
 import { format as formatHtmlDiff } from 'jsondiffpatch/formatters/html';
 import { useCallback, useMemo, useState } from 'react';
-import { AuditLogDto, GetAuditLogsEntityTypeEnum } from 'src/api/generated';
 import { useApi } from 'src/api';
+import { AuditLogDto, GetAuditLogsEntityTypeEnum } from 'src/api/generated';
 import { Page, Pagination } from 'src/components';
 import { texts } from 'src/texts';
-
-import 'jsondiffpatch/formatters/styles/html.css';
 
 const PAGE_SIZE = 20;
 
@@ -89,19 +87,13 @@ function ActionBadge({ action }: { action: string }) {
   return <Badge color={color}>{label}</Badge>;
 }
 
-function DiffView({
-  currentSnapshot,
-  previousSnapshot,
-}: {
-  currentSnapshot: object;
-  previousSnapshot: object | null;
-}) {
+function DiffView({ currentSnapshot, previousSnapshot }: { currentSnapshot: object; previousSnapshot: object | null }) {
   const diffHtml = useMemo(() => {
     if (!previousSnapshot) {
       return null;
     }
 
-    const delta = diffpatcher.diff(previousSnapshot, currentSnapshot) as Delta | undefined;
+    const delta = diffpatcher.diff(previousSnapshot, currentSnapshot);
 
     if (!delta) {
       return null;
@@ -111,19 +103,11 @@ function DiffView({
   }, [currentSnapshot, previousSnapshot]);
 
   if (!previousSnapshot) {
-    return (
-      <div className="rounded bg-blue-50 p-4 text-sm text-blue-700">
-        {texts.auditLog.noPreviousSnapshot}
-      </div>
-    );
+    return <div className="rounded bg-blue-50 p-4 text-sm text-blue-700">{texts.auditLog.noPreviousSnapshot}</div>;
   }
 
   if (!diffHtml) {
-    return (
-      <div className="rounded bg-gray-100 p-4 text-sm text-gray-500">
-        {texts.auditLog.noChanges}
-      </div>
-    );
+    return <div className="rounded bg-gray-100 p-4 text-sm text-gray-500">{texts.auditLog.noChanges}</div>;
   }
 
   return (
@@ -151,10 +135,11 @@ function DetailsModal({
   const snapshot = auditLog.snapshot as Record<string, unknown>;
   const isExtension = auditLog.entityType === 'extension';
   const extensionName = isExtension && typeof snapshot.name === 'string' ? snapshot.name : null;
-  const configurationName =
-    isExtension && typeof snapshot.configurationName === 'string' ? snapshot.configurationName : null;
+  const configurationName = isExtension && typeof snapshot.configurationName === 'string' ? snapshot.configurationName : null;
   const configurationId =
-    isExtension && snapshot.configurationId != null ? String(snapshot.configurationId) : null;
+    isExtension && (typeof snapshot.configurationId === 'string' || typeof snapshot.configurationId === 'number')
+      ? String(snapshot.configurationId)
+      : null;
 
   return (
     <Modal opened={!!auditLog} onClose={onClose} title={texts.auditLog.snapshotDetails} size="lg">
@@ -164,8 +149,7 @@ function DetailsModal({
           <EntityTypeBadge entityType={auditLog.entityType} />
         </div>
         <div>
-          <span className="text-sm text-gray-500">{texts.auditLog.action}:</span>{' '}
-          <ActionBadge action={auditLog.action} />
+          <span className="text-sm text-gray-500">{texts.auditLog.action}:</span> <ActionBadge action={auditLog.action} />
         </div>
       </div>
       {isExtension && configurationName && (
@@ -177,8 +161,7 @@ function DetailsModal({
       )}
       {isExtension && extensionName && (
         <div className="mb-4">
-          <span className="text-sm text-gray-500">{texts.auditLog.extension}:</span>{' '}
-          <span>{extensionName}</span>
+          <span className="text-sm text-gray-500">{texts.auditLog.extension}:</span> <span>{extensionName}</span>
           <span className="ml-2 text-sm text-gray-400">({auditLog.entityId})</span>
         </div>
       )}
@@ -190,28 +173,19 @@ function DetailsModal({
         </div>
       )}
       <div className="mb-4">
-        <span className="text-sm text-gray-500">{texts.auditLog.user}:</span>{' '}
-        <span>{auditLog.userName || auditLog.userId}</span>
+        <span className="text-sm text-gray-500">{texts.auditLog.user}:</span> <span>{auditLog.userName || auditLog.userId}</span>
       </div>
       <div className="mb-4">
-        <span className="text-sm text-gray-500">{texts.auditLog.timestamp}:</span>{' '}
-        <span>{formatDate(auditLog.createdAt)}</span>
+        <span className="text-sm text-gray-500">{texts.auditLog.timestamp}:</span> <span>{formatDate(auditLog.createdAt)}</span>
       </div>
 
       <div className="max-h-96 overflow-auto">
         {isCreate ? (
-          <div className="rounded bg-green-50 p-4 text-sm text-green-700">
-            {texts.auditLog.entityCreated}
-          </div>
+          <div className="rounded bg-green-50 p-4 text-sm text-green-700">{texts.auditLog.entityCreated}</div>
         ) : isDelete ? (
-          <div className="rounded bg-red-50 p-4 text-sm text-red-700">
-            {texts.auditLog.entityDeleted}
-          </div>
+          <div className="rounded bg-red-50 p-4 text-sm text-red-700">{texts.auditLog.entityDeleted}</div>
         ) : (
-          <DiffView
-            currentSnapshot={auditLog.snapshot}
-            previousSnapshot={previousLog?.snapshot ?? null}
-          />
+          <DiffView currentSnapshot={auditLog.snapshot} previousSnapshot={previousLog?.snapshot ?? null} />
         )}
       </div>
     </Modal>
@@ -221,9 +195,7 @@ function DetailsModal({
 export function AuditLogPage() {
   const api = useApi();
   const [page, setPage] = useState(0);
-  const [entityTypeFilter, setEntityTypeFilter] = useState<GetAuditLogsEntityTypeEnum | undefined>(
-    undefined,
-  );
+  const [entityTypeFilter, setEntityTypeFilter] = useState<GetAuditLogsEntityTypeEnum | undefined>(undefined);
   const [selectedLog, setSelectedLog] = useState<AuditLogDto | null>(null);
 
   const { data: auditLogs, isFetched } = useQuery({
@@ -235,12 +207,7 @@ export function AuditLogPage() {
   const { data: entityLogs } = useQuery({
     queryKey: ['auditLogsForEntity', selectedLog?.entityType, selectedLog?.entityId],
     queryFn: () =>
-      api.auditLogs.getAuditLogs(
-        selectedLog!.entityType as GetAuditLogsEntityTypeEnum,
-        selectedLog!.entityId,
-        0,
-        100,
-      ),
+      api.auditLogs.getAuditLogs(selectedLog!.entityType as GetAuditLogsEntityTypeEnum, selectedLog!.entityId, 0, 100),
     enabled: !!selectedLog && selectedLog.action === 'update',
   });
 
@@ -309,11 +276,7 @@ export function AuditLogPage() {
               </thead>
               <tbody>
                 {auditLogs?.items.map((log) => (
-                  <tr
-                    className="cursor-pointer hover:bg-gray-50"
-                    key={log.id}
-                    onClick={() => setSelectedLog(log)}
-                  >
+                  <tr className="cursor-pointer hover:bg-gray-50" key={log.id} onClick={() => setSelectedLog(log)}>
                     <td>
                       <EntityTypeBadge entityType={log.entityType} />
                     </td>
@@ -334,21 +297,12 @@ export function AuditLogPage() {
               </tbody>
             </table>
 
-            <Pagination
-              page={page}
-              pageSize={PAGE_SIZE}
-              total={auditLogs?.total || 0}
-              onPage={handleChangePage}
-            />
+            <Pagination page={page} pageSize={PAGE_SIZE} total={auditLogs?.total || 0} onPage={handleChangePage} />
           </div>
         </div>
       </Page>
 
-      <DetailsModal
-        auditLog={selectedLog}
-        previousLog={previousLog}
-        onClose={() => setSelectedLog(null)}
-      />
+      <DetailsModal auditLog={selectedLog} previousLog={previousLog} onClose={() => setSelectedLog(null)} />
     </>
   );
 }

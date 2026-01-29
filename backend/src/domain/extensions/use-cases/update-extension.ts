@@ -6,7 +6,14 @@ import { ConfigurationEntity, ConfigurationRepository, ExtensionEntity, Extensio
 import { assignDefined } from 'src/lib';
 import { ConfiguredExtension, ExtensionConfiguration, ExtensionObjectArgument } from '../interfaces';
 import { ExplorerService } from '../services';
-import { buildExtension, buildExtensionSnapshot, maskArgumentDefault, maskKeyValues, unmaskExtensionValues, validateConfiguration } from './utils';
+import {
+  buildExtension,
+  buildExtensionSnapshot,
+  maskArgumentDefault,
+  maskKeyValues,
+  unmaskExtensionValues,
+  validateConfiguration,
+} from './utils';
 
 type Values = Partial<{
   enabled: boolean;
