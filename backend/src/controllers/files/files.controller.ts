@@ -27,7 +27,6 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Request, Response } from 'express';
-import { AuditLogService } from 'src/domain/audit-log';
 import { LocalAuthGuard, Role, RoleGuard } from 'src/domain/auth';
 import { BUILTIN_USER_GROUP_ADMIN } from 'src/domain/database';
 import {
@@ -58,7 +57,6 @@ export class FilesController {
   constructor(
     private readonly queryBus: QueryBus,
     private readonly commandBus: CommandBus,
-    private readonly auditLogService: AuditLogService,
   ) {}
 
   @Post('test')
@@ -122,22 +120,11 @@ export class FilesController {
   @Role(BUILTIN_USER_GROUP_ADMIN)
   @UseGuards(RoleGuard)
   async postBucket(@Body() body: UpsertBucketDto, @Req() req: Request) {
-    const command = new CreateBucket(body);
+    const command = new CreateBucket(body, req.user);
 
     const result: CreateBucketResponse = await this.commandBus.execute(command);
 
-    const bucketDto = BucketDto.fromDomain(result.bucket);
-
-    await this.auditLogService.createAuditLog({
-      entityType: 'bucket',
-      entityId: String(result.bucket.id),
-      action: 'create',
-      userId: req.user.id,
-      userName: req.user.name,
-      snapshot: JSON.parse(JSON.stringify(bucketDto)),
-    });
-
-    return bucketDto;
+    return BucketDto.fromDomain(result.bucket);
   }
 
   @Put(':id')
@@ -152,22 +139,11 @@ export class FilesController {
   @Role(BUILTIN_USER_GROUP_ADMIN)
   @UseGuards(RoleGuard)
   async putBucket(@Param('id') id: number, @Body() body: UpsertBucketDto, @Req() req: Request) {
-    const command = new UpdateBucket(id, body);
+    const command = new UpdateBucket(id, body, req.user);
 
     const result: UpdateBucketResponse = await this.commandBus.execute(command);
 
-    const bucketDto = BucketDto.fromDomain(result.bucket);
-
-    await this.auditLogService.createAuditLog({
-      entityType: 'bucket',
-      entityId: String(result.bucket.id),
-      action: 'update',
-      userId: req.user.id,
-      userName: req.user.name,
-      snapshot: JSON.parse(JSON.stringify(bucketDto)),
-    });
-
-    return bucketDto;
+    return BucketDto.fromDomain(result.bucket);
   }
 
   @Delete(':id')
@@ -182,23 +158,8 @@ export class FilesController {
   @Role(BUILTIN_USER_GROUP_ADMIN)
   @UseGuards(RoleGuard)
   async deleteBucket(@Param('id') id: number, @Req() req: Request) {
-    // Get bucket before deletion for audit log
-    const bucketResult: GetBucketResponse = await this.queryBus.execute(new GetBucket(id));
-    const bucketDto = bucketResult.bucket ? BucketDto.fromDomain(bucketResult.bucket) : null;
-
-    const command = new DeleteBucket(id);
+    const command = new DeleteBucket(id, req.user);
     await this.commandBus.execute(command);
-
-    if (bucketDto) {
-      await this.auditLogService.createAuditLog({
-        entityType: 'bucket',
-        entityId: String(id),
-        action: 'delete',
-        userId: req.user.id,
-        userName: req.user.name,
-        snapshot: JSON.parse(JSON.stringify(bucketDto)),
-      });
-    }
   }
 
   @Get(':id/files')

@@ -3,6 +3,7 @@ import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
+import { AuditLogService, PerformedBy } from 'src/domain/audit-log';
 import { UserEntity, UserGroupEntity, UserRepository } from 'src/domain/database';
 import { assignDefined, isNull } from 'src/lib';
 import { User } from '../interfaces';
@@ -14,6 +15,7 @@ export class UpdateUser {
   constructor(
     public readonly id: string,
     public readonly values: Values,
+    public readonly performedBy?: PerformedBy,
   ) {}
 }
 
@@ -26,10 +28,11 @@ export class UpdateUserHandler implements ICommandHandler<UpdateUser, UpdateUser
   constructor(
     @InjectRepository(UserEntity)
     private readonly users: UserRepository,
+    private readonly auditLogService: AuditLogService,
   ) {}
 
   async execute(request: UpdateUser): Promise<UpdateUserResponse> {
-    const { id, values } = request;
+    const { id, values, performedBy } = request;
     const { apiKey, email, name, password, userGroupIds, currentPassword } = values;
 
     const entity = await this.users.findOneBy({ id });
@@ -64,6 +67,18 @@ export class UpdateUserHandler implements ICommandHandler<UpdateUser, UpdateUser
     // Use the save method otherwise we would not get previous values.
     const updated = await this.users.save(entity);
     const result = buildUser(updated);
+
+    // Only log if performedBy is provided (admin updates, not self password changes)
+    if (performedBy) {
+      await this.auditLogService.createAuditLog({
+        entityType: 'user',
+        entityId: updated.id,
+        action: 'update',
+        userId: performedBy.id,
+        userName: performedBy.name,
+        snapshot: result,
+      });
+    }
 
     return new UpdateUserResponse(result);
   }

@@ -180,3 +180,22 @@ export async function buildConfiguration(
     extensions: extensions.filter((x) => !!x),
   };
 }
+
+export function buildConfigurationSnapshot(configuration: ConfigurationModel): Record<string, any> {
+  // Exclude extensions from snapshot to avoid circular references and keep it focused
+  const { extensions, ...rest } = configuration;
+  return JSON.parse(JSON.stringify(rest));
+}
+
+export function buildExtensionSnapshot(
+  extension: ConfiguredExtension,
+  configurationId: number,
+  configurationName?: string,
+): Record<string, any> {
+  const { spec, ...rest } = extension;
+  return {
+    ...JSON.parse(JSON.stringify(rest)),
+    configurationId,
+    configurationName,
+  };
+}

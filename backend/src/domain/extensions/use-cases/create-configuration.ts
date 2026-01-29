@@ -1,6 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In } from 'typeorm';
+import { AuditLogService, PerformedBy } from 'src/domain/audit-log';
 import {
   ConfigurationEntity,
   ConfigurationRepository,
@@ -10,7 +11,7 @@ import {
 } from 'src/domain/database';
 import { assignDefined } from 'src/lib';
 import { ConfigurationModel } from '../interfaces';
-import { buildConfiguration } from './utils';
+import { buildConfiguration, buildConfigurationSnapshot } from './utils';
 
 type Values = Partial<
   Pick<
@@ -28,7 +29,10 @@ type Values = Partial<
 >;
 
 export class CreateConfiguration {
-  constructor(public readonly values: Values) {}
+  constructor(
+    public readonly values: Values,
+    public readonly performedBy: PerformedBy,
+  ) {}
 }
 
 export class CreateConfigurationResponse {
@@ -42,10 +46,11 @@ export class CreateConfigurationHandler implements ICommandHandler<CreateConfigu
     private readonly configurations: ConfigurationRepository,
     @InjectRepository(UserGroupEntity)
     private readonly userGroups: UserGroupRepository,
+    private readonly auditLogService: AuditLogService,
   ) {}
 
-  async execute(command: CreateConfiguration): Promise<any> {
-    const { values } = command;
+  async execute(command: CreateConfiguration): Promise<CreateConfigurationResponse> {
+    const { values, performedBy } = command;
     const {
       agentName,
       chatFooter,
@@ -79,6 +84,15 @@ export class CreateConfigurationHandler implements ICommandHandler<CreateConfigu
     // Use the save method otherwise we would not get previous values.
     const created = await this.configurations.save(entity);
     const result = await buildConfiguration(created);
+
+    await this.auditLogService.createAuditLog({
+      entityType: 'configuration',
+      entityId: String(created.id),
+      action: 'create',
+      userId: performedBy.id,
+      userName: performedBy.name,
+      snapshot: buildConfigurationSnapshot(result),
+    });
 
     return new CreateConfigurationResponse(result);
   }

@@ -1,11 +1,12 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ExtensionEntity, ExtensionRepository } from 'src/domain/database';
+import { AuditLogService, PerformedBy } from 'src/domain/audit-log';
+import { ConfigurationEntity, ConfigurationRepository, ExtensionEntity, ExtensionRepository } from 'src/domain/database';
 import { assignDefined } from 'src/lib';
 import { ConfiguredExtension, ExtensionConfiguration, ExtensionObjectArgument } from '../interfaces';
 import { ExplorerService } from '../services';
-import { buildExtension, maskArgumentDefault, maskKeyValues, unmaskExtensionValues, validateConfiguration } from './utils';
+import { buildExtension, buildExtensionSnapshot, maskArgumentDefault, maskKeyValues, unmaskExtensionValues, validateConfiguration } from './utils';
 
 type Values = Partial<{
   enabled: boolean;
@@ -17,6 +18,7 @@ export class UpdateExtension {
   constructor(
     public readonly id: number,
     public readonly values: Values,
+    public readonly performedBy: PerformedBy,
   ) {}
 }
 
@@ -30,10 +32,13 @@ export class UpdateExtensionHandler implements ICommandHandler<UpdateExtension, 
     private readonly explorer: ExplorerService,
     @InjectRepository(ExtensionEntity)
     private readonly extensions: ExtensionRepository,
+    @InjectRepository(ConfigurationEntity)
+    private readonly configurations: ConfigurationRepository,
+    private readonly auditLogService: AuditLogService,
   ) {}
 
   async execute(command: UpdateExtension): Promise<UpdateExtensionResponse> {
-    const { id } = command;
+    const { id, performedBy } = command;
     const { enabled, values, configurableArguments } = command.values;
 
     if (configurableArguments?.properties && values) {
@@ -70,6 +75,19 @@ export class UpdateExtensionHandler implements ICommandHandler<UpdateExtension, 
     await this.extensions.save(entity);
     const result = await buildExtension(entity, extension, true);
     maskKeyValues(result);
+
+    // Get configuration name for audit log
+    const configuration = await this.configurations.findOneBy({ id: entity.configurationId });
+
+    await this.auditLogService.createAuditLog({
+      entityType: 'extension',
+      entityId: String(id),
+      action: 'update',
+      userId: performedBy.id,
+      userName: performedBy.name,
+      snapshot: buildExtensionSnapshot(result, entity.configurationId, configuration?.name),
+    });
+
     return new UpdateExtensionResponse(result);
   }
 }
