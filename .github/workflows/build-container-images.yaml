@@ -24,6 +24,10 @@ on:
         required: false
         type: string
         default: linux/amd64
+      version:
+        required: false
+        type: string
+        default: ''
 
 jobs:
   build-container:
@@ -67,8 +71,9 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |
-            VERSION=${{ github.ref_type == 'tag' && github.ref_name || github.sha }}
+            VERSION=${{ inputs.version || (github.ref_type == 'tag' && github.ref_name) || github.sha }}
       - uses: actions/upload-artifact@v6
+        if: ${{ !inputs.push-to-registry }}
         with:
           name: ${{ matrix.service.name }}
           path: /tmp/${{ matrix.service.name }}.tar
