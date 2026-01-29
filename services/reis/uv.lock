@@ -1659,16 +1659,16 @@ wheels = [
 
 [[package]]
 name = "langchain-nvidia-ai-endpoints"
-version = "1.0.2"
+version = "1.0.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiohttp" },
     { name = "filetype" },
     { name = "langchain-core" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/7b/2d/de43a24e85d7c42b1fcbed24d8fff48b7855d4662cc779ac6edb45c526e5/langchain_nvidia_ai_endpoints-1.0.2.tar.gz", hash = "sha256:8478e1abd3f73f539cb8151574f44d44ff67de59e2a7e39aba5d0b9d0233dbb8", size = 46091, upload-time = "2026-01-17T00:30:13.98Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/5a/9e/30814da280f7a79b168f83180f6a0396c166f86a566e56bb9877bf562611/langchain_nvidia_ai_endpoints-1.0.3.tar.gz", hash = "sha256:11c48fd24e4a9d4c86c65bcef943400f4e709497c93254c7dc97c43f68c2be89", size = 46526, upload-time = "2026-01-28T22:04:33.93Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/43/b0/ca7e772b207f88ba465d0a24137d9cf1a4e24fc45eb88fcfb5689c8312b6/langchain_nvidia_ai_endpoints-1.0.2-py3-none-any.whl", hash = "sha256:2519017205578ee6df792dcf57745b7c86013e104a00c5e0d2c16357bc71c078", size = 49769, upload-time = "2026-01-17T00:30:12.947Z" },
+    { url = "https://files.pythonhosted.org/packages/67/04/c83f61106a245b74de11c1e075c1cc1e70462ece1dd9fc0584ad992a776d/langchain_nvidia_ai_endpoints-1.0.3-py3-none-any.whl", hash = "sha256:e5f170ad0a335637298bb90fb3df119793821e316355f61ab82f0106913eebbf", size = 50130, upload-time = "2026-01-28T22:04:33.065Z" },
 ]
 
 [[package]]
