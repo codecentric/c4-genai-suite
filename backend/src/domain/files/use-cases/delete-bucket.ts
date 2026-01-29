@@ -5,7 +5,7 @@ import { JsonContains } from 'typeorm';
 import { AuditLogService, PerformedBy } from 'src/domain/audit-log';
 import { BucketEntity, BucketRepository, ExtensionEntity, ExtensionRepository } from 'src/domain/database';
 import { ResponseError } from './generated';
-import { buildBucket, buildClient } from './utils';
+import { buildBucket, buildBucketSnapshot, buildClient } from './utils';
 
 export class DeleteBucket {
   constructor(
@@ -38,7 +38,7 @@ export class DeleteBucketHandler implements ICommandHandler<DeleteBucket, Delete
     }
 
     // Capture snapshot before deletion for audit log
-    const bucketSnapshot = buildBucket(bucket);
+    const bucketSnapshot = buildBucketSnapshot(buildBucket(bucket));
 
     const extensionUsingBucket = await this.extensions.findOne({
       where: { values: JsonContains({ bucket: Number(id) }) },

@@ -5,7 +5,7 @@ import { AuditLogService, PerformedBy } from 'src/domain/audit-log';
 import { BucketEntity, BucketRepository } from 'src/domain/database';
 import { assignDefined } from 'src/lib';
 import { Bucket } from '../interfaces';
-import { buildBucket } from './utils';
+import { buildBucket, buildBucketSnapshot } from './utils';
 
 type Values = Pick<
   Bucket,
@@ -78,7 +78,7 @@ export class CreateBucketHandler implements ICommandHandler<CreateBucket, Create
       action: 'create',
       userId: performedBy.id,
       userName: performedBy.name,
-      snapshot: result,
+      snapshot: buildBucketSnapshot(result),
     });
 
     return new CreateBucketResponse(result);
