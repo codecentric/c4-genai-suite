@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AuditLogModule } from 'src/domain/audit-log';
 import { UserEntity, UserGroupEntity } from 'src/domain/database';
 import {
   CreateUserGroupHandler,
@@ -16,7 +17,7 @@ import {
 } from './use-cases';
 
 @Module({
-  imports: [CqrsModule, TypeOrmModule.forFeature([UserEntity, UserGroupEntity])],
+  imports: [AuditLogModule, CqrsModule, TypeOrmModule.forFeature([UserEntity, UserGroupEntity])],
   providers: [
     CreateUserGroupHandler,
     CreateUserHandler,

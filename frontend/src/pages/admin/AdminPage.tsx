@@ -5,6 +5,7 @@ import { NavigationBar } from 'src/components/NavigationBar';
 import { useTheme } from 'src/hooks';
 import { texts } from 'src/texts';
 import { useStateOfSelectedChatId } from '../chat/state/chat';
+import { AuditLogPage } from './audit-log/AuditLogPage';
 import { DashboardPage } from './dashboard/DashboardPage';
 import { ConfigurationPage } from './extensions/ConfigurationPage.tsx';
 import { BucketsPage } from './files/BucketsPage';
@@ -55,6 +56,11 @@ export function AdminPage() {
                     {texts.userGroups.headline}
                   </TransientNavLink>
                 </li>
+                <li>
+                  <TransientNavLink className="block" to="/admin/audit-log">
+                    {texts.auditLog.headline}
+                  </TransientNavLink>
+                </li>
               </ul>
             </div>
 
@@ -74,6 +80,8 @@ export function AdminPage() {
             <Route path="/users" element={<UsersPage />} />
 
             <Route path="/user-groups" element={<UserGroupsPage />} />
+
+            <Route path="/audit-log" element={<AuditLogPage />} />
 
             <Route path="/assistants/*" element={<ConfigurationPage />} />
 
