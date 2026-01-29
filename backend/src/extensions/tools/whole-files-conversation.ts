@@ -74,7 +74,8 @@ export class WholeFilesExtension implements Extension<WholeFilesExtensionConfigu
 
   private decode(content: string, mimeType: string): string | null {
     if (mimeType === 'application/reis+processed') {
-      const data = JSON.parse(atob(content)) as FileProcessResult;
+      const decodedString = Buffer.from(content, 'base64').toString('utf-8');
+      const data = JSON.parse(decodedString) as FileProcessResult;
       return this.createContent(data);
     }
 

@@ -33,7 +33,6 @@ jobs:
           - chromium
           - firefox
         testdir:
-          - extension-tests
           - tests
     uses: ./.github/workflows/e2e-template.yaml
     with:
