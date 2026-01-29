@@ -5,7 +5,7 @@ import { AuditLogService, PerformedBy } from 'src/domain/audit-log';
 import { BucketEntity, BucketRepository } from 'src/domain/database';
 import { assignDefined } from 'src/lib';
 import { Bucket } from '../interfaces';
-import { buildBucket } from './utils';
+import { buildBucket, buildBucketSnapshot } from './utils';
 
 type Values = Partial<
   Pick<Bucket, 'allowedFileNameExtensions' | 'endpoint' | 'headers' | 'perUserQuota' | 'name' | 'indexName' | 'fileSizeLimits'>
@@ -54,7 +54,7 @@ export class UpdateBucketHandler implements ICommandHandler<UpdateBucket, Update
       action: 'update',
       userId: performedBy.id,
       userName: performedBy.name,
-      snapshot: result,
+      snapshot: buildBucketSnapshot(result),
     });
 
     return new UpdateBucketResponse(result);

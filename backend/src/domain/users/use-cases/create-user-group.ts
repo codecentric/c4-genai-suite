@@ -5,7 +5,7 @@ import { AuditLogService, PerformedBy } from 'src/domain/audit-log';
 import { UserGroupEntity, UserGroupRepository } from 'src/domain/database';
 import { assignDefined } from 'src/lib';
 import { UserGroup } from '../interfaces';
-import { buildUserGroup } from './utils';
+import { buildUserGroup, buildUserGroupSnapshot } from './utils';
 
 type Values = Pick<UserGroup, 'monthlyTokens' | 'monthlyUserTokens' | 'name'>;
 
@@ -47,7 +47,7 @@ export class CreateUserGroupHandler implements ICommandHandler<CreateUserGroup, 
       action: 'create',
       userId: performedBy.id,
       userName: performedBy.name,
-      snapshot: result,
+      snapshot: buildUserGroupSnapshot(result),
     });
 
     return new CreateUserGroupResponse(result);

@@ -8,6 +8,10 @@ export function buildBucket(source: BucketEntity): Bucket {
   return source;
 }
 
+export function buildBucketSnapshot(bucket: Bucket): Record<string, unknown> {
+  return JSON.parse(JSON.stringify(bucket)) as Record<string, unknown>;
+}
+
 export function buildFile(source: FileEntity): UploadedFile {
   const { createdAt: uploadedAt, ...other } = source;
 

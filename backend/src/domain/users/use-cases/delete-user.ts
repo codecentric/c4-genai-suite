@@ -3,7 +3,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AuditLogService, PerformedBy } from 'src/domain/audit-log';
 import { UserEntity, UserRepository } from 'src/domain/database';
-import { buildUser } from './utils';
+import { buildUser, buildUserSnapshot } from './utils';
 
 export class DeleteUser {
   constructor(
@@ -25,7 +25,7 @@ export class DeleteUserHandler implements ICommandHandler<DeleteUser, void> {
 
     // Get user before deletion for audit log
     const entity = await this.users.findOneBy({ id });
-    const userSnapshot = entity ? buildUser(entity) : null;
+    const userSnapshot = entity ? buildUserSnapshot(buildUser(entity)) : null;
 
     const result = await this.users.delete({ id });
 

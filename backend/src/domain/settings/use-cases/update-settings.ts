@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { AuditLogService, PerformedBy } from 'src/domain/audit-log';
 import { SettingEntity, SettingRepository } from 'src/domain/database';
 import { Settings } from '../interfaces';
-import { buildSettings } from './utils';
+import { buildSettings, buildSettingsSnapshot } from './utils';
 
 export class UpdateSettings {
   constructor(
@@ -36,7 +36,7 @@ export class UpdateSettingsHandler implements ICommandHandler<UpdateSettings, Up
       action: 'update',
       userId: performedBy.id,
       userName: performedBy.name,
-      snapshot: result,
+      snapshot: buildSettingsSnapshot(result),
     });
 
     return new UpdateSettingsResponse(result);
