@@ -17,5 +17,3 @@ export function buildSettings(source: SettingEntity): Settings {
     ...other,
   };
 }
-
-

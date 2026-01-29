@@ -44,10 +44,14 @@ describe(UpdateExtension.name, () => {
 
     try {
       const result = await handler.execute(
-        new UpdateExtension(1, {
-          enabled: true,
-          values: {},
-        }, mockPerformedBy),
+        new UpdateExtension(
+          1,
+          {
+            enabled: true,
+            values: {},
+          },
+          mockPerformedBy,
+        ),
       );
       expect(result).toBe(false);
     } catch (err) {
@@ -63,10 +67,14 @@ describe(UpdateExtension.name, () => {
 
     try {
       const result = await handler.execute(
-        new UpdateExtension(1, {
-          enabled: true,
-          values: {},
-        }, mockPerformedBy),
+        new UpdateExtension(
+          1,
+          {
+            enabled: true,
+            values: {},
+          },
+          mockPerformedBy,
+        ),
       );
       expect(result).toBe(false);
     } catch (err) {
@@ -85,10 +93,14 @@ describe(UpdateExtension.name, () => {
     });
 
     const result = await handler.execute(
-      new UpdateExtension(1, {
-        enabled: true,
-        values: {},
-      }, mockPerformedBy),
+      new UpdateExtension(
+        1,
+        {
+          enabled: true,
+          values: {},
+        },
+        mockPerformedBy,
+      ),
     );
     expect(result).toBeDefined();
     expect(result.extension.enabled).toBe(true);
@@ -136,12 +148,16 @@ describe(UpdateExtension.name, () => {
     });
 
     const result = await handler.execute(
-      new UpdateExtension(1, {
-        enabled: true,
-        values: {
-          bar: 'secure',
+      new UpdateExtension(
+        1,
+        {
+          enabled: true,
+          values: {
+            bar: 'secure',
+          },
         },
-      }, mockPerformedBy),
+        mockPerformedBy,
+      ),
     );
 
     expect(saveArg).toEqual({

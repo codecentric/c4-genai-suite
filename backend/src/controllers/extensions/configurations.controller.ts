@@ -217,11 +217,7 @@ export class ConfigurationsController {
   @ApiOkResponse({ type: ExtensionDto })
   @Role(BUILTIN_USER_GROUP_ADMIN)
   @UseGuards(RoleGuard)
-  async putExtension(
-    @Param('extensionId') extensionId: number,
-    @Body() body: UpdateExtensionDto,
-    @Req() req: Request,
-  ) {
+  async putExtension(@Param('extensionId') extensionId: number, @Body() body: UpdateExtensionDto, @Req() req: Request) {
     const command = new UpdateExtension(+extensionId, body, req.user);
 
     const result: UpdateExtensionResponse = await this.commandBus.execute(command);
