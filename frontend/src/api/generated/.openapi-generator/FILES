@@ -9,6 +9,7 @@ apis/UsagesApi.ts
 apis/UsersApi.ts
 apis/index.ts
 index.ts
+models/AuditLogDetailDto.ts
 models/AuditLogDto.ts
 models/AuditLogsDto.ts
 models/AuthProviderDto.ts

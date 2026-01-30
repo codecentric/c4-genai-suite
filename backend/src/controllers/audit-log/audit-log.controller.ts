@@ -1,10 +1,10 @@
-import { Controller, Get, ParseIntPipe, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, NotFoundException, Param, ParseIntPipe, Query, UseGuards } from '@nestjs/common';
 import { QueryBus } from '@nestjs/cqrs';
-import { ApiOkResponse, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
-import { GetAuditLogs, GetAuditLogsResponse } from 'src/domain/audit-log';
+import { ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { GetAuditLogById, GetAuditLogByIdResponse, GetAuditLogs, GetAuditLogsResponse } from 'src/domain/audit-log';
 import { LocalAuthGuard, Role, RoleGuard } from 'src/domain/auth';
 import { AuditEntityType, BUILTIN_USER_GROUP_ADMIN } from 'src/domain/database';
-import { AuditLogsDto } from './dtos';
+import { AuditLogDetailDto, AuditLogsDto } from './dtos';
 
 @Controller('audit-logs')
 @ApiTags('audit-logs')
@@ -59,5 +59,30 @@ export class AuditLogController {
     );
 
     return AuditLogsDto.fromDomain(result.auditLogs, result.total);
+  }
+
+  @Get(':id')
+  @ApiOperation({
+    operationId: 'getAuditLogById',
+    description: 'Gets a single audit log entry by ID, including the previous snapshot for diff.',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'The ID of the audit log entry.',
+    required: true,
+    type: Number,
+  })
+  @ApiOkResponse({ type: AuditLogDetailDto })
+  @ApiNotFoundResponse({ description: 'Audit log entry not found.' })
+  @Role(BUILTIN_USER_GROUP_ADMIN)
+  @UseGuards(RoleGuard)
+  async getAuditLogById(@Param('id', ParseIntPipe) id: number) {
+    const result: GetAuditLogByIdResponse = await this.queryBus.execute(new GetAuditLogById(id));
+
+    if (!result.auditLog) {
+      throw new NotFoundException('Audit log entry not found.');
+    }
+
+    return AuditLogDetailDto.fromDomainWithPrevious(result.auditLog, result.previousSnapshot);
   }
 }
