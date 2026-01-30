@@ -8,6 +8,7 @@ export class GetAuditLogs {
     public readonly options?: {
       entityType?: AuditEntityType;
       entityId?: string;
+      configurationId?: number;
       page?: number;
       pageSize?: number;
     },
@@ -42,16 +43,27 @@ export class GetAuditLogsHandler implements IQueryHandler<GetAuditLogs, GetAudit
   ) {}
 
   async execute(query: GetAuditLogs): Promise<GetAuditLogsResponse> {
-    const { entityType, entityId, page = 0, pageSize = 50 } = query.options ?? {};
+    const { entityType, entityId, configurationId, page = 0, pageSize = 50 } = query.options ?? {};
 
     const queryBuilder = this.auditLogs.createQueryBuilder('audit_log');
 
-    if (entityType) {
-      queryBuilder.andWhere('audit_log.entityType = :entityType', { entityType });
-    }
+    if (configurationId) {
+      // Filter for configuration changes and related extension changes
+      queryBuilder.andWhere(
+        `(
+          (audit_log.entityType = 'configuration' AND audit_log.entityId = :configId)
+          OR (audit_log.entityType = 'extension' AND audit_log.snapshot->>'configurationId' = :configId)
+        )`,
+        { configId: String(configurationId) },
+      );
+    } else {
+      if (entityType) {
+        queryBuilder.andWhere('audit_log.entityType = :entityType', { entityType });
+      }
 
-    if (entityId) {
-      queryBuilder.andWhere('audit_log.entityId = :entityId', { entityId });
+      if (entityId) {
+        queryBuilder.andWhere('audit_log.entityId = :entityId', { entityId });
+      }
     }
 
     queryBuilder.orderBy('audit_log.createdAt', 'DESC');

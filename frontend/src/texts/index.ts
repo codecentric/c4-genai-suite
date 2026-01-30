@@ -334,6 +334,7 @@ function load() {
       noChanges: translate('auditLog.noChanges'),
       entityCreated: translate('auditLog.entityCreated'),
       entityDeleted: translate('auditLog.entityDeleted'),
+      filterByAssistant: translate('auditLog.filterByAssistant'),
     },
     userGroups: {
       create: translate('userGroups.create'),

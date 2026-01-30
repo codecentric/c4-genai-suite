@@ -217,7 +217,12 @@ export class ConfigurationsController {
   @ApiOkResponse({ type: ExtensionDto })
   @Role(BUILTIN_USER_GROUP_ADMIN)
   @UseGuards(RoleGuard)
-  async putExtension(@Param('extensionId') extensionId: number, @Body() body: UpdateExtensionDto, @Req() req: Request) {
+  async putExtension(
+    @Param('id') id: number,
+    @Param('extensionId') extensionId: number,
+    @Body() body: UpdateExtensionDto,
+    @Req() req: Request,
+  ) {
     const command = new UpdateExtension(+extensionId, body, req.user);
 
     const result: UpdateExtensionResponse = await this.commandBus.execute(command);
@@ -242,7 +247,7 @@ export class ConfigurationsController {
   @ApiNoContentResponse()
   @Role(BUILTIN_USER_GROUP_ADMIN)
   @UseGuards(RoleGuard)
-  async deleteExtension(@Param('extensionId') extensionId: number, @Req() req: Request) {
+  async deleteExtension(@Param('id') id: number, @Param('extensionId') extensionId: number, @Req() req: Request) {
     const command = new DeleteExtension(+extensionId, req.user);
     await this.commandBus.execute(command);
   }

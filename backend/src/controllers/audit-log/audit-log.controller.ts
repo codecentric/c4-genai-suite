@@ -27,6 +27,12 @@ export class AuditLogController {
     type: String,
   })
   @ApiQuery({
+    name: 'configurationId',
+    description: 'Filter by configuration/assistant ID. Returns configuration changes and related extension changes.',
+    required: false,
+    type: Number,
+  })
+  @ApiQuery({
     name: 'page',
     description: 'The page number (0-based).',
     required: false,
@@ -44,10 +50,13 @@ export class AuditLogController {
   async getAuditLogs(
     @Query('entityType') entityType?: AuditEntityType,
     @Query('entityId') entityId?: string,
+    @Query('configurationId', new ParseIntPipe({ optional: true })) configurationId?: number,
     @Query('page', new ParseIntPipe({ optional: true })) page?: number,
     @Query('pageSize', new ParseIntPipe({ optional: true })) pageSize?: number,
   ) {
-    const result: GetAuditLogsResponse = await this.queryBus.execute(new GetAuditLogs({ entityType, entityId, page, pageSize }));
+    const result: GetAuditLogsResponse = await this.queryBus.execute(
+      new GetAuditLogs({ entityType, entityId, configurationId, page, pageSize }),
+    );
 
     return AuditLogsDto.fromDomain(result.auditLogs, result.total);
   }

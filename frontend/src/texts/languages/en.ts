@@ -307,6 +307,7 @@ export const en = {
     noChanges: 'No changes detected.',
     entityCreated: 'Entity was created.',
     entityDeleted: 'Entity was deleted.',
+    filterByAssistant: 'Filter by Assistant',
   },
   userGroups: {
     create: 'Create User Group',

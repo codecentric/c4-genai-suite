@@ -312,6 +312,7 @@ export const de: typeof en = {
     noChanges: 'Keine Änderungen erkannt.',
     entityCreated: 'Entität wurde erstellt.',
     entityDeleted: 'Entität wurde gelöscht.',
+    filterByAssistant: 'Nach Assistent filtern',
   },
   userGroups: {
     create: 'Benutzergruppe erstellen',

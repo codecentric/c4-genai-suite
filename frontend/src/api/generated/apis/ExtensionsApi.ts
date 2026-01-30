@@ -55,8 +55,8 @@ export interface DeleteConfigurationRequest {
 }
 
 export interface DeleteExtensionRequest {
-    extensionId: number;
     id: number;
+    extensionId: number;
 }
 
 export interface DuplicateConfigurationRequest {
@@ -99,8 +99,8 @@ export interface PutConfigurationRequest {
 }
 
 export interface PutExtensionRequest {
-    extensionId: number;
     id: number;
+    extensionId: number;
     updateExtensionDto: UpdateExtensionDto;
 }
 
@@ -161,17 +161,17 @@ export class ExtensionsApi extends runtime.BaseAPI {
      * 
      */
     async deleteExtensionRaw(requestParameters: DeleteExtensionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        if (requestParameters['extensionId'] == null) {
-            throw new runtime.RequiredError(
-                'extensionId',
-                'Required parameter "extensionId" was null or undefined when calling deleteExtension().'
-            );
-        }
-
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
                 'Required parameter "id" was null or undefined when calling deleteExtension().'
+            );
+        }
+
+        if (requestParameters['extensionId'] == null) {
+            throw new runtime.RequiredError(
+                'extensionId',
+                'Required parameter "extensionId" was null or undefined when calling deleteExtension().'
             );
         }
 
@@ -180,7 +180,7 @@ export class ExtensionsApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/api/configurations/{id}/extensions/{extensionId}`.replace(`{${"extensionId"}}`, encodeURIComponent(String(requestParameters['extensionId']))).replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            path: `/api/configurations/{id}/extensions/{extensionId}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))).replace(`{${"extensionId"}}`, encodeURIComponent(String(requestParameters['extensionId']))),
             method: 'DELETE',
             headers: headerParameters,
             query: queryParameters,
@@ -193,8 +193,8 @@ export class ExtensionsApi extends runtime.BaseAPI {
      * Deletes an extension.
      * 
      */
-    async deleteExtension(extensionId: number, id: number, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.deleteExtensionRaw({ extensionId: extensionId, id: id }, initOverrides);
+    async deleteExtension(id: number, extensionId: number, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.deleteExtensionRaw({ id: id, extensionId: extensionId }, initOverrides);
     }
 
     /**
@@ -544,17 +544,17 @@ export class ExtensionsApi extends runtime.BaseAPI {
      * 
      */
     async putExtensionRaw(requestParameters: PutExtensionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ExtensionDto>> {
-        if (requestParameters['extensionId'] == null) {
-            throw new runtime.RequiredError(
-                'extensionId',
-                'Required parameter "extensionId" was null or undefined when calling putExtension().'
-            );
-        }
-
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
                 'Required parameter "id" was null or undefined when calling putExtension().'
+            );
+        }
+
+        if (requestParameters['extensionId'] == null) {
+            throw new runtime.RequiredError(
+                'extensionId',
+                'Required parameter "extensionId" was null or undefined when calling putExtension().'
             );
         }
 
@@ -572,7 +572,7 @@ export class ExtensionsApi extends runtime.BaseAPI {
         headerParameters['Content-Type'] = 'application/json';
 
         const response = await this.request({
-            path: `/api/configurations/{id}/extensions/{extensionId}`.replace(`{${"extensionId"}}`, encodeURIComponent(String(requestParameters['extensionId']))).replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            path: `/api/configurations/{id}/extensions/{extensionId}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))).replace(`{${"extensionId"}}`, encodeURIComponent(String(requestParameters['extensionId']))),
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
@@ -586,8 +586,8 @@ export class ExtensionsApi extends runtime.BaseAPI {
      * Updates an extension.
      * 
      */
-    async putExtension(extensionId: number, id: number, updateExtensionDto: UpdateExtensionDto, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ExtensionDto> {
-        const response = await this.putExtensionRaw({ extensionId: extensionId, id: id, updateExtensionDto: updateExtensionDto }, initOverrides);
+    async putExtension(id: number, extensionId: number, updateExtensionDto: UpdateExtensionDto, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ExtensionDto> {
+        const response = await this.putExtensionRaw({ id: id, extensionId: extensionId, updateExtensionDto: updateExtensionDto }, initOverrides);
         return await response.value();
     }
 
