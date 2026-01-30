@@ -9,6 +9,7 @@ import {
   enterUserArea,
   login,
   newChat,
+  save,
   selectConfiguration,
   sendMessage,
   uniqueName,
@@ -54,5 +55,31 @@ test('configurable arguments', async ({ page, mockServerUrl }) => {
     await sendMessage(page, configuration, { message: 'What is the capital of Germany?' });
     const testoutput = await page.waitForSelector(`:has-text("parrot")`);
     expect(testoutput).toBeDefined();
+  });
+
+  await test.step('verify configurable argument is listed on assistant page', async () => {
+    await enterAdminArea(page);
+    await page.getByRole('link', { name: 'Assistants' }).click();
+    await page.getByRole('link').filter({ hasText: configuration.name }).click();
+
+    await expect(page.getByText('Text', { exact: true })).toBeVisible();
+  });
+
+  await test.step('remove configurable argument from extension', async () => {
+    await page.getByRole('tab', { name: 'Other' }).click();
+    await page.getByLabel('Other').getByRole('heading', { name: 'Prompt' }).click();
+
+    const configurableInput = page.getByTestId('configurableArguments');
+    await expect(configurableInput.getByText('Text')).toBeVisible();
+
+    await configurableInput.locator('.mantine-Pill-remove').click();
+
+    await expect(configurableInput.getByText('Text')).not.toBeVisible();
+
+    await save(page);
+  });
+
+  await test.step('verify configurable argument is not listed anymore', async () => {
+    await expect(page.getByText('Text', { exact: true })).not.toBeVisible();
   });
 });
