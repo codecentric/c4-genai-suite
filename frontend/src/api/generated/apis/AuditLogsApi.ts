@@ -16,12 +16,19 @@
 
 import * as runtime from '../runtime';
 import type {
+  AuditLogDetailDto,
   AuditLogsDto,
 } from '../models/index';
 import {
+    AuditLogDetailDtoFromJSON,
+    AuditLogDetailDtoToJSON,
     AuditLogsDtoFromJSON,
     AuditLogsDtoToJSON,
 } from '../models/index';
+
+export interface GetAuditLogByIdRequest {
+    id: number;
+}
 
 export interface GetAuditLogsRequest {
     entityType?: GetAuditLogsEntityTypeEnum;
@@ -35,6 +42,41 @@ export interface GetAuditLogsRequest {
  * 
  */
 export class AuditLogsApi extends runtime.BaseAPI {
+
+    /**
+     * Gets a single audit log entry by ID, including the previous snapshot for diff.
+     * 
+     */
+    async getAuditLogByIdRaw(requestParameters: GetAuditLogByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AuditLogDetailDto>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling getAuditLogById().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/audit-logs/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => AuditLogDetailDtoFromJSON(jsonValue));
+    }
+
+    /**
+     * Gets a single audit log entry by ID, including the previous snapshot for diff.
+     * 
+     */
+    async getAuditLogById(id: number, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AuditLogDetailDto> {
+        const response = await this.getAuditLogByIdRaw({ id: id }, initOverrides);
+        return await response.value();
+    }
 
     /**
      * Gets the audit log entries.
