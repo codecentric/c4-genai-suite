@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Repository, Unique } from 'typeorm';
+import { Column, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Repository, Unique } from 'typeorm';
 import { schema } from '../typeorm.helper';
 import { ConversationEntity } from './conversation';
 import { FileEntity } from './file';
@@ -8,6 +8,9 @@ export type ConversationFileRepository = Repository<ConversationFileEntity>;
 
 @Entity({ name: 'conversations_files', schema })
 @Unique(['conversationId', 'fileId'])
+@Index(['conversationId'])
+@Index(['fileId'])
+@Index(['messageId'])
 export class ConversationFileEntity {
   @PrimaryGeneratedColumn()
   id!: number;

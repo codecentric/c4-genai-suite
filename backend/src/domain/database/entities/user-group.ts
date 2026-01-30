@@ -1,4 +1,14 @@
-import { Column, CreateDateColumn, Entity, ManyToMany, PrimaryColumn, RelationId, Repository, UpdateDateColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  Index,
+  ManyToMany,
+  PrimaryColumn,
+  RelationId,
+  Repository,
+  UpdateDateColumn,
+} from 'typeorm';
 import { schema } from '../typeorm.helper';
 import { ConfigurationEntity } from './configuration';
 import { UserEntity } from './user';
@@ -6,6 +16,7 @@ import { UserEntity } from './user';
 export type UserGroupRepository = Repository<UserGroupEntity>;
 
 @Entity({ name: 'user-groups', schema })
+@Index(['name'])
 export class UserGroupEntity {
   @PrimaryColumn()
   id!: string;

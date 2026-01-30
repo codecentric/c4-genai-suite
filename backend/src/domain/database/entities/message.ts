@@ -2,6 +2,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   JoinColumn,
   ManyToOne,
   OneToMany,
@@ -17,6 +18,12 @@ import { ConversationFileEntity } from './conversation-file';
 export type ExtensionSource = Source & { extensionExternalId: string };
 
 @Entity({ name: 'messages', schema })
+@Index(['conversationId'])
+// Used by analytics: getMessageCount and getUsersCountByPeriod filter by type='human' and createdAt
+// See: src/domain/database/repositories/message.repository.ts, conversation.repository.ts
+@Index(['type', 'createdAt'])
+@Index(['parentId'])
+@Index(['configurationId'])
 export class MessageEntity {
   @PrimaryGeneratedColumn()
   id!: number;
