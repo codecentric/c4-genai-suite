@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, Repository } from 'typeorm';
+import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, Repository } from 'typeorm';
 import { schema } from '../typeorm.helper';
 
 export type AuditLogRepository = Repository<AuditLogEntity>;
@@ -11,9 +11,11 @@ export class AuditLogEntity {
   @PrimaryGeneratedColumn()
   id!: number;
 
+  @Index()
   @Column()
   entityType!: AuditEntityType;
 
+  @Index()
   @Column()
   entityId!: string;
 
@@ -29,6 +31,7 @@ export class AuditLogEntity {
   @Column('jsonb')
   snapshot!: Record<string, any>;
 
+  @Index()
   @CreateDateColumn({ type: 'timestamptz' })
   createdAt!: Date;
 }

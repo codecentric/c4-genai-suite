@@ -895,19 +895,19 @@
         "operationId": "putExtension",
         "parameters": [
           {
-            "name": "id",
+            "name": "extensionId",
             "required": true,
             "in": "path",
-            "description": "The ID of the configuration.",
+            "description": "The ID of the extension.",
             "schema": {
               "type": "number"
             }
           },
           {
-            "name": "extensionId",
+            "name": "id",
             "required": true,
             "in": "path",
-            "description": "The ID of the extension.",
+            "description": "The ID of the configuration.",
             "schema": {
               "type": "number"
             }
@@ -943,19 +943,19 @@
         "operationId": "deleteExtension",
         "parameters": [
           {
-            "name": "id",
+            "name": "extensionId",
             "required": true,
             "in": "path",
-            "description": "The ID of the configuration.",
+            "description": "The ID of the extension.",
             "schema": {
               "type": "number"
             }
           },
           {
-            "name": "extensionId",
+            "name": "id",
             "required": true,
             "in": "path",
-            "description": "The ID of the extension.",
+            "description": "The ID of the configuration.",
             "schema": {
               "type": "number"
             }
