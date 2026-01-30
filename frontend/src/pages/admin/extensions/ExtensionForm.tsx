@@ -12,13 +12,7 @@ import {
 } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
 import { UseFormReturnType } from '@mantine/form';
-import {
-  BucketDto,
-  CreateExtensionDto,
-  ExtensionArgumentObjectSpecDto,
-  ExtensionArgumentObjectSpecDtoPropertiesValue,
-  ExtensionSpecDto,
-} from 'src/api';
+import { BucketDto, CreateExtensionDto, ExtensionArgumentObjectSpecDtoPropertiesValue, ExtensionSpecDto } from 'src/api';
 import { Icon, Markdown } from 'src/components';
 import { texts } from 'src/texts';
 
@@ -109,6 +103,7 @@ export function ExtensionForm(props: ExtensionFormProps) {
           key={form.key('configurableArguments')}
           value={Object.keys(form.getValues().configurableArguments?.properties ?? {})}
           onChange={(v: string[]) => {
+            // Mantine forms ignore undefined but properly handle null values
             const value = v.length
               ? {
                   type: 'object' as const,
@@ -119,8 +114,8 @@ export function ExtensionForm(props: ExtensionFormProps) {
                       .map(([key, value]) => [key, { ...value, required: false }]),
                   ),
                 }
-              : undefined;
-            form.setFieldValue('configurableArguments', value as ExtensionArgumentObjectSpecDto | undefined);
+              : null;
+            form.setFieldValue('configurableArguments', value as any); // eslint-disable-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument
           }}
         />
       </FormRow>
