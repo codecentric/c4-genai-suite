@@ -2,6 +2,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -25,6 +26,10 @@ export enum FileUploadStatus {
 }
 
 @Entity({ name: 'files', schema })
+// Used by file listing and quota checks: findBy/countBy bucketId + userId
+// See: src/extensions/tools/files.ts, src/domain/files/use-cases/upload-file.ts
+@Index(['bucketId', 'userId'])
+@Index(['extensionId'])
 export class FileEntity {
   @PrimaryGeneratedColumn()
   id!: number;

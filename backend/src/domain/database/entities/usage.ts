@@ -1,8 +1,14 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, Index, PrimaryColumn } from 'typeorm';
 import { UsageRepository } from '../repositories/usage.repository';
 import { schema } from '../typeorm.helper';
 
 @Entity({ name: 'usages', schema })
+// Used by analytics: getRatingCount/getUsageCount filter by counter type and date range
+// See: src/domain/database/repositories/usage.repository.ts
+@Index(['counter', 'date'])
+// Used by usage limit checks: sum by userId within date range
+// See: src/domain/chat/middlewares/check-usage-middleware.ts
+@Index(['userId', 'date'])
 export class UsageEntity {
   @PrimaryColumn({ type: 'timestamptz' })
   date!: Date;

@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, Index, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { schema } from '../typeorm.helper';
 import { ConfigurationEntity } from './configuration';
 import { ConversationFileEntity } from './conversation-file';
@@ -12,6 +12,10 @@ export type ExtensionUserArguments = Record<string, Record<string, any>>;
 export type ConversationRating = 'good' | 'bad' | 'unrated';
 
 @Entity({ name: 'conversations', schema })
+// Used by GetConversationsHandler: find by userId, order by updatedAt DESC
+// See: src/domain/chat/use-cases/get-conversations.ts
+@Index(['userId', 'updatedAt'])
+@Index(['configurationId'])
 export class ConversationEntity {
   @PrimaryGeneratedColumn()
   id!: number;

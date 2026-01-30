@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, PrimaryColumn, Repository } from 'typeorm';
+import { Column, Entity, Index, ManyToOne, PrimaryColumn, Repository } from 'typeorm';
 import { schema } from '../typeorm.helper';
 import { FileEntity } from './file';
 import { UserEntity } from './user';
@@ -13,6 +13,8 @@ export enum BlobCategory {
 }
 
 @Entity({ name: 'blobs', schema })
+@Index(['fileId'])
+@Index(['userId'])
 export class BlobEntity {
   @PrimaryColumn()
   id!: string;

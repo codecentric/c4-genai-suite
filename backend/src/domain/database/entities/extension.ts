@@ -1,4 +1,13 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, Repository, UpdateDateColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  Index,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  Repository,
+  UpdateDateColumn,
+} from 'typeorm';
 import { ExtensionObjectArgument } from 'src/domain/extensions';
 import { schema } from '../typeorm.helper';
 import { ConfigurationEntity } from './configuration';
@@ -12,6 +21,10 @@ export type ExtensionState = {
 };
 
 @Entity({ name: 'extensions', schema })
+@Index(['configurationId'])
+// Used to fetch enabled extensions for a configuration
+// See: src/domain/extensions/use-cases/update-configuration-user-values.ts, get-bucket-availability.ts
+@Index(['configurationId', 'enabled'])
 export class ExtensionEntity {
   @PrimaryGeneratedColumn()
   id!: number;

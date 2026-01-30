@@ -2,6 +2,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   JoinTable,
   ManyToMany,
   OneToMany,
@@ -26,6 +27,7 @@ export enum ConfigurationStatus {
 }
 
 @Entity({ name: 'configurations', schema })
+@Index(['status'])
 export class ConfigurationEntity {
   @PrimaryGeneratedColumn()
   id!: number;
