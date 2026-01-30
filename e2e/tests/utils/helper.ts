@@ -17,9 +17,8 @@ export async function goto(page: Page, relativePath: `/${string}` | '') {
 }
 
 export async function enterAdminArea(page: Page) {
-  if (await hasMenuItem(page, { name: 'Admin' })) {
-    await page.getByRole('menuitem', { name: 'Admin' }).click();
-  }
+  await page.getByTestId('menu user').click();
+  await page.getByRole('menuitem', { name: 'Admin' }).click();
 }
 
 export async function logout(page: Page) {
@@ -36,9 +35,8 @@ export async function hasMenuItem(page: Page, item: { name: string }) {
 }
 
 export async function enterUserArea(page: Page) {
-  if (await hasMenuItem(page, { name: 'Chat' })) {
-    await page.getByRole('menuitem', { name: 'Chat' }).click();
-  }
+  await page.getByTestId('menu user').click();
+  await page.getByRole('menuitem', { name: 'Chat' }).click();
   await page.getByRole('button', { name: 'New chat' }).waitFor({ state: 'visible' });
 }
 
@@ -496,6 +494,25 @@ export async function addAzureModelToConfiguration(
       .click();
     await loader.waitFor({ state: 'detached' });
   }
+
+  await save(page);
+}
+
+export async function addMockModelToConfiguration(
+  page: Page,
+  configuration: { name: string },
+  mockServer: { endpoint: string; modelName?: string },
+) {
+  await page.getByRole('link', { name: 'Assistants' }).click();
+  await page.getByRole('link').filter({ hasText: configuration.name }).click();
+
+  await page.getByRole('button', { name: 'Add Extension' }).click();
+
+  await page.getByRole('heading', { name: 'OpenAI compatible' }).click();
+
+  await page.getByLabel('API Key').fill('mock-api-key');
+  await page.getByLabel('Endpoint').fill(mockServer.endpoint);
+  await page.getByLabel('Model Name').fill(mockServer.modelName ?? 'mock-gpt-4');
 
   await save(page);
 }
