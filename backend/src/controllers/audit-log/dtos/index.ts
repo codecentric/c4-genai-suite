@@ -88,3 +88,16 @@ export class AuditLogsDto {
     return result;
   }
 }
+
+export class AuditLogDetailDto extends AuditLogDto {
+  @ApiProperty({
+    description: 'The previous snapshot of the entity, for computing diffs. Null if this is the first entry for the entity.',
+    required: false,
+    nullable: true,
+  })
+  previousSnapshot!: Record<string, any> | null;
+
+  static fromDomainWithPrevious(source: AuditLog, previousSnapshot: Record<string, unknown> | null): AuditLogDetailDto {
+    return { ...AuditLogDto.fromDomain(source), previousSnapshot };
+  }
+}

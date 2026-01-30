@@ -4,7 +4,7 @@ import { create } from 'jsondiffpatch';
 import { format as formatHtmlDiff } from 'jsondiffpatch/formatters/html';
 import { useCallback, useMemo, useState } from 'react';
 import { useApi } from 'src/api';
-import { AuditLogDto, GetAuditLogsEntityTypeEnum } from 'src/api/generated';
+import { AuditLogDetailDto, AuditLogDto, GetAuditLogsEntityTypeEnum } from 'src/api/generated';
 import { Page, Pagination } from 'src/components';
 import { texts } from 'src/texts';
 
@@ -118,15 +118,7 @@ function DiffView({ currentSnapshot, previousSnapshot }: { currentSnapshot: obje
   );
 }
 
-function DetailsModal({
-  auditLog,
-  previousLog,
-  onClose,
-}: {
-  auditLog: AuditLogDto | null;
-  previousLog: AuditLogDto | null;
-  onClose: () => void;
-}) {
+function DetailsModal({ auditLog, onClose }: { auditLog: AuditLogDetailDto | null; onClose: () => void }) {
   if (!auditLog) return null;
 
   const isCreate = auditLog.action === 'create';
@@ -185,7 +177,7 @@ function DetailsModal({
         ) : isDelete ? (
           <div className="rounded bg-red-50 p-4 text-sm text-red-700">{texts.auditLog.entityDeleted}</div>
         ) : (
-          <DiffView currentSnapshot={auditLog.snapshot} previousSnapshot={previousLog?.snapshot ?? null} />
+          <DiffView currentSnapshot={auditLog.snapshot} previousSnapshot={auditLog.previousSnapshot ?? null} />
         )}
       </div>
     </Modal>
@@ -221,27 +213,12 @@ export function AuditLogPage() {
       ),
   });
 
-  // Fetch all logs for the selected entity to find the previous entry
-  const { data: entityLogs } = useQuery({
-    queryKey: ['auditLogsForEntity', selectedLog?.entityType, selectedLog?.entityId],
-    queryFn: () =>
-      api.auditLogs.getAuditLogs(selectedLog!.entityType as GetAuditLogsEntityTypeEnum, selectedLog!.entityId, undefined, 0, 100),
-    enabled: !!selectedLog && selectedLog.action === 'update',
+  // Fetch the selected log with its previous snapshot for diff
+  const { data: selectedLogDetail } = useQuery({
+    queryKey: ['auditLogDetail', selectedLog?.id],
+    queryFn: () => api.auditLogs.getAuditLogById(selectedLog!.id),
+    enabled: !!selectedLog,
   });
-
-  // Find the previous log entry for the selected log
-  const previousLog = useMemo(() => {
-    if (!selectedLog || !entityLogs?.items) return null;
-
-    const allLogs = entityLogs.items;
-    const currentIndex = allLogs.findIndex((log) => log.id === selectedLog.id);
-
-    if (currentIndex >= 0 && currentIndex < allLogs.length - 1) {
-      return allLogs[currentIndex + 1];
-    }
-
-    return null;
-  }, [selectedLog, entityLogs]);
 
   const handleChangePage = useCallback((newPage: number) => {
     setPage(newPage);
@@ -348,7 +325,7 @@ export function AuditLogPage() {
         </div>
       </Page>
 
-      <DetailsModal auditLog={selectedLog} previousLog={previousLog} onClose={() => setSelectedLog(null)} />
+      <DetailsModal auditLog={selectedLogDetail ?? null} onClose={() => setSelectedLog(null)} />
     </>
   );
 }
