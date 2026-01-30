@@ -26,6 +26,7 @@ import {
 export interface GetAuditLogsRequest {
     entityType?: GetAuditLogsEntityTypeEnum;
     entityId?: string;
+    configurationId?: number;
     page?: number;
     pageSize?: number;
 }
@@ -48,6 +49,10 @@ export class AuditLogsApi extends runtime.BaseAPI {
 
         if (requestParameters['entityId'] != null) {
             queryParameters['entityId'] = requestParameters['entityId'];
+        }
+
+        if (requestParameters['configurationId'] != null) {
+            queryParameters['configurationId'] = requestParameters['configurationId'];
         }
 
         if (requestParameters['page'] != null) {
@@ -74,8 +79,8 @@ export class AuditLogsApi extends runtime.BaseAPI {
      * Gets the audit log entries.
      * 
      */
-    async getAuditLogs(entityType?: GetAuditLogsEntityTypeEnum, entityId?: string, page?: number, pageSize?: number, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AuditLogsDto> {
-        const response = await this.getAuditLogsRaw({ entityType: entityType, entityId: entityId, page: page, pageSize: pageSize }, initOverrides);
+    async getAuditLogs(entityType?: GetAuditLogsEntityTypeEnum, entityId?: string, configurationId?: number, page?: number, pageSize?: number, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AuditLogsDto> {
+        const response = await this.getAuditLogsRaw({ entityType: entityType, entityId: entityId, configurationId: configurationId, page: page, pageSize: pageSize }, initOverrides);
         return await response.value();
     }
 

@@ -192,22 +192,40 @@ function DetailsModal({
   );
 }
 
+function truncateId(id: string, length: number = 6): string {
+  if (id.length <= length) return id;
+  return id.substring(0, length) + '…';
+}
+
 export function AuditLogPage() {
   const api = useApi();
   const [page, setPage] = useState(0);
   const [entityTypeFilter, setEntityTypeFilter] = useState<GetAuditLogsEntityTypeEnum | undefined>(undefined);
+  const [configurationFilter, setConfigurationFilter] = useState<number | undefined>(undefined);
   const [selectedLog, setSelectedLog] = useState<AuditLogDto | null>(null);
 
+  const { data: configurations } = useQuery({
+    queryKey: ['configurations'],
+    queryFn: () => api.extensions.getConfigurations(),
+  });
+
   const { data: auditLogs, isFetched } = useQuery({
-    queryKey: ['auditLogs', page, entityTypeFilter],
-    queryFn: () => api.auditLogs.getAuditLogs(entityTypeFilter, undefined, page, PAGE_SIZE),
+    queryKey: ['auditLogs', page, entityTypeFilter, configurationFilter],
+    queryFn: () =>
+      api.auditLogs.getAuditLogs(
+        configurationFilter ? undefined : entityTypeFilter,
+        undefined,
+        configurationFilter,
+        page,
+        PAGE_SIZE,
+      ),
   });
 
   // Fetch all logs for the selected entity to find the previous entry
   const { data: entityLogs } = useQuery({
     queryKey: ['auditLogsForEntity', selectedLog?.entityType, selectedLog?.entityId],
     queryFn: () =>
-      api.auditLogs.getAuditLogs(selectedLog!.entityType as GetAuditLogsEntityTypeEnum, selectedLog!.entityId, 0, 100),
+      api.auditLogs.getAuditLogs(selectedLog!.entityType as GetAuditLogsEntityTypeEnum, selectedLog!.entityId, undefined, 0, 100),
     enabled: !!selectedLog && selectedLog.action === 'update',
   });
 
@@ -234,6 +252,20 @@ export function AuditLogPage() {
     setPage(0);
   }, []);
 
+  const handleConfigurationFilterChange = useCallback((value: string | null) => {
+    setConfigurationFilter(value ? Number(value) : undefined);
+    setPage(0);
+  }, []);
+
+  const configurationOptions = useMemo(
+    () =>
+      configurations?.items.map((config) => ({
+        value: String(config.id),
+        label: config.name,
+      })) ?? [],
+    [configurations],
+  );
+
   const filterOptions = [
     { value: '', label: texts.auditLog.allTypes },
     { value: 'configuration', label: texts.auditLog.configuration },
@@ -252,11 +284,21 @@ export function AuditLogPage() {
 
           <div className="flex gap-4">
             <Select
+              placeholder={texts.auditLog.filterByAssistant}
+              data={configurationOptions}
+              value={configurationFilter ? String(configurationFilter) : null}
+              onChange={handleConfigurationFilterChange}
+              clearable
+              searchable
+              className="w-64"
+            />
+            <Select
               placeholder={texts.auditLog.entityType}
               data={filterOptions}
               value={entityTypeFilter || ''}
               onChange={handleFilterChange}
               clearable
+              disabled={!!configurationFilter}
               className="w-48"
             />
           </div>
@@ -268,6 +310,7 @@ export function AuditLogPage() {
               <thead>
                 <tr>
                   <th className="w-32">{texts.auditLog.entityType}</th>
+                  <th className="w-24">{texts.auditLog.entityId}</th>
                   <th>{texts.auditLog.entityName}</th>
                   <th className="w-32">{texts.auditLog.action}</th>
                   <th>{texts.auditLog.user}</th>
@@ -280,6 +323,9 @@ export function AuditLogPage() {
                     <td>
                       <EntityTypeBadge entityType={log.entityType} />
                     </td>
+                    <td className="font-mono text-sm text-gray-500" title={log.entityId}>
+                      {truncateId(log.entityId)}
+                    </td>
                     <td className="truncate overflow-hidden">{getEntityName(log)}</td>
                     <td>
                       <ActionBadge action={log.action} />
@@ -291,7 +337,7 @@ export function AuditLogPage() {
 
                 {auditLogs?.items.length === 0 && isFetched && (
                   <tr>
-                    <td colSpan={5}>{texts.auditLog.empty}</td>
+                    <td colSpan={6}>{texts.auditLog.empty}</td>
                   </tr>
                 )}
               </tbody>
