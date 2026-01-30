@@ -2,14 +2,15 @@
 
 ## Basic settings
 
-| Env Variable   | Required            | Default | Description                                                              |
-|----------------|---------------------|---------|--------------------------------------------------------------------------|
-| BASE_URL       | Yes                 | None    | Required for OpenID Connect or assistants using Dall-E image generation. |
-| DB_URL         | Yes                 | None    |                                                                          |
-| SESSION_SECRET | NODE_ENV=production | None    |                                                                          |
-| NODE_ENV       | No                  | None    |                                                                          |
-| EXTENSIONS     | No                  | None    | ","-separated list of enabled extensions, when empty all enabled         |
-| PORT           | No                  | 3000    |                                                                          |
+| Env Variable          | Required            | Default | Description                                                              |
+|-----------------------|---------------------|---------|--------------------------------------------------------------------------|
+| BASE_URL              | Yes                 | None    | Required for OpenID Connect or assistants using Dall-E image generation. |
+| DB_URL                | Yes                 | None    |                                                                          |
+| DB_IDLE_TIMEOUT_MS    | No                  | 900000  | Idle connection timeout in ms (default 15 min). Set to 0 to disable.     |
+| SESSION_SECRET        | NODE_ENV=production | None    |                                                                          |
+| NODE_ENV              | No                  | None    |                                                                          |
+| EXTENSIONS            | No                  | None    | ","-separated list of enabled extensions, when empty all enabled         |
+| PORT                  | No                  | 3000    |                                                                          |
 
 
 ## Logging (LLM)
@@ -32,12 +33,12 @@
 | Env Variable                     | Required | Default       | Description                             |
 |----------------------------------|----------|---------------|-----------------------------------------|
 | AUTH_ENABLE_PASSWORD             | No       | None          | boolean                                 |
-| AUTH_TRUST_PROXY                 | No       | None          | boolean                                 |  
+| AUTH_TRUST_PROXY                 | No       | None          | boolean                                 |
 | AUTH_TRUST_COOKIE                | No       | _oauth2_proxy | used only when AUTH_TRUST_PROXY = true  |
 | AUTH_INITIAL_ADMIN_USERNAME      | No       | None          |                                         |
 | AUTH_INITIALUSER_APIKEY          | No       | None          |                                         |
 | AUTH_INITIAL_ADMIN_PASSWORD      | No       | None          |                                         |
-| AUTH_INITIAL_ADMIN_ROLE_REQUIRED | No       | false         | true, when initial user should be admin | 
+| AUTH_INITIAL_ADMIN_ROLE_REQUIRED | No       | false         | true, when initial user should be admin |
 
 ### Github
 

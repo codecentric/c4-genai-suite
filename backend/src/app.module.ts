@@ -60,6 +60,7 @@ import { PrometheusModule } from './metrics/prometheus.module';
       useFactory: async (config: ConfigService) => {
         const url = config.getOrThrow<string>('DB_URL');
         await initSchemaIfNotExistsAndMoveMigrations(url, schema);
+        const idleTimeoutMs = config.get<number>('DB_IDLE_TIMEOUT_MS', 15 * 60 * 1000);
         return {
           url,
           type: 'postgres',
@@ -70,6 +71,11 @@ import { PrometheusModule } from './metrics/prometheus.module';
           entities: [path.join(__dirname, 'domain', 'database', 'entities', '*{.ts,.js}')],
           migrations: [path.join(__dirname, 'migrations', '*{.ts,.js}')],
           schema,
+          extra: {
+            // this allows saas dbs to scale to 0
+            idleTimeoutMillis: idleTimeoutMs,
+            min: 0,
+          },
         };
       },
       dataSourceFactory: async (options) => {
