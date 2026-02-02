@@ -50,9 +50,7 @@ function getStatusConfig(status: QACatalogStatus, error?: string | null) {
         label: texts.evals.qaCatalog.statusFailure,
         badgeClass: 'badge-error',
         icon: <IconAlertTriangle size={14} />,
-        tooltip: error
-          ? texts.evals.qaCatalog.statusFailureTooltip(error)
-          : texts.evals.qaCatalog.statusFailure,
+        tooltip: error ? texts.evals.qaCatalog.statusFailureTooltip(error) : texts.evals.qaCatalog.statusFailure,
       };
     default:
       return {
