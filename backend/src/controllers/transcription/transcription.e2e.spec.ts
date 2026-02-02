@@ -38,7 +38,7 @@ describe('Transcription', () => {
     app = initialized.app;
     await cleanDatabase(dataSource);
     await seedTestData(dataSource);
-    extensionId = await createDictateExtension(dataSource);
+    extensionId = await createTranscribeExtension(dataSource);
   });
 
   afterAll(async () => {
@@ -132,7 +132,7 @@ async function seedTestData(dataSource: DataSource) {
   await configurationRepository.save(configurationEntity);
 }
 
-async function createDictateExtension(dataSource: DataSource): Promise<number> {
+async function createTranscribeExtension(dataSource: DataSource): Promise<number> {
   const configRepo = dataSource.getRepository(ConfigurationEntity);
   const extensionRepo = dataSource.getRepository(ExtensionEntity);
 
@@ -149,7 +149,6 @@ async function createDictateExtension(dataSource: DataSource): Promise<number> {
       apiKey: 'test-api-key',
       instanceName: 'test-instance',
       deploymentName: 'whisper',
-      language: 'en',
       apiVersion: '2024-06-01',
     },
   });

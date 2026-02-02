@@ -158,7 +158,7 @@ export const de: typeof en = {
       maxDurationReached: 'Maximale Aufnahmedauer erreicht. Audio wird transkribiert...',
       startRecording: 'Aufnahme starten',
       stopRecording: 'Aufnahme stoppen und transkribieren',
-      transcribing: 'Transkrition läuft...',
+      transcribing: 'Transkription läuft...',
     },
 
     thisMonth: 'Letzte 30 Tage',

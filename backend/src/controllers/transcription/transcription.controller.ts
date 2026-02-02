@@ -46,7 +46,7 @@ export class TranscriptionController {
     name: 'extensionId',
     required: true,
     type: 'number',
-    description: 'ID of the Dictate extension configuration to use',
+    description: 'ID of the Azure Transcribe extension configuration to use',
   })
   @UseInterceptors(FileInterceptor('audio'))
   @ApiOkResponse({ type: TranscriptionDto })

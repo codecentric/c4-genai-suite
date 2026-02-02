@@ -12,10 +12,6 @@ interface UseTranscribeProps {
 
 export type TranscribeState = 'idle' | 'recording' | 'transcribing' | 'error';
 
-export function isBrowserSupported(): boolean {
-  return typeof window !== 'undefined' && window.MediaRecorder && !!navigator.mediaDevices?.getUserMedia;
-}
-
 export function useTranscribe({ extensionId, onTranscriptReceived, maxDurationMs = 10 * 60 * 1000 }: UseTranscribeProps) {
   const [recordingState, setRecordingState] = useState<TranscribeState>('idle');
 
@@ -186,7 +182,7 @@ export function useTranscribe({ extensionId, onTranscriptReceived, maxDurationMs
     }
   }, [recordingState, startRecording, stopRecording]);
 
-  // Cleanup on unmount
+  // Cleanup
   useEffect(() => {
     return () => {
       cleanup();

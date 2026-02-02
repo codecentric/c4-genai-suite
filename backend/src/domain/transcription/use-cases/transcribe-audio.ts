@@ -30,7 +30,7 @@ export class TranscribeAudioHandler implements ICommandHandler<TranscribeAudio, 
   async execute(command: TranscribeAudio): Promise<TranscribeAudioResponse> {
     const { user, extensionId, audioBuffer, fileName, mimeType } = command.params;
 
-    this.logger.log(`Transcribing audio,, file: ${fileName}, size: ${audioBuffer.length} bytes`);
+    this.logger.log(`Transcribing audio, file: ${fileName}, size: ${audioBuffer.length} bytes`);
 
     const extensionResult: GetExtensionResponse = await this.queryBus.execute(new GetExtension({ id: extensionId }));
 
