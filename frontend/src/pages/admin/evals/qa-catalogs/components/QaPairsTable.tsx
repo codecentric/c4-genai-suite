@@ -39,7 +39,7 @@ export function QaPairsTable({ pairs, pendingChanges, onEdit, onDelete, onUndo }
   };
 
   return (
-    <table className="table table-fixed text-base w-full">
+    <table className="table w-full table-fixed text-base">
       <thead>
         <tr>
           <th className="w-2/5">{texts.evals.qaCatalog.question}</th>
@@ -54,28 +54,22 @@ export function QaPairsTable({ pairs, pendingChanges, onEdit, onDelete, onUndo }
             <td className="align-top">
               <div className={pair._pendingStatus === 'deleted' ? 'line-through' : ''}>
                 <Tooltip label={pair.question} multiline w={400} disabled={pair.question.length <= 100}>
-                  <span className="whitespace-pre-wrap break-words">{truncate(pair.question, 100)}</span>
+                  <span className="break-words whitespace-pre-wrap">{truncate(pair.question, 100)}</span>
                 </Tooltip>
               </div>
             </td>
             <td className="align-top">
               <div className={pair._pendingStatus === 'deleted' ? 'line-through' : ''}>
                 <Tooltip label={pair.expectedOutput} multiline w={400} disabled={pair.expectedOutput.length <= 100}>
-                  <span className="whitespace-pre-wrap break-words">{truncate(pair.expectedOutput, 100)}</span>
+                  <span className="break-words whitespace-pre-wrap">{truncate(pair.expectedOutput, 100)}</span>
                 </Tooltip>
               </div>
             </td>
             <td className="align-top">
               <div className={pair._pendingStatus === 'deleted' ? 'line-through' : ''}>
                 {pair.contexts.length > 0 ? (
-                  <Tooltip
-                    label={pair.contexts.join('\n---\n')}
-                    multiline
-                    w={400}
-                  >
-                    <span className="text-sm text-gray-600">
-                      {pair.contexts.length} context(s)
-                    </span>
+                  <Tooltip label={pair.contexts.join('\n---\n')} multiline w={400}>
+                    <span className="text-sm text-gray-600">{pair.contexts.length} context(s)</span>
                   </Tooltip>
                 ) : (
                   <span className="text-sm text-gray-400">-</span>
@@ -86,41 +80,25 @@ export function QaPairsTable({ pairs, pendingChanges, onEdit, onDelete, onUndo }
               <div className="flex gap-1">
                 {pair._pendingStatus === 'deleted' ? (
                   <Tooltip label={texts.evals.qaCatalog.undoChange}>
-                    <button
-                      type="button"
-                      className="btn btn-ghost btn-sm text-warning"
-                      onClick={() => onUndo(pair.id)}
-                    >
+                    <button type="button" className="btn btn-ghost btn-sm text-warning" onClick={() => onUndo(pair.id)}>
                       <IconArrowBackUp size={18} />
                     </button>
                   </Tooltip>
                 ) : (
                   <>
                     <Tooltip label={texts.common.edit}>
-                      <button
-                        type="button"
-                        className="btn btn-ghost btn-sm"
-                        onClick={() => onEdit(pair)}
-                      >
+                      <button type="button" className="btn btn-ghost btn-sm" onClick={() => onEdit(pair)}>
                         <IconEdit size={18} />
                       </button>
                     </Tooltip>
                     <Tooltip label={texts.common.remove}>
-                      <button
-                        type="button"
-                        className="btn btn-ghost btn-sm text-error"
-                        onClick={() => onDelete(pair)}
-                      >
+                      <button type="button" className="btn btn-ghost btn-sm text-error" onClick={() => onDelete(pair)}>
                         <IconTrash size={18} />
                       </button>
                     </Tooltip>
                     {isPending(pair.id) && pair._pendingStatus !== 'added' && (
                       <Tooltip label={texts.evals.qaCatalog.undoChange}>
-                        <button
-                          type="button"
-                          className="btn btn-ghost btn-sm text-warning"
-                          onClick={() => onUndo(pair.id)}
-                        >
+                        <button type="button" className="btn btn-ghost btn-sm text-warning" onClick={() => onUndo(pair.id)}>
                           <IconArrowBackUp size={18} />
                         </button>
                       </Tooltip>

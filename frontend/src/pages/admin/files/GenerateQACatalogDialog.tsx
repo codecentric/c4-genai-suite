@@ -1,7 +1,8 @@
-import { Button, Modal, TextInput } from '@mantine/core';
+import { Button, Modal, Select, TextInput } from '@mantine/core';
 import { useState } from 'react';
 import { FileDto } from 'src/api';
 import { useEvalApi } from 'src/api';
+import { useLlmEndpoints } from 'src/pages/admin/evals/llm-endpoints/hooks/useLlmEndpointQueries';
 
 interface GenerateQACatalogDialogProps {
   bucketId: number;
@@ -13,13 +14,22 @@ interface GenerateQACatalogDialogProps {
 export function GenerateQACatalogDialog({ bucketId, selectedFiles, opened, onClose }: GenerateQACatalogDialogProps) {
   const evalApi = useEvalApi();
   const [catalogName, setCatalogName] = useState('');
+  const [selectedEndpointId, setSelectedEndpointId] = useState<string | null>(null);
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
+  // Fetch available LLM endpoints
+  const { data: endpoints, isFetching: isLoadingEndpoints } = useLlmEndpoints(0, undefined);
+
   const handleGenerate = async () => {
     if (!catalogName.trim()) {
       setError('Please enter a catalog name');
+      return;
+    }
+
+    if (!selectedEndpointId) {
+      setError('Please select an LLM endpoint');
       return;
     }
 
@@ -41,7 +51,7 @@ export function GenerateQACatalogDialog({ bucketId, selectedFiles, opened, onClo
         },
         modelConfigSchema: {
           type: 'RAGAS',
-          llmEndpoint: 'test',
+          llmEndpoint: selectedEndpointId,
         },
       });
 
@@ -63,10 +73,18 @@ export function GenerateQACatalogDialog({ bucketId, selectedFiles, opened, onClo
     if (!generating) {
       onClose();
       setCatalogName('');
+      setSelectedEndpointId(null);
       setError(null);
       setSuccess(false);
     }
   };
+
+  // Prepare endpoint options for Select component
+  const endpointOptions =
+    endpoints?.map((endpoint) => ({
+      value: endpoint.id,
+      label: `${endpoint.name} (${endpoint._configuration.type})`,
+    })) ?? [];
 
   return (
     <Modal opened={opened} onClose={handleClose} title="Generate QA Catalog from Files" size="lg">
@@ -81,16 +99,27 @@ export function GenerateQACatalogDialog({ bucketId, selectedFiles, opened, onClo
           value={catalogName}
           onChange={(e) => setCatalogName(e.currentTarget.value)}
           required
-          error={error}
           disabled={generating || success}
+        />
+
+        <Select
+          label="LLM Endpoint"
+          placeholder="Select an LLM endpoint for generation"
+          value={selectedEndpointId}
+          onChange={setSelectedEndpointId}
+          data={endpointOptions}
+          searchable
+          required
+          disabled={generating || success || isLoadingEndpoints}
+          error={error && !catalogName.trim() ? undefined : error}
         />
 
         <div className="text-sm text-gray-500">
           <p>This will create a QA catalog using the RAGAS generator with the following settings:</p>
           <ul className="mt-2 list-inside list-disc">
-            <li>Test size: 20%</li>
-            <li>Distributions: 50% simple, 25% reasoning, 25% multi-context</li>
-            <li>Model: Azure OpenAI GPT-4o</li>
+            <li>Sample count: 10</li>
+            <li>Query distributions: Single-hop, Multi-hop specific, Multi-hop abstract</li>
+            <li>Selected LLM endpoint will be used for generation</li>
           </ul>
         </div>
 
@@ -100,7 +129,11 @@ export function GenerateQACatalogDialog({ bucketId, selectedFiles, opened, onClo
           <Button variant="subtle" onClick={handleClose} disabled={generating || success}>
             Cancel
           </Button>
-          <Button onClick={handleGenerate} loading={generating} disabled={!catalogName.trim() || generating || success}>
+          <Button
+            onClick={handleGenerate}
+            loading={generating}
+            disabled={!catalogName.trim() || !selectedEndpointId || generating || success}
+          >
             {success ? 'Done!' : 'Generate Catalog'}
           </Button>
         </div>

@@ -38,8 +38,7 @@ export function QaCatalogsPage() {
     refetch,
   } = useQuery({
     queryKey: ['qaCatalogs', page, query],
-    queryFn: () =>
-      evalApi.qaCatalog.qaCatalogGetAll(query || undefined, page * PAGE_SIZE, PAGE_SIZE),
+    queryFn: () => evalApi.qaCatalog.qaCatalogGetAll(query || undefined, page * PAGE_SIZE, PAGE_SIZE),
   });
 
   useEffect(() => {
@@ -117,57 +116,66 @@ export function QaCatalogsPage() {
                   <>
                     {[...Array(5)].map((_, i) => (
                       <tr key={i}>
-                        <td><Skeleton height={20} /></td>
-                        <td><Skeleton height={20} /></td>
-                        <td><Skeleton height={20} /></td>
-                        <td><Skeleton height={20} /></td>
-                        <td><Skeleton height={20} /></td>
-                        <td><Skeleton height={20} /></td>
+                        <td>
+                          <Skeleton height={20} />
+                        </td>
+                        <td>
+                          <Skeleton height={20} />
+                        </td>
+                        <td>
+                          <Skeleton height={20} />
+                        </td>
+                        <td>
+                          <Skeleton height={20} />
+                        </td>
+                        <td>
+                          <Skeleton height={20} />
+                        </td>
+                        <td>
+                          <Skeleton height={20} />
+                        </td>
                       </tr>
                     ))}
                   </>
                 )}
 
-                {isFetched && catalogs.map((catalog) => (
-                  <tr
-                    className="cursor-pointer hover:bg-gray-50"
-                    key={catalog.id}
-                    onClick={() => handleRowClick(catalog)}
-                  >
-                    <td className="truncate overflow-hidden font-semibold">{catalog.name}</td>
-                    <td className="overflow-hidden">{catalog.length}</td>
-                    <td className="overflow-hidden">
-                      <QaCatalogStatusChip status={catalog.status} />
-                    </td>
-                    <td className="overflow-hidden">{formatDate(catalog.createdAt)}</td>
-                    <td className="overflow-hidden">{formatDate(catalog.updatedAt)}</td>
-                    <td className="overflow-hidden">
-                      <ConfirmDialog
-                        title={texts.evals.qaCatalog.deleteConfirmTitle}
-                        text={texts.evals.qaCatalog.deleteConfirmText(catalog.name)}
-                        onPerform={() => deleteMutation.mutate(catalog.id)}
-                      >
-                        {({ onClick }) => (
-                          <button
-                            type="button"
-                            className="btn btn-ghost btn-sm text-error"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onClick();
-                            }}
-                            disabled={deleteMutation.isPending}
-                          >
-                            <IconTrash size={18} />
-                          </button>
-                        )}
-                      </ConfirmDialog>
-                    </td>
-                  </tr>
-                ))}
+                {isFetched &&
+                  catalogs.map((catalog) => (
+                    <tr className="cursor-pointer hover:bg-gray-50" key={catalog.id} onClick={() => handleRowClick(catalog)}>
+                      <td className="truncate overflow-hidden font-semibold">{catalog.name}</td>
+                      <td className="overflow-hidden">{catalog.length}</td>
+                      <td className="overflow-hidden">
+                        <QaCatalogStatusChip status={catalog.status} />
+                      </td>
+                      <td className="overflow-hidden">{formatDate(catalog.createdAt)}</td>
+                      <td className="overflow-hidden">{formatDate(catalog.updatedAt)}</td>
+                      <td className="overflow-hidden">
+                        <ConfirmDialog
+                          title={texts.evals.qaCatalog.deleteConfirmTitle}
+                          text={texts.evals.qaCatalog.deleteConfirmText(catalog.name)}
+                          onPerform={() => deleteMutation.mutate(catalog.id)}
+                        >
+                          {({ onClick }) => (
+                            <button
+                              type="button"
+                              className="btn btn-ghost btn-sm text-error"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onClick();
+                              }}
+                              disabled={deleteMutation.isPending}
+                            >
+                              <IconTrash size={18} />
+                            </button>
+                          )}
+                        </ConfirmDialog>
+                      </td>
+                    </tr>
+                  ))}
 
                 {isFetched && catalogs.length === 0 && (
                   <tr>
-                    <td colSpan={6} className="text-center py-8">
+                    <td colSpan={6} className="py-8 text-center">
                       <div className="text-gray-500">
                         <p className="mb-2">{texts.evals.qaCatalog.empty}</p>
                         <p className="text-sm">{texts.evals.qaCatalog.emptyHint}</p>
@@ -178,19 +186,12 @@ export function QaCatalogsPage() {
               </tbody>
             </table>
 
-            <Pagination
-              page={page}
-              pageSize={PAGE_SIZE}
-              total={totalCount}
-              onPage={handleChangePage}
-            />
+            <Pagination page={page} pageSize={PAGE_SIZE} total={totalCount} onPage={handleChangePage} />
           </div>
         </div>
       </Page>
 
-      {showCreateDialog && (
-        <CreateQaCatalogDialog onClose={handleCloseCreateDialog} onCreated={handleCreated} />
-      )}
+      {showCreateDialog && <CreateQaCatalogDialog onClose={handleCloseCreateDialog} onCreated={handleCreated} />}
     </>
   );
 }

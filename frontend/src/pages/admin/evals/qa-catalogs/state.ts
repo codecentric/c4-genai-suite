@@ -110,7 +110,7 @@ const useQaCatalogsStore_ = create<QaCatalogsState & QaCatalogsActions>()((set, 
       } else if (change.type === 'update') {
         // For updates, check if there's already a pending change for this id
         const existingIndex = pendingChanges.findIndex(
-          (c) => (c.type === 'update' && c.id === change.id) || (c.type === 'deletion' && c.id === change.id)
+          (c) => (c.type === 'update' && c.id === change.id) || (c.type === 'deletion' && c.id === change.id),
         );
 
         if (existingIndex >= 0) {
@@ -128,18 +128,14 @@ const useQaCatalogsStore_ = create<QaCatalogsState & QaCatalogsActions>()((set, 
         }
       } else if (change.type === 'deletion') {
         // For deletions, check if it was a pending addition
-        const additionIndex = pendingChanges.findIndex(
-          (c) => c.type === 'addition' && c.tempId === change.id
-        );
+        const additionIndex = pendingChanges.findIndex((c) => c.type === 'addition' && c.tempId === change.id);
 
         if (additionIndex >= 0) {
           // Just remove the pending addition
           pendingChanges.splice(additionIndex, 1);
         } else {
           // Check if there's an update pending
-          const updateIndex = pendingChanges.findIndex(
-            (c) => c.type === 'update' && c.id === change.id
-          );
+          const updateIndex = pendingChanges.findIndex((c) => c.type === 'update' && c.id === change.id);
 
           if (updateIndex >= 0) {
             // Replace the update with a deletion, using the original data
@@ -151,9 +147,7 @@ const useQaCatalogsStore_ = create<QaCatalogsState & QaCatalogsActions>()((set, 
             };
           } else {
             // Check if already marked for deletion
-            const deletionIndex = pendingChanges.findIndex(
-              (c) => c.type === 'deletion' && c.id === change.id
-            );
+            const deletionIndex = pendingChanges.findIndex((c) => c.type === 'deletion' && c.id === change.id);
             if (deletionIndex < 0) {
               pendingChanges.push(change);
             }
@@ -182,9 +176,7 @@ const useQaCatalogsStore_ = create<QaCatalogsState & QaCatalogsActions>()((set, 
     const { qaPairs, pendingChanges } = get();
 
     // Start with original pairs
-    let effectivePairs: (QAPair & { _pendingStatus?: 'added' | 'updated' | 'deleted' })[] = qaPairs.map(
-      (pair) => ({ ...pair })
-    );
+    let effectivePairs: (QAPair & { _pendingStatus?: 'added' | 'updated' | 'deleted' })[] = qaPairs.map((pair) => ({ ...pair }));
 
     // Apply pending changes
     for (const change of pendingChanges) {

@@ -60,9 +60,7 @@ export function EditQaPairDialog({ pair, onClose, onSave }: EditQaPairDialogProp
               <Button type="button" variant="subtle" onClick={onClose}>
                 {texts.common.cancel}
               </Button>
-              <Button type="submit">
-                {texts.common.save}
-              </Button>
+              <Button type="submit">{texts.common.save}</Button>
             </div>
           }
         >
@@ -89,19 +87,15 @@ export function EditQaPairDialog({ pair, onClose, onSave }: EditQaPairDialogProp
           />
 
           <div className="mb-4">
-            <div className="flex items-center justify-between mb-2">
-              <label className="text-sm font-medium">
-                {texts.evals.qaCatalog.contextsLabel}
-              </label>
+            <div className="mb-2 flex items-center justify-between">
+              <label className="text-sm font-medium">{texts.evals.qaCatalog.contextsLabel}</label>
               <Tooltip label={texts.evals.qaCatalog.addContext}>
                 <ActionIcon variant="light" size="sm" onClick={addContext}>
                   <IconPlus size={16} />
                 </ActionIcon>
               </Tooltip>
             </div>
-            <p className="text-xs text-gray-500 mb-2">
-              {texts.evals.qaCatalog.contextsHint}
-            </p>
+            <p className="mb-2 text-xs text-gray-500">{texts.evals.qaCatalog.contextsHint}</p>
 
             {form.values.contexts.length === 0 ? (
               <p className="text-sm text-gray-400 italic">No contexts added</p>
@@ -117,12 +111,7 @@ export function EditQaPairDialog({ pair, onClose, onSave }: EditQaPairDialogProp
                       {...form.getInputProps(`contexts.${index}`)}
                     />
                     <Tooltip label={texts.evals.qaCatalog.removeContext}>
-                      <ActionIcon
-                        variant="subtle"
-                        color="red"
-                        className="mt-1"
-                        onClick={() => removeContext(index)}
-                      >
+                      <ActionIcon variant="subtle" color="red" className="mt-1" onClick={() => removeContext(index)}>
                         <IconX size={16} />
                       </ActionIcon>
                     </Tooltip>

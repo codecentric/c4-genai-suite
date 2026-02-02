@@ -60,11 +60,7 @@ export function UploadQaCatalogDialog({ catalogId, onClose, onSuccess }: UploadQ
                 <Button type="button" variant="subtle" onClick={onClose}>
                   {texts.common.cancel}
                 </Button>
-                <Button
-                  type="submit"
-                  leftSection={<IconUpload size={16} />}
-                  loading={uploadMutation.isPending}
-                >
+                <Button type="submit" leftSection={<IconUpload size={16} />} loading={uploadMutation.isPending}>
                   {texts.evals.qaCatalog.uploadFile}
                 </Button>
               </div>
@@ -74,9 +70,7 @@ export function UploadQaCatalogDialog({ catalogId, onClose, onSuccess }: UploadQ
           <fieldset disabled={uploadMutation.isPending}>
             <FormAlert common={texts.evals.qaCatalog.uploadFailed} error={uploadMutation.error} />
 
-            <p className="text-sm text-gray-500 mb-4">
-              {texts.evals.qaCatalog.uploadHint}
-            </p>
+            <p className="mb-4 text-sm text-gray-500">{texts.evals.qaCatalog.uploadHint}</p>
 
             <FileInput
               id="file"

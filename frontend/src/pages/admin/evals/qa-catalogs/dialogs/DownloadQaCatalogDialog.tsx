@@ -4,10 +4,7 @@ import { IconDownload } from '@tabler/icons-react';
 import { useMutation } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { toast } from 'react-toastify';
-import {
-  SupportedQACatalogDownloadFormat,
-  type QACatalogVersionHistoryItem,
-} from 'src/api/generated-eval';
+import { SupportedQACatalogDownloadFormat, type QACatalogVersionHistoryItem } from 'src/api/generated-eval';
 import { useEvalApi } from 'src/api/state/apiEvalClient';
 import { Modal } from 'src/components';
 import { texts } from 'src/texts';
@@ -27,11 +24,7 @@ interface FormValues {
   selectedVersions: string[];
 }
 
-export function DownloadQaCatalogDialog({
-  catalogId,
-  versions,
-  onClose,
-}: DownloadQaCatalogDialogProps) {
+export function DownloadQaCatalogDialog({ catalogId, versions, onClose }: DownloadQaCatalogDialogProps) {
   const evalApi = useEvalApi();
 
   const form = useForm<FormValues>({
@@ -55,8 +48,7 @@ export function DownloadQaCatalogDialog({
       const options = {
         format: values.format,
         parentCatalogId: catalogId,
-        versionIds:
-          values.versionSelection === 'specific' ? values.selectedVersions : undefined,
+        versionIds: values.versionSelection === 'specific' ? values.selectedVersions : undefined,
         includeAll: values.versionSelection === 'all',
       };
 
@@ -94,11 +86,7 @@ export function DownloadQaCatalogDialog({
               <Button type="button" variant="subtle" onClick={onClose}>
                 {texts.common.cancel}
               </Button>
-              <Button
-                type="submit"
-                leftSection={<IconDownload size={16} />}
-                loading={downloadMutation.isPending}
-              >
+              <Button type="submit" leftSection={<IconDownload size={16} />} loading={downloadMutation.isPending}>
                 {texts.evals.qaCatalog.downloadStart}
               </Button>
             </div>
@@ -106,58 +94,33 @@ export function DownloadQaCatalogDialog({
         >
           {/* Format selection */}
           <div className="mb-6">
-            <label className="text-sm font-medium block mb-2">
-              {texts.evals.qaCatalog.downloadFormat}
-            </label>
+            <label className="mb-2 block text-sm font-medium">{texts.evals.qaCatalog.downloadFormat}</label>
             <Radio.Group
               value={form.values.format}
               onChange={(value) => form.setFieldValue('format', value as SupportedQACatalogDownloadFormat)}
             >
               <Stack gap="xs">
-                <Radio
-                  value={SupportedQACatalogDownloadFormat.Csv}
-                  label={texts.evals.qaCatalog.downloadFormatCsv}
-                />
-                <Radio
-                  value={SupportedQACatalogDownloadFormat.Json}
-                  label={texts.evals.qaCatalog.downloadFormatJson}
-                />
-                <Radio
-                  value={SupportedQACatalogDownloadFormat.Yaml}
-                  label={texts.evals.qaCatalog.downloadFormatYaml}
-                />
-                <Radio
-                  value={SupportedQACatalogDownloadFormat.Xlsx}
-                  label={texts.evals.qaCatalog.downloadFormatXlsx}
-                />
+                <Radio value={SupportedQACatalogDownloadFormat.Csv} label={texts.evals.qaCatalog.downloadFormatCsv} />
+                <Radio value={SupportedQACatalogDownloadFormat.Json} label={texts.evals.qaCatalog.downloadFormatJson} />
+                <Radio value={SupportedQACatalogDownloadFormat.Yaml} label={texts.evals.qaCatalog.downloadFormatYaml} />
+                <Radio value={SupportedQACatalogDownloadFormat.Xlsx} label={texts.evals.qaCatalog.downloadFormatXlsx} />
               </Stack>
             </Radio.Group>
           </div>
 
           {/* Version selection */}
           <div className="mb-4">
-            <label className="text-sm font-medium block mb-2">
-              {texts.evals.qaCatalog.downloadVersions}
-            </label>
+            <label className="mb-2 block text-sm font-medium">{texts.evals.qaCatalog.downloadVersions}</label>
             <Radio.Group
               value={form.values.versionSelection}
               onChange={(value) => form.setFieldValue('versionSelection', value as VersionSelection)}
             >
               <Stack gap="xs">
-                <Radio
-                  value="current"
-                  label={texts.evals.qaCatalog.downloadCurrentVersion}
-                />
+                <Radio value="current" label={texts.evals.qaCatalog.downloadCurrentVersion} />
                 {versions.length > 1 && (
                   <>
-                    <Radio
-                      value="specific"
-                      label={texts.evals.qaCatalog.downloadSpecificVersions}
-                    />
-                    <Radio
-                      value="all"
-                      label={texts.evals.qaCatalog.downloadAllVersions}
-                    />
+                    <Radio value="specific" label={texts.evals.qaCatalog.downloadSpecificVersions} />
+                    <Radio value="all" label={texts.evals.qaCatalog.downloadAllVersions} />
                   </>
                 )}
               </Stack>

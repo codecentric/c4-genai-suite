@@ -83,8 +83,7 @@ export function QaCatalogDetailPage() {
     refetch: refetchPairs,
   } = useQuery({
     queryKey: ['qaPairs', catalogId, page, versionId],
-    queryFn: () =>
-      evalApi.qaCatalog.qaCatalogGetCatalogQaPairs(catalogId!, page * PAGE_SIZE, PAGE_SIZE),
+    queryFn: () => evalApi.qaCatalog.qaCatalogGetCatalogQaPairs(catalogId!, page * PAGE_SIZE, PAGE_SIZE),
     enabled: !!catalogId,
   });
 
@@ -174,9 +173,7 @@ export function QaCatalogDetailPage() {
 
   const handleDelete = useEventCallback((pair: QAPair) => {
     // Check if it's a pending addition (temp id)
-    const isAddition = pendingChanges.some(
-      (c) => c.type === 'addition' && c.tempId === pair.id
-    );
+    const isAddition = pendingChanges.some((c) => c.type === 'addition' && c.tempId === pair.id);
 
     if (isAddition) {
       removePendingChange(pair.id);
@@ -194,9 +191,7 @@ export function QaCatalogDetailPage() {
 
   const handleSaveEdit = useEventCallback((pair: QAPair) => {
     // Check if it's a pending addition
-    const additionIndex = pendingChanges.findIndex(
-      (c) => c.type === 'addition' && c.tempId === pair.id
-    );
+    const additionIndex = pendingChanges.findIndex((c) => c.type === 'addition' && c.tempId === pair.id);
 
     if (additionIndex >= 0) {
       // Update the pending addition
@@ -273,7 +268,7 @@ export function QaCatalogDetailPage() {
   if (!catalog) {
     return (
       <Page>
-        <div className="text-center py-12">
+        <div className="py-12 text-center">
           <p className="text-lg text-gray-500">{texts.evals.qaCatalog.errorNotFound}</p>
           <Button
             variant="subtle"
@@ -293,7 +288,7 @@ export function QaCatalogDetailPage() {
       <Page>
         {/* Header */}
         <div className="mb-4">
-          <div className="flex items-center gap-2 mb-2">
+          <div className="mb-2 flex items-center gap-2">
             <Button
               variant="subtle"
               size="sm"
@@ -332,16 +327,10 @@ export function QaCatalogDetailPage() {
                 </Menu.Target>
 
                 <Menu.Dropdown>
-                  <Menu.Item
-                    leftSection={<IconDownload size={16} />}
-                    onClick={() => setShowDownloadDialog(true)}
-                  >
+                  <Menu.Item leftSection={<IconDownload size={16} />} onClick={() => setShowDownloadDialog(true)}>
                     {texts.evals.qaCatalog.downloadCatalog}
                   </Menu.Item>
-                  <Menu.Item
-                    leftSection={<IconUpload size={16} />}
-                    onClick={() => setShowUploadDialog(true)}
-                  >
+                  <Menu.Item leftSection={<IconUpload size={16} />} onClick={() => setShowUploadDialog(true)}>
                     {texts.evals.qaCatalog.uploadTitle}
                   </Menu.Item>
                   <Menu.Divider />
@@ -351,11 +340,7 @@ export function QaCatalogDetailPage() {
                     onPerform={() => deleteMutation.mutate()}
                   >
                     {({ onClick }) => (
-                      <Menu.Item
-                        color="red"
-                        leftSection={<IconTrash size={16} />}
-                        onClick={onClick}
-                      >
+                      <Menu.Item color="red" leftSection={<IconTrash size={16} />} onClick={onClick}>
                         {texts.evals.qaCatalog.deleteCatalog}
                       </Menu.Item>
                     )}
@@ -370,20 +355,24 @@ export function QaCatalogDetailPage() {
           </div>
 
           {/* Metadata */}
-          <div className="mt-2 text-sm text-gray-500 flex gap-4">
-            <span>{texts.evals.qaCatalog.revision}: {catalog.revision}</span>
-            <span>{texts.evals.qaCatalog.createdAt}: {formatDate(catalog.createdAt)}</span>
-            <span>{texts.evals.qaCatalog.updatedAt}: {formatDate(catalog.updatedAt)}</span>
+          <div className="mt-2 flex gap-4 text-sm text-gray-500">
+            <span>
+              {texts.evals.qaCatalog.revision}: {catalog.revision}
+            </span>
+            <span>
+              {texts.evals.qaCatalog.createdAt}: {formatDate(catalog.createdAt)}
+            </span>
+            <span>
+              {texts.evals.qaCatalog.updatedAt}: {formatDate(catalog.updatedAt)}
+            </span>
           </div>
         </div>
 
         {/* Pending changes bar */}
         {hasChanges && (
-          <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg flex items-center justify-between">
+          <div className="mb-4 flex items-center justify-between rounded-lg border border-yellow-200 bg-yellow-50 p-3">
             <div className="flex items-center gap-4 text-sm">
-              <span className="font-medium">
-                {texts.evals.qaCatalog.pendingChanges(pendingChanges.length)}
-              </span>
+              <span className="font-medium">{texts.evals.qaCatalog.pendingChanges(pendingChanges.length)}</span>
               {pendingCounts.additions > 0 && (
                 <span className="text-green-600">
                   +{pendingCounts.additions} {texts.evals.qaCatalog.pendingAdditions(pendingCounts.additions)}
@@ -444,17 +433,10 @@ export function QaCatalogDetailPage() {
                 />
 
                 {effectivePairs.length === 0 && (
-                  <div className="text-center py-8 text-gray-500">
-                    {texts.evals.qaCatalog.noQaPairs}
-                  </div>
+                  <div className="py-8 text-center text-gray-500">{texts.evals.qaCatalog.noQaPairs}</div>
                 )}
 
-                <Pagination
-                  page={page}
-                  pageSize={PAGE_SIZE}
-                  total={qaPairs.length + pendingCounts.additions}
-                  onPage={setPage}
-                />
+                <Pagination page={page} pageSize={PAGE_SIZE} total={qaPairs.length + pendingCounts.additions} onPage={setPage} />
               </>
             )}
           </div>
@@ -462,20 +444,9 @@ export function QaCatalogDetailPage() {
       </Page>
 
       {/* Dialogs */}
-      {editingPair && (
-        <EditQaPairDialog
-          pair={editingPair}
-          onClose={() => setEditingPair(null)}
-          onSave={handleSaveEdit}
-        />
-      )}
+      {editingPair && <EditQaPairDialog pair={editingPair} onClose={() => setEditingPair(null)} onSave={handleSaveEdit} />}
 
-      {showAddDialog && (
-        <AddQaPairDialog
-          onClose={() => setShowAddDialog(false)}
-          onAdd={handleAddPair}
-        />
-      )}
+      {showAddDialog && <AddQaPairDialog onClose={() => setShowAddDialog(false)} onAdd={handleAddPair} />}
 
       {showDownloadDialog && (
         <DownloadQaCatalogDialog
