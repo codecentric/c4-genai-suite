@@ -127,11 +127,9 @@ export function CreateQaCatalogDialog({ onClose, onCreated }: CreateQaCatalogDia
 
             <Tabs.Panel value="generate" pt="md">
               <div className="flex flex-col items-center justify-center py-8 text-center">
-                <IconSparkles size={48} className="mb-4 text-primary" />
+                <IconSparkles size={48} className="text-primary mb-4" />
                 <p className="mb-4 text-lg">{texts.evals.qaCatalog.generateTitle}</p>
-                <p className="text-sm text-gray-500">
-                  Generate Q&A pairs automatically from your documents using AI.
-                </p>
+                <p className="text-sm text-gray-500">Generate Q&A pairs automatically from your documents using AI.</p>
               </div>
             </Tabs.Panel>
           </Tabs>
