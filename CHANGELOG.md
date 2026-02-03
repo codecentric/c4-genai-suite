@@ -1,5 +1,13 @@
 # Changelog
 
+## [9.11.2](https://github.com/codecentric/c4-genai-suite/compare/v9.11.1...v9.11.2) (2026-02-03)
+
+
+### Bug Fixes
+
+* add indices for some common queries to improve db performance ([#1184](https://github.com/codecentric/c4-genai-suite/issues/1184)) ([957865d](https://github.com/codecentric/c4-genai-suite/commit/957865d313bb6cfbf8d4aef073ac64eb283c988e))
+* show the correct version in the frontend ([#1176](https://github.com/codecentric/c4-genai-suite/issues/1176)) ([ff26160](https://github.com/codecentric/c4-genai-suite/commit/ff26160615573fc8d9b0cab470d0a629407ed77e))
+
 ## [9.11.1](https://github.com/codecentric/c4-genai-suite/compare/v9.11.0...v9.11.1) (2026-01-29)
 
 
