@@ -13,3 +13,11 @@ export function buildUser(source: UserEntity): User {
 export function buildUserGroup(source: UserGroupEntity): UserGroup {
   return source;
 }
+
+export function buildUserSnapshot(user: User): Record<string, unknown> {
+  return JSON.parse(JSON.stringify(user)) as Record<string, unknown>;
+}
+
+export function buildUserGroupSnapshot(userGroup: UserGroup): Record<string, unknown> {
+  return JSON.parse(JSON.stringify(userGroup)) as Record<string, unknown>;
+}

@@ -1,6 +1,108 @@
 {
   "openapi": "3.0.0",
   "paths": {
+    "/api/audit-logs": {
+      "get": {
+        "description": "Gets the audit log entries.",
+        "operationId": "getAuditLogs",
+        "parameters": [
+          {
+            "name": "entityType",
+            "required": false,
+            "in": "query",
+            "description": "Filter by entity type.",
+            "schema": {
+              "enum": ["extension", "bucket", "configuration", "settings", "userGroup", "user"],
+              "type": "string"
+            }
+          },
+          {
+            "name": "entityId",
+            "required": false,
+            "in": "query",
+            "description": "Filter by entity ID.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "configurationId",
+            "required": false,
+            "in": "query",
+            "description": "Filter by configuration/assistant ID. Returns configuration changes and related extension changes.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "The page number (0-based).",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "description": "The number of items per page.",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuditLogsDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "",
+        "tags": ["audit-logs"]
+      }
+    },
+    "/api/audit-logs/{id}": {
+      "get": {
+        "description": "Gets a single audit log entry by ID, including the previous snapshot for diff.",
+        "operationId": "getAuditLogById",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "The ID of the audit log entry.",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuditLogDetailDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Audit log entry not found."
+          }
+        },
+        "summary": "",
+        "tags": ["audit-logs"]
+      }
+    },
     "/api/auth/settings": {
       "get": {
         "description": "The settings.",
@@ -2201,6 +2303,110 @@
   "servers": [],
   "components": {
     "schemas": {
+      "AuditLogDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "The ID of the audit log entry."
+          },
+          "entityType": {
+            "type": "string",
+            "description": "The type of entity that was modified.",
+            "enum": ["extension", "bucket", "configuration", "settings", "userGroup", "user"]
+          },
+          "entityId": {
+            "type": "string",
+            "description": "The ID of the entity that was modified."
+          },
+          "action": {
+            "type": "string",
+            "description": "The action that was performed.",
+            "enum": ["create", "update", "delete"]
+          },
+          "userId": {
+            "type": "string",
+            "description": "The ID of the user who performed the action."
+          },
+          "userName": {
+            "type": "string",
+            "description": "The name of the user who performed the action."
+          },
+          "snapshot": {
+            "type": "object",
+            "description": "The complete state snapshot of the entity at the time of the action."
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "The timestamp when the action was performed."
+          }
+        },
+        "required": ["id", "entityType", "entityId", "action", "userId", "snapshot", "createdAt"]
+      },
+      "AuditLogsDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "description": "The audit log entries.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AuditLogDto"
+            }
+          },
+          "total": {
+            "type": "number",
+            "description": "The total number of audit log entries."
+          }
+        },
+        "required": ["items", "total"]
+      },
+      "AuditLogDetailDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "The ID of the audit log entry."
+          },
+          "entityType": {
+            "type": "string",
+            "description": "The type of entity that was modified.",
+            "enum": ["extension", "bucket", "configuration", "settings", "userGroup", "user"]
+          },
+          "entityId": {
+            "type": "string",
+            "description": "The ID of the entity that was modified."
+          },
+          "action": {
+            "type": "string",
+            "description": "The action that was performed.",
+            "enum": ["create", "update", "delete"]
+          },
+          "userId": {
+            "type": "string",
+            "description": "The ID of the user who performed the action."
+          },
+          "userName": {
+            "type": "string",
+            "description": "The name of the user who performed the action."
+          },
+          "snapshot": {
+            "type": "object",
+            "description": "The complete state snapshot of the entity at the time of the action."
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "The timestamp when the action was performed."
+          },
+          "previousSnapshot": {
+            "type": "object",
+            "description": "The previous snapshot of the entity, for computing diffs. Null if this is the first entry for the entity.",
+            "nullable": true
+          }
+        },
+        "required": ["id", "entityType", "entityId", "action", "userId", "snapshot", "createdAt"]
+      },
       "AuthProviderDto": {
         "type": "object",
         "properties": {

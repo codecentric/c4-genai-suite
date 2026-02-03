@@ -1,8 +1,11 @@
 import { HttpException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { AuditLogService } from 'src/domain/audit-log';
 import { BucketEntity, BucketRepository } from '../../database';
 import { CreateBucket, CreateBucketHandler, CreateBucketResponse } from './create-bucket';
+
+const mockPerformedBy = { id: 'test-user', name: 'Test User' };
 
 describe('Create Bucket', () => {
   let bucketRepository: BucketRepository;
@@ -22,6 +25,12 @@ describe('Create Bucket', () => {
             save: jest.fn(),
           },
         },
+        {
+          provide: AuditLogService,
+          useValue: {
+            createAuditLog: jest.fn(),
+          },
+        },
       ],
     }).compile();
 
@@ -39,14 +48,17 @@ describe('Create Bucket', () => {
       perUserQuota: 20,
     } as BucketEntity);
 
-    const command = new CreateBucket({
-      name: 'bucket-user',
-      type: 'user',
-      endpoint: 'http://localhost:8080',
-      perUserQuota: 20,
-      isDefault: false,
-      fileSizeLimits: { general: 1, pdf: 10 },
-    });
+    const command = new CreateBucket(
+      {
+        name: 'bucket-user',
+        type: 'user',
+        endpoint: 'http://localhost:8080',
+        perUserQuota: 20,
+        isDefault: false,
+        fileSizeLimits: { general: 1, pdf: 10 },
+      },
+      mockPerformedBy,
+    );
 
     const response = await handler.execute(command);
 
@@ -56,14 +68,17 @@ describe('Create Bucket', () => {
   });
   it('should fail to create a new user bucket if one already exists', async () => {
     jest.spyOn(bucketRepository, 'findOneBy').mockResolvedValueOnce({ id: 1 } as BucketEntity);
-    const command = new CreateBucket({
-      name: 'bucket-user',
-      type: 'user',
-      endpoint: 'http://localhost:8080',
-      perUserQuota: 20,
-      isDefault: false,
-      fileSizeLimits: { general: 1, pdf: 10 },
-    });
+    const command = new CreateBucket(
+      {
+        name: 'bucket-user',
+        type: 'user',
+        endpoint: 'http://localhost:8080',
+        perUserQuota: 20,
+        isDefault: false,
+        fileSizeLimits: { general: 1, pdf: 10 },
+      },
+      mockPerformedBy,
+    );
 
     await expect(handler.execute(command)).rejects.toThrow(HttpException);
   });
@@ -77,14 +92,17 @@ describe('Create Bucket', () => {
       perUserQuota: 20,
     } as BucketEntity);
 
-    const command = new CreateBucket({
-      name: 'bucket-general',
-      type: 'general',
-      endpoint: 'http://localhost:8080',
-      perUserQuota: 20,
-      isDefault: false,
-      fileSizeLimits: { general: 1, pdf: 10 },
-    });
+    const command = new CreateBucket(
+      {
+        name: 'bucket-general',
+        type: 'general',
+        endpoint: 'http://localhost:8080',
+        perUserQuota: 20,
+        isDefault: false,
+        fileSizeLimits: { general: 1, pdf: 10 },
+      },
+      mockPerformedBy,
+    );
 
     const response = await handler.execute(command);
 
@@ -102,14 +120,17 @@ describe('Create Bucket', () => {
       isDefault: false,
     } as BucketEntity);
 
-    const command = new CreateBucket({
-      name: 'bucket-conversation',
-      type: 'conversation',
-      endpoint: 'http://localhost:8080',
-      perUserQuota: 0,
-      isDefault: false,
-      fileSizeLimits: { general: 1, pdf: 10 },
-    });
+    const command = new CreateBucket(
+      {
+        name: 'bucket-conversation',
+        type: 'conversation',
+        endpoint: 'http://localhost:8080',
+        perUserQuota: 0,
+        isDefault: false,
+        fileSizeLimits: { general: 1, pdf: 10 },
+      },
+      mockPerformedBy,
+    );
 
     const response = await handler.execute(command);
 
@@ -118,14 +139,17 @@ describe('Create Bucket', () => {
   });
   it('should fail to create a new conversation bucket if one already exists', async () => {
     jest.spyOn(bucketRepository, 'findOneBy').mockResolvedValueOnce({ id: 1, type: 'conversation' } as BucketEntity);
-    const command = new CreateBucket({
-      name: 'bucket-conversation',
-      type: 'conversation',
-      endpoint: 'http://localhost:8080',
-      perUserQuota: 0,
-      isDefault: false,
-      fileSizeLimits: { general: 1, pdf: 10 },
-    });
+    const command = new CreateBucket(
+      {
+        name: 'bucket-conversation',
+        type: 'conversation',
+        endpoint: 'http://localhost:8080',
+        perUserQuota: 0,
+        isDefault: false,
+        fileSizeLimits: { general: 1, pdf: 10 },
+      },
+      mockPerformedBy,
+    );
 
     await expect(handler.execute(command)).rejects.toThrow(HttpException);
   });

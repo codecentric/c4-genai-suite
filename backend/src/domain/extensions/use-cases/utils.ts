@@ -180,3 +180,43 @@ export async function buildConfiguration(
     extensions: extensions.filter((x) => !!x),
   };
 }
+
+export function buildConfigurationSnapshot(configuration: ConfigurationModel): Record<string, unknown> {
+  // Explicitly pick only the fields defined in the ConfigurationModel interface (excluding extensions)
+  const snapshot: Omit<ConfigurationModel, 'extensions'> = {
+    id: configuration.id,
+    name: configuration.name,
+    description: configuration.description,
+    enabled: configuration.enabled,
+    agentName: configuration.agentName,
+    chatFooter: configuration.chatFooter,
+    chatSuggestions: configuration.chatSuggestions,
+    executorEndpoint: configuration.executorEndpoint,
+    executorHeaders: configuration.executorHeaders,
+    userGroupIds: configuration.userGroupIds,
+  };
+  return JSON.parse(JSON.stringify(snapshot)) as Record<string, unknown>;
+}
+
+type ExtensionSnapshot = Pick<ExtensionEntity, 'id' | 'name' | 'enabled' | 'values' | 'configurableArguments'> & {
+  configurationId: number;
+  configurationName?: string;
+};
+
+export function buildExtensionSnapshot(
+  extension: ConfiguredExtension,
+  configurationId: number,
+  configurationName?: string,
+): Record<string, unknown> {
+  // Explicitly pick only the relevant fields from ConfiguredExtension
+  const snapshot: ExtensionSnapshot = {
+    id: extension.id,
+    name: extension.name,
+    enabled: extension.enabled,
+    values: extension.values,
+    configurableArguments: extension.configurableArguments,
+    configurationId,
+    configurationName,
+  };
+  return JSON.parse(JSON.stringify(snapshot)) as Record<string, unknown>;
+}

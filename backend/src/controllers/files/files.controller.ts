@@ -119,8 +119,8 @@ export class FilesController {
   @ApiOkResponse({ description: 'Creates a bucket.', type: BucketDto })
   @Role(BUILTIN_USER_GROUP_ADMIN)
   @UseGuards(RoleGuard)
-  async postBucket(@Body() body: UpsertBucketDto) {
-    const command = new CreateBucket(body);
+  async postBucket(@Body() body: UpsertBucketDto, @Req() req: Request) {
+    const command = new CreateBucket(body, req.user);
 
     const result: CreateBucketResponse = await this.commandBus.execute(command);
 
@@ -138,8 +138,8 @@ export class FilesController {
   @ApiOkResponse({ type: BucketDto })
   @Role(BUILTIN_USER_GROUP_ADMIN)
   @UseGuards(RoleGuard)
-  async putBucket(@Param('id') id: number, @Body() body: UpsertBucketDto) {
-    const command = new UpdateBucket(id, body);
+  async putBucket(@Param('id') id: number, @Body() body: UpsertBucketDto, @Req() req: Request) {
+    const command = new UpdateBucket(id, body, req.user);
 
     const result: UpdateBucketResponse = await this.commandBus.execute(command);
 
@@ -157,9 +157,8 @@ export class FilesController {
   @ApiNoContentResponse()
   @Role(BUILTIN_USER_GROUP_ADMIN)
   @UseGuards(RoleGuard)
-  async deleteBucket(@Param('id') id: number) {
-    const command = new DeleteBucket(id);
-
+  async deleteBucket(@Param('id') id: number, @Req() req: Request) {
+    const command = new DeleteBucket(id, req.user);
     await this.commandBus.execute(command);
   }
 
