@@ -14,7 +14,7 @@ describe('AzureTranscribeExtension', () => {
 
   describe('spec', () => {
     it('should have correct name', () => {
-      expect(extension.spec.name).toBe('transcribe');
+      expect(extension.spec.name).toBe('transcribe-azure');
     });
 
     it('should have group set to speech-to-text', () => {

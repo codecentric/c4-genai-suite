@@ -207,7 +207,7 @@
       "description": "Allows speech input via microphone icon"
     },
     "transcribe": {
-      "title": "Azure Transcribe",
+      "title": "Transcription: Azure OpenAI",
       "description": "Transcribe audio recordings to text using Azure OpenAI Whisper",
       "apiKey": "API Key",
       "apiKeyHint": "Your Azure OpenAI API key",

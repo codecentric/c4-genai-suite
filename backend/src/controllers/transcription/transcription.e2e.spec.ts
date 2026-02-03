@@ -142,7 +142,7 @@ async function createTranscribeExtension(dataSource: DataSource): Promise<number
   }
 
   const extension = extensionRepo.create({
-    name: 'transcribe',
+    name: 'transcribe-azure',
     enabled: true,
     configuration: config,
     values: {

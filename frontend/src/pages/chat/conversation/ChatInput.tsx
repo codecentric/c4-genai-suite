@@ -176,10 +176,11 @@ export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEm
     onTranscriptUpdate: setInput,
   });
 
-  const voiceExtensions = configuration?.extensions?.filter((e) => e.name === 'speech-to-text' || e.name === 'transcribe') ?? [];
+  const voiceExtensions =
+    configuration?.extensions?.filter((e) => e.name === 'speech-to-text' || e.name === 'transcribe-azure') ?? [];
   const activeVoiceExtension = voiceExtensions[0];
   const showSpeechToText = activeVoiceExtension?.name === 'speech-to-text';
-  const showTranscribe = activeVoiceExtension?.name === 'transcribe';
+  const showTranscribe = activeVoiceExtension?.name === 'transcribe-azure';
 
   // Transcribe extension setup
   const transcribeExtension = showTranscribe ? activeVoiceExtension : undefined;
