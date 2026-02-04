@@ -18,27 +18,23 @@ export class AzureTranscribeExtension implements Extension<TranscribeExtensionCo
       arguments: {
         apiKey: {
           type: 'string',
-          title: this.i18n.t('texts.extensions.transcribe.apiKey'),
+          title: this.i18n.t('texts.extensions.common.apiKey'),
           required: true,
           format: 'password',
-          description: this.i18n.t('texts.extensions.transcribe.apiKeyHint'),
         },
         instanceName: {
           type: 'string',
           title: this.i18n.t('texts.extensions.common.instanceName'),
           required: true,
-          description: this.i18n.t('texts.extensions.transcribe.instanceNameHint'),
         },
         deploymentName: {
           type: 'string',
           title: this.i18n.t('texts.extensions.common.deploymentName'),
           required: true,
-          description: this.i18n.t('texts.extensions.transcribe.deploymentNameHint'),
         },
         apiVersion: {
           type: 'string',
           title: this.i18n.t('texts.extensions.common.apiVersion'),
-          description: this.i18n.t('texts.extensions.transcribe.apiVersionHint'),
           required: true,
           format: 'select',
           examples: ['2024-06-01', '2025-03-01-preview'],

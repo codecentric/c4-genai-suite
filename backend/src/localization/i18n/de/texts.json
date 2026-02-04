@@ -208,15 +208,7 @@
     },
     "transcribe": {
       "title": "Transcription: Azure OpenAI",
-      "description": "Audioaufnahmen in Text umwandeln mit Azure OpenAI Whisper",
-      "apiKey": "API-Schlüssel",
-      "apiKeyHint": "Ihr Azure OpenAI API-Schlüssel",
-      "instanceName": "Instanzname",
-      "instanceNameHint": "Name der Azure OpenAI-Ressource",
-      "deploymentName": "Bereitstellungsname",
-      "deploymentNameHint": "Name der Whisper-Bereitstellung in Ihrer Azure OpenAI-Ressource",
-      "apiVersion": "API-Version",
-      "apiVersionHint": "Azure OpenAI API-Version"
+      "description": "Audioaufnahmen mit Azure OpenAI in Text transkribieren"
     },
     "filesInConversation": {
       "title": "Suche in Dateien im Chat",
