@@ -75,7 +75,11 @@ jobs:
           - confluence-importer
     needs:
       - upstream-workflows
+      - build-container-images
     steps:
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - uses: docker/login-action@v3
         with:
           registry: ghcr.io
@@ -88,11 +92,10 @@ jobs:
 
       - name: Promote Image
         run: |
-          docker pull ghcr.io/${{ github.repository }}/${{ matrix.image }}:commit-${{ github.sha }}
-          docker tag ghcr.io/${{ github.repository }}/${{ matrix.image }}:commit-${{ github.sha }} ghcr.io/${{ github.repository }}/${{ matrix.image }}:${{ steps.extract_ref.outputs.ref_name }}
-          docker tag ghcr.io/${{ github.repository }}/${{ matrix.image }}:commit-${{ github.sha }} ghcr.io/${{ github.repository }}/${{ matrix.image }}:latest
-          docker push ghcr.io/${{ github.repository }}/${{ matrix.image }}:${{ steps.extract_ref.outputs.ref_name }}
-          docker push ghcr.io/${{ github.repository }}/${{ matrix.image }}:latest
+          docker buildx imagetools create \
+            --tag ghcr.io/${{ github.repository }}/${{ matrix.image }}:${{ steps.extract_ref.outputs.ref_name }} \
+            --tag ghcr.io/${{ github.repository }}/${{ matrix.image }}:latest \
+            ghcr.io/${{ github.repository }}/${{ matrix.image }}:commit-${{ github.sha }}
 
   publish-helm-chart:
     name: Publish Helm Chart
