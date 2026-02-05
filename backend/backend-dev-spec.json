@@ -1568,6 +1568,55 @@
         "tags": ["settings"]
       }
     },
+    "/api/transcription": {
+      "post": {
+        "description": "Transcribes an audio file to text using OpenAI Whisper.",
+        "operationId": "transcribeAudio",
+        "parameters": [
+          {
+            "name": "extensionId",
+            "required": true,
+            "in": "query",
+            "description": "ID of the Azure Transcribe extension configuration to use",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "audio": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Audio file to transcribe (max 25MB)"
+                  }
+                },
+                "required": ["audio"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TranscriptionDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "",
+        "tags": ["transcription"]
+      }
+    },
     "/api/usages/tokens": {
       "get": {
         "description": "Gets the token usage.",
@@ -4056,6 +4105,17 @@
             "description": "The key of the avatar logo."
           }
         }
+      },
+      "TranscriptionDto": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string",
+            "description": "The transcribed text from the audio",
+            "example": "Hello, this is a test transcription."
+          }
+        },
+        "required": ["text"]
       },
       "UsageDto": {
         "type": "object",

@@ -73,6 +73,7 @@ export * from './StreamUIEventDto';
 export * from './StreamUIRequestDto';
 export * from './TestBucketDto';
 export * from './TestExtensionDto';
+export * from './TranscriptionDto';
 export * from './UpdateConversationDto';
 export * from './UpdateExtensionDto';
 export * from './UpsertBucketDto';

@@ -206,6 +206,10 @@
       "title": "Spracheingabe",
       "description": "Erlaubt Spracheingaben über ein Mikrofon-Icon"
     },
+    "transcribe": {
+      "title": "Transcription: Azure OpenAI",
+      "description": "Audioaufnahmen mit Azure OpenAI in Text transkribieren"
+    },
     "filesInConversation": {
       "title": "Suche in Dateien im Chat",
       "description": "Ermöglicht dem LLM, Dateien zu durchsuchen, die in einem Chat über die Büroklammer hochgeladen wurden.",

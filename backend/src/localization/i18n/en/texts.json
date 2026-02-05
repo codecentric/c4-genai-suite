@@ -206,6 +206,10 @@
       "title": "Speech To Text",
       "description": "Allows speech input via microphone icon"
     },
+    "transcribe": {
+      "title": "Transcription: Azure OpenAI",
+      "description": "Transcribe audio recordings to text using Azure OpenAI"
+    },
     "filesInConversation": {
       "title": "Search Files in Chat",
       "description": "Enables the LLM to search files uploaded via the paperclip to a conversation.",

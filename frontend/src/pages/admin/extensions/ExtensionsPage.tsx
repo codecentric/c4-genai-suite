@@ -151,6 +151,12 @@ export function ExtensionsPage() {
   const incompatibleToolPairsNames = filterPermutations(
     incompatibleToolPairs.map(([tool, otherTool]) => [tool.spec.title, otherTool.spec.title]),
   );
+  const incompatibleToolsOtherPairs = asOthers
+    .filter((tool) => tool.enabled)
+    .flatMap((tool) => findAllIncompatibleTools(tool, asOthers).map((incompatibleTool) => [tool, incompatibleTool]));
+  const incompatibleToolsOtherPairsNames = filterPermutations(
+    incompatibleToolsOtherPairs.map(([tool, otherTool]) => [tool.spec.title, otherTool.spec.title]),
+  );
 
   return (
     <>
@@ -261,6 +267,19 @@ export function ExtensionsPage() {
                 </Tabs.Panel>
                 <Tabs.Panel value="others">
                   {asOthers.length == 0 && isFetched && <div className="p-2 text-sm">{texts.extensions.noOthers}</div>}
+
+                  {incompatibleToolsOtherPairsNames.map(([title, other]) => (
+                    <div
+                      key={title + other}
+                      role="alert"
+                      className="alert alert-warning"
+                      aria-label={'warning'}
+                      data-testid="incompatibleOtherAlert"
+                    >
+                      <Icon icon="alert" />
+                      <span>{texts.extensions.warningIncompatibleFilesTools(title, other)}</span>
+                    </div>
+                  ))}
 
                   <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
                     {asOthers.map((extension) => (

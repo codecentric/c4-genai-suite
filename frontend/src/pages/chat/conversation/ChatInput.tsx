@@ -6,9 +6,11 @@ import { ConfigurationDto, FileDto } from 'src/api';
 import { Icon, Markdown } from 'src/components';
 import { ExtensionContext, JSONObject, useEventCallback, useExtensionContext, usePersistentState, useTheme } from 'src/hooks';
 import { useSpeechRecognitionToggle } from 'src/hooks/useSpeechRecognitionToggle';
+import { useTranscribe } from 'src/hooks/useTranscribe';
 import { FileItemComponent } from 'src/pages/chat/conversation/FileItem';
 import { FilterModal } from 'src/pages/chat/conversation/FilterModal';
 import { Language, SpeechRecognitionButton } from 'src/pages/chat/conversation/SpeechRecognitionButton';
+import { TranscribeButton } from 'src/pages/chat/conversation/TranscribeButton';
 import { texts } from 'src/texts';
 import { useChatDropzone } from '../useChatDropzone';
 import { Suggestions } from './Suggestions';
@@ -174,6 +176,20 @@ export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEm
     onTranscriptUpdate: setInput,
   });
 
+  const voiceExtensions =
+    configuration?.extensions?.filter((e) => e.name === 'speech-to-text' || e.name === 'transcribe-azure') ?? [];
+  const activeVoiceExtension = voiceExtensions[0];
+  const showSpeechToText = activeVoiceExtension?.name === 'speech-to-text';
+  const showTranscribe = activeVoiceExtension?.name === 'transcribe-azure';
+
+  // Transcribe extension setup
+  const transcribeExtension = showTranscribe ? activeVoiceExtension : undefined;
+  const transcribeHook = useTranscribe({
+    extensionId: transcribeExtension?.id ?? 0,
+    onTranscriptReceived: setInput,
+  });
+  const { isRecording, isTranscribing, toggleRecording } = transcribeHook;
+
   return (
     <>
       <div className="flex flex-col gap-2">
@@ -270,7 +286,7 @@ export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEm
                 )}
               </div>
               <div className="flex items-center gap-1">
-                {configuration?.extensions?.some((e) => e.name === 'speech-to-text') && (
+                {showSpeechToText ? (
                   <SpeechRecognitionButton
                     listening={listening}
                     toggleSpeechRecognition={toggleSpeechRecognition}
@@ -278,7 +294,9 @@ export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEm
                     setSpeechLanguage={setSpeechLanguage}
                     languages={speechRecognitionLanguages}
                   />
-                )}
+                ) : showTranscribe ? (
+                  <TranscribeButton isRecording={isRecording} isTranscribing={isTranscribing} onToggle={toggleRecording} />
+                ) : null}
                 <ActionIcon
                   type="submit"
                   size="lg"
