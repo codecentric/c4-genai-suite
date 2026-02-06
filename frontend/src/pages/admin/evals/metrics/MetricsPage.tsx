@@ -1,42 +1,121 @@
 import { Button } from '@mantine/core';
 import { IconPlus } from '@tabler/icons-react';
-import { useState } from 'react';
-import { Page } from 'src/components';
+import { useCallback, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import type { Metric } from 'src/api/generated-eval';
+import { Page, Pagination, Search } from 'src/components';
+import { useEventCallback } from 'src/hooks';
 import { texts } from 'src/texts';
+import { MetricsTable } from './components/MetricsTable';
+import { CreateMetricDialog } from './dialogs/CreateMetricDialog';
+import { DeleteMetricDialog } from './dialogs/DeleteMetricDialog';
+import { EditMetricDialog } from './dialogs/EditMetricDialog';
+import { PAGE_SIZE, useMetrics } from './hooks/useMetricQueries';
+import { useMetricsStore } from './state';
 
 export function MetricsPage() {
-  const [_toCreate, setToCreate] = useState<boolean>();
+  const { metrics, setMetrics, totalCount } = useMetricsStore();
+  const navigate = useNavigate();
+
+  const [page, setPage] = useState(0);
+  const [query, setQuery] = useState<string>();
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [metricToEdit, setMetricToEdit] = useState<Metric | null>(null);
+  const [metricToDelete, setMetricToDelete] = useState<Metric | null>(null);
+
+  const handleSearch = useCallback((newQuery: string | undefined) => {
+    setQuery(newQuery);
+    setPage(0);
+  }, []);
+
+  const { data: loadedMetrics, isFetching, isFetched, refetch } = useMetrics(page, query);
+
+  useEffect(() => {
+    if (loadedMetrics) {
+      setMetrics(loadedMetrics, loadedMetrics.length);
+    }
+  }, [loadedMetrics, setMetrics]);
+
+  const handleChangePage = useEventCallback((newPage: number) => {
+    setPage(newPage);
+  });
+
+  const handleCloseCreateDialog = useEventCallback(() => {
+    setShowCreateDialog(false);
+  });
+
+  const handleCreated = useEventCallback(() => {
+    void refetch();
+  });
+
+  const handleRowClick = useEventCallback((metric: Metric) => {
+    // Navigate to detail page
+    navigate(`/admin/evals/metrics/${metric.id}`);
+  });
+
+  const handleEdit = useEventCallback((metric: Metric) => {
+    setMetricToEdit(metric);
+  });
+
+  const handleCloseEditDialog = useEventCallback(() => {
+    setMetricToEdit(null);
+  });
+
+  const handleUpdated = useEventCallback(() => {
+    void refetch();
+  });
+
+  const handleDelete = useEventCallback((metric: Metric) => {
+    setMetricToDelete(metric);
+  });
+
+  const handleCloseDeleteDialog = useEventCallback(() => {
+    setMetricToDelete(null);
+  });
+
+  const handleDeleted = useEventCallback(() => {
+    void refetch();
+  });
 
   return (
-    <Page>
-      <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-3xl">{texts.evals.metrics}</h2>
+    <>
+      <Page>
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-3xl">{texts.evals.metrics}</h2>
 
-        <div className="flex gap-4">
-          <Button leftSection={<IconPlus />} onClick={() => setToCreate(true)}>
-            Create Metric
-          </Button>
-        </div>
-      </div>
+          <div className="flex gap-4">
+            <Search value={query} onSearch={handleSearch} placeholder={texts.evals.metric.searchPlaceholder} />
 
-      <div className="card bg-base-100 shadow">
-        <div className="card-body">
-          <table className="table table-fixed text-base">
-            <thead>
-              <tr>
-                <th>{texts.common.name}</th>
-                <th>{texts.common.description}</th>
-                <th className="w-32">Type</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td colSpan={3}>No metrics found.</td>
-              </tr>
-            </tbody>
-          </table>
+            <Button leftSection={<IconPlus />} onClick={() => setShowCreateDialog(true)}>
+              {texts.evals.metric.create}
+            </Button>
+          </div>
         </div>
-      </div>
-    </Page>
+
+        <div className="card bg-base-100 shadow">
+          <div className="card-body">
+            <MetricsTable
+              metrics={metrics}
+              isFetching={isFetching}
+              isFetched={isFetched}
+              onRowClick={handleRowClick}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+              isDeleting={!!metricToDelete}
+            />
+
+            <Pagination page={page} pageSize={PAGE_SIZE} total={totalCount} onPage={handleChangePage} />
+          </div>
+        </div>
+      </Page>
+
+      {showCreateDialog && <CreateMetricDialog onClose={handleCloseCreateDialog} onCreated={handleCreated} />}
+
+      {metricToEdit && <EditMetricDialog metric={metricToEdit} onClose={handleCloseEditDialog} onUpdated={handleUpdated} />}
+
+      {metricToDelete && (
+        <DeleteMetricDialog metric={metricToDelete} onClose={handleCloseDeleteDialog} onDeleted={handleDeleted} />
+      )}
+    </>
   );
 }
