@@ -1,5 +1,17 @@
 # Changelog
 
+## [9.12.0](https://github.com/codecentric/c4-genai-suite/compare/v9.11.2...v9.12.0) (2026-02-06)
+
+
+### Features
+
+* **backend,frontend:** add transcription extension using Azure OpenAI ([#1191](https://github.com/codecentric/c4-genai-suite/issues/1191)) ([c86e1ce](https://github.com/codecentric/c4-genai-suite/commit/c86e1cedf98640be45b68d3e6a20976da76a677e))
+
+
+### Bug Fixes
+
+* **frontend:** mantine form selects will allow free text if only examples are given ([#1229](https://github.com/codecentric/c4-genai-suite/issues/1229)) ([1a8e8cb](https://github.com/codecentric/c4-genai-suite/commit/1a8e8cbdee77449ebef4d733ba0b16231bf9b783))
+
 ## [9.11.2](https://github.com/codecentric/c4-genai-suite/compare/v9.11.1...v9.11.2) (2026-02-03)
 
 
