@@ -138,8 +138,10 @@ export const en = {
       statusFailureTooltip: 'Generation failed: {{error}}',
       // Create dialog
       createTitle: 'Create QA Catalog',
+      createTabEmpty: 'Empty Catalog',
       createTabUpload: 'Upload File',
       createTabGenerate: 'Generate',
+      createEmptyDescription: 'Start with an empty catalog and add Q&A pairs manually.',
       uploadFile: 'Upload File',
       uploadFileHint: 'Upload a CSV, JSON, or XLSX file with Q&A pairs',
       uploadFileFormats: 'Supported formats: CSV, JSON, XLSX',

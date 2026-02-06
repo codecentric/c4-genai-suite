@@ -168,8 +168,10 @@ function load() {
         statusFailureTooltip: (error: string) => translate('evals.qaCatalog.statusFailureTooltip', { error }),
         // Create dialog
         createTitle: translate('evals.qaCatalog.createTitle'),
+        createTabEmpty: translate('evals.qaCatalog.createTabEmpty'),
         createTabUpload: translate('evals.qaCatalog.createTabUpload'),
         createTabGenerate: translate('evals.qaCatalog.createTabGenerate'),
+        createEmptyDescription: translate('evals.qaCatalog.createEmptyDescription'),
         uploadFile: translate('evals.qaCatalog.uploadFile'),
         uploadFileHint: translate('evals.qaCatalog.uploadFileHint'),
         uploadFileFormats: translate('evals.qaCatalog.uploadFileFormats'),

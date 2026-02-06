@@ -2,6 +2,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 
+from llm_eval.database.model import QACatalogStatus
 from llm_eval.db import SessionDep
 from llm_eval.qa_catalog.db.delete_qa_catalog import delete_qa_catalog
 from llm_eval.qa_catalog.db.find_qa_catalog import find_qa_catalog
@@ -63,6 +64,17 @@ async def get_all(
     return await find_qa_catalog_previews(
         db, pagination_params.limit, pagination_params.offset, name
     )
+
+
+@router.post("", status_code=201)
+async def create_empty(
+    db: SessionDep,
+    name: str,
+) -> QACatalog:
+    """Create a new empty QA catalog that can be populated manually."""
+    catalog = await create_qa_catalog(db, [], name)
+    catalog.status = QACatalogStatus.READY
+    return QACatalog.from_db_model(catalog)
 
 
 @router.post("/upload", status_code=201)
