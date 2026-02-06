@@ -127,13 +127,18 @@ export function QaCatalogDetailPage() {
         deletions,
       });
     },
-    onSuccess: () => {
+    onSuccess: (newCatalog) => {
       toast.success(texts.evals.qaCatalog.changesSaved);
       clearPendingChanges();
-      refetchCatalog();
-      refetchPairs();
-      queryClient.invalidateQueries({ queryKey: ['qaCatalogs'] });
-      queryClient.invalidateQueries({ queryKey: ['qaCatalogHistory', catalogId] });
+      void queryClient.invalidateQueries({ queryKey: ['qaCatalogs'] });
+      // Navigate to the new catalog ID since edit creates a new version
+      if (newCatalog.id !== catalogId) {
+        void navigate(`/admin/evals/qa-catalogs/${newCatalog.id}`, { replace: true });
+      } else {
+        void refetchCatalog();
+        void refetchPairs();
+        void queryClient.invalidateQueries({ queryKey: ['qaCatalogHistory', catalogId] });
+      }
     },
     onError: () => {
       toast.error(texts.evals.qaCatalog.changesSaveFailed);
@@ -145,16 +150,16 @@ export function QaCatalogDetailPage() {
     mutationFn: () => evalApi.qaCatalog.qaCatalogDelete(catalogId!),
     onSuccess: () => {
       toast.success(texts.evals.qaCatalog.deleteSuccess);
-      queryClient.invalidateQueries({ queryKey: ['qaCatalogs'] });
-      navigate('/admin/evals/qa-catalogs');
+      void queryClient.invalidateQueries({ queryKey: ['qaCatalogs'] });
+      void navigate('/admin/evals/qa-catalogs');
     },
     onError: () => {
       toast.error(texts.evals.qaCatalog.deleteFailed);
     },
   });
 
-  const effectivePairs = useMemo(() => getEffectiveQaPairs(), [getEffectiveQaPairs, pendingChanges, qaPairs]);
-  const pendingCounts = useMemo(() => getPendingChangeCounts(), [getPendingChangeCounts, pendingChanges]);
+  const effectivePairs = useMemo(() => getEffectiveQaPairs(), [getEffectiveQaPairs]);
+  const pendingCounts = useMemo(() => getPendingChangeCounts(), [getPendingChangeCounts]);
   const hasChanges = hasPendingChanges();
 
   const handleVersionChange = useEventCallback((value: string | null) => {
@@ -226,9 +231,9 @@ export function QaCatalogDetailPage() {
   });
 
   const handleUploadSuccess = useEventCallback(() => {
-    refetchCatalog();
-    refetchPairs();
-    queryClient.invalidateQueries({ queryKey: ['qaCatalogHistory', catalogId] });
+    void refetchCatalog();
+    void refetchPairs();
+    void queryClient.invalidateQueries({ queryKey: ['qaCatalogHistory', catalogId] });
     setShowUploadDialog(false);
   });
 
@@ -418,7 +423,7 @@ export function QaCatalogDetailPage() {
           <div className="card-body">
             {isPairsLoading ? (
               <div className="space-y-2">
-                {[...Array(5)].map((_, i) => (
+                {Array.from({ length: 5 }, (_, i) => (
                   <Skeleton key={i} height={60} />
                 ))}
               </div>

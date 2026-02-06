@@ -7,7 +7,7 @@ interface BaseConfigurationFieldsProps {
   isEdit?: boolean;
 }
 
-export function BaseConfigurationFields({ form, isEdit }: BaseConfigurationFieldsProps) {
+export function BaseConfigurationFields({ form, isEdit: _isEdit }: BaseConfigurationFieldsProps) {
   return (
     <>
       <TextInput
