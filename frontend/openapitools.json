@@ -19,7 +19,9 @@
         "inputSpec": "../services/eval/eval-dev-spec.json",
         "additionalProperties": {
           "useSingleRequestParameter": false,
-          "ensureUniqueParams": false
+          "ensureUniqueParams": false,
+          "supportsES6": true,
+          "nullSafeAdditionalProps": true
         }
       }
     }
