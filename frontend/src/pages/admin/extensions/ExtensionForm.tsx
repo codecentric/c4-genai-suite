@@ -1,4 +1,5 @@
 import {
+  Autocomplete,
   Checkbox,
   Fieldset,
   MultiSelect,
@@ -218,16 +219,23 @@ export function Argument({
     );
   }
 
-  if (type === 'string' && (argument._enum?.length || argument.examples?.length)) {
-    const options = (argument._enum?.length ? argument._enum : (argument.examples ?? [])).map((x) => ({ value: x, label: x }));
+  if (type === 'string' && argument._enum?.length) {
+    const options = argument._enum.map((x) => ({ value: x, label: x }));
 
     return (
       <FormRow name={fieldName} label={title} hints={hints()}>
-        <Select
+        <Select id={fieldName} data={options} required={required} key={form.key(fieldName)} {...form.getInputProps(fieldName)} />
+      </FormRow>
+    );
+  }
+
+  if (type === 'string' && argument.examples?.length) {
+    return (
+      <FormRow name={fieldName} label={title} hints={hints()}>
+        <Autocomplete
           id={fieldName}
-          data={options}
+          data={argument.examples}
           required={required}
-          searchable={!!argument.examples?.length}
           key={form.key(fieldName)}
           {...form.getInputProps(fieldName)}
         />
