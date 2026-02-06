@@ -75,6 +75,11 @@ export class NvidiaModelExtension implements Extension<NvidiaModelExtensionConfi
           required: false,
           enum: ['', 'minimal', 'low', 'medium', 'high'],
         },
+        parallelToolCalls: {
+          type: 'boolean',
+          title: this.i18n.t('texts.extensions.common.parallelToolCalls'),
+          default: true,
+        },
         summary: {
           type: 'string',
           title: this.i18n.t('texts.extensions.common.reasoningSummary'),
@@ -143,6 +148,7 @@ export class NvidiaModelExtension implements Extension<NvidiaModelExtensionConfi
           openai: {
             reasoningEffort: config.effort ? config.effort : undefined,
             reasoningSummary: config.summary || 'detailed',
+            parallelToolCalls: config.parallelToolCalls ?? true,
           },
         },
       } as Partial<CallSettings>,
@@ -161,5 +167,6 @@ type NvidiaModelExtensionConfiguration = ExtensionConfiguration & {
   presencePenalty?: number;
   frequencyPenalty?: number;
   effort?: 'minimal' | 'low' | 'medium' | 'high';
+  parallelToolCalls?: boolean;
   summary?: 'detailed' | 'auto';
 };

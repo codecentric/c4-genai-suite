@@ -68,6 +68,11 @@ export class OpenAIModelExtension implements Extension<OpenAIModelExtensionConfi
           required: false,
           enum: ['', 'minimal', 'low', 'medium', 'high'],
         },
+        parallelToolCalls: {
+          type: 'boolean',
+          title: this.i18n.t('texts.extensions.common.parallelToolCalls'),
+          default: true,
+        },
         summary: {
           type: 'string',
           title: this.i18n.t('texts.extensions.common.reasoningSummary'),
@@ -106,7 +111,17 @@ export class OpenAIModelExtension implements Extension<OpenAIModelExtensionConfi
   }
 
   private createModel(configuration: OpenAIModelExtensionConfiguration, streaming = false) {
-    const { apiKey, modelName, frequencyPenalty, presencePenalty, temperature, seed, effort, summary } = configuration;
+    const {
+      apiKey,
+      modelName,
+      frequencyPenalty,
+      presencePenalty,
+      temperature,
+      seed,
+      effort,
+      parallelToolCalls = true,
+      summary,
+    } = configuration;
 
     const open = createOpenAI({
       name: 'open-ai',
@@ -127,8 +142,11 @@ export class OpenAIModelExtension implements Extension<OpenAIModelExtensionConfi
             ? {
                 reasoningEffort: effort ? effort : undefined,
                 reasoningSummary: summary || 'detailed',
+                parallelToolCalls,
               }
-            : {},
+            : {
+                parallelToolCalls,
+              },
         },
       } as Partial<CallSettings>,
       modelName: modelName,
@@ -145,5 +163,6 @@ type OpenAIModelExtensionConfiguration = ExtensionConfiguration & {
   presencePenalty?: number;
   frequencyPenalty?: number;
   effort?: 'minimal' | 'low' | 'medium' | 'high';
+  parallelToolCalls?: boolean;
   summary?: 'detailed' | 'auto';
 };

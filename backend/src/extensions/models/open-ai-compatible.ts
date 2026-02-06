@@ -80,6 +80,11 @@ export class OpenAICompatibleModelExtension implements Extension<OpenAICompatibl
           required: false,
           enum: ['', 'low', 'medium', 'high'],
         },
+        parallelToolCalls: {
+          type: 'boolean',
+          title: this.i18n.t('texts.extensions.common.parallelToolCalls'),
+          default: true,
+        },
         summary: {
           type: 'string',
           title: this.i18n.t('texts.extensions.common.reasoningSummary'),
@@ -118,8 +123,19 @@ export class OpenAICompatibleModelExtension implements Extension<OpenAICompatibl
   }
 
   private createModel(configuration: OpenAICompatibleModelExtensionConfiguration, streaming = false) {
-    const { apiKey, baseUrl, modelName, frequencyPenalty, maxOutputTokens, presencePenalty, temperature, seed, effort, summary } =
-      configuration;
+    const {
+      apiKey,
+      baseUrl,
+      modelName,
+      frequencyPenalty,
+      maxOutputTokens,
+      presencePenalty,
+      temperature,
+      seed,
+      effort,
+      parallelToolCalls = true,
+      summary,
+    } = configuration;
 
     const open = createOpenAICompatible({
       name: 'openai-compatible',
@@ -143,8 +159,11 @@ export class OpenAICompatibleModelExtension implements Extension<OpenAICompatibl
             ? {
                 reasoningEffort: effort ? effort : undefined,
                 reasoningSummary: summary || 'detailed',
+                parallelToolCalls,
               }
-            : {},
+            : {
+                parallelToolCalls,
+              },
         },
       } as Partial<CallSettings>,
       modelName: modelName,
@@ -163,5 +182,6 @@ type OpenAICompatibleModelExtensionConfiguration = ExtensionConfiguration & {
   frequencyPenalty?: number;
   maxOutputTokens?: number;
   effort?: 'low' | 'medium' | 'high';
+  parallelToolCalls?: boolean;
   summary?: 'detailed' | 'auto';
 };
