@@ -731,6 +731,47 @@
             }
           }
         }
+      },
+      "post": {
+        "tags": [
+          "qa-catalog"
+        ],
+        "summary": "Create Empty",
+        "description": "Create a new empty QA catalog that can be populated manually.",
+        "operationId": "qa-catalog_create_empty",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Name"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QACatalog"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/v1/qa-catalog/upload": {

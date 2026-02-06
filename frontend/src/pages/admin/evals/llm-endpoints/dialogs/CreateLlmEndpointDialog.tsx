@@ -105,30 +105,46 @@ export function CreateLlmEndpointDialog({ onClose, onCreated }: CreateLlmEndpoin
 
     // Add type-specific fields
     if (type === 'C4') {
+      const c4Fields = typeSpecificFields as { endpoint: string; apiKey: string; configurationId: number };
       configuration = {
         ...configuration,
-        endpoint: typeSpecificFields.endpoint,
-        apiKey: typeSpecificFields.apiKey,
-        configurationId: typeSpecificFields.configurationId,
+        endpoint: c4Fields.endpoint,
+        apiKey: c4Fields.apiKey,
+        configurationId: c4Fields.configurationId,
       };
     } else if (type === 'OPENAI') {
+      const openAiFields = typeSpecificFields as {
+        apiKey: string;
+        model: string;
+        baseUrl?: string | null;
+        temperature?: number | null;
+        language?: string | null;
+      };
       configuration = {
         ...configuration,
-        baseUrl: typeSpecificFields.baseUrl || null,
-        apiKey: typeSpecificFields.apiKey,
-        model: typeSpecificFields.model,
-        temperature: typeSpecificFields.temperature ?? null,
-        language: typeSpecificFields.language || null,
+        baseUrl: openAiFields.baseUrl || null,
+        apiKey: openAiFields.apiKey,
+        model: openAiFields.model,
+        temperature: openAiFields.temperature ?? null,
+        language: openAiFields.language || null,
       };
     } else if (type === 'AZURE_OPENAI') {
+      const azureFields = typeSpecificFields as {
+        endpoint: string;
+        apiKey: string;
+        deployment: string;
+        apiVersion: string;
+        temperature?: number | null;
+        language?: string | null;
+      };
       configuration = {
         ...configuration,
-        endpoint: typeSpecificFields.endpoint,
-        apiKey: typeSpecificFields.apiKey,
-        deployment: typeSpecificFields.deployment,
-        apiVersion: typeSpecificFields.apiVersion,
-        temperature: typeSpecificFields.temperature ?? null,
-        language: typeSpecificFields.language || null,
+        endpoint: azureFields.endpoint,
+        apiKey: azureFields.apiKey,
+        deployment: azureFields.deployment,
+        apiVersion: azureFields.apiVersion,
+        temperature: azureFields.temperature ?? null,
+        language: azureFields.language || null,
       };
     }
 

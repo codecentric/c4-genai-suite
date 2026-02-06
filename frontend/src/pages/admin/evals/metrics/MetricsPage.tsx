@@ -5,7 +5,7 @@ import { Page } from 'src/components';
 import { texts } from 'src/texts';
 
 export function MetricsPage() {
-  const [toCreate, setToCreate] = useState<boolean>();
+  const [_toCreate, setToCreate] = useState<boolean>();
 
   return (
     <Page>
