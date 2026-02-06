@@ -1,5 +1,12 @@
 # Changelog
 
+## [9.13.0](https://github.com/codecentric/c4-genai-suite/compare/v9.12.0...v9.13.0) (2026-02-06)
+
+
+### Features
+
+* **models:** make parallelToolCalls configurable in the model ([d25962f](https://github.com/codecentric/c4-genai-suite/commit/d25962f488fbc5a4983b959f06d07833a6e4c098))
+
 ## [9.12.0](https://github.com/codecentric/c4-genai-suite/compare/v9.11.2...v9.12.0) (2026-02-06)
 
 
