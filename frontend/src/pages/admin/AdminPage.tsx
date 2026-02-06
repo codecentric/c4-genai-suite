@@ -9,6 +9,7 @@ import { AuditLogPage } from './audit-log/AuditLogPage';
 import { DashboardPage } from './dashboard/DashboardPage';
 import { EvaluationsPage } from './evals/evaluations/EvaluationsPage';
 import { LlmEndpointsPage } from './evals/llm-endpoints/LlmEndpointsPage';
+import { MetricDetailPage } from './evals/metrics/MetricDetailPage';
 import { MetricsPage } from './evals/metrics/MetricsPage';
 import { QaCatalogDetailPage } from './evals/qa-catalogs/QaCatalogDetailPage';
 import { QaCatalogsPage } from './evals/qa-catalogs/QaCatalogsPage';
@@ -140,6 +141,8 @@ export function AdminPage() {
             <Route path="/evals/qa-catalogs/:catalogId" element={<QaCatalogDetailPage />} />
 
             <Route path="/evals/metrics" element={<MetricsPage />} />
+
+            <Route path="/evals/metrics/:metricId" element={<MetricDetailPage />} />
 
             <Route path="/evals/llm-endpoints" element={<LlmEndpointsPage />} />
 
