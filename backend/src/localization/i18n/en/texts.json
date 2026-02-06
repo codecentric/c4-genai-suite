@@ -45,7 +45,8 @@
       "presencePenaltyHint": "Positive values penalize new tokens based on whether they appear in the text so far, increasing the model's likelihood to talk about new topics.",
       "frequencyPenaltyHint": "Positive values penalize new tokens based on their existing frequency in the text so far, decreasing the model's likelihood to repeat the same line verbatim.",
       "maxOutputTokensHint": "The maximum number of tokens to generate in the completion. Also known as max_tokens.",
-      "topPHint": "Tokens are selected from the most probable to the least probable until the sum of their probabilities equals the Top-p value.\nExample: If tokens A, B, and C have probabilities of 0.3, 0.2, and 0.1, and the Top-p value is 0.5, then the model will choose either A or B as the next token (using temperature)."
+      "topPHint": "Tokens are selected from the most probable to the least probable until the sum of their probabilities equals the Top-p value.\nExample: If tokens A, B, and C have probabilities of 0.3, 0.2, and 0.1, and the Top-p value is 0.5, then the model will choose either A or B as the next token (using temperature).",
+      "parallelToolCalls": "Parallel tool calls"
     },
     "azure": {
       "title": "Azure OpenAI",
