@@ -83,9 +83,7 @@ describe('MetricsPage', () => {
 
         if (query) {
           // Filter metrics by query
-          const filtered = mockMetrics.filter((m) =>
-            m.configuration.name.toLowerCase().includes(query.toLowerCase())
-          );
+          const filtered = mockMetrics.filter((m) => m.configuration.name.toLowerCase().includes(query.toLowerCase()));
           return HttpResponse.json(filtered);
         }
 
@@ -93,7 +91,7 @@ describe('MetricsPage', () => {
       }),
       http.get(`${evalApiBaseUrl}/v1/llm-endpoints`, () => {
         return HttpResponse.json(mockLlmEndpoints);
-      })
+      }),
     );
   });
 
@@ -122,7 +120,7 @@ describe('MetricsPage', () => {
     server.use(
       http.get(`${evalApiBaseUrl}/v1/metrics`, () => {
         return HttpResponse.json([]);
-      })
+      }),
     );
 
     render(<MetricsPage />);
@@ -194,7 +192,7 @@ describe('MetricsPage', () => {
             name: 'Updated Name',
           },
         });
-      })
+      }),
     );
 
     render(<MetricsPage />);
@@ -224,5 +222,4 @@ describe('MetricsPage', () => {
       expect(screen.queryByText(texts.evals.metric.editTitle)).not.toBeInTheDocument();
     });
   });
-
 });

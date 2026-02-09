@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { QACatalog, QACatalogPreview, QAPair, NewQAPair } from 'src/api/generated-eval';
+import type { NewQAPair, QAPair } from 'src/api/generated-eval';
 
 /**
  * Represents a pending change to a Q&A pair
@@ -10,38 +10,11 @@ export type PendingChange =
   | { type: 'deletion'; id: string; original: QAPair };
 
 type QaCatalogsState = {
-  // List of catalog previews for the list page
-  catalogs: QACatalogPreview[];
-
-  // Currently selected/viewed catalog
-  selectedCatalog: QACatalog | null;
-
-  // Q&A pairs for the currently selected catalog
-  qaPairs: QAPair[];
-
-  // Pending changes that haven't been saved yet
+  // Pending changes that haven't been saved yet (client-only state)
   pendingChanges: PendingChange[];
-
-  // Total count for pagination
-  totalCount: number;
 };
 
 type QaCatalogsActions = {
-  // Set all catalogs (from list fetch)
-  setCatalogs: (catalogs: QACatalogPreview[], totalCount?: number) => void;
-
-  // Update a single catalog in the list
-  updateCatalogInList: (catalog: QACatalogPreview) => void;
-
-  // Remove a catalog from the list
-  removeCatalogFromList: (id: string) => void;
-
-  // Set the currently selected catalog
-  setSelectedCatalog: (catalog: QACatalog | null) => void;
-
-  // Set Q&A pairs for the current catalog
-  setQaPairs: (pairs: QAPair[]) => void;
-
   // Add a pending change (addition, update, or deletion)
   addPendingChange: (change: PendingChange) => void;
 
@@ -52,7 +25,7 @@ type QaCatalogsActions = {
   clearPendingChanges: () => void;
 
   // Get the effective Q&A pairs list (original + pending changes applied)
-  getEffectiveQaPairs: () => QAPair[];
+  getEffectiveQaPairs: (qaPairs: QAPair[]) => QAPair[];
 
   // Check if there are any pending changes
   hasPendingChanges: () => boolean;
@@ -62,43 +35,7 @@ type QaCatalogsActions = {
 };
 
 const useQaCatalogsStore_ = create<QaCatalogsState & QaCatalogsActions>()((set, get) => ({
-  catalogs: [],
-  selectedCatalog: null,
-  qaPairs: [],
   pendingChanges: [],
-  totalCount: 0,
-
-  setCatalogs: (catalogs: QACatalogPreview[], totalCount?: number) => {
-    return set({ catalogs, totalCount: totalCount ?? catalogs.length });
-  },
-
-  updateCatalogInList: (catalog: QACatalogPreview) => {
-    return set((state) => {
-      const catalogs = [...state.catalogs];
-      const index = catalogs.findIndex((c) => c.id === catalog.id);
-      if (index >= 0) {
-        catalogs[index] = catalog;
-      } else {
-        catalogs.push(catalog);
-      }
-      return { catalogs };
-    });
-  },
-
-  removeCatalogFromList: (id: string) => {
-    return set((state) => ({
-      catalogs: state.catalogs.filter((c) => c.id !== id),
-      totalCount: Math.max(0, state.totalCount - 1),
-    }));
-  },
-
-  setSelectedCatalog: (catalog: QACatalog | null) => {
-    return set({ selectedCatalog: catalog, pendingChanges: [] });
-  },
-
-  setQaPairs: (pairs: QAPair[]) => {
-    return set({ qaPairs: pairs });
-  },
 
   addPendingChange: (change: PendingChange) => {
     return set((state) => {
@@ -172,11 +109,13 @@ const useQaCatalogsStore_ = create<QaCatalogsState & QaCatalogsActions>()((set, 
     return set({ pendingChanges: [] });
   },
 
-  getEffectiveQaPairs: () => {
-    const { qaPairs, pendingChanges } = get();
+  getEffectiveQaPairs: (qaPairs: QAPair[]) => {
+    const { pendingChanges } = get();
 
     // Start with original pairs
-    let effectivePairs: (QAPair & { _pendingStatus?: 'added' | 'updated' | 'deleted' })[] = qaPairs.map((pair) => ({ ...pair }));
+    const effectivePairs: (QAPair & { _pendingStatus?: 'added' | 'updated' | 'deleted' })[] = qaPairs.map((pair) => ({
+      ...pair,
+    }));
 
     // Apply pending changes
     for (const change of pendingChanges) {
@@ -221,7 +160,7 @@ const useQaCatalogsStore_ = create<QaCatalogsState & QaCatalogsActions>()((set, 
 }));
 
 /**
- * Zustand store for QA Catalogs state management.
- * Handles catalog list, selected catalog, Q&A pairs, and pending changes.
+ * Zustand store for QA Catalogs pending changes state management.
+ * Only handles client-side pending changes - server data comes from React Query.
  */
 export const useQaCatalogsStore = useQaCatalogsStore_;

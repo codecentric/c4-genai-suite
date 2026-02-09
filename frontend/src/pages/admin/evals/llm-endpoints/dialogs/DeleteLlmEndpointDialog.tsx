@@ -46,7 +46,7 @@ export function DeleteLlmEndpointDialog({ endpoint, onClose, onDeleted }: Delete
           </fieldset>
         }
       >
-        <p className="text-gray-700">{texts.evals.llmEndpoint.deleteConfirmText.replace('{{name}}', endpoint.name)}</p>
+        <p className="text-gray-700">{texts.evals.llmEndpoint.deleteConfirmText(endpoint.name)}</p>
       </Modal>
     </Portal>
   );

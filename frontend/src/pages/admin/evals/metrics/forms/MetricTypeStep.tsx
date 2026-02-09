@@ -1,9 +1,10 @@
 import { Radio, Stack } from '@mantine/core';
 import type { UseFormReturnType } from '@mantine/form';
 import { texts } from 'src/texts';
+import type { MetricFormValues } from './types';
 
 interface MetricTypeStepProps {
-  form: UseFormReturnType<any>;
+  form: UseFormReturnType<MetricFormValues>;
 }
 
 export function MetricTypeStep({ form }: MetricTypeStepProps) {

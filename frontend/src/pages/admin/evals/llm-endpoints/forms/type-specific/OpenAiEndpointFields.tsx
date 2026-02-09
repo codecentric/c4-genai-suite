@@ -2,11 +2,12 @@ import { NumberInput, PasswordInput, Select, TextInput } from '@mantine/core';
 import type { UseFormReturnType } from '@mantine/form';
 import { Language } from 'src/api/generated-eval';
 import { texts } from 'src/texts';
+import type { EndpointFormValues } from '../types';
 
 const UNCHANGED_API_KEY = 'd1d04d4e-38b9-441c-a6e3-68fb1e18f0c0';
 
 interface OpenAiEndpointFieldsProps {
-  form: UseFormReturnType<any>;
+  form: UseFormReturnType<EndpointFormValues>;
   isEdit?: boolean;
 }
 

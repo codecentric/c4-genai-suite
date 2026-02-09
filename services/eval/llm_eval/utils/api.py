@@ -22,10 +22,10 @@ async def get_user_principal(
 ) -> UserPrincipal:
     """
     Get user principal from headers (passed by C4 backend).
-    
+
     This service is internal and trusts all requests.
     User context is optionally provided via headers for audit/tracking purposes.
-    
+
     Headers:
         X-User-Id: User ID from C4
         X-User-Name: Username from C4

@@ -258,9 +258,9 @@ def test__qa_pairs_to_excel_contains_headers_and_data() -> None:
     header_row = [cell.value for cell in ws[1]]
     # Expected headers are from model_dump of the first QAPair
     expected_headers = list(pair1.model_dump().keys())
-    assert (
-        header_row == expected_headers
-    ), "Headers in excel should match keys of QAPair model"
+    assert header_row == expected_headers, (
+        "Headers in excel should match keys of QAPair model"
+    )
 
     # Prepare expected row data for pair1 with transformed fields
     p1_data = pair1.model_dump()
@@ -280,9 +280,9 @@ def test__qa_pairs_to_excel_contains_headers_and_data() -> None:
 
     # Extract row 3 values from sheet
     row_3 = [cell.value for cell in ws[3]]
-    assert (
-        row_3 == expected_row_2
-    ), "Row for second QA pair does not match expected data"
+    assert row_3 == expected_row_2, (
+        "Row for second QA pair does not match expected data"
+    )
 
 
 def test__qa_pairs_to_excel_returns_workbook_instance() -> None:
@@ -295,6 +295,6 @@ def test__qa_pairs_to_excel_returns_workbook_instance() -> None:
     )
     qa_pairs = [pair]
     wb = _qa_pairs_to_excel(qa_pairs)
-    assert isinstance(
-        wb, excel.Workbook
-    ), "Returned object must be an openpyxl Workbook"
+    assert isinstance(wb, excel.Workbook), (
+        "Returned object must be an openpyxl Workbook"
+    )

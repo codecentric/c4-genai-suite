@@ -1,9 +1,10 @@
 import { Radio, Stack } from '@mantine/core';
 import type { UseFormReturnType } from '@mantine/form';
 import { texts } from 'src/texts';
+import type { EndpointFormValues } from './types';
 
 interface EndpointTypeStepProps {
-  form: UseFormReturnType<any>;
+  form: UseFormReturnType<EndpointFormValues>;
 }
 
 export function EndpointTypeStep({ form }: EndpointTypeStepProps) {

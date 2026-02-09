@@ -2,12 +2,12 @@ import { Button, Portal, Stepper } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useMemo, useState } from 'react';
 import { z } from 'zod';
-import type { MetricCreate, LLMTestCaseParams } from 'src/api/generated-eval';
+import type { LLMTestCaseParams, MetricConfigurationCreate, MetricCreate } from 'src/api/generated-eval';
 import { FormAlert, Modal } from 'src/components';
 import { typedZodResolver } from 'src/lib';
 import { texts } from 'src/texts';
-import { MetricTypeStep } from '../forms/MetricTypeStep';
 import { MetricConfigurationStep } from '../forms/MetricConfigurationStep';
+import { MetricTypeStep } from '../forms/MetricTypeStep';
 import { useCreateMetric } from '../hooks/useMetricMutations';
 
 interface CreateMetricDialogProps {
@@ -34,12 +34,8 @@ function createValidationSchema() {
   // G-Eval schema
   const gEvalMetricSchema = baseSchema.extend({
     type: z.literal('G_EVAL'),
-    evaluationSteps: z
-      .array(z.string().min(1))
-      .min(1, texts.evals.metric.evaluationStepsRequired),
-    evaluationParams: z
-      .array(z.string())
-      .min(1, texts.evals.metric.evaluationParamsRequired),
+    evaluationSteps: z.array(z.string().min(1)).min(1, texts.evals.metric.evaluationStepsRequired),
+    evaluationParams: z.array(z.string()).min(1, texts.evals.metric.evaluationParamsRequired),
   });
 
   return z.discriminatedUnion('type', [simpleMetricSchema, gEvalMetricSchema]);
@@ -86,7 +82,8 @@ export function CreateMetricDialog({ onClose, onCreated }: CreateMetricDialogPro
     // NOTE: API expects ALL fields to be present, even if not used for the metric type
     const { type } = values;
 
-    let configuration: any = {
+    // Build configuration with all fields - the API requires all fields present
+    let configuration: Partial<MetricConfigurationCreate> = {
       type,
       name: values.name,
       threshold: values.threshold,
@@ -100,17 +97,23 @@ export function CreateMetricDialog({ onClose, onCreated }: CreateMetricDialogPro
 
     // Override with type-specific values
     if (type === 'G_EVAL') {
-      const gEvalValues = values as Extract<CreateFormValues, { type: 'G_EVAL' }>;
-      configuration.evaluationSteps = gEvalValues.evaluationSteps;
-      configuration.evaluationParams = gEvalValues.evaluationParams as LLMTestCaseParams[];
+      const gEvalValues = values as CreateFormValues & { type: 'G_EVAL' };
+      configuration = {
+        ...configuration,
+        evaluationSteps: gEvalValues.evaluationSteps,
+        evaluationParams: gEvalValues.evaluationParams as LLMTestCaseParams[],
+      };
     } else {
       // Simple metrics (ANSWER_RELEVANCY, FAITHFULNESS, HALLUCINATION)
-      const simpleValues = values as Extract<CreateFormValues, { type: 'ANSWER_RELEVANCY' | 'FAITHFULNESS' | 'HALLUCINATION' }>;
-      configuration.includeReason = simpleValues.includeReason;
+      const simpleValues = values as CreateFormValues & { type: 'ANSWER_RELEVANCY' | 'FAITHFULNESS' | 'HALLUCINATION' };
+      configuration = {
+        ...configuration,
+        includeReason: simpleValues.includeReason,
+      };
     }
 
     const payload: MetricCreate = {
-      _configuration: configuration,
+      _configuration: configuration as MetricConfigurationCreate,
     };
 
     createMutation.mutate(payload, {
@@ -161,13 +164,14 @@ export function CreateMetricDialog({ onClose, onCreated }: CreateMetricDialogPro
           </Stepper>
 
           {createMutation.isError && (
-            <FormAlert type="error" className="mb-4">
-              {texts.evals.metric.createFailed}
-            </FormAlert>
+            <FormAlert common={texts.evals.metric.createFailed} error={createMutation.error as Error | null} className="mb-4" />
           )}
 
-          {activeStep === 0 && <MetricTypeStep form={form} />}
-          {activeStep === 1 && <MetricConfigurationStep form={form} />}
+          {/* Form type is discriminated union but child components accept flat type - structurally compatible */}
+          {activeStep === 0 && <MetricTypeStep form={form as unknown as Parameters<typeof MetricTypeStep>[0]['form']} />}
+          {activeStep === 1 && (
+            <MetricConfigurationStep form={form as unknown as Parameters<typeof MetricConfigurationStep>[0]['form']} />
+          )}
         </Modal>
       </form>
     </Portal>

@@ -2,14 +2,14 @@ import { Button, Portal, Stepper } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useMemo, useState } from 'react';
 import { z } from 'zod';
-import type { LLMEndpoint, LLMEndpointUpdate } from 'src/api/generated-eval';
+import type { LLMEndpoint, LLMEndpointConfigurationUpdate, LLMEndpointUpdate } from 'src/api/generated-eval';
 import { Language } from 'src/api/generated-eval';
 import { FormAlert, Modal } from 'src/components';
 import { typedZodResolver } from 'src/lib';
 import { texts } from 'src/texts';
-import { EndpointTypeStep } from '../forms/EndpointTypeStep';
 import { EndpointConfigurationStep } from '../forms/EndpointConfigurationStep';
-import { useUpdateLlmEndpoint, UNCHANGED_API_KEY } from '../hooks/useLlmEndpointMutations';
+import { EndpointTypeStep } from '../forms/EndpointTypeStep';
+import { UNCHANGED_API_KEY, useUpdateLlmEndpoint } from '../hooks/useLlmEndpointMutations';
 
 interface EditLlmEndpointDialogProps {
   endpoint: LLMEndpoint;
@@ -106,7 +106,7 @@ export function EditLlmEndpointDialog({ endpoint, onClose, onUpdated }: EditLlmE
           language: config.language,
         } as UpdateFormValues;
       default:
-        throw new Error(`Unknown endpoint type: ${(config as any).type}`);
+        throw new Error(`Unknown endpoint type: ${config.type}`);
     }
   };
 
@@ -128,65 +128,54 @@ export function EditLlmEndpointDialog({ endpoint, onClose, onUpdated }: EditLlmE
 
   const handleSubmit = form.onSubmit((values) => {
     // Transform form values to API format
-    // Extract name separately, rest goes into configuration
-    const { name, type, parallelQueries, maxRetries, requestTimeout, ...typeSpecificFields } = values;
+    const { name, type, parallelQueries, maxRetries, requestTimeout } = values;
 
-    // Build configuration based on type to ensure only relevant fields are sent
-    let configuration: any = {
+    // Base configuration fields common to all types
+    const baseConfig = {
       type,
       parallelQueries,
       maxRetries,
       requestTimeout,
     };
 
-    // Add type-specific fields
+    // Build configuration based on type - cast to Partial first, then to full type
+    let configuration: Partial<LLMEndpointConfigurationUpdate>;
+
     if (type === 'C4') {
-      const c4Fields = typeSpecificFields as { endpoint: string; apiKey?: string; configurationId: number };
+      const c4Values = values as UpdateFormValues & { type: 'C4' };
       configuration = {
-        ...configuration,
-        endpoint: c4Fields.endpoint,
-        apiKey: c4Fields.apiKey || UNCHANGED_API_KEY,
-        configurationId: c4Fields.configurationId,
+        ...baseConfig,
+        endpoint: c4Values.endpoint,
+        apiKey: c4Values.apiKey || UNCHANGED_API_KEY,
+        configurationId: c4Values.configurationId,
       };
     } else if (type === 'OPENAI') {
-      const openAiFields = typeSpecificFields as {
-        apiKey?: string;
-        model: string;
-        baseUrl?: string | null;
-        temperature?: number | null;
-        language?: string | null;
-      };
+      const openAiValues = values as UpdateFormValues & { type: 'OPENAI' };
       configuration = {
-        ...configuration,
-        baseUrl: openAiFields.baseUrl || null,
-        apiKey: openAiFields.apiKey || UNCHANGED_API_KEY,
-        model: openAiFields.model,
-        temperature: openAiFields.temperature ?? null,
-        language: openAiFields.language || null,
+        ...baseConfig,
+        baseUrl: openAiValues.baseUrl || '',
+        apiKey: openAiValues.apiKey || UNCHANGED_API_KEY,
+        model: openAiValues.model,
+        temperature: openAiValues.temperature ?? 0,
+        language: openAiValues.language || Language.English,
       };
-    } else if (type === 'AZURE_OPENAI') {
-      const azureFields = typeSpecificFields as {
-        endpoint: string;
-        apiKey?: string;
-        deployment: string;
-        apiVersion: string;
-        temperature?: number | null;
-        language?: string | null;
-      };
+    } else {
+      // AZURE_OPENAI
+      const azureValues = values as UpdateFormValues & { type: 'AZURE_OPENAI' };
       configuration = {
-        ...configuration,
-        endpoint: azureFields.endpoint,
-        apiKey: azureFields.apiKey || UNCHANGED_API_KEY,
-        deployment: azureFields.deployment,
-        apiVersion: azureFields.apiVersion,
-        temperature: azureFields.temperature ?? null,
-        language: azureFields.language || null,
+        ...baseConfig,
+        endpoint: azureValues.endpoint,
+        apiKey: azureValues.apiKey || UNCHANGED_API_KEY,
+        deployment: azureValues.deployment,
+        apiVersion: azureValues.apiVersion,
+        temperature: azureValues.temperature ?? 0,
+        language: azureValues.language || Language.English,
       };
     }
 
     const payload: LLMEndpointUpdate = {
       name,
-      _configuration: configuration,
+      _configuration: configuration as LLMEndpointConfigurationUpdate,
       version: endpoint.version,
     };
 
@@ -241,10 +230,17 @@ export function EditLlmEndpointDialog({ endpoint, onClose, onUpdated }: EditLlmE
           </Stepper>
 
           <fieldset disabled={updateMutation.isPending}>
-            <FormAlert common={texts.evals.llmEndpoint.updateFailed} error={updateMutation.error} />
+            <FormAlert common={texts.evals.llmEndpoint.updateFailed} error={updateMutation.error as Error | null} />
 
-            {activeStep === 0 && <EndpointTypeStep form={form} />}
-            {activeStep === 1 && <EndpointConfigurationStep form={form} endpointType={form.values.type} isEdit={true} />}
+            {/* Form type is discriminated union but child components accept flat type - structurally compatible */}
+            {activeStep === 0 && <EndpointTypeStep form={form as unknown as Parameters<typeof EndpointTypeStep>[0]['form']} />}
+            {activeStep === 1 && (
+              <EndpointConfigurationStep
+                form={form as unknown as Parameters<typeof EndpointConfigurationStep>[0]['form']}
+                endpointType={form.values.type}
+                isEdit={true}
+              />
+            )}
           </fieldset>
         </Modal>
       </form>

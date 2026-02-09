@@ -1,7 +1,7 @@
 import { Button, Skeleton } from '@mantine/core';
 import { IconPlus, IconTrash } from '@tabler/icons-react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import type { QACatalogPreview } from 'src/api/generated-eval';
@@ -11,7 +11,6 @@ import { useEventCallback } from 'src/hooks';
 import { texts } from 'src/texts';
 import { QaCatalogStatusChip } from './components/QaCatalogStatusChip';
 import { CreateQaCatalogDialog } from './dialogs/CreateQaCatalogDialog';
-import { useQaCatalogsStore } from './state';
 
 const PAGE_SIZE = 20;
 
@@ -19,8 +18,6 @@ export function QaCatalogsPage() {
   const evalApi = useEvalApi();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-
-  const { catalogs, setCatalogs, removeCatalogFromList, totalCount } = useQaCatalogsStore();
 
   const [page, setPage] = useState(0);
   const [query, setQuery] = useState<string>();
@@ -32,7 +29,7 @@ export function QaCatalogsPage() {
   }, []);
 
   const {
-    data: loadedCatalogs,
+    data: catalogs,
     isFetching,
     isFetched,
     refetch,
@@ -41,18 +38,11 @@ export function QaCatalogsPage() {
     queryFn: () => evalApi.qaCatalog.qaCatalogGetAll(query || undefined, page * PAGE_SIZE, PAGE_SIZE),
   });
 
-  useEffect(() => {
-    if (loadedCatalogs) {
-      setCatalogs(loadedCatalogs, loadedCatalogs.length);
-    }
-  }, [loadedCatalogs, setCatalogs]);
-
   const deleteMutation = useMutation({
     mutationFn: (catalogId: string) => evalApi.qaCatalog.qaCatalogDelete(catalogId),
-    onSuccess: (_, catalogId) => {
-      removeCatalogFromList(catalogId);
+    onSuccess: () => {
       toast.success(texts.evals.qaCatalog.deleteSuccess);
-      queryClient.invalidateQueries({ queryKey: ['qaCatalogs'] });
+      void queryClient.invalidateQueries({ queryKey: ['qaCatalogs'] });
     },
     onError: () => {
       toast.error(texts.evals.qaCatalog.deleteFailed);
@@ -68,11 +58,11 @@ export function QaCatalogsPage() {
   });
 
   const handleCreated = useEventCallback(() => {
-    refetch();
+    void refetch();
   });
 
   const handleRowClick = useEventCallback((catalog: QACatalogPreview) => {
-    navigate(`/admin/evals/qa-catalogs/${catalog.id}`);
+    void navigate(`/admin/evals/qa-catalogs/${catalog.id}`);
   });
 
   const formatDate = (date: Date) => {
@@ -114,7 +104,7 @@ export function QaCatalogsPage() {
               <tbody>
                 {isFetching && !isFetched && (
                   <>
-                    {[...Array(5)].map((_, i) => (
+                    {Array.from({ length: 5 }).map((_, i) => (
                       <tr key={i}>
                         <td>
                           <Skeleton height={20} />
@@ -140,7 +130,7 @@ export function QaCatalogsPage() {
                 )}
 
                 {isFetched &&
-                  catalogs.map((catalog) => (
+                  catalogs?.map((catalog) => (
                     <tr className="cursor-pointer hover:bg-gray-50" key={catalog.id} onClick={() => handleRowClick(catalog)}>
                       <td className="truncate overflow-hidden font-semibold">{catalog.name}</td>
                       <td className="overflow-hidden">{catalog.length}</td>
@@ -173,7 +163,7 @@ export function QaCatalogsPage() {
                     </tr>
                   ))}
 
-                {isFetched && catalogs.length === 0 && (
+                {isFetched && catalogs?.length === 0 && (
                   <tr>
                     <td colSpan={6} className="py-8 text-center">
                       <div className="text-gray-500">
@@ -186,7 +176,7 @@ export function QaCatalogsPage() {
               </tbody>
             </table>
 
-            <Pagination page={page} pageSize={PAGE_SIZE} total={totalCount} onPage={handleChangePage} />
+            <Pagination page={page} pageSize={PAGE_SIZE} total={catalogs?.length ?? 0} onPage={handleChangePage} />
           </div>
         </div>
       </Page>

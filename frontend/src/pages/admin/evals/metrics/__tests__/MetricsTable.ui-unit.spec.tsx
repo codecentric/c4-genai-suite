@@ -52,7 +52,7 @@ describe('MetricsTable', () => {
         onEdit={vi.fn()}
         onDelete={vi.fn()}
         isDeleting=""
-      />
+      />,
     );
 
     // Should show multiple skeleton rows
@@ -70,7 +70,7 @@ describe('MetricsTable', () => {
         onEdit={vi.fn()}
         onDelete={vi.fn()}
         isDeleting=""
-      />
+      />,
     );
 
     expect(screen.getByText(texts.evals.metric.empty)).toBeInTheDocument();
@@ -87,7 +87,7 @@ describe('MetricsTable', () => {
         onEdit={vi.fn()}
         onDelete={vi.fn()}
         isDeleting=""
-      />
+      />,
     );
 
     // Should show metric names
@@ -114,7 +114,7 @@ describe('MetricsTable', () => {
         onEdit={vi.fn()}
         onDelete={vi.fn()}
         isDeleting=""
-      />
+      />,
     );
 
     const user = userEvent.setup();
@@ -135,7 +135,7 @@ describe('MetricsTable', () => {
         onEdit={onEdit}
         onDelete={vi.fn()}
         isDeleting=""
-      />
+      />,
     );
 
     const user = userEvent.setup();
@@ -156,7 +156,7 @@ describe('MetricsTable', () => {
         onEdit={vi.fn()}
         onDelete={onDelete}
         isDeleting=""
-      />
+      />,
     );
 
     const user = userEvent.setup();
@@ -178,7 +178,7 @@ describe('MetricsTable', () => {
         onEdit={onEdit}
         onDelete={vi.fn()}
         isDeleting=""
-      />
+      />,
     );
 
     const user = userEvent.setup();
@@ -200,7 +200,7 @@ describe('MetricsTable', () => {
         onEdit={vi.fn()}
         onDelete={vi.fn()}
         isDeleting="metric-1"
-      />
+      />,
     );
 
     const deleteButtons = screen.getAllByLabelText(texts.common.remove);
@@ -218,7 +218,7 @@ describe('MetricsTable', () => {
         onEdit={vi.fn()}
         onDelete={vi.fn()}
         isDeleting=""
-      />
+      />,
     );
 
     expect(screen.getByText(texts.evals.metric.name)).toBeInTheDocument();

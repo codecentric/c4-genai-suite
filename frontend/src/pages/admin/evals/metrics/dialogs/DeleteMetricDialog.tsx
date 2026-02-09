@@ -24,7 +24,7 @@ export function DeleteMetricDialog({ metric, onClose, onDeleted }: DeleteMetricD
           onDeleted?.();
           onClose();
         },
-      }
+      },
     );
   };
 
@@ -46,9 +46,7 @@ export function DeleteMetricDialog({ metric, onClose, onDeleted }: DeleteMetricD
           </fieldset>
         }
       >
-        <p className="text-gray-700">
-          {texts.evals.metric.deleteConfirmText(metric._configuration.name)}
-        </p>
+        <p className="text-gray-700">{texts.evals.metric.deleteConfirmText(metric._configuration.name)}</p>
       </Modal>
     </Portal>
   );

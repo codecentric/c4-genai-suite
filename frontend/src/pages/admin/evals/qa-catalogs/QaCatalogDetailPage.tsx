@@ -10,10 +10,10 @@ import {
   IconX,
 } from '@tabler/icons-react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useEffect, useMemo, useState } from 'react';
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { useMemo, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import type { QAPair, QACatalogVersionHistoryItem } from 'src/api/generated-eval';
+import type { QACatalogVersionHistoryItem, QAPair } from 'src/api/generated-eval';
 import { QACatalogStatus } from 'src/api/generated-eval';
 import { useEvalApi } from 'src/api/state/apiEvalClient';
 import { ConfirmDialog, Page, Pagination } from 'src/components';
@@ -25,23 +25,18 @@ import { AddQaPairDialog } from './dialogs/AddQaPairDialog';
 import { DownloadQaCatalogDialog } from './dialogs/DownloadQaCatalogDialog';
 import { EditQaPairDialog } from './dialogs/EditQaPairDialog';
 import { UploadQaCatalogDialog } from './dialogs/UploadQaCatalogDialog';
-import { useQaCatalogsStore, type PendingChange } from './state';
+import { type PendingChange, useQaCatalogsStore } from './state';
 
 const PAGE_SIZE = 20;
 
 export function QaCatalogDetailPage() {
   const { catalogId } = useParams<{ catalogId: string }>();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const versionId = searchParams.get('version');
 
   const evalApi = useEvalApi();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
   const {
-    setSelectedCatalog,
-    qaPairs,
-    setQaPairs,
     pendingChanges,
     addPendingChange,
     removePendingChange,
@@ -82,7 +77,7 @@ export function QaCatalogDetailPage() {
     isLoading: isPairsLoading,
     refetch: refetchPairs,
   } = useQuery({
-    queryKey: ['qaPairs', catalogId, page, versionId],
+    queryKey: ['qaPairs', catalogId, page],
     queryFn: () => evalApi.qaCatalog.qaCatalogGetCatalogQaPairs(catalogId!, page * PAGE_SIZE, PAGE_SIZE),
     enabled: !!catalogId,
   });
@@ -93,18 +88,6 @@ export function QaCatalogDetailPage() {
     queryFn: () => evalApi.qaCatalog.qaCatalogGetHistory(catalogId!),
     enabled: !!catalogId,
   });
-
-  useEffect(() => {
-    if (catalog) {
-      setSelectedCatalog(catalog);
-    }
-  }, [catalog, setSelectedCatalog]);
-
-  useEffect(() => {
-    if (pairsData) {
-      setQaPairs(pairsData);
-    }
-  }, [pairsData, setQaPairs]);
 
   // Save all pending changes
   const saveMutation = useMutation({
@@ -158,18 +141,15 @@ export function QaCatalogDetailPage() {
     },
   });
 
-  const effectivePairs = useMemo(() => getEffectiveQaPairs(), [getEffectiveQaPairs]);
+  const effectivePairs = useMemo(() => getEffectiveQaPairs(pairsData ?? []), [getEffectiveQaPairs, pairsData, pendingChanges]);
   const pendingCounts = useMemo(() => getPendingChangeCounts(), [getPendingChangeCounts]);
   const hasChanges = hasPendingChanges();
 
   const handleVersionChange = useEventCallback((value: string | null) => {
-    if (value) {
-      setSearchParams({ version: value });
-    } else {
-      setSearchParams({});
+    if (value && value !== catalogId) {
+      clearPendingChanges();
+      void navigate(`/admin/evals/qa-catalogs/${value}`);
     }
-    clearPendingChanges();
-    setPage(0);
   });
 
   const handleEdit = useEventCallback((pair: QAPair) => {
@@ -183,7 +163,7 @@ export function QaCatalogDetailPage() {
     if (isAddition) {
       removePendingChange(pair.id);
     } else {
-      const original = qaPairs.find((p) => p.id === pair.id);
+      const original = pairsData?.find((p) => p.id === pair.id);
       if (original) {
         addPendingChange({ type: 'deletion', id: pair.id, original });
       }
@@ -212,7 +192,7 @@ export function QaCatalogDetailPage() {
       });
     } else {
       // It's an existing pair - find the original
-      const original = qaPairs.find((p) => p.id === pair.id);
+      const original = pairsData?.find((p) => p.id === pair.id);
       if (original) {
         addPendingChange({ type: 'update', id: pair.id, data: pair, original });
       }
@@ -316,7 +296,7 @@ export function QaCatalogDetailPage() {
                 <Select
                   placeholder={texts.evals.qaCatalog.versionSelect}
                   data={versionOptions}
-                  value={versionId}
+                  value={catalogId}
                   onChange={handleVersionChange}
                   clearable
                   className="w-48"
@@ -441,7 +421,12 @@ export function QaCatalogDetailPage() {
                   <div className="py-8 text-center text-gray-500">{texts.evals.qaCatalog.noQaPairs}</div>
                 )}
 
-                <Pagination page={page} pageSize={PAGE_SIZE} total={qaPairs.length + pendingCounts.additions} onPage={setPage} />
+                <Pagination
+                  page={page}
+                  pageSize={PAGE_SIZE}
+                  total={(pairsData?.length ?? 0) + pendingCounts.additions}
+                  onPage={setPage}
+                />
               </>
             )}
           </div>

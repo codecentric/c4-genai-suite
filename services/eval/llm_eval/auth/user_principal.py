@@ -35,7 +35,10 @@ async def get_user_from_headers(
     if not user_id or not user_name:
         raise HTTPException(
             status_code=400,
-            detail="Missing required user headers. This service must be accessed via C4 backend proxy.",
+            detail=(
+                "Missing required user headers. "
+                "This service must be accessed via C4 backend proxy."
+            ),
         )
 
     return UserPrincipal(id=user_id, name=user_name, email=user_email)

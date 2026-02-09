@@ -2,7 +2,7 @@ import { Button, Portal } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useMemo } from 'react';
 import { z } from 'zod';
-import type { Metric, MetricUpdate, LLMTestCaseParams } from 'src/api/generated-eval';
+import type { LLMTestCaseParams, Metric, MetricConfigurationUpdate, MetricUpdate } from 'src/api/generated-eval';
 import { FormAlert, Modal } from 'src/components';
 import { typedZodResolver } from 'src/lib';
 import { texts } from 'src/texts';
@@ -34,12 +34,8 @@ function createUpdateValidationSchema() {
   // G-Eval schema
   const gEvalMetricSchema = baseSchema.extend({
     type: z.literal('G_EVAL'),
-    evaluationSteps: z
-      .array(z.string().min(1))
-      .min(1, texts.evals.metric.evaluationStepsRequired),
-    evaluationParams: z
-      .array(z.string())
-      .min(1, texts.evals.metric.evaluationParamsRequired),
+    evaluationSteps: z.array(z.string().min(1)).min(1, texts.evals.metric.evaluationStepsRequired),
+    evaluationParams: z.array(z.string()).min(1, texts.evals.metric.evaluationParamsRequired),
   });
 
   return z.discriminatedUnion('type', [simpleMetricSchema, gEvalMetricSchema]);
@@ -92,7 +88,8 @@ export function EditMetricDialog({ metric, onClose, onUpdated }: EditMetricDialo
     // NOTE: API expects ALL fields to be present, even if not used for the metric type
     const { type } = values;
 
-    let configuration: any = {
+    // Build configuration with all fields - the API requires all fields present
+    let configuration: Partial<MetricConfigurationUpdate> = {
       type,
       name: values.name,
       threshold: values.threshold,
@@ -106,18 +103,24 @@ export function EditMetricDialog({ metric, onClose, onUpdated }: EditMetricDialo
 
     // Override with type-specific values
     if (type === 'G_EVAL') {
-      const gEvalValues = values as Extract<UpdateFormValues, { type: 'G_EVAL' }>;
-      configuration.evaluationSteps = gEvalValues.evaluationSteps;
-      configuration.evaluationParams = gEvalValues.evaluationParams as LLMTestCaseParams[];
+      const gEvalValues = values as UpdateFormValues & { type: 'G_EVAL' };
+      configuration = {
+        ...configuration,
+        evaluationSteps: gEvalValues.evaluationSteps,
+        evaluationParams: gEvalValues.evaluationParams as LLMTestCaseParams[],
+      };
     } else {
       // Simple metrics (ANSWER_RELEVANCY, FAITHFULNESS, HALLUCINATION)
-      const simpleValues = values as Extract<UpdateFormValues, { type: 'ANSWER_RELEVANCY' | 'FAITHFULNESS' | 'HALLUCINATION' }>;
-      configuration.includeReason = simpleValues.includeReason;
+      const simpleValues = values as UpdateFormValues & { type: 'ANSWER_RELEVANCY' | 'FAITHFULNESS' | 'HALLUCINATION' };
+      configuration = {
+        ...configuration,
+        includeReason: simpleValues.includeReason,
+      };
     }
 
     const payload: MetricUpdate = {
       version: metric.version,
-      _configuration: configuration,
+      _configuration: configuration as MetricConfigurationUpdate,
     };
 
     updateMutation.mutate(
@@ -127,7 +130,7 @@ export function EditMetricDialog({ metric, onClose, onUpdated }: EditMetricDialo
           onUpdated?.();
           onClose();
         },
-      }
+      },
     );
   });
 
@@ -152,12 +155,11 @@ export function EditMetricDialog({ metric, onClose, onUpdated }: EditMetricDialo
           }
         >
           {updateMutation.isError && (
-            <FormAlert type="error" className="mb-4">
-              {texts.evals.metric.updateFailed}
-            </FormAlert>
+            <FormAlert common={texts.evals.metric.updateFailed} error={updateMutation.error as Error | null} className="mb-4" />
           )}
 
-          <MetricConfigurationStep form={form} />
+          {/* Form type is discriminated union but child component accepts flat type - structurally compatible */}
+          <MetricConfigurationStep form={form as unknown as Parameters<typeof MetricConfigurationStep>[0]['form']} />
         </Modal>
       </form>
     </Portal>
