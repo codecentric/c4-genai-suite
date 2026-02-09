@@ -4,7 +4,7 @@ import { IconDownload } from '@tabler/icons-react';
 import { useMutation } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { toast } from 'react-toastify';
-import { SupportedQACatalogDownloadFormat, type QACatalogVersionHistoryItem } from 'src/api/generated-eval';
+import { type QACatalogVersionHistoryItem, SupportedQACatalogDownloadFormat } from 'src/api/generated-eval';
 import { useEvalApi } from 'src/api/state/apiEvalClient';
 import { Modal } from 'src/components';
 import { texts } from 'src/texts';

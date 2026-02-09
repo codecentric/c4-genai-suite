@@ -1,6 +1,6 @@
 import { Button, FileInput, Portal, Tabs, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { IconFile, IconFileUpload, IconSparkles, IconUpload } from '@tabler/icons-react';
+import { IconFile, IconFileUpload, IconUpload } from '@tabler/icons-react';
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -84,11 +84,6 @@ export function CreateQaCatalogDialog({ onClose, onCreated }: CreateQaCatalogDia
     void uploadMutation.mutate(values);
   });
 
-  const handleGoToGenerate = () => {
-    onClose();
-    void navigate('/admin/evals/qa-catalogs/generate');
-  };
-
   const isPending = createEmptyMutation.isPending || uploadMutation.isPending;
   const error = activeTab === 'empty' ? createEmptyMutation.error : uploadMutation.error;
 
@@ -125,11 +120,6 @@ export function CreateQaCatalogDialog({ onClose, onCreated }: CreateQaCatalogDia
                     {texts.evals.qaCatalog.create}
                   </Button>
                 )}
-                {activeTab === 'generate' && (
-                  <Button type="button" onClick={handleGoToGenerate}>
-                    {texts.evals.qaCatalog.generateTitle}
-                  </Button>
-                )}
               </div>
             </fieldset>
           }
@@ -141,9 +131,6 @@ export function CreateQaCatalogDialog({ onClose, onCreated }: CreateQaCatalogDia
               </Tabs.Tab>
               <Tabs.Tab value="upload" leftSection={<IconFileUpload size={16} />}>
                 {texts.evals.qaCatalog.createTabUpload}
-              </Tabs.Tab>
-              <Tabs.Tab value="generate" leftSection={<IconSparkles size={16} />}>
-                {texts.evals.qaCatalog.createTabGenerate}
               </Tabs.Tab>
             </Tabs.List>
 
@@ -192,14 +179,6 @@ export function CreateQaCatalogDialog({ onClose, onCreated }: CreateQaCatalogDia
                   {...uploadForm.getInputProps('file')}
                 />
               </fieldset>
-            </Tabs.Panel>
-
-            <Tabs.Panel value="generate" pt="md">
-              <div className="flex flex-col items-center justify-center py-8 text-center">
-                <IconSparkles size={48} className="text-primary mb-4" />
-                <p className="mb-4 text-lg">{texts.evals.qaCatalog.generateTitle}</p>
-                <p className="text-sm text-gray-500">Generate Q&A pairs automatically from your documents using AI.</p>
-              </div>
             </Tabs.Panel>
           </Tabs>
         </Modal>

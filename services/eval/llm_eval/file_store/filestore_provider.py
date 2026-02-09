@@ -10,7 +10,8 @@ def get_filestore() -> FileStoreAdapter | None:
     """Get the configured file store adapter.
 
     Returns:
-        FileStoreAdapter | None: The configured adapter, or None if file store is not configured
+        FileStoreAdapter | None: The configured adapter,
+            or None if file store is not configured
 
     Raises:
         ValueError: If file store type is not supported or configuration is invalid

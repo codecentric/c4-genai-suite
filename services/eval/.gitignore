@@ -92,3 +92,4 @@ poetry.toml
 
 # OS files
 Thumbs.db
+.deepeval_telemetry.txt

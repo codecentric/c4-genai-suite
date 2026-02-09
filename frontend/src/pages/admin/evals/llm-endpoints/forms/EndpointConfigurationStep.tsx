@@ -1,11 +1,12 @@
 import type { UseFormReturnType } from '@mantine/form';
 import { BaseConfigurationFields } from './BaseConfigurationFields';
+import { AzureOpenAiEndpointFields } from './type-specific/AzureOpenAiEndpointFields';
 import { C4EndpointFields } from './type-specific/C4EndpointFields';
 import { OpenAiEndpointFields } from './type-specific/OpenAiEndpointFields';
-import { AzureOpenAiEndpointFields } from './type-specific/AzureOpenAiEndpointFields';
+import type { EndpointFormValues } from './types';
 
 interface EndpointConfigurationStepProps {
-  form: UseFormReturnType<any>;
+  form: UseFormReturnType<EndpointFormValues>;
   endpointType: string;
   isEdit?: boolean;
 }

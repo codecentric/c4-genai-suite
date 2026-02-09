@@ -52,15 +52,15 @@ async def test_create_qa_catalog_from_file(filename: str) -> None:
             )
             assert isinstance(qa_catalog, QACatalog)
             for qa_pair in qa_catalog.qa_pairs:
-                assert hasattr(
-                    qa_pair, "question"
-                ), "QAPair does not have 'question' attribute"
-                assert hasattr(
-                    qa_pair, "expected_output"
-                ), "QAPair does not have 'expected output' attribute"
-                assert hasattr(
-                    qa_pair, "contexts"
-                ), "QAPair does not have 'contexts' attribute"
+                assert hasattr(qa_pair, "question"), (
+                    "QAPair does not have 'question' attribute"
+                )
+                assert hasattr(qa_pair, "expected_output"), (
+                    "QAPair does not have 'expected output' attribute"
+                )
+                assert hasattr(qa_pair, "contexts"), (
+                    "QAPair does not have 'contexts' attribute"
+                )
 
 
 filenames = ["csv_tests_missing_fields.csv", "csv_tests_missing_fields_question.csv"]

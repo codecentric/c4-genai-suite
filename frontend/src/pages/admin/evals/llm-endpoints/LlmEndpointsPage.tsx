@@ -1,6 +1,6 @@
 import { Button } from '@mantine/core';
 import { IconPlus } from '@tabler/icons-react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import type { LLMEndpoint } from 'src/api/generated-eval';
 import { Page, Pagination, Search } from 'src/components';
 import { useEventCallback } from 'src/hooks';
@@ -10,11 +10,8 @@ import { CreateLlmEndpointDialog } from './dialogs/CreateLlmEndpointDialog';
 import { DeleteLlmEndpointDialog } from './dialogs/DeleteLlmEndpointDialog';
 import { EditLlmEndpointDialog } from './dialogs/EditLlmEndpointDialog';
 import { PAGE_SIZE, useLlmEndpoints } from './hooks/useLlmEndpointQueries';
-import { useLlmEndpointsStore } from './state';
 
 export function LlmEndpointsPage() {
-  const { endpoints, setEndpoints, totalCount } = useLlmEndpointsStore();
-
   const [page, setPage] = useState(0);
   const [query, setQuery] = useState<string>();
   const [showCreateDialog, setShowCreateDialog] = useState(false);
@@ -28,11 +25,14 @@ export function LlmEndpointsPage() {
 
   const { data: loadedEndpoints, isFetching, isFetched, refetch } = useLlmEndpoints(page, query);
 
-  useEffect(() => {
-    if (loadedEndpoints) {
-      setEndpoints(loadedEndpoints, loadedEndpoints.length);
-    }
-  }, [loadedEndpoints, setEndpoints]);
+  // Data comes directly from React Query - no store sync needed
+  const endpoints = loadedEndpoints ?? [];
+
+  // For pagination without total count from API:
+  // If we got PAGE_SIZE items, there might be more pages
+  const hasMorePages = endpoints.length === PAGE_SIZE;
+  // Calculate an effective total for the Pagination component
+  const effectiveTotal = hasMorePages ? (page + 2) * PAGE_SIZE : page * PAGE_SIZE + endpoints.length;
 
   const handleChangePage = useEventCallback((newPage: number) => {
     setPage(newPage);
@@ -102,7 +102,7 @@ export function LlmEndpointsPage() {
               isDeleting={!!endpointToDelete}
             />
 
-            <Pagination page={page} pageSize={PAGE_SIZE} total={totalCount} onPage={handleChangePage} />
+            <Pagination page={page} pageSize={PAGE_SIZE} total={effectiveTotal} onPage={handleChangePage} />
           </div>
         </div>
       </Page>

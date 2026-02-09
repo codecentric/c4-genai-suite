@@ -4,9 +4,10 @@ import { IconPlus, IconTrash } from '@tabler/icons-react';
 import { LLMTestCaseParams } from 'src/api/generated-eval';
 import { texts } from 'src/texts';
 import { BaseMetricFields } from './BaseMetricFields';
+import type { MetricFormValues } from './types';
 
 interface GEvalMetricFieldsProps {
-  form: UseFormReturnType<any>;
+  form: UseFormReturnType<MetricFormValues>;
 }
 
 export function GEvalMetricFields({ form }: GEvalMetricFieldsProps) {
@@ -26,14 +27,14 @@ export function GEvalMetricFields({ form }: GEvalMetricFieldsProps) {
       <BaseMetricFields form={form} />
 
       <div className="mb-4">
-        <label className="block text-sm font-medium mb-2">
+        <label className="mb-2 block text-sm font-medium">
           {texts.evals.metric.evaluationStepsLabel}
-          <span className="text-red-500 ml-1">*</span>
+          <span className="ml-1 text-red-500">*</span>
         </label>
-        <p className="text-sm text-gray-600 mb-3">{texts.evals.metric.evaluationStepsHint}</p>
+        <p className="mb-3 text-sm text-gray-600">{texts.evals.metric.evaluationStepsHint}</p>
 
-        {form.values.evaluationSteps?.map((_: string, index: number) => (
-          <div key={index} className="flex gap-2 mb-2">
+        {form.values.evaluationSteps?.map((_, index) => (
+          <div key={index} className="mb-2 flex gap-2">
             <TextInput
               className="flex-1"
               placeholder={texts.evals.metric.evaluationStepPlaceholder}
@@ -44,7 +45,7 @@ export function GEvalMetricFields({ form }: GEvalMetricFieldsProps) {
               color="red"
               variant="light"
               onClick={() => form.removeListItem('evaluationSteps', index)}
-              disabled={form.values.evaluationSteps.length === 1}
+              disabled={(form.values.evaluationSteps?.length ?? 0) <= 1}
             >
               <IconTrash size={16} />
             </ActionIcon>
@@ -60,9 +61,7 @@ export function GEvalMetricFields({ form }: GEvalMetricFieldsProps) {
           {texts.evals.metric.addEvaluationStep}
         </Button>
 
-        {form.errors.evaluationSteps && (
-          <p className="text-sm text-red-500 mt-1">{form.errors.evaluationSteps}</p>
-        )}
+        {form.errors.evaluationSteps && <p className="mt-1 text-sm text-red-500">{form.errors.evaluationSteps}</p>}
       </div>
 
       <MultiSelect

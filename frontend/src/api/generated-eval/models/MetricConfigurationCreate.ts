@@ -19,141 +19,134 @@
 import { mapValues } from '../runtime';
 import type { HallucinationMetricConfigurationCreate } from './HallucinationMetricConfigurationCreate';
 import {
-    HallucinationMetricConfigurationCreateFromJSON,
-    HallucinationMetricConfigurationCreateFromJSONTyped,
-    HallucinationMetricConfigurationCreateToJSON,
+  HallucinationMetricConfigurationCreateFromJSON,
+  HallucinationMetricConfigurationCreateFromJSONTyped,
+  HallucinationMetricConfigurationCreateToJSON,
 } from './HallucinationMetricConfigurationCreate';
 import type { LLMTestCaseParams } from './LLMTestCaseParams';
-import {
-    LLMTestCaseParamsFromJSON,
-    LLMTestCaseParamsFromJSONTyped,
-    LLMTestCaseParamsToJSON,
-} from './LLMTestCaseParams';
+import { LLMTestCaseParamsFromJSON, LLMTestCaseParamsFromJSONTyped, LLMTestCaseParamsToJSON } from './LLMTestCaseParams';
 import type { AnswerRelevancyMetricConfigurationCreate } from './AnswerRelevancyMetricConfigurationCreate';
 import {
-    AnswerRelevancyMetricConfigurationCreateFromJSON,
-    AnswerRelevancyMetricConfigurationCreateFromJSONTyped,
-    AnswerRelevancyMetricConfigurationCreateToJSON,
+  AnswerRelevancyMetricConfigurationCreateFromJSON,
+  AnswerRelevancyMetricConfigurationCreateFromJSONTyped,
+  AnswerRelevancyMetricConfigurationCreateToJSON,
 } from './AnswerRelevancyMetricConfigurationCreate';
 import type { FaithfulnessMetricConfigurationCreate } from './FaithfulnessMetricConfigurationCreate';
 import {
-    FaithfulnessMetricConfigurationCreateFromJSON,
-    FaithfulnessMetricConfigurationCreateFromJSONTyped,
-    FaithfulnessMetricConfigurationCreateToJSON,
+  FaithfulnessMetricConfigurationCreateFromJSON,
+  FaithfulnessMetricConfigurationCreateFromJSONTyped,
+  FaithfulnessMetricConfigurationCreateToJSON,
 } from './FaithfulnessMetricConfigurationCreate';
 import type { GEvalMetricConfigurationCreate } from './GEvalMetricConfigurationCreate';
 import {
-    GEvalMetricConfigurationCreateFromJSON,
-    GEvalMetricConfigurationCreateFromJSONTyped,
-    GEvalMetricConfigurationCreateToJSON,
+  GEvalMetricConfigurationCreateFromJSON,
+  GEvalMetricConfigurationCreateFromJSONTyped,
+  GEvalMetricConfigurationCreateToJSON,
 } from './GEvalMetricConfigurationCreate';
 
 /**
- * 
+ *
  * @export
  * @interface MetricConfigurationCreate
  */
 export interface MetricConfigurationCreate {
-    /**
-     * 
-     * @type {string}
-     * @memberof MetricConfigurationCreate
-     */
-    type: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof MetricConfigurationCreate
-     */
-    name: string;
-    /**
-     * 
-     * @type {Array<string>}
-     * @memberof MetricConfigurationCreate
-     */
-    evaluationSteps: Array<string>;
-    /**
-     * 
-     * @type {Array<LLMTestCaseParams>}
-     * @memberof MetricConfigurationCreate
-     */
-    evaluationParams: Array<LLMTestCaseParams>;
-    /**
-     * 
-     * @type {string}
-     * @memberof MetricConfigurationCreate
-     */
-    chatModelId: string;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof MetricConfigurationCreate
-     */
-    strictMode: boolean;
-    /**
-     * 
-     * @type {number}
-     * @memberof MetricConfigurationCreate
-     */
-    threshold: number;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof MetricConfigurationCreate
-     */
-    includeReason: boolean;
+  /**
+   *
+   * @type {string}
+   * @memberof MetricConfigurationCreate
+   */
+  type: string;
+  /**
+   *
+   * @type {string}
+   * @memberof MetricConfigurationCreate
+   */
+  name: string;
+  /**
+   *
+   * @type {Array<string>}
+   * @memberof MetricConfigurationCreate
+   */
+  evaluationSteps: Array<string>;
+  /**
+   *
+   * @type {Array<LLMTestCaseParams>}
+   * @memberof MetricConfigurationCreate
+   */
+  evaluationParams: Array<LLMTestCaseParams>;
+  /**
+   *
+   * @type {string}
+   * @memberof MetricConfigurationCreate
+   */
+  chatModelId: string;
+  /**
+   *
+   * @type {boolean}
+   * @memberof MetricConfigurationCreate
+   */
+  strictMode: boolean;
+  /**
+   *
+   * @type {number}
+   * @memberof MetricConfigurationCreate
+   */
+  threshold: number;
+  /**
+   *
+   * @type {boolean}
+   * @memberof MetricConfigurationCreate
+   */
+  includeReason: boolean;
 }
 
 /**
  * Check if a given object implements the MetricConfigurationCreate interface.
  */
 export function instanceOfMetricConfigurationCreate(value: object): value is MetricConfigurationCreate {
-    if (!('type' in value) || value['type'] === undefined) return false;
-    if (!('name' in value) || value['name'] === undefined) return false;
-    if (!('evaluationSteps' in value) || value['evaluationSteps'] === undefined) return false;
-    if (!('evaluationParams' in value) || value['evaluationParams'] === undefined) return false;
-    if (!('chatModelId' in value) || value['chatModelId'] === undefined) return false;
-    if (!('strictMode' in value) || value['strictMode'] === undefined) return false;
-    if (!('threshold' in value) || value['threshold'] === undefined) return false;
-    if (!('includeReason' in value) || value['includeReason'] === undefined) return false;
-    return true;
+  if (!('type' in value) || value['type'] === undefined) return false;
+  if (!('name' in value) || value['name'] === undefined) return false;
+  if (!('evaluationSteps' in value) || value['evaluationSteps'] === undefined) return false;
+  if (!('evaluationParams' in value) || value['evaluationParams'] === undefined) return false;
+  if (!('chatModelId' in value) || value['chatModelId'] === undefined) return false;
+  if (!('strictMode' in value) || value['strictMode'] === undefined) return false;
+  if (!('threshold' in value) || value['threshold'] === undefined) return false;
+  if (!('includeReason' in value) || value['includeReason'] === undefined) return false;
+  return true;
 }
 
 export function MetricConfigurationCreateFromJSON(json: any): MetricConfigurationCreate {
-    return MetricConfigurationCreateFromJSONTyped(json, false);
+  return MetricConfigurationCreateFromJSONTyped(json, false);
 }
 
 export function MetricConfigurationCreateFromJSONTyped(json: any, ignoreDiscriminator: boolean): MetricConfigurationCreate {
-    if (json == null) {
-        return json;
-    }
-    return {
-
-        'type': json['type'],
-        'name': json['name'],
-        'evaluationSteps': json['evaluationSteps'] ?? [],
-        'evaluationParams': json['evaluationParams'] ? ((json['evaluationParams'] as Array<any>).map(LLMTestCaseParamsFromJSON)) : [],
-        'chatModelId': json['chatModelId'] ?? '',
-        'strictMode': json['strictMode'] ?? false,
-        'threshold': json['threshold'] ?? 0,
-        'includeReason': json['includeReason'] ?? false,
-    };
+  if (json == null) {
+    return json;
+  }
+  return {
+    type: json['type'],
+    name: json['name'],
+    evaluationSteps: json['evaluationSteps'] ?? [],
+    evaluationParams: json['evaluationParams'] ? (json['evaluationParams'] as Array<any>).map(LLMTestCaseParamsFromJSON) : [],
+    chatModelId: json['chatModelId'] ?? '',
+    strictMode: json['strictMode'] ?? false,
+    threshold: json['threshold'] ?? 0,
+    includeReason: json['includeReason'] ?? false,
+  };
 }
 
 export function MetricConfigurationCreateToJSON(value?: MetricConfigurationCreate | null): any {
-    if (value == null) {
-        return value;
-    }
-    return {
-
-        'type': value['type'],
-        'name': value['name'],
-        'evaluationSteps': value['evaluationSteps'] ?? [],
-        'evaluationParams': value['evaluationParams'] ? ((value['evaluationParams'] as Array<any>).map(LLMTestCaseParamsToJSON)) : [],
-        'chatModelId': value['chatModelId'],
-        'strictMode': value['strictMode'],
-        'threshold': value['threshold'],
-        'includeReason': value['includeReason'],
-    };
+  if (value == null) {
+    return value;
+  }
+  return {
+    type: value['type'],
+    name: value['name'],
+    evaluationSteps: value['evaluationSteps'] ?? [],
+    evaluationParams: value['evaluationParams'] ? (value['evaluationParams'] as Array<any>).map(LLMTestCaseParamsToJSON) : [],
+    chatModelId: value['chatModelId'],
+    strictMode: value['strictMode'],
+    threshold: value['threshold'],
+    includeReason: value['includeReason'],
+  };
 }
-

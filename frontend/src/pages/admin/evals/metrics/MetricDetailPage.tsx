@@ -20,7 +20,7 @@ export function MetricDetailPage() {
   const { data: metric, isLoading, refetch } = useMetric(metricId);
 
   const handleBack = useEventCallback(() => {
-    navigate('/admin/evals/metrics');
+    void navigate('/admin/evals/metrics');
   });
 
   const handleEdit = useEventCallback(() => {
@@ -44,7 +44,7 @@ export function MetricDetailPage() {
   });
 
   const handleDeleted = useEventCallback(() => {
-    navigate('/admin/evals/metrics');
+    void navigate('/admin/evals/metrics');
   });
 
   const formatDate = (date: Date) => {
@@ -104,9 +104,9 @@ export function MetricDetailPage() {
         </div>
 
         {/* Overview Section */}
-        <div className="card bg-base-100 shadow mb-4">
+        <div className="card bg-base-100 mb-4 shadow">
           <div className="card-body">
-            <h3 className="text-xl font-semibold mb-4">{texts.evals.metric.overview}</h3>
+            <h3 className="mb-4 text-xl font-semibold">{texts.evals.metric.overview}</h3>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <p className="text-sm text-gray-500">{texts.evals.metric.type}</p>
@@ -127,9 +127,9 @@ export function MetricDetailPage() {
         </div>
 
         {/* Configuration Section */}
-        <div className="card bg-base-100 shadow mb-4">
+        <div className="card bg-base-100 mb-4 shadow">
           <div className="card-body">
-            <h3 className="text-xl font-semibold mb-4">{texts.evals.metric.configuration}</h3>
+            <h3 className="mb-4 text-xl font-semibold">{texts.evals.metric.configuration}</h3>
             <div className="space-y-3">
               <div>
                 <p className="text-sm text-gray-500">{texts.evals.metric.nameLabel}</p>
@@ -162,7 +162,7 @@ export function MetricDetailPage() {
                 <>
                   <div>
                     <p className="text-sm text-gray-500">{texts.evals.metric.evaluationStepsLabel}</p>
-                    <ol className="list-decimal list-inside space-y-1 mt-1">
+                    <ol className="mt-1 list-inside list-decimal space-y-1">
                       {config.evaluationSteps.map((step: string, index: number) => (
                         <li key={index} className="font-medium">
                           {step}
@@ -173,7 +173,7 @@ export function MetricDetailPage() {
 
                   <div>
                     <p className="text-sm text-gray-500">{texts.evals.metric.evaluationParamsLabel}</p>
-                    <div className="flex flex-wrap gap-2 mt-1">
+                    <div className="mt-1 flex flex-wrap gap-2">
                       {config.evaluationParams.map((param: string) => (
                         <span key={param} className="badge badge-outline">
                           {param}
@@ -190,15 +190,13 @@ export function MetricDetailPage() {
         {/* Usage Section (placeholder) */}
         <div className="card bg-base-100 shadow">
           <div className="card-body">
-            <h3 className="text-xl font-semibold mb-4">{texts.evals.metric.usage}</h3>
-            <p className="text-gray-500 text-center py-8">{texts.evals.metric.noEvaluationsUsing}</p>
+            <h3 className="mb-4 text-xl font-semibold">{texts.evals.metric.usage}</h3>
+            <p className="py-8 text-center text-gray-500">{texts.evals.metric.noEvaluationsUsing}</p>
           </div>
         </div>
       </Page>
 
-      {showEditDialog && metric && (
-        <EditMetricDialog metric={metric} onClose={handleCloseEditDialog} onUpdated={handleUpdated} />
-      )}
+      {showEditDialog && metric && <EditMetricDialog metric={metric} onClose={handleCloseEditDialog} onUpdated={handleUpdated} />}
 
       {showDeleteDialog && metric && (
         <DeleteMetricDialog metric={metric} onClose={handleCloseDeleteDialog} onDeleted={handleDeleted} />

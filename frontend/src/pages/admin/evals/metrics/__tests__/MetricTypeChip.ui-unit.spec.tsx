@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { render, screen } from '../../../test-utils';
 import { texts } from 'src/texts';
+import { render, screen } from '../../../test-utils';
 import { MetricTypeChip } from '../components/MetricTypeChip';
 
 describe('MetricTypeChip', () => {
