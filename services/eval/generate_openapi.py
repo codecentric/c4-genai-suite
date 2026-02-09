@@ -1,4 +1,5 @@
 """Generate OpenAPI spec from the FastAPI application."""
+
 import json
 from sys import argv
 

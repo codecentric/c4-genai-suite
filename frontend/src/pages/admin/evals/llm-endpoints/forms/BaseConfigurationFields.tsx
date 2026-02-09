@@ -1,9 +1,10 @@
 import { NumberInput, TextInput } from '@mantine/core';
 import type { UseFormReturnType } from '@mantine/form';
 import { texts } from 'src/texts';
+import type { EndpointFormValues } from './types';
 
 interface BaseConfigurationFieldsProps {
-  form: UseFormReturnType<any>;
+  form: UseFormReturnType<EndpointFormValues>;
   isEdit?: boolean;
 }
 

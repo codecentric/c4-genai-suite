@@ -47,7 +47,7 @@ describe('CreateMetricDialog', () => {
     server.use(
       http.get(`${evalApiBaseUrl}/v1/llm-endpoints`, () => {
         return HttpResponse.json(mockLlmEndpoints);
-      })
+      }),
     );
   });
 

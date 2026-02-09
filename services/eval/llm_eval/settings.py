@@ -37,7 +37,8 @@ class CelerySettings(BaseSettings, prefix="CELERY_"):
     def broker(self) -> str:
         user = quote_plus(self.broker_user)
         password = quote_plus(self.broker_password)
-        return f"pyamqp://{user}:{password}@{self.broker_host}:{self.broker_port}"  # gitleaks:allow
+        # gitleaks:allow
+        return f"pyamqp://{user}:{password}@{self.broker_host}:{self.broker_port}"
 
     @property
     def heartbeat_file(self) -> str:

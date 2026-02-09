@@ -486,9 +486,9 @@ async def test_ragas_generator_splits_large_documents_correctly(
     split_documents_result = RagasQACatalogGenerator.split_documents(docs)
 
     assert split_documents_result == splitted_docs
-    assert mock_num_tokens_from_string.call_count == (
-        len(docs) + len(splitted_docs)
-    ), "Every doc should be counted once"
+    assert mock_num_tokens_from_string.call_count == (len(docs) + len(splitted_docs)), (
+        "Every doc should be counted once"
+    )
     mock_splitter.assert_called_with(
         chunk_size=chunk_size,
         chunk_overlap=chunk_overlap,

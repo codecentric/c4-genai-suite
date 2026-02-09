@@ -53,7 +53,7 @@ describe('DeleteMetricDialog', () => {
     server.use(
       http.delete(`${evalApiBaseUrl}/v1/metrics/:metricId`, () => {
         return new HttpResponse(null, { status: 204 });
-      })
+      }),
     );
 
     render(<DeleteMetricDialog metric={mockMetric} onClose={onClose} onDeleted={onDeleted} />);
@@ -68,7 +68,7 @@ describe('DeleteMetricDialog', () => {
         expect(onDeleted).toHaveBeenCalled();
         expect(onClose).toHaveBeenCalled();
       },
-      { timeout: 3000 }
+      { timeout: 3000 },
     );
   });
 
@@ -77,7 +77,7 @@ describe('DeleteMetricDialog', () => {
       http.delete(`${evalApiBaseUrl}/v1/metrics/:metricId`, async () => {
         await new Promise((resolve) => setTimeout(resolve, 100));
         return HttpResponse.json(null, { status: 204 });
-      })
+      }),
     );
 
     render(<DeleteMetricDialog metric={mockMetric} onClose={vi.fn()} />);
@@ -97,7 +97,7 @@ describe('DeleteMetricDialog', () => {
     server.use(
       http.delete(`${evalApiBaseUrl}/v1/metrics/:metricId`, () => {
         return HttpResponse.json({ detail: 'Failed to delete' }, { status: 500 });
-      })
+      }),
     );
 
     render(<DeleteMetricDialog metric={mockMetric} onClose={onClose} onDeleted={onDeleted} />);

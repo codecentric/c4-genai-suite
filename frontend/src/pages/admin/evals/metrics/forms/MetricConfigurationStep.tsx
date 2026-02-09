@@ -1,13 +1,14 @@
 import type { UseFormReturnType } from '@mantine/form';
 import { GEvalMetricFields } from './GEvalMetricFields';
 import { SimpleMetricFields } from './SimpleMetricFields';
+import type { MetricFormValues } from './types';
 
 interface MetricConfigurationStepProps {
-  form: UseFormReturnType<any>;
+  form: UseFormReturnType<MetricFormValues>;
 }
 
 export function MetricConfigurationStep({ form }: MetricConfigurationStepProps) {
-  const metricType = form.values.type;
+  const metricType: MetricFormValues['type'] = form.values.type;
 
   // Router component: render appropriate form based on selected metric type
   if (metricType === 'G_EVAL') {
@@ -21,7 +22,7 @@ export function MetricConfigurationStep({ form }: MetricConfigurationStepProps) 
 
   // Fallback (shouldn't happen if wizard enforces type selection)
   return (
-    <div className="text-center text-gray-500 py-8">
+    <div className="py-8 text-center text-gray-500">
       <p>Please select a metric type first</p>
     </div>
   );

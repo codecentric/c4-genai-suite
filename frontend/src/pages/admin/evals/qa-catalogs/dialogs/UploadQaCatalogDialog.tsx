@@ -2,8 +2,8 @@ import { Button, FileInput, Portal } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconUpload } from '@tabler/icons-react';
 import { useMutation } from '@tanstack/react-query';
-import { z } from 'zod';
 import { toast } from 'react-toastify';
+import { z } from 'zod';
 import { useEvalApi } from 'src/api/state/apiEvalClient';
 import { FormAlert, Modal } from 'src/components';
 import { typedZodResolver } from 'src/lib';
@@ -36,11 +36,17 @@ export function UploadQaCatalogDialog({ catalogId, onClose, onSuccess }: UploadQ
 
   const uploadMutation = useMutation({
     mutationFn: async (values: FormValues) => {
+      console.log('Uploading file:', values.file.name, 'to catalog:', catalogId);
+      // Use the generated API client method directly
       return await evalApi.qaCatalog.qaCatalogUpdate(catalogId, values.file);
     },
     onSuccess: () => {
       toast.success(texts.evals.qaCatalog.uploadSuccess);
       onSuccess();
+    },
+    onError: (error: unknown) => {
+      console.error('Upload error:', error);
+      toast.error(texts.evals.qaCatalog.uploadFailed);
     },
   });
 
@@ -68,7 +74,7 @@ export function UploadQaCatalogDialog({ catalogId, onClose, onSuccess }: UploadQ
           }
         >
           <fieldset disabled={uploadMutation.isPending}>
-            <FormAlert common={texts.evals.qaCatalog.uploadFailed} error={uploadMutation.error} />
+            <FormAlert common={texts.evals.qaCatalog.uploadFailed} error={uploadMutation.error as Error | null} />
 
             <p className="mb-4 text-sm text-gray-500">{texts.evals.qaCatalog.uploadHint}</p>
 

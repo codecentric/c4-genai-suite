@@ -2,13 +2,13 @@ import { Button, Portal, Stepper } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useMemo, useState } from 'react';
 import { z } from 'zod';
-import type { LLMEndpointCreate } from 'src/api/generated-eval';
+import type { LLMEndpointConfigurationCreate, LLMEndpointCreate } from 'src/api/generated-eval';
 import { Language } from 'src/api/generated-eval';
 import { FormAlert, Modal } from 'src/components';
 import { typedZodResolver } from 'src/lib';
 import { texts } from 'src/texts';
-import { EndpointTypeStep } from '../forms/EndpointTypeStep';
 import { EndpointConfigurationStep } from '../forms/EndpointConfigurationStep';
+import { EndpointTypeStep } from '../forms/EndpointTypeStep';
 import { useCreateLlmEndpoint } from '../hooks/useLlmEndpointMutations';
 
 interface CreateLlmEndpointDialogProps {
@@ -93,64 +93,56 @@ export function CreateLlmEndpointDialog({ onClose, onCreated }: CreateLlmEndpoin
   const handleSubmit = form.onSubmit((values) => {
     // Transform form values to API format
     // Extract name separately, rest goes into configuration
-    const { name, type, parallelQueries, maxRetries, requestTimeout, ...typeSpecificFields } = values;
+    const { name, type, parallelQueries, maxRetries, requestTimeout } = values;
 
-    // Build configuration based on type to ensure only relevant fields are sent
-    let configuration: any = {
+    // Base configuration fields common to all types
+    const baseConfig = {
       type,
       parallelQueries,
       maxRetries,
       requestTimeout,
     };
 
-    // Add type-specific fields
+    // Build configuration based on type - cast to Partial first, then to full type
+    // This is needed because the generated API type requires all fields, but the backend
+    // only uses fields relevant to each type
+    let configuration: Partial<LLMEndpointConfigurationCreate>;
+
     if (type === 'C4') {
-      const c4Fields = typeSpecificFields as { endpoint: string; apiKey: string; configurationId: number };
+      const c4Values = values as CreateFormValues & { type: 'C4' };
       configuration = {
-        ...configuration,
-        endpoint: c4Fields.endpoint,
-        apiKey: c4Fields.apiKey,
-        configurationId: c4Fields.configurationId,
+        ...baseConfig,
+        endpoint: c4Values.endpoint,
+        apiKey: c4Values.apiKey,
+        configurationId: c4Values.configurationId,
       };
     } else if (type === 'OPENAI') {
-      const openAiFields = typeSpecificFields as {
-        apiKey: string;
-        model: string;
-        baseUrl?: string | null;
-        temperature?: number | null;
-        language?: string | null;
-      };
+      const openAiValues = values as CreateFormValues & { type: 'OPENAI' };
       configuration = {
-        ...configuration,
-        baseUrl: openAiFields.baseUrl || null,
-        apiKey: openAiFields.apiKey,
-        model: openAiFields.model,
-        temperature: openAiFields.temperature ?? null,
-        language: openAiFields.language || null,
+        ...baseConfig,
+        baseUrl: openAiValues.baseUrl || '',
+        apiKey: openAiValues.apiKey,
+        model: openAiValues.model,
+        temperature: openAiValues.temperature ?? 0,
+        language: openAiValues.language || Language.English,
       };
-    } else if (type === 'AZURE_OPENAI') {
-      const azureFields = typeSpecificFields as {
-        endpoint: string;
-        apiKey: string;
-        deployment: string;
-        apiVersion: string;
-        temperature?: number | null;
-        language?: string | null;
-      };
+    } else {
+      // AZURE_OPENAI
+      const azureValues = values as CreateFormValues & { type: 'AZURE_OPENAI' };
       configuration = {
-        ...configuration,
-        endpoint: azureFields.endpoint,
-        apiKey: azureFields.apiKey,
-        deployment: azureFields.deployment,
-        apiVersion: azureFields.apiVersion,
-        temperature: azureFields.temperature ?? null,
-        language: azureFields.language || null,
+        ...baseConfig,
+        endpoint: azureValues.endpoint,
+        apiKey: azureValues.apiKey,
+        deployment: azureValues.deployment,
+        apiVersion: azureValues.apiVersion,
+        temperature: azureValues.temperature ?? 0,
+        language: azureValues.language || Language.English,
       };
     }
 
     const payload: LLMEndpointCreate = {
       name,
-      _configuration: configuration,
+      _configuration: configuration as LLMEndpointConfigurationCreate,
     };
 
     createMutation.mutate(payload, {
@@ -201,10 +193,17 @@ export function CreateLlmEndpointDialog({ onClose, onCreated }: CreateLlmEndpoin
           </Stepper>
 
           <fieldset disabled={createMutation.isPending}>
-            <FormAlert common={texts.evals.llmEndpoint.createFailed} error={createMutation.error} />
+            <FormAlert common={texts.evals.llmEndpoint.createFailed} error={createMutation.error as Error | null} />
 
-            {activeStep === 0 && <EndpointTypeStep form={form} />}
-            {activeStep === 1 && <EndpointConfigurationStep form={form} endpointType={form.values.type} isEdit={false} />}
+            {/* Form type is discriminated union but child components accept flat type - structurally compatible */}
+            {activeStep === 0 && <EndpointTypeStep form={form as unknown as Parameters<typeof EndpointTypeStep>[0]['form']} />}
+            {activeStep === 1 && (
+              <EndpointConfigurationStep
+                form={form as unknown as Parameters<typeof EndpointConfigurationStep>[0]['form']}
+                endpointType={form.values.type}
+                isEdit={false}
+              />
+            )}
           </fieldset>
         </Modal>
       </form>

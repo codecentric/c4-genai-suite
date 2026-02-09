@@ -230,7 +230,8 @@ async def generate_from_c4_bucket(
 
     Args:
         db: Database session
-        request: Request containing bucket_id, file_ids, catalog name, and generation config
+        request: Request containing bucket_id, file_ids, catalog name,
+            and generation config
 
     Returns:
         QACatalogGenerationResult with the created catalog ID
@@ -240,7 +241,6 @@ async def generate_from_c4_bucket(
     """
     import os
     from hashlib import md5
-    from pathlib import Path
     from uuid import uuid4
 
     from llm_eval.file_store import get_filestore
@@ -257,7 +257,10 @@ async def generate_from_c4_bucket(
     if file_store is None:
         raise HTTPException(
             status_code=400,
-            detail="File store is not configured. Please set FILE_STORE_TYPE and related settings.",
+            detail=(
+                "File store is not configured. "
+                "Please set FILE_STORE_TYPE and related settings."
+            ),
         )
 
     # Create temporary directory for downloaded files

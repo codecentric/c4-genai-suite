@@ -1,11 +1,12 @@
 import { NumberInput, PasswordInput, TextInput } from '@mantine/core';
 import type { UseFormReturnType } from '@mantine/form';
 import { texts } from 'src/texts';
+import type { EndpointFormValues } from '../types';
 
 const UNCHANGED_API_KEY = 'd1d04d4e-38b9-441c-a6e3-68fb1e18f0c0';
 
 interface C4EndpointFieldsProps {
-  form: UseFormReturnType<any>;
+  form: UseFormReturnType<EndpointFormValues>;
   isEdit?: boolean;
 }
 

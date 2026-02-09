@@ -19,141 +19,134 @@
 import { mapValues } from '../runtime';
 import type { FaithfulnessMetricConfigurationRead } from './FaithfulnessMetricConfigurationRead';
 import {
-    FaithfulnessMetricConfigurationReadFromJSON,
-    FaithfulnessMetricConfigurationReadFromJSONTyped,
-    FaithfulnessMetricConfigurationReadToJSON,
+  FaithfulnessMetricConfigurationReadFromJSON,
+  FaithfulnessMetricConfigurationReadFromJSONTyped,
+  FaithfulnessMetricConfigurationReadToJSON,
 } from './FaithfulnessMetricConfigurationRead';
 import type { AnswerRelevancyMetricConfigurationRead } from './AnswerRelevancyMetricConfigurationRead';
 import {
-    AnswerRelevancyMetricConfigurationReadFromJSON,
-    AnswerRelevancyMetricConfigurationReadFromJSONTyped,
-    AnswerRelevancyMetricConfigurationReadToJSON,
+  AnswerRelevancyMetricConfigurationReadFromJSON,
+  AnswerRelevancyMetricConfigurationReadFromJSONTyped,
+  AnswerRelevancyMetricConfigurationReadToJSON,
 } from './AnswerRelevancyMetricConfigurationRead';
 import type { HallucinationMetricConfigurationRead } from './HallucinationMetricConfigurationRead';
 import {
-    HallucinationMetricConfigurationReadFromJSON,
-    HallucinationMetricConfigurationReadFromJSONTyped,
-    HallucinationMetricConfigurationReadToJSON,
+  HallucinationMetricConfigurationReadFromJSON,
+  HallucinationMetricConfigurationReadFromJSONTyped,
+  HallucinationMetricConfigurationReadToJSON,
 } from './HallucinationMetricConfigurationRead';
 import type { LLMTestCaseParams } from './LLMTestCaseParams';
-import {
-    LLMTestCaseParamsFromJSON,
-    LLMTestCaseParamsFromJSONTyped,
-    LLMTestCaseParamsToJSON,
-} from './LLMTestCaseParams';
+import { LLMTestCaseParamsFromJSON, LLMTestCaseParamsFromJSONTyped, LLMTestCaseParamsToJSON } from './LLMTestCaseParams';
 import type { GEvalMetricConfigurationRead } from './GEvalMetricConfigurationRead';
 import {
-    GEvalMetricConfigurationReadFromJSON,
-    GEvalMetricConfigurationReadFromJSONTyped,
-    GEvalMetricConfigurationReadToJSON,
+  GEvalMetricConfigurationReadFromJSON,
+  GEvalMetricConfigurationReadFromJSONTyped,
+  GEvalMetricConfigurationReadToJSON,
 } from './GEvalMetricConfigurationRead';
 
 /**
- * 
+ *
  * @export
  * @interface MetricConfigurationRead
  */
 export interface MetricConfigurationRead {
-    /**
-     * 
-     * @type {string}
-     * @memberof MetricConfigurationRead
-     */
-    type: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof MetricConfigurationRead
-     */
-    name: string;
-    /**
-     * 
-     * @type {Array<string>}
-     * @memberof MetricConfigurationRead
-     */
-    evaluationSteps: Array<string>;
-    /**
-     * 
-     * @type {Array<LLMTestCaseParams>}
-     * @memberof MetricConfigurationRead
-     */
-    evaluationParams: Array<LLMTestCaseParams>;
-    /**
-     * 
-     * @type {string}
-     * @memberof MetricConfigurationRead
-     */
-    chatModelId: string;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof MetricConfigurationRead
-     */
-    strictMode: boolean;
-    /**
-     * 
-     * @type {number}
-     * @memberof MetricConfigurationRead
-     */
-    threshold: number;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof MetricConfigurationRead
-     */
-    includeReason: boolean;
+  /**
+   *
+   * @type {string}
+   * @memberof MetricConfigurationRead
+   */
+  type: string;
+  /**
+   *
+   * @type {string}
+   * @memberof MetricConfigurationRead
+   */
+  name: string;
+  /**
+   *
+   * @type {Array<string>}
+   * @memberof MetricConfigurationRead
+   */
+  evaluationSteps: Array<string>;
+  /**
+   *
+   * @type {Array<LLMTestCaseParams>}
+   * @memberof MetricConfigurationRead
+   */
+  evaluationParams: Array<LLMTestCaseParams>;
+  /**
+   *
+   * @type {string}
+   * @memberof MetricConfigurationRead
+   */
+  chatModelId: string;
+  /**
+   *
+   * @type {boolean}
+   * @memberof MetricConfigurationRead
+   */
+  strictMode: boolean;
+  /**
+   *
+   * @type {number}
+   * @memberof MetricConfigurationRead
+   */
+  threshold: number;
+  /**
+   *
+   * @type {boolean}
+   * @memberof MetricConfigurationRead
+   */
+  includeReason: boolean;
 }
 
 /**
  * Check if a given object implements the MetricConfigurationRead interface.
  */
 export function instanceOfMetricConfigurationRead(value: object): value is MetricConfigurationRead {
-    if (!('type' in value) || value['type'] === undefined) return false;
-    if (!('name' in value) || value['name'] === undefined) return false;
-    if (!('evaluationSteps' in value) || value['evaluationSteps'] === undefined) return false;
-    if (!('evaluationParams' in value) || value['evaluationParams'] === undefined) return false;
-    if (!('chatModelId' in value) || value['chatModelId'] === undefined) return false;
-    if (!('strictMode' in value) || value['strictMode'] === undefined) return false;
-    if (!('threshold' in value) || value['threshold'] === undefined) return false;
-    if (!('includeReason' in value) || value['includeReason'] === undefined) return false;
-    return true;
+  if (!('type' in value) || value['type'] === undefined) return false;
+  if (!('name' in value) || value['name'] === undefined) return false;
+  if (!('evaluationSteps' in value) || value['evaluationSteps'] === undefined) return false;
+  if (!('evaluationParams' in value) || value['evaluationParams'] === undefined) return false;
+  if (!('chatModelId' in value) || value['chatModelId'] === undefined) return false;
+  if (!('strictMode' in value) || value['strictMode'] === undefined) return false;
+  if (!('threshold' in value) || value['threshold'] === undefined) return false;
+  if (!('includeReason' in value) || value['includeReason'] === undefined) return false;
+  return true;
 }
 
 export function MetricConfigurationReadFromJSON(json: any): MetricConfigurationRead {
-    return MetricConfigurationReadFromJSONTyped(json, false);
+  return MetricConfigurationReadFromJSONTyped(json, false);
 }
 
 export function MetricConfigurationReadFromJSONTyped(json: any, ignoreDiscriminator: boolean): MetricConfigurationRead {
-    if (json == null) {
-        return json;
-    }
-    return {
-
-        'type': json['type'],
-        'name': json['name'],
-        'evaluationSteps': json['evaluationSteps'] ?? [],
-        'evaluationParams': json['evaluationParams'] ? ((json['evaluationParams'] as Array<any>).map(LLMTestCaseParamsFromJSON)) : [],
-        'chatModelId': json['chatModelId'] ?? '',
-        'strictMode': json['strictMode'] ?? false,
-        'threshold': json['threshold'] ?? 0,
-        'includeReason': json['includeReason'] ?? false,
-    };
+  if (json == null) {
+    return json;
+  }
+  return {
+    type: json['type'],
+    name: json['name'],
+    evaluationSteps: json['evaluationSteps'] ?? [],
+    evaluationParams: json['evaluationParams'] ? (json['evaluationParams'] as Array<any>).map(LLMTestCaseParamsFromJSON) : [],
+    chatModelId: json['chatModelId'] ?? '',
+    strictMode: json['strictMode'] ?? false,
+    threshold: json['threshold'] ?? 0,
+    includeReason: json['includeReason'] ?? false,
+  };
 }
 
 export function MetricConfigurationReadToJSON(value?: MetricConfigurationRead | null): any {
-    if (value == null) {
-        return value;
-    }
-    return {
-
-        'type': value['type'],
-        'name': value['name'],
-        'evaluationSteps': value['evaluationSteps'] ?? [],
-        'evaluationParams': value['evaluationParams'] ? ((value['evaluationParams'] as Array<any>).map(LLMTestCaseParamsToJSON)) : [],
-        'chatModelId': value['chatModelId'],
-        'strictMode': value['strictMode'],
-        'threshold': value['threshold'],
-        'includeReason': value['includeReason'],
-    };
+  if (value == null) {
+    return value;
+  }
+  return {
+    type: value['type'],
+    name: value['name'],
+    evaluationSteps: value['evaluationSteps'] ?? [],
+    evaluationParams: value['evaluationParams'] ? (value['evaluationParams'] as Array<any>).map(LLMTestCaseParamsToJSON) : [],
+    chatModelId: value['chatModelId'],
+    strictMode: value['strictMode'],
+    threshold: value['threshold'],
+    includeReason: value['includeReason'],
+  };
 }
-

@@ -14,15 +14,7 @@ interface MetricsTableProps {
   isDeleting?: string; // ID of the metric being deleted
 }
 
-export function MetricsTable({
-  metrics,
-  isFetching,
-  isFetched,
-  onRowClick,
-  onEdit,
-  onDelete,
-  isDeleting,
-}: MetricsTableProps) {
+export function MetricsTable({ metrics, isFetching, isFetched, onRowClick, onEdit, onDelete, isDeleting }: MetricsTableProps) {
   const formatDate = (date: Date) => {
     return date.toLocaleDateString(undefined, {
       year: 'numeric',
@@ -46,7 +38,7 @@ export function MetricsTable({
       <tbody>
         {isFetching && !isFetched && (
           <>
-            {[...Array(5)].map((_, i) => (
+            {Array.from({ length: 5 }).map((_, i) => (
               <tr key={i}>
                 <td>
                   <Skeleton height={20} />

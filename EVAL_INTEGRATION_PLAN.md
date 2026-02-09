@@ -191,54 +191,64 @@ A Connection should be designed in the eval service and c4 backend to enable acc
 
 ## 5. Evaluations Management
 
-### 5.1 Evaluations List Page 🚧
+### 5.1 Evaluations List Page ✅
 
-- 🔍 **NEEDS REVIEW**: Basic page exists, needs full implementation
-- ⏳ List all evaluations
-- ⏳ Display evaluation status (pending, running, completed, failed)
-- ⏳ Show QA catalog, metrics, LLM endpoint
-- ⏳ Show progress for running evaluations
-- ⏳ Create new evaluation button
-- ⏳ Search and filter evaluations
-- ⏳ Navigate to evaluation details
-- ⏳ Navigate to evaluation results
-- ⏳ Delete evaluation
-- ⏳ Infinite scroll or pagination
+- ✅ **DONE**: Full implementation complete
+- ✅ List all evaluations
+- ✅ Display evaluation status (pending, running, completed, failed)
+- ✅ Show QA catalog, metrics, LLM endpoint
+- ✅ Show progress for running evaluations
+- ✅ Create new evaluation button
+- ✅ Search and filter evaluations
+- ✅ Navigate to evaluation details
+- ✅ Navigate to evaluation results (integrated in detail page)
+- ✅ Delete evaluation (via actions menu)
+- ✅ Pagination
 
-### 5.2 Create Evaluation Page ⏳
+### 5.2 Create Evaluation Page ✅
 
-- ⏳ New evaluation page (`/admin/evals/evaluations/new`)
-- ⏳ Multi-step form or wizard
-  - ⏳ Step 1: Select evaluation type (by catalog or manual test cases)
-  - ⏳ Step 2: Select QA catalog or enter test cases
-  - ⏳ Step 3: Select metrics (multiple)
-  - ⏳ Step 4: Select LLM endpoint
-  - ⏳ Step 5: Review and submit
-- ⏳ Support for manual test cases
-- ⏳ Test case builder (question, expected output, contexts)
-- ⏳ Form validation
-- ⏳ Submit evaluation
-- ⏳ Navigate to evaluation details after creation
+- ✅ **DONE**: Full implementation complete
+- ✅ New evaluation page (`/admin/evals/evaluations/new`)
+- ✅ Multi-step wizard (5 steps with Stepper component)
+  - ✅ Step 1: Select mode (by catalog or manual test cases)
+  - ✅ Step 2: Source (catalog selection with pagination or manual test cases)
+  - ✅ Step 3: Select metrics (multiple selection with search)
+  - ✅ Step 4: Select LLM endpoint (with search)
+  - ✅ Step 5: Review and submit
+- ✅ Support for manual test cases
+- ✅ Test case builder (question, expected output, contexts array)
+- ✅ Wizard state management (Zustand)
+- ✅ Form validation with canProceed checks
+- ✅ Submit evaluation
+- ✅ Navigate to evaluation details after creation
+- ✅ Cancel confirmation dialog
+- ✅ Tests for CreateEvaluationPage
 
-### 5.3 Evaluation Detail Page ⏳
+### 5.3 Evaluation Detail Page ✅
 
-- ⏳ View evaluation details (`/admin/evals/evaluations/:id`)
-- ⏳ Show evaluation metadata
-  - ⏳ Name, description
-  - ⏳ QA catalog used
-  - ⏳ Metrics configured
-  - ⏳ LLM endpoint used
-  - ⏳ Status and progress
-- ⏳ Display test case count
-- ⏳ Show creation and update times
-- ⏳ Actions menu
-  - ⏳ Run evaluation
-  - ⏳ Edit evaluation
-  - ⏳ Delete evaluation
-  - ⏳ Clone evaluation
-  - ⏳ Compare with others
-- ⏳ List of evaluation results (runs)
-- ⏳ Navigate to result details
+- ✅ **DONE**: Full implementation complete
+- ✅ View evaluation details (`/admin/evals/evaluations/:id`)
+- ✅ Tabs for Overview and Results
+- ✅ Show evaluation metadata in Overview tab
+  - ✅ Name, description
+  - ✅ QA catalog used (with link to catalog)
+  - ✅ Metrics configured
+  - ✅ Status chip and progress
+  - ✅ Test case statistics (total, completed, passed, failed)
+  - ✅ Pie chart visualization for test case pass/fail
+- ✅ Display test case count
+- ✅ Show creation and update times
+- ✅ Actions menu (EvaluationActionsMenu)
+  - ⏳ Run evaluation (future enhancement)
+  - ✅ Edit evaluation name (EditEvaluationNameDialog)
+  - ✅ Delete evaluation (DeleteEvaluationDialog)
+  - ✅ Export results (CSV)
+  - ⏳ Clone evaluation (future enhancement)
+  - ⏳ Compare with others (future enhancement)
+- ✅ Real-time polling for running evaluations (5s interval)
+- ✅ Status banners for RUNNING and FAILURE states
+- ✅ Metric results with donut charts (MetricResultsSection)
+- ✅ Results tab with test case results table
 
 ### 5.4 Edit Evaluation Page ⏳
 
@@ -250,26 +260,33 @@ A Connection should be designed in the eval service and c4 backend to enable acc
 - ⏳ Cannot edit while running
 - ⏳ Save changes
 
-### 5.5 Evaluation Result Detail Page ⏳
+### 5.5 Evaluation Result Detail Page ✅
 
-- ⏳ View evaluation result (`/admin/evals/evaluations/:id/results/:resultId`)
-- ⏳ Summary section
-  - ⏳ Overall metrics scores
-  - ⏳ Pass/fail indicators
-  - ⏳ Execution time
-  - ⏳ Status
-- ⏳ Test cases results table
-  - ⏳ Question
-  - ⏳ Expected output
-  - ⏳ Actual output
-  - ⏳ Contexts
-  - ⏳ Metric scores per test case
-  - ⏳ Pass/fail status
-- ⏳ Pagination for test case results
-- ⏳ Filter by pass/fail
-- ⏳ Export results
-- ⏳ Expand test case for details
-- ⏳ Real-time updates for running evaluations
+- ✅ **DONE**: Full implementation complete (integrated into detail page Results tab)
+- ✅ View evaluation results (integrated into detail page as Results tab)
+- ✅ Summary section (integrated in Overview tab)
+  - ✅ Overall metrics scores with donut charts
+  - ✅ Pass/fail indicators
+  - ✅ Completion rate
+  - ✅ Status
+- ✅ Test cases results table (TestCaseResultsTable component)
+  - ✅ Question
+  - ✅ Expected output (shown in expandable row)
+  - ✅ Metric scores per test case
+  - ✅ Pass/fail status chips
+  - ✅ Expandable rows for full details (contexts, actual output)
+  - ✅ Score display with color coding and threshold indicators
+- ✅ Pagination for test case results (20 per page)
+- ⏳ Filter by pass/fail (future enhancement)
+- ✅ Export results (CSV via actions menu)
+- ✅ Expand test case for details
+- ✅ Real-time updates for running evaluations (5s polling)
+
+**TODO - Backend API Enhancement:**
+- ⏳ Add `actualOutput` field to grouped evaluation results API (`GET /evaluation-results/grouped`)
+  - Currently the frontend shows "Not available" for actual output in the test case results table
+  - The `actualOutput` is only available in the individual result fetch (`EvaluationResult`), not in `GroupedEvaluationResult`
+  - This requires backend change to include the LLM response in the grouped results endpoint
 
 ### 5.6 Evaluation Comparison Page ⏳
 
@@ -281,18 +298,22 @@ A Connection should be designed in the eval service and c4 backend to enable acc
 - ⏳ Highlight improvements/regressions
 - ⏳ Export comparison report
 
-### 5.7 Evaluation Components ⏳
+### 5.7 Evaluation Components 🚧
 
-- ⏳ EvaluationsTable
-- ⏳ EvaluationStatusChip
-- ⏳ EvaluationProgressBar
-- ⏳ EvaluationCard
-- ⏳ TestCaseBuilder
-- ⏳ TestCaseResultsTable
-- ⏳ MetricScoresDisplay
-- ⏳ EvaluationWizard
-- ⏳ ComparisonChart
-- ⏳ ComparisonTable
+- ✅ EvaluationsTable (Phase 1)
+- ✅ EvaluationStatusChip (Phase 1)
+- ✅ EvaluationProgressBar (Phase 1)
+- ✅ EvaluationCard (Phase 2)
+- ✅ MetricsDisplay (Phase 2)
+- ✅ EvaluationActionsMenu (Phase 2)
+- ✅ TestCaseStatusChip (Phase 3)
+- ✅ TestCaseResultsTable (Phase 3)
+- ✅ MetricScoreDisplay (Phase 3)
+- ✅ ResultsSummary (Phase 3)
+- ⏳ TestCaseBuilder (Phase 4)
+- ⏳ EvaluationWizard (Phase 4)
+- ⏳ ComparisonChart (Phase 5)
+- ⏳ ComparisonTable (Phase 5)
 
 ---
 

@@ -1,4 +1,5 @@
 import asyncio
+import typing
 from contextlib import asynccontextmanager
 from os import environ
 from typing import AsyncGenerator
@@ -40,7 +41,9 @@ async def lifespan(_: FastAPI) -> AsyncGenerator[None, None]:
             logger.info("Database migrations completed successfully")
     except asyncio.TimeoutError:
         logger.error("Database migrations timed out after 60 seconds")
-        raise RuntimeError("Database migrations timed out - check database connectivity")
+        raise RuntimeError(
+            "Database migrations timed out - check database connectivity"
+        )
     except Exception as e:
         logger.error(f"Database migration failed: {e}")
         raise
@@ -57,7 +60,9 @@ app.add_exception_handler(Exception, unhandled_exception_handler)
 
 
 @app.middleware("http")
-async def log_requests(request: Request, call_next):
+async def log_requests(
+    request: Request, call_next: typing.Callable[[Request], typing.Awaitable[Response]]
+) -> Response:
     """Log all incoming requests and responses with timing and error details."""
     start_time = time.time()
 
@@ -69,9 +74,15 @@ async def log_requests(request: Request, call_next):
     )
 
     # Log relevant headers (excluding sensitive ones)
+    allowed_headers = [
+        "content-type",
+        "user-agent",
+        "x-user-id",
+        "x-user-email",
+        "x-user-name",
+    ]
     headers_to_log = {
-        k: v for k, v in request.headers.items()
-        if k.lower() in ['content-type', 'user-agent', 'x-user-id', 'x-user-email', 'x-user-name']
+        k: v for k, v in request.headers.items() if k.lower() in allowed_headers
     }
     if headers_to_log:
         logger.debug(f"Headers: {headers_to_log}")

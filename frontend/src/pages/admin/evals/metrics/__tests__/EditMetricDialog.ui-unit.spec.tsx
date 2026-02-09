@@ -68,7 +68,7 @@ describe('EditMetricDialog', () => {
     server.use(
       http.get(`${evalApiBaseUrl}/v1/llm-endpoints`, () => {
         return HttpResponse.json(mockLlmEndpoints);
-      })
+      }),
     );
   });
 
@@ -136,7 +136,7 @@ describe('EditMetricDialog', () => {
             name: 'Updated Name',
           },
         });
-      })
+      }),
     );
 
     render(<EditMetricDialog metric={mockSimpleMetric} onClose={onClose} onUpdated={onUpdated} />);
@@ -209,7 +209,7 @@ describe('EditMetricDialog', () => {
       http.patch(`${evalApiBaseUrl}/v1/metrics/:metricId`, async () => {
         await new Promise((resolve) => setTimeout(resolve, 100));
         return HttpResponse.json(mockSimpleMetric);
-      })
+      }),
     );
 
     render(<EditMetricDialog metric={mockSimpleMetric} onClose={vi.fn()} />);

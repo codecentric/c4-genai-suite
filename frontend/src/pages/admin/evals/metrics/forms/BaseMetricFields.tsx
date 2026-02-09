@@ -2,13 +2,13 @@ import { Slider, Switch, TextInput } from '@mantine/core';
 import type { UseFormReturnType } from '@mantine/form';
 import { LlmEndpointSelect } from 'src/pages/admin/evals/components/LlmEndpointSelect';
 import { texts } from 'src/texts';
+import type { MetricFormValues } from './types';
 
 interface BaseMetricFieldsProps {
-  form: UseFormReturnType<any>;
+  form: UseFormReturnType<MetricFormValues>;
 }
 
 export function BaseMetricFields({ form }: BaseMetricFieldsProps) {
-
   // Threshold marks for the slider
   const thresholdMarks = [
     { value: 0, label: '0' },
@@ -30,11 +30,11 @@ export function BaseMetricFields({ form }: BaseMetricFieldsProps) {
       />
 
       <div className="mb-4">
-        <label className="block text-sm font-medium mb-2">
+        <label className="mb-2 block text-sm font-medium">
           {texts.evals.metric.thresholdLabel}
-          <span className="text-red-500 ml-1">*</span>
+          <span className="ml-1 text-red-500">*</span>
         </label>
-        <p className="text-sm text-gray-600 mb-3">{texts.evals.metric.thresholdHint}</p>
+        <p className="mb-3 text-sm text-gray-600">{texts.evals.metric.thresholdHint}</p>
         <Slider
           min={0}
           max={1}

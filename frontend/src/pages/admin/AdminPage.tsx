@@ -7,6 +7,8 @@ import { texts } from 'src/texts';
 import { useStateOfSelectedChatId } from '../chat/state/chat';
 import { AuditLogPage } from './audit-log/AuditLogPage';
 import { DashboardPage } from './dashboard/DashboardPage';
+import { CreateEvaluationPage } from './evals/evaluations/CreateEvaluationPage';
+import { EvaluationDetailPage } from './evals/evaluations/EvaluationDetailPage';
 import { EvaluationsPage } from './evals/evaluations/EvaluationsPage';
 import { LlmEndpointsPage } from './evals/llm-endpoints/LlmEndpointsPage';
 import { MetricDetailPage } from './evals/metrics/MetricDetailPage';
@@ -89,7 +91,7 @@ export function AdminPage() {
                     <ul className="ml-4 mt-1 space-y-1">
                       <li>
                         <TransientNavLink className="block" to="/admin/evals/evaluations">
-                          {texts.evals.evaluations}
+                          {texts.evals.evaluationsLabel}
                         </TransientNavLink>
                       </li>
                       <li>
@@ -135,6 +137,8 @@ export function AdminPage() {
             <Route path="/assistants/*" element={<ConfigurationPage />} />
 
             <Route path="/evals/evaluations" element={<EvaluationsPage />} />
+            <Route path="/evals/evaluations/new" element={<CreateEvaluationPage />} />
+            <Route path="/evals/evaluations/:id" element={<EvaluationDetailPage />} />
 
             <Route path="/evals/qa-catalogs" element={<QaCatalogsPage />} />
 

@@ -1,5 +1,5 @@
 import { Tooltip } from '@mantine/core';
-import { IconEdit, IconTrash, IconArrowBackUp } from '@tabler/icons-react';
+import { IconArrowBackUp, IconEdit, IconTrash } from '@tabler/icons-react';
 import type { QAPair } from 'src/api/generated-eval';
 import { texts } from 'src/texts';
 import type { PendingChange } from '../state';
@@ -16,13 +16,24 @@ export function QaPairsTable({ pairs, pendingChanges, onEdit, onDelete, onUndo }
   const getRowClass = (pair: QAPair & { _pendingStatus?: string }) => {
     switch (pair._pendingStatus) {
       case 'added':
-        return 'bg-green-50 border-l-4 border-green-500';
       case 'updated':
-        return 'bg-blue-50 border-l-4 border-blue-500';
       case 'deleted':
-        return 'bg-red-50 border-l-4 border-red-500 opacity-60';
+        return ''; // Will apply border to first cell instead
       default:
         return 'hover:bg-gray-50';
+    }
+  };
+
+  const getBorderClass = (pair: QAPair & { _pendingStatus?: string }) => {
+    switch (pair._pendingStatus) {
+      case 'added':
+        return 'border-l-4 border-green-500';
+      case 'updated':
+        return 'border-l-4 border-blue-500';
+      case 'deleted':
+        return 'border-l-4 border-red-500';
+      default:
+        return '';
     }
   };
 
@@ -39,34 +50,34 @@ export function QaPairsTable({ pairs, pendingChanges, onEdit, onDelete, onUndo }
   };
 
   return (
-    <table className="table w-full table-fixed text-base">
+    <table className="w-full table-fixed text-base">
       <thead>
-        <tr>
-          <th className="w-2/5">{texts.evals.qaCatalog.question}</th>
-          <th className="w-2/5">{texts.evals.qaCatalog.expectedOutput}</th>
-          <th className="w-1/5">{texts.evals.qaCatalog.contexts}</th>
-          <th className="w-24">{texts.evals.qaCatalog.actions}</th>
+        <tr className="border-b-2 border-gray-200">
+          <th className="w-[35%] px-4 py-4 text-left font-semibold">{texts.evals.qaCatalog.question}</th>
+          <th className="w-[35%] px-4 py-4 text-left font-semibold">{texts.evals.qaCatalog.expectedOutput}</th>
+          <th className="w-[15%] px-4 py-4 text-left font-semibold">{texts.evals.qaCatalog.contexts}</th>
+          <th className="w-[15%] px-4 py-4 text-left font-semibold">{texts.evals.qaCatalog.actions}</th>
         </tr>
       </thead>
       <tbody>
         {pairs.map((pair) => (
           <tr key={pair.id} className={getRowClass(pair)}>
-            <td className="align-top">
-              <div className={pair._pendingStatus === 'deleted' ? 'line-through' : ''}>
+            <td className={`px-4 py-4 align-top ${getBorderClass(pair)}`}>
+              <div className={pair._pendingStatus === 'deleted' ? 'text-gray-500 line-through' : ''}>
                 <Tooltip label={pair.question} multiline w={400} disabled={pair.question.length <= 100}>
                   <span className="break-words whitespace-pre-wrap">{truncate(pair.question, 100)}</span>
                 </Tooltip>
               </div>
             </td>
-            <td className="align-top">
-              <div className={pair._pendingStatus === 'deleted' ? 'line-through' : ''}>
+            <td className="px-4 py-4 align-top">
+              <div className={pair._pendingStatus === 'deleted' ? 'text-gray-500 line-through' : ''}>
                 <Tooltip label={pair.expectedOutput} multiline w={400} disabled={pair.expectedOutput.length <= 100}>
                   <span className="break-words whitespace-pre-wrap">{truncate(pair.expectedOutput, 100)}</span>
                 </Tooltip>
               </div>
             </td>
-            <td className="align-top">
-              <div className={pair._pendingStatus === 'deleted' ? 'line-through' : ''}>
+            <td className="px-4 py-4 align-top">
+              <div className={pair._pendingStatus === 'deleted' ? 'text-gray-500 line-through' : ''}>
                 {pair.contexts.length > 0 ? (
                   <Tooltip label={pair.contexts.join('\n---\n')} multiline w={400}>
                     <span className="text-sm text-gray-600">{pair.contexts.length} context(s)</span>
@@ -76,7 +87,7 @@ export function QaPairsTable({ pairs, pendingChanges, onEdit, onDelete, onUndo }
                 )}
               </div>
             </td>
-            <td className="align-top">
+            <td className="px-4 py-4 align-top">
               <div className="flex gap-1">
                 {pair._pendingStatus === 'deleted' ? (
                   <Tooltip label={texts.evals.qaCatalog.undoChange}>
@@ -96,7 +107,7 @@ export function QaPairsTable({ pairs, pendingChanges, onEdit, onDelete, onUndo }
                         <IconTrash size={18} />
                       </button>
                     </Tooltip>
-                    {isPending(pair.id) && pair._pendingStatus !== 'added' && (
+                    {isPending(pair.id) && (
                       <Tooltip label={texts.evals.qaCatalog.undoChange}>
                         <button type="button" className="btn btn-ghost btn-sm text-warning" onClick={() => onUndo(pair.id)}>
                           <IconArrowBackUp size={18} />

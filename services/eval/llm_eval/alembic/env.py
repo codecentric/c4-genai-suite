@@ -8,10 +8,11 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 
 # IMPORTANT: Load environment variables FIRST before importing settings
 from llm_eval.utils.env import load_env
+
 load_env()
 
-from llm_eval.database.model import Base, SCHEMA_NAME
-from llm_eval.settings import SETTINGS
+from llm_eval.database.model import Base, SCHEMA_NAME  # noqa: E402
+from llm_eval.settings import SETTINGS  # noqa: E402
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -89,10 +90,10 @@ async def run_async_migrations() -> None:
 
     config_section = config.get_section(config.config_ini_section, {})
     # Add timeout parameters to connection string if not present
-    if 'sqlalchemy.url' in config_section:
-        url = config_section['sqlalchemy.url']
-        if 'timeout' not in url:
-            config_section['sqlalchemy.url'] = f"{url}?timeout=10&command_timeout=30"
+    if "sqlalchemy.url" in config_section:
+        url = config_section["sqlalchemy.url"]
+        if "timeout" not in url:
+            config_section["sqlalchemy.url"] = f"{url}?timeout=10&command_timeout=30"
 
     connectable = async_engine_from_config(
         config_section,
