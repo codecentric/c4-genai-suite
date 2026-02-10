@@ -1,7 +1,8 @@
-import test, { expect } from '@playwright/test';
-import { sseBodyABC, sseBodyBanana } from '../tests/utils/files/sse-responses';
+import { expect } from '@playwright/test';
+import { test } from '../utils/fixtures';
 import {
-  addAzureModelToConfiguration,
+  addMockModelToConfiguration,
+  addSystemPromptToConfiguration,
   createConfiguration,
   enterAdminArea,
   enterUserArea,
@@ -10,36 +11,9 @@ import {
   selectConfiguration,
   sendMessage,
   uniqueName,
-} from '../tests/utils/helper';
+} from '../utils/helper';
 
-test('Chat viewport scrolling', async ({ page }) => {
-  // we do not actually need an LLM, so we mock the response
-  await page.route('**/api/extensions/test', async (route) => {
-    const json = {
-      successful: true,
-    };
-    await route.fulfill({ json });
-  });
-  await page.route('**/api/conversations/*/messages/sse', async (route) => {
-    const request = route.request();
-    const postData = request.postData() || '';
-
-    const containsBanana = postData.includes('Banane');
-    const body = containsBanana ? sseBodyBanana : sseBodyABC;
-    await page.waitForTimeout(600);
-    await route.fulfill({
-      status: 200,
-      headers: {
-        'Content-Type': 'text/event-stream',
-        'Cache-Control': 'no-cache, no-store, must-revalidate',
-        Pragma: 'no-cache',
-        Connection: 'keep-alive',
-        'Access-Control-Allow-Origin': '*',
-      },
-      body,
-    });
-  });
-
+test('Chat viewport scrolling', async ({ page, mockServerUrl }) => {
   const configuration = { name: uniqueName('E2E-Test'), description: '' };
 
   await test.step('should login', async () => {
@@ -50,7 +24,8 @@ test('Chat viewport scrolling', async ({ page }) => {
     configuration.description = `Example for the ${configuration.name}`;
     await enterAdminArea(page);
     await createConfiguration(page, configuration);
-    await addAzureModelToConfiguration(page, configuration, { deployment: 'mocked', apiKey: 'nokey' });
+    await addMockModelToConfiguration(page, configuration, { endpoint: mockServerUrl });
+    await addSystemPromptToConfiguration(page, configuration, { text: 'You are a helpful assistant.' });
   });
 
   await test.step('should reply to questions in the chat', async () => {
@@ -87,24 +62,24 @@ test('Chat viewport scrolling', async ({ page }) => {
 
   await test.step('should show auto-scroll button when reply is too long for viewport', async () => {
     const autoScrollButton = page.locator('[data-testid="scrollToBottomButton"]');
-    expect(await autoScrollButton.evaluate((el) => getComputedStyle(el).opacity)).toBe('1');
+    await expect(autoScrollButton).toHaveCSS('opacity', '1');
   });
 
   await test.step('should hide auto-scroll button when scrolled to bottom', async () => {
     const autoScrollButton = page.locator('[data-testid="scrollToBottomButton"]');
     await autoScrollButton.click();
     await page.waitForTimeout(1000);
-    expect(await autoScrollButton.evaluate((el) => getComputedStyle(el).opacity)).toBe('0');
+    await expect(autoScrollButton).toHaveCSS('opacity', '0');
   });
 
   await test.step('should show and allow clicking auto-scroll button when user scrolls up', async () => {
     await page.mouse.wheel(0, -800);
     const autoScrollButton = page.locator('[data-testid="scrollToBottomButton"]');
     await page.waitForTimeout(1000);
-    expect(await autoScrollButton.evaluate((el) => getComputedStyle(el).opacity)).toBe('1');
+    await expect(autoScrollButton).toHaveCSS('opacity', '1');
     await autoScrollButton.click();
     await page.waitForTimeout(1000);
-    expect(await autoScrollButton.evaluate((el) => getComputedStyle(el).opacity)).toBe('0');
+    await expect(autoScrollButton).toHaveCSS('opacity', '0');
   });
 
   await test.step('should stop showing auto-scroll button, if new chat is opened, while button was visible', async () => {
@@ -113,14 +88,10 @@ test('Chat viewport scrolling', async ({ page }) => {
     });
     await page.waitForTimeout(1500);
     const autoScrollButton = page.locator('[data-testid="scrollToBottomButton"]');
-    expect(await autoScrollButton.evaluate((el) => getComputedStyle(el).opacity)).toBe('1');
-    // since we are mocking all responses, the backend did not create a new conversation
-    // thus we just change to another chat manually, but without reload
-    await page.evaluate(() => {
-      window.history.pushState({}, '', '/chat/1');
-      window.dispatchEvent(new Event('popstate'));
-    });
+    await expect(autoScrollButton).toHaveCSS('opacity', '1');
+    // Start a new chat - with mock LLM server the backend creates real conversations
+    await page.getByRole('button', { name: 'New chat' }).click();
     await page.waitForTimeout(1500);
-    expect(await autoScrollButton.evaluate((el) => getComputedStyle(el).opacity)).toBe('0');
+    await expect(autoScrollButton).toHaveCSS('opacity', '0');
   });
 });

@@ -16,7 +16,6 @@ It orchestrates the multiple services needed(PostgreSQL, frontend, backend, REIS
 | `--forceTestsOnDev`           | Forces tests to run even in `--devSetup` mode (normally skipped)            |
 | `--file <path>`               | Runs only the specified test file                                           |
 | `--withoutExpensiveTests`     | Skips tests in the `expensive-tests` directory                              |
-| `--withoutExtensionTests`     | Skips tests in the `extension-tests` directory                              |
 | `--withoutNormalTests`        | Skips standard E2E tests                                                    |
 | `--ui`                        | Launches Playwright UI                                                      |
 | `--debug`                     | Enables debug mode for Playwright                                           |
