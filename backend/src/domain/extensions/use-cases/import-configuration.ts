@@ -1,8 +1,8 @@
 import { BadRequestException, Logger } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { ConfigurationEntity, ConfigurationStatus, ExtensionEntity } from '../../database';
+import { In, Repository } from 'typeorm';
+import { ConfigurationEntity, ConfigurationStatus, ExtensionEntity, UserGroupEntity, UserGroupRepository } from '../../database';
 import { ConfigurationModel } from '../interfaces';
 import { ExplorerService } from '../services';
 import { buildConfiguration, unmaskExtensionValues, validateConfiguration } from './utils';
@@ -46,6 +46,8 @@ export class ImportConfigurationHandler implements ICommandHandler<ImportConfigu
     private readonly repository: Repository<ConfigurationEntity>,
     @InjectRepository(ExtensionEntity)
     private readonly extensionRepository: Repository<ExtensionEntity>,
+    @InjectRepository(UserGroupEntity)
+    private readonly userGroupRepository: UserGroupRepository,
     private readonly extensionExplorer: ExplorerService,
   ) {}
 
@@ -96,6 +98,26 @@ export class ImportConfigurationHandler implements ICommandHandler<ImportConfigu
       }
     }
 
+    // Validate and resolve user groups
+    let userGroups: UserGroupEntity[] = [];
+    if (data.userGroupIds && data.userGroupIds.length > 0) {
+      userGroups = await this.userGroupRepository.findBy({ id: In(data.userGroupIds) });
+      if (userGroups.length === 0) {
+        this.logger.warn(
+          `Cannot import configuration "${data.name}": none of the specified user groups exist in this system. ` +
+            `Requested userGroupIds: ${data.userGroupIds.join(', ')}`,
+        );
+        throw new BadRequestException('Cannot import configuration: none of the specified user groups exist in this system');
+      }
+      if (userGroups.length < data.userGroupIds.length) {
+        const foundIds = userGroups.map((ug) => ug.id);
+        const missingIds = data.userGroupIds.filter((id) => !foundIds.includes(id));
+        this.logger.warn(
+          `Some user groups not found during import of "${data.name}". Missing: ${missingIds.join(', ')}. Proceeding with available groups.`,
+        );
+      }
+    }
+
     // Create a new configuration
     const configurationEntity = new ConfigurationEntity();
     configurationEntity.name = data.name;
@@ -106,7 +128,7 @@ export class ImportConfigurationHandler implements ICommandHandler<ImportConfigu
     configurationEntity.chatSuggestions = data.chatSuggestions;
     configurationEntity.executorEndpoint = data.executorEndpoint;
     configurationEntity.executorHeaders = data.executorHeaders;
-    configurationEntity.userGroupIds = data.userGroupIds || [];
+    configurationEntity.userGroups = userGroups;
 
     // Save configuration first
     const savedConfiguration = await this.repository.save(configurationEntity);

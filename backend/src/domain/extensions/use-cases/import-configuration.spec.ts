@@ -11,6 +11,7 @@ describe(ImportConfiguration.name, () => {
   let handler: ImportConfigurationHandler;
   let configRepository: any;
   let extensionRepository: any;
+  let userGroupRepository: any;
   let explorer: ExplorerService;
 
   beforeEach(() => {
@@ -27,7 +28,11 @@ describe(ImportConfiguration.name, () => {
       save: jest.fn(),
     };
 
-    handler = new ImportConfigurationHandler(configRepository, extensionRepository, explorer);
+    userGroupRepository = {
+      findBy: jest.fn().mockResolvedValue([]),
+    };
+
+    handler = new ImportConfigurationHandler(configRepository, extensionRepository, userGroupRepository, explorer);
   });
 
   it('should throw BadRequestException when extension is not available', async () => {
@@ -200,6 +205,8 @@ describe(ImportConfiguration.name, () => {
   });
 
   it('should successfully import configuration with valid data', async () => {
+    const mockUserGroups = [{ id: 'group1', name: 'Group 1' }];
+
     const savedConfiguration: Partial<ConfigurationEntity> = {
       id: 1,
       name: 'Imported Config',
@@ -214,6 +221,7 @@ describe(ImportConfiguration.name, () => {
       extensions: [],
     };
 
+    jest.spyOn(userGroupRepository, 'findBy').mockResolvedValue(mockUserGroups);
     jest.spyOn(configRepository, 'save').mockResolvedValue(savedConfiguration);
     jest.spyOn(extensionRepository, 'save').mockResolvedValue([]);
     jest.spyOn(configRepository, 'findOne').mockResolvedValue({
@@ -740,5 +748,189 @@ describe(ImportConfiguration.name, () => {
 
     expect(result).toBeDefined();
     expect(result.configuration.name).toBe('Config with timestamp');
+  });
+
+  it('should throw BadRequestException when none of the specified user groups exist', async () => {
+    jest.spyOn(explorer, 'getExtension').mockReturnValue({
+      spec: {
+        name: 'test',
+        arguments: {},
+        title: 'Test',
+        description: 'Test',
+        type: 'tool',
+      },
+      getMiddlewares: () => Promise.resolve([]),
+    } as Extension);
+
+    // No user groups found
+    jest.spyOn(userGroupRepository, 'findBy').mockResolvedValue([]);
+
+    const importData: ImportConfigurationData = {
+      name: 'Config with invalid groups',
+      description: 'Test',
+      enabled: true,
+      userGroupIds: ['non-existent-group-1', 'non-existent-group-2'],
+      extensions: [],
+    };
+
+    await expect(handler.execute(new ImportConfiguration(importData))).rejects.toThrow(BadRequestException);
+    await expect(handler.execute(new ImportConfiguration(importData))).rejects.toThrow(
+      'Cannot import configuration: none of the specified user groups exist in this system',
+    );
+  });
+
+  it('should successfully import configuration when all user groups exist', async () => {
+    const mockUserGroups = [
+      { id: 'group-1', name: 'Group 1' },
+      { id: 'group-2', name: 'Group 2' },
+    ];
+
+    const savedConfiguration: Partial<ConfigurationEntity> = {
+      id: 11,
+      name: 'Config with valid groups',
+      description: 'Test',
+      status: ConfigurationStatus.ENABLED,
+      agentName: undefined,
+      chatFooter: undefined,
+      chatSuggestions: undefined,
+      executorEndpoint: undefined,
+      executorHeaders: undefined,
+      userGroupIds: ['group-1', 'group-2'],
+      extensions: [],
+    };
+
+    jest.spyOn(userGroupRepository, 'findBy').mockResolvedValue(mockUserGroups);
+    jest.spyOn(configRepository, 'save').mockResolvedValue(savedConfiguration);
+    jest.spyOn(extensionRepository, 'save').mockResolvedValue([]);
+    jest.spyOn(configRepository, 'findOne').mockResolvedValue(savedConfiguration);
+    jest.spyOn(explorer, 'getExtension').mockReturnValue({
+      spec: {
+        name: 'test',
+        arguments: {},
+        title: 'Test',
+        description: 'Test',
+        type: 'tool',
+      },
+      getMiddlewares: () => Promise.resolve([]),
+    } as Extension);
+
+    const importData: ImportConfigurationData = {
+      name: 'Config with valid groups',
+      description: 'Test',
+      enabled: true,
+      userGroupIds: ['group-1', 'group-2'],
+      extensions: [],
+    };
+
+    const result = await handler.execute(new ImportConfiguration(importData));
+
+    expect(result).toBeDefined();
+    expect(result.configuration.name).toBe('Config with valid groups');
+    expect(configRepository.save).toHaveBeenCalledWith(
+      expect.objectContaining({
+        userGroups: mockUserGroups,
+      }),
+    );
+  });
+
+  it('should warn and proceed when some user groups are missing', async () => {
+    const mockUserGroups = [{ id: 'group-1', name: 'Group 1' }];
+
+    const savedConfiguration: Partial<ConfigurationEntity> = {
+      id: 12,
+      name: 'Config with partial groups',
+      description: 'Test',
+      status: ConfigurationStatus.ENABLED,
+      agentName: undefined,
+      chatFooter: undefined,
+      chatSuggestions: undefined,
+      executorEndpoint: undefined,
+      executorHeaders: undefined,
+      userGroupIds: ['group-1'],
+      extensions: [],
+    };
+
+    // Only one of two groups found
+    jest.spyOn(userGroupRepository, 'findBy').mockResolvedValue(mockUserGroups);
+    jest.spyOn(configRepository, 'save').mockResolvedValue(savedConfiguration);
+    jest.spyOn(extensionRepository, 'save').mockResolvedValue([]);
+    jest.spyOn(configRepository, 'findOne').mockResolvedValue(savedConfiguration);
+    jest.spyOn(explorer, 'getExtension').mockReturnValue({
+      spec: {
+        name: 'test',
+        arguments: {},
+        title: 'Test',
+        description: 'Test',
+        type: 'tool',
+      },
+      getMiddlewares: () => Promise.resolve([]),
+    } as Extension);
+
+    const loggerWarnSpy = jest.spyOn(handler['logger'], 'warn');
+
+    const importData: ImportConfigurationData = {
+      name: 'Config with partial groups',
+      description: 'Test',
+      enabled: true,
+      userGroupIds: ['group-1', 'missing-group'],
+      extensions: [],
+    };
+
+    const result = await handler.execute(new ImportConfiguration(importData));
+
+    expect(result).toBeDefined();
+    expect(loggerWarnSpy).toHaveBeenCalledWith(expect.stringContaining('Missing: missing-group'));
+    expect(configRepository.save).toHaveBeenCalledWith(
+      expect.objectContaining({
+        userGroups: mockUserGroups,
+      }),
+    );
+  });
+
+  it('should import configuration without user groups when none specified', async () => {
+    const savedConfiguration: Partial<ConfigurationEntity> = {
+      id: 13,
+      name: 'Config without groups',
+      description: 'Test',
+      status: ConfigurationStatus.ENABLED,
+      agentName: undefined,
+      chatFooter: undefined,
+      chatSuggestions: undefined,
+      executorEndpoint: undefined,
+      executorHeaders: undefined,
+      userGroupIds: [],
+      extensions: [],
+    };
+
+    jest.spyOn(configRepository, 'save').mockResolvedValue(savedConfiguration);
+    jest.spyOn(extensionRepository, 'save').mockResolvedValue([]);
+    jest.spyOn(configRepository, 'findOne').mockResolvedValue(savedConfiguration);
+    jest.spyOn(explorer, 'getExtension').mockReturnValue({
+      spec: {
+        name: 'test',
+        arguments: {},
+        title: 'Test',
+        description: 'Test',
+        type: 'tool',
+      },
+      getMiddlewares: () => Promise.resolve([]),
+    } as Extension);
+
+    const importData: ImportConfigurationData = {
+      name: 'Config without groups',
+      description: 'Test',
+      enabled: true,
+      extensions: [],
+    };
+
+    const result = await handler.execute(new ImportConfiguration(importData));
+
+    expect(result).toBeDefined();
+    expect(userGroupRepository.findBy).not.toHaveBeenCalled();
+    expect(configRepository.save).toHaveBeenCalledWith(
+      expect.objectContaining({
+        userGroups: [],
+      }),
+    );
   });
 });
