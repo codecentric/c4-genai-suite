@@ -1,5 +1,12 @@
 # Changelog
 
+## [9.14.0](https://github.com/codecentric/c4-genai-suite/compare/v9.13.0...v9.14.0) (2026-02-13)
+
+
+### Features
+
+* **models:** make reasoning tag name configurable ([2b7f2fa](https://github.com/codecentric/c4-genai-suite/commit/2b7f2fa69fe0813cec1074b3f0cfa5cdf3cd511c))
+
 ## [9.13.0](https://github.com/codecentric/c4-genai-suite/compare/v9.12.0...v9.13.0) (2026-02-06)
 
 
