@@ -5,6 +5,7 @@ import { Extension, ExtensionConfiguration, ExtensionEntity, ExtensionSpec } fro
 import { User } from 'src/domain/users';
 import { fetchWithDebugLogging } from 'src/lib/log-requests';
 import { I18nService } from '../../localization/i18n.service';
+import { wrapWithReasoningTagName } from './model-tools';
 
 @Extension()
 export class OpenAICompatibleModelExtension implements Extension<OpenAICompatibleModelExtensionConfiguration> {
@@ -80,6 +81,11 @@ export class OpenAICompatibleModelExtension implements Extension<OpenAICompatibl
           required: false,
           enum: ['', 'low', 'medium', 'high'],
         },
+        reasoningTagName: {
+          type: 'string',
+          title: this.i18n.t('texts.extensions.common.reasoningTagName'),
+          required: false,
+        },
         parallelToolCalls: {
           type: 'boolean',
           title: this.i18n.t('texts.extensions.common.parallelToolCalls'),
@@ -133,6 +139,7 @@ export class OpenAICompatibleModelExtension implements Extension<OpenAICompatibl
       temperature,
       seed,
       effort,
+      reasoningTagName,
       parallelToolCalls = true,
       summary,
     } = configuration;
@@ -146,7 +153,7 @@ export class OpenAICompatibleModelExtension implements Extension<OpenAICompatibl
     });
 
     return {
-      model: open(modelName),
+      model: wrapWithReasoningTagName(open(modelName), reasoningTagName),
       options: {
         presencePenalty,
         frequencyPenalty,
@@ -182,6 +189,7 @@ type OpenAICompatibleModelExtensionConfiguration = ExtensionConfiguration & {
   frequencyPenalty?: number;
   maxOutputTokens?: number;
   effort?: 'low' | 'medium' | 'high';
+  reasoningTagName?: string;
   parallelToolCalls?: boolean;
   summary?: 'detailed' | 'auto';
 };

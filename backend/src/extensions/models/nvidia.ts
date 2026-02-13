@@ -5,6 +5,7 @@ import { Extension, ExtensionConfiguration, ExtensionEntity, ExtensionSpec } fro
 import { User } from 'src/domain/users';
 import { fetchWithDebugLogging } from 'src/lib/log-requests';
 import { I18nService } from '../../localization/i18n.service';
+import { wrapWithReasoningTagName } from './model-tools';
 
 type Fetch = (input: string | URL | Request, init?: RequestInit) => Promise<Response>;
 
@@ -75,6 +76,11 @@ export class NvidiaModelExtension implements Extension<NvidiaModelExtensionConfi
           required: false,
           enum: ['', 'minimal', 'low', 'medium', 'high'],
         },
+        reasoningTagName: {
+          type: 'string',
+          title: this.i18n.t('texts.extensions.common.reasoningTagName'),
+          required: false,
+        },
         parallelToolCalls: {
           type: 'boolean',
           title: this.i18n.t('texts.extensions.common.parallelToolCalls'),
@@ -137,7 +143,7 @@ export class NvidiaModelExtension implements Extension<NvidiaModelExtensionConfi
     });
 
     return {
-      model: openAi(config.modelName),
+      model: wrapWithReasoningTagName(openAi(config.modelName), config.reasoningTagName),
       options: {
         presencePenalty: config.presencePenalty,
         frequencyPenalty: config.frequencyPenalty,
@@ -167,6 +173,7 @@ type NvidiaModelExtensionConfiguration = ExtensionConfiguration & {
   presencePenalty?: number;
   frequencyPenalty?: number;
   effort?: 'minimal' | 'low' | 'medium' | 'high';
+  reasoningTagName?: string;
   parallelToolCalls?: boolean;
   summary?: 'detailed' | 'auto';
 };
