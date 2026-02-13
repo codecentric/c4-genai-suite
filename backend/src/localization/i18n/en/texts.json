@@ -9,6 +9,7 @@
       "temperature": "Temperature",
       "reasoningEffort": "Reasoning Effort",
       "reasoningSummary": "Reasoning Summary",
+      "reasoningTagName": "Reasoning Tag Name",
       "seed": "Seed",
       "presencePenalty": "Presence Penalty",
       "frequencyPenalty": "Frequency Penalty",

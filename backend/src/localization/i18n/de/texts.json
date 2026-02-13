@@ -1,14 +1,15 @@
 {
   "extensions": {
     "common": {
-      "apiKey": "API Key",
+      "apiKey": "API-Key",
       "description": "Beschreibung",
       "deploymentName": "Deployment Name",
-      "instanceName": "Instance Name",
+      "instanceName": "Name der Instanz",
       "apiVersion": "API-Version",
       "temperature": "Temperatur",
       "reasoningEffort": "Reasoning Effort",
       "reasoningSummary": "Reasoning Zusammenfassung",
+      "reasoningTagName": "Reasoning-Tag-Name",
       "seed": "Seed",
       "presencePenalty": "Presence Penalty",
       "frequencyPenalty": "Frequency Penalty",
