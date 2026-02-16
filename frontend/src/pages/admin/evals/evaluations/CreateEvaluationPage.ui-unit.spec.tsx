@@ -47,8 +47,8 @@ vi.mock('./create/steps/MetricsSelectionStep', () => ({
   MetricsSelectionStep: () => <div data-testid="metrics-step">Metrics Step</div>,
 }));
 
-vi.mock('./create/steps/EndpointSelectionStep', () => ({
-  EndpointSelectionStep: () => <div data-testid="endpoint-step">Endpoint Step</div>,
+vi.mock('./create/steps/AssistantSelectionStep', () => ({
+  AssistantSelectionStep: () => <div data-testid="assistant-step">Assistant Step</div>,
 }));
 
 vi.mock('./create/steps/ReviewStep', () => ({
@@ -99,7 +99,7 @@ describe('CreateEvaluationPage', () => {
           btn.textContent?.includes('Source Mode') ||
           btn.textContent?.includes('Test Cases') ||
           btn.textContent?.includes('Metrics') ||
-          btn.textContent?.includes('LLM Endpoint') ||
+          btn.textContent?.includes('Assistant') ||
           btn.textContent?.includes('Review'),
       );
     expect(stepButtons.length).toBeGreaterThanOrEqual(5);
@@ -205,7 +205,7 @@ describe('CreateEvaluationPage', () => {
       { step: 'mode' as const, testId: 'mode-step' },
       { step: 'source' as const, testId: 'source-step' },
       { step: 'metrics' as const, testId: 'metrics-step' },
-      { step: 'endpoint' as const, testId: 'endpoint-step' },
+      { step: 'assistant' as const, testId: 'assistant-step' },
       { step: 'review' as const, testId: 'review-step' },
     ];
 

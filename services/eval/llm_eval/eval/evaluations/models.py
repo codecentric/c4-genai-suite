@@ -151,6 +151,8 @@ class GetAllEvaluationResult(ApiModel):
     status: EvaluationStatus
     test_case_progress: TestCaseProgress
     version: int
+    c4_assistant_id: int | None = None
+    c4_assistant_name: str | None = None
 
     @staticmethod
     def from_evaluation(evaluation: Evaluation) -> "GetAllEvaluationResult":
@@ -174,6 +176,8 @@ class GetAllEvaluationResult(ApiModel):
             test_case_progress=TestCaseProgress.from_test_cases(evaluation.test_cases),
             version=evaluation.version,
             metric_results=metric_results,
+            c4_assistant_id=evaluation.c4_assistant_id,
+            c4_assistant_name=evaluation.c4_assistant_name,
         )
 
 

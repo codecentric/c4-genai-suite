@@ -2,7 +2,10 @@ import { Button, Portal, Stepper } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useMemo, useState } from 'react';
 import { z } from 'zod';
-import type { LLMTestCaseParams, MetricConfigurationCreate, MetricCreate } from 'src/api/generated-eval';
+import type { Configuration1, LLMTestCaseParams, MetricCreate } from 'src/api/generated-eval';
+
+// Alias for clarity - Configuration1 is the discriminated union for metric configuration creation
+type MetricConfigurationCreate = Configuration1;
 import { FormAlert, Modal } from 'src/components';
 import { typedZodResolver } from 'src/lib';
 import { texts } from 'src/texts';

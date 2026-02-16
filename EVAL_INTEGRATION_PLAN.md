@@ -112,13 +112,14 @@ This document tracks the complete migration of llmeval features into c4-genai-su
   - ✅ Step 1: Select endpoint type
   - ✅ Step 2: Configure endpoint
 - ✅ Endpoint type specific forms
-  - ✅ C4 LLM Endpoint configuration
-  - ✅ OpenAI configuration
-  - ✅ Azure OpenAI configuration
+  - ✅ OpenAI configuration (for eval models)
+  - ✅ Azure OpenAI configuration (for eval models)
 - ✅ Base configuration fields (name, description)
 - ✅ Edit endpoint
 - ✅ Delete endpoint
 - ✅ Validate endpoint configuration
+
+> **Note**: C4 LLM Endpoint type has been removed. LLM Endpoints are now only used for eval models (metrics computation). Evaluations use C4 Assistants directly via internal service-to-service auth.
 
 ### 3.4 LLM Endpoint Components
 
@@ -128,10 +129,12 @@ This document tracks the complete migration of llmeval features into c4-genai-su
 - ⏳ EndpointTestDialog (test connection)
 - ⏳ EndpointUsageStats
 
-### 3.5 C4 Assistants into LLM Endpoints (Pending)
+### 3.5 C4 Assistants for Evaluations ✅
 
-C4 Assistants should be directly be selectable as LLM endpoints, and should be selected for evaluation.
-A Connection should be designed in the eval service and c4 backend to enable accessing to assistants in c4.
+- ✅ C4 Assistants are directly selectable for evaluations (no LLM endpoint needed)
+- ✅ Internal service-to-service auth between eval service and C4 backend
+- ✅ Removed C4 LLM Endpoint plugin (replaced by direct assistant integration)
+- ✅ Removed `llm_endpoint_id` from Evaluation model (c4_assistant_id is now required)
 
 ---
 

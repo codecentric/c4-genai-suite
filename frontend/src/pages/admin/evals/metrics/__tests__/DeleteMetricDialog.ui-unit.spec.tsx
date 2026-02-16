@@ -20,8 +20,6 @@ const mockMetric: Metric = {
     includeReason: true,
     chatModelId: 'chat-model-1',
     strictMode: false,
-    evaluationSteps: [],
-    evaluationParams: [],
   },
 };
 

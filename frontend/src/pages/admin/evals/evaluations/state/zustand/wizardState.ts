@@ -3,7 +3,7 @@ import type { RunEvaluationByTestCasesTestCase } from 'src/api/generated-eval';
 
 export type EvaluationMode = 'catalog' | 'manual';
 
-export type WizardStep = 'mode' | 'source' | 'metrics' | 'endpoint' | 'review';
+export type WizardStep = 'mode' | 'source' | 'metrics' | 'assistant' | 'review';
 
 interface WizardState {
   // Current step
@@ -25,7 +25,10 @@ interface WizardState {
 
   // Common fields
   metricIds: string[];
-  endpointId: string | null;
+
+  // C4 Assistant (Configuration) to evaluate
+  c4AssistantId: number | null;
+  c4AssistantName: string | null;
 }
 
 interface WizardActions {
@@ -56,8 +59,8 @@ interface WizardActions {
   addMetricId: (metricId: string) => void;
   removeMetricId: (metricId: string) => void;
 
-  // Endpoint
-  setEndpointId: (endpointId: string | null) => void;
+  // C4 Assistant
+  setC4Assistant: (id: number | null, name: string | null) => void;
 
   // Reset
   reset: () => void;
@@ -66,7 +69,7 @@ interface WizardActions {
   canProceed: () => boolean;
 }
 
-const stepOrder: WizardStep[] = ['mode', 'source', 'metrics', 'endpoint', 'review'];
+const stepOrder: WizardStep[] = ['mode', 'source', 'metrics', 'assistant', 'review'];
 
 const initialState: WizardState = {
   currentStep: 'mode',
@@ -77,7 +80,8 @@ const initialState: WizardState = {
   testCasesPerQaPair: 1,
   testCases: [],
   metricIds: [],
-  endpointId: null,
+  c4AssistantId: null,
+  c4AssistantName: null,
 };
 
 export const useWizardStore = create<WizardState & WizardActions>()((set, get) => ({
@@ -135,13 +139,13 @@ export const useWizardStore = create<WizardState & WizardActions>()((set, get) =
       metricIds: state.metricIds.filter((id) => id !== metricId),
     })),
 
-  setEndpointId: (endpointId: string | null) => set({ endpointId }),
+  setC4Assistant: (id: number | null, name: string | null) => set({ c4AssistantId: id, c4AssistantName: name }),
 
   reset: () => set(initialState),
 
   canProceed: () => {
     const state = get();
-    const { currentStep, mode, catalogId, testCases, metricIds, endpointId, name } = state;
+    const { currentStep, mode, catalogId, testCases, metricIds, c4AssistantId, name } = state;
 
     switch (currentStep) {
       case 'mode':
@@ -154,8 +158,8 @@ export const useWizardStore = create<WizardState & WizardActions>()((set, get) =
         }
       case 'metrics':
         return metricIds.length > 0;
-      case 'endpoint':
-        return endpointId !== null;
+      case 'assistant':
+        return c4AssistantId !== null;
       case 'review':
         return name.trim().length > 0;
       default:
