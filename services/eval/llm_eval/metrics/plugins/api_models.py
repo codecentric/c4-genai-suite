@@ -1,3 +1,7 @@
+from typing import Annotated, Union
+
+from pydantic import Discriminator
+
 from llm_eval.metrics.plugins.impl.answer_relevancy import (
     AnswerRelevancyMetricConfigurationCreate,
     AnswerRelevancyMetricConfigurationRead,
@@ -19,23 +23,32 @@ from llm_eval.metrics.plugins.impl.hallucination import (
     HallucinationMetricConfigurationUpdate,
 )
 
-type MetricConfigurationRead = (
-    GEvalMetricConfigurationRead
-    | AnswerRelevancyMetricConfigurationRead
-    | HallucinationMetricConfigurationRead
-    | FaithfulnessMetricConfigurationRead
-)
+MetricConfigurationRead = Annotated[
+    Union[
+        GEvalMetricConfigurationRead,
+        AnswerRelevancyMetricConfigurationRead,
+        HallucinationMetricConfigurationRead,
+        FaithfulnessMetricConfigurationRead,
+    ],
+    Discriminator("type"),
+]
 
-type MetricConfigurationCreate = (
-    GEvalMetricConfigurationCreate
-    | AnswerRelevancyMetricConfigurationCreate
-    | HallucinationMetricConfigurationCreate
-    | FaithfulnessMetricConfigurationCreate
-)
+MetricConfigurationCreate = Annotated[
+    Union[
+        GEvalMetricConfigurationCreate,
+        AnswerRelevancyMetricConfigurationCreate,
+        HallucinationMetricConfigurationCreate,
+        FaithfulnessMetricConfigurationCreate,
+    ],
+    Discriminator("type"),
+]
 
-type MetricConfigurationUpdate = (
-    GEvalMetricConfigurationUpdate
-    | AnswerRelevancyMetricConfigurationUpdate
-    | HallucinationMetricConfigurationUpdate
-    | FaithfulnessMetricConfigurationUpdate
-)
+MetricConfigurationUpdate = Annotated[
+    Union[
+        GEvalMetricConfigurationUpdate,
+        AnswerRelevancyMetricConfigurationUpdate,
+        HallucinationMetricConfigurationUpdate,
+        FaithfulnessMetricConfigurationUpdate,
+    ],
+    Discriminator("type"),
+]

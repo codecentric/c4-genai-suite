@@ -60,9 +60,12 @@ async def start_evaluation_task(session: AsyncSession, evaluation_id: str) -> No
     for test_case in test_cases:
         # noinspection PyUnresolvedReferences
         c = chain(
-            retrieve_answer_task.si(test_case.id, evaluation.llm_endpoint_id).on_error(
-                handle_test_case_task.s(test_case.id)
-            ),
+            retrieve_answer_task.si(
+                test_case.id,
+                evaluation.c4_assistant_id,
+                evaluation.callback_user_id,
+                evaluation.callback_user_name,
+            ).on_error(handle_test_case_task.s(test_case.id)),
             evaluate_test_case_task.si(
                 test_case.id, [metric.id for metric in metrics]
             ).on_error(handle_test_case_task.s(test_case.id)),

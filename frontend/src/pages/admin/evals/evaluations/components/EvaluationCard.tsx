@@ -1,5 +1,5 @@
 import { Anchor, Card, Divider, Grid, Group, Stack, Text } from '@mantine/core';
-import { IconCalendar, IconChartBar, IconDatabase, IconRocket } from '@tabler/icons-react';
+import { IconCalendar, IconChartBar, IconDatabase, IconRobot, IconRocket } from '@tabler/icons-react';
 import { Link } from 'react-router-dom';
 import type { EvaluationDetailSummary } from 'src/api/generated-eval';
 import { texts } from 'src/texts';
@@ -66,6 +66,19 @@ export function EvaluationCard({ evaluation }: EvaluationCardProps) {
                   </Text>
                 )}
               </Group>
+
+              {/* C4 Assistant */}
+              {evaluation.c4AssistantId && (
+                <Group gap="xs">
+                  <IconRobot size={18} className="text-gray-600" />
+                  <Text size="sm" fw={500}>
+                    Assistant:
+                  </Text>
+                  <Text size="sm" c="dimmed">
+                    {evaluation.c4AssistantName ?? `ID: ${evaluation.c4AssistantId}`}
+                  </Text>
+                </Group>
+              )}
 
               {/* Test Cases */}
               <Group gap="xs">

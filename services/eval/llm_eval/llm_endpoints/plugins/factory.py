@@ -5,7 +5,6 @@ from llm_eval.database.model import LLMEndpoint
 from llm_eval.llm_endpoints.plugins.impl.azure_openai import (
     AzureOpenAILLMEndpointPlugin,
 )
-from llm_eval.llm_endpoints.plugins.impl.c4 import C4LLMEndpointPlugin
 from llm_eval.llm_endpoints.plugins.impl.openai import (
     OpenAILLMEndpointPlugin,
 )
@@ -15,7 +14,6 @@ from llm_eval.llm_endpoints.plugins.interface import (
 )
 
 plugins: list[LLMEndpointPlugin] = [
-    C4LLMEndpointPlugin(),
     AzureOpenAILLMEndpointPlugin(),
     OpenAILLMEndpointPlugin(),
 ]
