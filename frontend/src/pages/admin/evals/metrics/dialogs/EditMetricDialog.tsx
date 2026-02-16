@@ -2,7 +2,10 @@ import { Button, Portal } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useMemo } from 'react';
 import { z } from 'zod';
-import type { LLMTestCaseParams, Metric, MetricConfigurationUpdate, MetricUpdate } from 'src/api/generated-eval';
+import type { Configuration2, LLMTestCaseParams, Metric, MetricUpdate } from 'src/api/generated-eval';
+
+// Alias for clarity - Configuration2 is the discriminated union for metric configuration updates
+type MetricConfigurationUpdate = Configuration2;
 import { FormAlert, Modal } from 'src/components';
 import { typedZodResolver } from 'src/lib';
 import { texts } from 'src/texts';
@@ -71,7 +74,7 @@ export function EditMetricDialog({ metric, onClose, onUpdated }: EditMetricDialo
       // Simple metrics
       return {
         ...base,
-        type: config.type as 'ANSWER_RELEVANCY' | 'FAITHFULNESS' | 'HALLUCINATION',
+        type: config.type,
         includeReason: config.includeReason ?? true,
       };
     }

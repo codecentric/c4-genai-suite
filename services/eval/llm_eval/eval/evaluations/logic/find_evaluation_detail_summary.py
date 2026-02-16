@@ -44,6 +44,8 @@ class EvaluationDetailSummary(ApiModel):
     status: EvaluationStatus
     test_case_progress: TestCaseProgress
     version: int
+    c4_assistant_id: int | None = None
+    c4_assistant_name: str | None = None
 
 
 async def find_evaluation_detail_summary(
@@ -90,4 +92,6 @@ async def find_evaluation_detail_summary(
         status=evaluation.status,
         test_case_progress=TestCaseProgress.from_test_cases(evaluation.test_cases),
         version=evaluation.version,
+        c4_assistant_id=evaluation.c4_assistant_id,
+        c4_assistant_name=evaluation.c4_assistant_name,
     )

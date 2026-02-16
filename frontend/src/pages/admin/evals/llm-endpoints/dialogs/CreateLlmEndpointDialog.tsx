@@ -25,13 +25,6 @@ function createValidationSchema() {
     requestTimeout: z.number().int().min(1).max(600),
   });
 
-  const c4ConfigSchema = baseConfigSchema.extend({
-    type: z.literal('C4'),
-    endpoint: z.string().url(texts.evals.llmEndpoint.c4EndpointRequired),
-    apiKey: z.string().min(1, texts.evals.llmEndpoint.apiKeyRequired),
-    configurationId: z.number().int().min(1, texts.evals.llmEndpoint.configurationIdRequired),
-  });
-
   const openAiConfigSchema = baseConfigSchema.extend({
     type: z.literal('OPENAI'),
     baseUrl: z.string().url().optional().nullable(),
@@ -51,7 +44,7 @@ function createValidationSchema() {
     language: z.nativeEnum(Language).optional().nullable(),
   });
 
-  return z.discriminatedUnion('type', [c4ConfigSchema, openAiConfigSchema, azureOpenAiConfigSchema]);
+  return z.discriminatedUnion('type', [openAiConfigSchema, azureOpenAiConfigSchema]);
 }
 
 type CreateFormValues = z.infer<ReturnType<typeof createValidationSchema>>;
@@ -66,15 +59,18 @@ export function CreateLlmEndpointDialog({ onClose, onCreated }: CreateLlmEndpoin
   const form = useForm<CreateFormValues>({
     validate: activeStep === 1 ? typedZodResolver(createSchema) : undefined,
     initialValues: {
-      type: 'C4',
+      type: 'AZURE_OPENAI',
       name: '',
       parallelQueries: 5,
       maxRetries: 3,
       requestTimeout: 60,
-      // C4 defaults
+      // Azure OpenAI defaults
       endpoint: '',
       apiKey: '',
-      configurationId: 1,
+      deployment: '',
+      apiVersion: '2024-02-15-preview',
+      temperature: 0,
+      language: Language.English,
     } as CreateFormValues,
     mode: 'controlled',
   });
@@ -108,15 +104,7 @@ export function CreateLlmEndpointDialog({ onClose, onCreated }: CreateLlmEndpoin
     // only uses fields relevant to each type
     let configuration: Partial<LLMEndpointConfigurationCreate>;
 
-    if (type === 'C4') {
-      const c4Values = values as CreateFormValues & { type: 'C4' };
-      configuration = {
-        ...baseConfig,
-        endpoint: c4Values.endpoint,
-        apiKey: c4Values.apiKey,
-        configurationId: c4Values.configurationId,
-      };
-    } else if (type === 'OPENAI') {
+    if (type === 'OPENAI') {
       const openAiValues = values as CreateFormValues & { type: 'OPENAI' };
       configuration = {
         ...baseConfig,

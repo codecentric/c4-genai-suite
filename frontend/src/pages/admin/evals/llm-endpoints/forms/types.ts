@@ -10,14 +10,6 @@ const baseConfigSchema = z.object({
   requestTimeout: z.number().int().min(1).max(600),
 });
 
-// C4 endpoint configuration
-export const c4ConfigSchema = baseConfigSchema.extend({
-  type: z.literal('C4'),
-  endpoint: z.string().url(texts.evals.llmEndpoint.c4EndpointRequired),
-  apiKey: z.string().min(1, texts.evals.llmEndpoint.apiKeyRequired),
-  configurationId: z.number().int().min(1, texts.evals.llmEndpoint.configurationIdRequired),
-});
-
 // OpenAI endpoint configuration
 export const openAiConfigSchema = baseConfigSchema.extend({
   type: z.literal('OPENAI'),
@@ -40,17 +32,15 @@ export const azureOpenAiConfigSchema = baseConfigSchema.extend({
 });
 
 // Combined schema for create operations
-export const createEndpointSchema = z.discriminatedUnion('type', [c4ConfigSchema, openAiConfigSchema, azureOpenAiConfigSchema]);
+export const createEndpointSchema = z.discriminatedUnion('type', [openAiConfigSchema, azureOpenAiConfigSchema]);
 
 // For edit operations - apiKey is optional
 export const editEndpointSchema = z.discriminatedUnion('type', [
-  c4ConfigSchema.extend({ apiKey: z.string().optional() }),
   openAiConfigSchema.extend({ apiKey: z.string().optional() }),
   azureOpenAiConfigSchema.extend({ apiKey: z.string().optional() }),
 ]);
 
 // Export inferred types
-export type C4FormValues = z.infer<typeof c4ConfigSchema>;
 export type OpenAiFormValues = z.infer<typeof openAiConfigSchema>;
 export type AzureOpenAiFormValues = z.infer<typeof azureOpenAiConfigSchema>;
 export type CreateEndpointFormValues = z.infer<typeof createEndpointSchema>;
@@ -67,16 +57,12 @@ export type EditEndpointFormValuesUnion = EditEndpointFormValues;
  */
 export interface EndpointFormValues {
   // Common fields
-  type: 'C4' | 'OPENAI' | 'AZURE_OPENAI';
+  type: 'OPENAI' | 'AZURE_OPENAI';
   name: string;
   parallelQueries: number;
   maxRetries: number;
   requestTimeout: number;
   apiKey?: string;
-
-  // C4-specific
-  endpoint?: string;
-  configurationId?: number;
 
   // OpenAI-specific
   baseUrl?: string | null;
@@ -85,6 +71,7 @@ export interface EndpointFormValues {
   language?: Language | null;
 
   // Azure OpenAI-specific
+  endpoint?: string;
   deployment?: string;
   apiVersion?: string;
 }

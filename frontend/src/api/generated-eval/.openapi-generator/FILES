@@ -1,3 +1,4 @@
+.openapi-generator-ignore
 apis/DashboardApi.ts
 apis/EvaluationResultsApi.ts
 apis/EvaluationsApi.ts
@@ -15,9 +16,8 @@ models/AzureOpenAILLMEndpointConfigurationCreate.ts
 models/AzureOpenAILLMEndpointConfigurationRead.ts
 models/AzureOpenAILLMEndpointConfigurationUpdate.ts
 models/Baseurl.ts
-models/C4LLMEndpointConfigurationCreate.ts
-models/C4LLMEndpointConfigurationRead.ts
-models/C4LLMEndpointConfigurationUpdate.ts
+models/Configuration1.ts
+models/Configuration2.ts
 models/DashboardData.ts
 models/DashboardEvaluationResult.ts
 models/DashboardLastEvaluationCatalogHistory.ts
@@ -64,9 +64,6 @@ models/Language1.ts
 models/LlmEvalEvalEvaluateResultsRouterEvaluationResult.ts
 models/LlmEvalEvalEvaluationsModelsEvaluationResult.ts
 models/Metric.ts
-models/MetricConfigurationCreate.ts
-models/MetricConfigurationRead.ts
-models/MetricConfigurationUpdate.ts
 models/MetricCreate.ts
 models/MetricDelete.ts
 models/MetricResult.ts
@@ -75,6 +72,7 @@ models/MetricScores.ts
 models/MetricTypesResponse.ts
 models/MetricUpdate.ts
 models/MetricsData.ts
+models/ModelConfiguration.ts
 models/NewQAPair.ts
 models/OpenAILLMEndpointConfigurationCreate.ts
 models/OpenAILLMEndpointConfigurationRead.ts

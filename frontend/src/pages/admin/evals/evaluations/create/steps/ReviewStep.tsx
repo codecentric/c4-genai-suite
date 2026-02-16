@@ -1,12 +1,23 @@
 import { Badge, Card, Divider, Group, Stack, Text, Textarea, TextInput } from '@mantine/core';
-import { IconChartBar, IconDatabase, IconEdit, IconRocket } from '@tabler/icons-react';
+import { IconChartBar, IconDatabase, IconEdit, IconRobot } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
 import { useEvalApi } from 'src/api/state/apiEvalClient';
 import { useWizardStore } from '../../state/zustand/wizardState';
 
 export function ReviewStep() {
-  const { mode, name, description, setName, setDescription, catalogId, testCasesPerQaPair, testCases, metricIds, endpointId } =
-    useWizardStore();
+  const {
+    mode,
+    name,
+    description,
+    setName,
+    setDescription,
+    catalogId,
+    testCasesPerQaPair,
+    testCases,
+    metricIds,
+    c4AssistantId,
+    c4AssistantName,
+  } = useWizardStore();
 
   const evalApi = useEvalApi();
 
@@ -20,12 +31,6 @@ export function ReviewStep() {
   const { data: metrics = [] } = useQuery({
     queryKey: ['metrics', 'all'],
     queryFn: () => evalApi.metrics.metricsGetAll(0, 100),
-  });
-
-  const { data: endpoint } = useQuery({
-    queryKey: ['llmEndpoint', endpointId],
-    queryFn: () => evalApi.llmEndpoints.llmEndpointsGet(endpointId!),
-    enabled: !!endpointId,
   });
 
   const selectedMetrics = metrics.filter((m) => metricIds.includes(m.id));
@@ -130,18 +135,18 @@ export function ReviewStep() {
         </Stack>
       </Card>
 
-      {/* Endpoint */}
+      {/* Assistant */}
       <Card padding="md" withBorder>
         <Stack gap="xs">
           <Group gap="xs">
-            <IconRocket size={18} className="text-purple-600" />
-            <Text fw={600}>LLM Endpoint</Text>
+            <IconRobot size={18} className="text-blue-600" />
+            <Text fw={600}>Assistant</Text>
           </Group>
-          {endpoint && (
+          {c4AssistantId && (
             <>
-              <Text size="sm">{endpoint.name}</Text>
-              <Badge variant="light" size="sm">
-                {endpoint._configuration.type}
+              <Text size="sm">{c4AssistantName ?? `Assistant ID: ${c4AssistantId}`}</Text>
+              <Badge variant="light" size="sm" color="blue">
+                C4 Assistant
               </Badge>
             </>
           )}

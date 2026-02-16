@@ -26,13 +26,6 @@ function createUpdateValidationSchema() {
     requestTimeout: z.number().int().min(1).max(600),
   });
 
-  const c4ConfigSchema = baseConfigSchema.extend({
-    type: z.literal('C4'),
-    endpoint: z.string().url(texts.evals.llmEndpoint.c4EndpointRequired),
-    apiKey: z.string().optional(),
-    configurationId: z.number().int().min(1, texts.evals.llmEndpoint.configurationIdRequired),
-  });
-
   const openAiConfigSchema = baseConfigSchema.extend({
     type: z.literal('OPENAI'),
     baseUrl: z.string().url().optional().nullable(),
@@ -52,7 +45,7 @@ function createUpdateValidationSchema() {
     language: z.nativeEnum(Language).optional().nullable(),
   });
 
-  return z.discriminatedUnion('type', [c4ConfigSchema, openAiConfigSchema, azureOpenAiConfigSchema]);
+  return z.discriminatedUnion('type', [openAiConfigSchema, azureOpenAiConfigSchema]);
 }
 
 type UpdateFormValues = z.infer<ReturnType<typeof createUpdateValidationSchema>>;
@@ -76,14 +69,6 @@ export function EditLlmEndpointDialog({ endpoint, onClose, onUpdated }: EditLlmE
     };
 
     switch (config.type) {
-      case 'C4':
-        return {
-          ...base,
-          type: 'C4',
-          endpoint: config.endpoint,
-          apiKey: '', // Empty for edit, will use UNCHANGED_API_KEY if not changed
-          configurationId: config.configurationId,
-        } as UpdateFormValues;
       case 'OPENAI':
         return {
           ...base,
@@ -141,15 +126,7 @@ export function EditLlmEndpointDialog({ endpoint, onClose, onUpdated }: EditLlmE
     // Build configuration based on type - cast to Partial first, then to full type
     let configuration: Partial<LLMEndpointConfigurationUpdate>;
 
-    if (type === 'C4') {
-      const c4Values = values as UpdateFormValues & { type: 'C4' };
-      configuration = {
-        ...baseConfig,
-        endpoint: c4Values.endpoint,
-        apiKey: c4Values.apiKey || UNCHANGED_API_KEY,
-        configurationId: c4Values.configurationId,
-      };
-    } else if (type === 'OPENAI') {
+    if (type === 'OPENAI') {
       const openAiValues = values as UpdateFormValues & { type: 'OPENAI' };
       configuration = {
         ...baseConfig,

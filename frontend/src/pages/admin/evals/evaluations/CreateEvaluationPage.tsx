@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { Dto } from 'src/api/generated-eval';
 import { texts } from 'src/texts';
-import { EndpointSelectionStep } from './create/steps/EndpointSelectionStep';
+import { AssistantSelectionStep } from './create/steps/AssistantSelectionStep';
 import { MetricsSelectionStep } from './create/steps/MetricsSelectionStep';
 import { ModeSelectionStep } from './create/steps/ModeSelectionStep';
 import { ReviewStep } from './create/steps/ReviewStep';
@@ -25,7 +25,8 @@ export function CreateEvaluationPage() {
     testCasesPerQaPair,
     testCases,
     metricIds,
-    endpointId,
+    c4AssistantId,
+    c4AssistantName,
     nextStep,
     previousStep,
     canProceed,
@@ -63,10 +64,13 @@ export function CreateEvaluationPage() {
     // Using type assertion to handle the union type properly
     const dto = {
       name,
-      llmEndpointId: endpointId!,
+      c4AssistantId: c4AssistantId!,
+      c4AssistantName: c4AssistantName,
       metrics: metricIds,
+      // Always include testCases (empty array for catalog mode, populated for manual mode)
+      testCases: mode === 'catalog' ? [] : testCases,
       ...(description ? { description } : {}),
-      ...(mode === 'catalog' ? { catalogId: catalogId!, testCasesPerQaPair: testCasesPerQaPair || 1 } : { testCases }),
+      ...(mode === 'catalog' ? { catalogId: catalogId!, testCasesPerQaPair: testCasesPerQaPair || 1 } : {}),
     } as Dto;
 
     createEvaluationMutation.mutate(dto, {
@@ -85,8 +89,8 @@ export function CreateEvaluationPage() {
         return <SourceStep />;
       case 'metrics':
         return <MetricsSelectionStep />;
-      case 'endpoint':
-        return <EndpointSelectionStep />;
+      case 'assistant':
+        return <AssistantSelectionStep />;
       case 'review':
         return <ReviewStep />;
       default:
@@ -125,8 +129,8 @@ export function CreateEvaluationPage() {
             completedIcon={<IconCheck size={18} />}
           />
           <Stepper.Step
-            label={texts.evals.evaluations.wizard.endpointStep}
-            description={texts.evals.evaluations.wizard.endpointStepDescription}
+            label={texts.evals.evaluations.wizard.assistantStep}
+            description={texts.evals.evaluations.wizard.assistantStepDescription}
             completedIcon={<IconCheck size={18} />}
           />
           <Stepper.Step

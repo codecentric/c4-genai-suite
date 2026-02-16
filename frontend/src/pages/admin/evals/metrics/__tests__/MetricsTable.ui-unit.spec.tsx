@@ -19,8 +19,6 @@ const mockMetrics: Metric[] = [
       includeReason: true,
       chatModelId: 'chat-1',
       strictMode: false,
-      evaluationSteps: [],
-      evaluationParams: [],
     },
   },
   {
@@ -36,7 +34,6 @@ const mockMetrics: Metric[] = [
       strictMode: true,
       evaluationSteps: ['Step 1'],
       evaluationParams: ['input'],
-      includeReason: false,
     },
   },
 ];

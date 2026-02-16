@@ -167,10 +167,14 @@ class Evaluation(Base, CreatedTrait, UpdatedTrait, DeletedTrait):
     test_cases: Mapped[List["TestCase"]] = relationship(
         back_populates="evaluation", cascade="all, delete-orphan"
     )
-    llm_endpoint_id: Mapped[str | None] = mapped_column(
-        ForeignKey("llm_endpoint.id"), nullable=True
-    )
-    llm_endpoint: Mapped["LLMEndpoint"] = relationship()
+
+    # User context for callbacks (stored when evaluation is created)
+    callback_user_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    callback_user_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
+
+    # C4 assistant fields
+    c4_assistant_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    c4_assistant_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
 
     metrics: Mapped[List["EvaluationMetric"]] = relationship(
         secondary=evaluation_evaluation_metric_association_table,

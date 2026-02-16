@@ -4,9 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from llm_eval.database.model import TestCaseStatus
 from llm_eval.eval.evaluate_results.db.find_test_case import find_test_case
 from llm_eval.eval.evaluations.tasks.utils.test_case import fail_test_case
-from llm_eval.llm_endpoints.db.find_llm_endpoint import find_llm_endpoint
-from llm_eval.llm_endpoints.plugins.factory import get_endpoint_plugin
-from llm_eval.llm_endpoints.plugins.interface import LLMQuerySupport
+from llm_eval.llm_query.c4_assistant_query import C4AssistantQuery
 from llm_eval.tasks import app
 from llm_eval.utils.task import async_task, with_session
 
@@ -20,7 +18,11 @@ from llm_eval.utils.task import async_task, with_session
 @async_task
 @with_session
 async def retrieve_answer_task(
-    session: AsyncSession, test_case_id: str, endpoint_id: str | None
+    session: AsyncSession,
+    test_case_id: str,
+    c4_assistant_id: int,
+    callback_user_id: str,
+    callback_user_name: str,
 ) -> None:
     test_case = await find_test_case(session, test_case_id)
 
@@ -34,27 +36,11 @@ async def retrieve_answer_task(
         )
         return
 
-    if endpoint_id is None:
-        return await fail_test_case(session, test_case, "No endpoint specified.")
-
-    llm_endpoint = await find_llm_endpoint(session, endpoint_id)
-
-    if llm_endpoint is None:
-        return await fail_test_case(
-            session, test_case, f"Endpoint '{endpoint_id}' not found."
-        )
-
-    endpoint_plugin = get_endpoint_plugin(llm_endpoint)
-    endpoint_configuration = endpoint_plugin.configuration_from_db_json(
-        llm_endpoint.endpoint_config
+    query = C4AssistantQuery(
+        assistant_id=c4_assistant_id,
+        user_id=callback_user_id,
+        user_name=callback_user_name,
     )
-
-    if not isinstance(endpoint_plugin, LLMQuerySupport):
-        return await fail_test_case(
-            session, test_case, "Used endpoint does not support LLM queries."
-        )
-
-    query = endpoint_plugin.create_llm_query(endpoint_configuration)
 
     result = await query.query(
         test_case.input, test_case.meta_data if test_case.meta_data is not None else {}

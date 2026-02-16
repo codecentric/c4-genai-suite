@@ -16,11 +16,6 @@ export function LlmEndpointTypeChip({ type }: LlmEndpointTypeChipProps) {
 
 function getTypeConfig(type: string) {
   switch (type) {
-    case 'C4':
-      return {
-        label: texts.evals.llmEndpoint.typeC4,
-        badgeClass: 'badge-primary',
-      };
     case 'OPENAI':
       return {
         label: texts.evals.llmEndpoint.typeOpenAI,

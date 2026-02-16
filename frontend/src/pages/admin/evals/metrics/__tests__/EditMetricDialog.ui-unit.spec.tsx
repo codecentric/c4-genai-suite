@@ -40,8 +40,6 @@ const mockSimpleMetric: Metric = {
     includeReason: true,
     chatModelId: 'endpoint-1',
     strictMode: false,
-    evaluationSteps: [],
-    evaluationParams: [],
   },
 };
 
@@ -58,7 +56,6 @@ const mockGEvalMetric: Metric = {
     strictMode: true,
     evaluationSteps: ['Step 1', 'Step 2'],
     evaluationParams: ['input', 'actual_output'],
-    includeReason: false,
   },
 };
 

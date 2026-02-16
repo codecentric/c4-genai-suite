@@ -11,37 +11,59 @@ from llm_eval.llm_query.interface import (
     LLMQuery,
     LLMQueryResult,
 )
+from llm_eval.settings import SETTINGS
 from llm_eval.utils.decorators import async_retry_on_error
 from llm_eval.utils.json_types import JSONObject
 
 
-class C4Query(LLMQuery):
-    configuration_id: int
+class C4AssistantQuery(LLMQuery):
+    """
+    Query class for C4 assistants using internal service-to-service auth.
+
+    Authenticates with C4 backend using shared secret (X-Internal-Service-Key)
+    and passes user context (X-User-Id, X-User-Name) for authorization.
+    """
+
+    assistant_id: int
+    user_id: str
+    user_name: str
     max_retries: int
-    endpoint: str
-    common_headers: dict[str, str]
     timeout: int
 
     def __init__(
         self,
-        endpoint: str,
-        api_key: str,
-        max_retries: int,
-        configuration_id: int,
-        parallel_queries: int,
-        timeout: int,
+        assistant_id: int,
+        user_id: str,
+        user_name: str,
+        max_retries: int = 3,
+        parallel_queries: int = 1,
+        timeout: int = 60,
     ) -> None:
         super().__init__(parallel_queries)
 
-        self.endpoint = endpoint
+        self.assistant_id = assistant_id
+        self.user_id = user_id
+        self.user_name = user_name
         self.max_retries = max_retries
-        self.configuration_id = configuration_id
-        self.common_headers = {
+        self.timeout = timeout
+
+    @property
+    def endpoint(self) -> str:
+        return SETTINGS.c4_backend.url
+
+    @property
+    def common_headers(self) -> dict[str, str]:
+        headers = {
             "Content-Type": "application/json",
             "Accept": "application/json",
-            "x-api-key": api_key,
+            "X-User-Id": self.user_id,
+            "X-User-Name": self.user_name,
         }
-        self.timeout = timeout
+        if SETTINGS.c4_backend.internal_service_secret:
+            headers["x-internal-service-key"] = (
+                SETTINGS.c4_backend.internal_service_secret
+            )
+        return headers
 
     async def query(self, prompt: str, meta_data: JSONObject) -> LLMQueryResult:
         @async_retry_on_error(
@@ -58,12 +80,12 @@ class C4Query(LLMQuery):
                 logger.info(f"Processing prompt: {prompt}")
 
                 configuration_name = await self.get_configuration_name(
-                    client, self.configuration_id
+                    client, self.assistant_id
                 )
 
                 conversation_id = await self._create_conversation(
                     client,
-                    self.configuration_id,
+                    self.assistant_id,
                 )
 
                 answer = await self._send_prompt(client, conversation_id, prompt)
@@ -74,7 +96,7 @@ class C4Query(LLMQuery):
                     answer=answer,
                     retrieval_context=None,
                     configuration=LLMConfiguration(
-                        id=str(self.configuration_id),
+                        id=str(self.assistant_id),
                         name=configuration_name,
                         version=datetime.now().strftime("%Y-%m-%d"),
                     ),

@@ -2571,169 +2571,6 @@
         ],
         "title": "Body_upload_v1_qa_catalog_upload_post"
       },
-      "C4LLMEndpointConfigurationCreate": {
-        "properties": {
-          "type": {
-            "type": "string",
-            "const": "C4",
-            "title": "Type"
-          },
-          "parallelQueries": {
-            "type": "integer",
-            "title": "Parallelqueries"
-          },
-          "maxRetries": {
-            "type": "integer",
-            "title": "Maxretries"
-          },
-          "endpoint": {
-            "type": "string",
-            "title": "Endpoint"
-          },
-          "configurationId": {
-            "type": "integer",
-            "title": "Configurationid"
-          },
-          "apiKey": {
-            "type": "string",
-            "title": "Apikey"
-          },
-          "requestTimeout": {
-            "type": "integer",
-            "title": "Requesttimeout"
-          }
-        },
-        "type": "object",
-        "required": [
-          "type",
-          "parallelQueries",
-          "maxRetries",
-          "endpoint",
-          "configurationId",
-          "apiKey",
-          "requestTimeout"
-        ],
-        "title": "C4LLMEndpointConfigurationCreate"
-      },
-      "C4LLMEndpointConfigurationRead": {
-        "properties": {
-          "type": {
-            "type": "string",
-            "const": "C4",
-            "title": "Type"
-          },
-          "parallelQueries": {
-            "type": "integer",
-            "title": "Parallelqueries"
-          },
-          "maxRetries": {
-            "type": "integer",
-            "title": "Maxretries"
-          },
-          "endpoint": {
-            "type": "string",
-            "title": "Endpoint"
-          },
-          "configurationId": {
-            "type": "integer",
-            "title": "Configurationid"
-          },
-          "requestTimeout": {
-            "type": "integer",
-            "title": "Requesttimeout"
-          }
-        },
-        "type": "object",
-        "required": [
-          "type",
-          "parallelQueries",
-          "maxRetries",
-          "endpoint",
-          "configurationId",
-          "requestTimeout"
-        ],
-        "title": "C4LLMEndpointConfigurationRead"
-      },
-      "C4LLMEndpointConfigurationUpdate": {
-        "properties": {
-          "type": {
-            "type": "string",
-            "const": "C4",
-            "title": "Type"
-          },
-          "parallelQueries": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Parallelqueries"
-          },
-          "maxRetries": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Maxretries"
-          },
-          "endpoint": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Endpoint"
-          },
-          "apiKey": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Apikey"
-          },
-          "configurationId": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Configurationid"
-          },
-          "requestTimeout": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Requesttimeout"
-          }
-        },
-        "type": "object",
-        "required": [
-          "type"
-        ],
-        "title": "C4LLMEndpointConfigurationUpdate"
-      },
       "DashboardData": {
         "properties": {
           "lastEvaluation": {
@@ -3017,6 +2854,28 @@
           "version": {
             "type": "integer",
             "title": "Version"
+          },
+          "c4AssistantId": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "C4Assistantid"
+          },
+          "c4AssistantName": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "C4Assistantname"
           }
         },
         "type": "object",
@@ -3500,6 +3359,28 @@
           "version": {
             "type": "integer",
             "title": "Version"
+          },
+          "c4AssistantId": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "C4Assistantid"
+          },
+          "c4AssistantName": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "C4Assistantname"
           }
         },
         "type": "object",
@@ -3933,9 +3814,6 @@
       "LLMEndpointConfigurationCreate": {
         "anyOf": [
           {
-            "$ref": "#/components/schemas/C4LLMEndpointConfigurationCreate"
-          },
-          {
             "$ref": "#/components/schemas/AzureOpenAILLMEndpointConfigurationCreate"
           },
           {
@@ -3946,9 +3824,6 @@
       "LLMEndpointConfigurationRead": {
         "anyOf": [
           {
-            "$ref": "#/components/schemas/C4LLMEndpointConfigurationRead"
-          },
-          {
             "$ref": "#/components/schemas/AzureOpenAILLMEndpointConfigurationRead"
           },
           {
@@ -3958,9 +3833,6 @@
       },
       "LLMEndpointConfigurationUpdate": {
         "anyOf": [
-          {
-            "$ref": "#/components/schemas/C4LLMEndpointConfigurationUpdate"
-          },
           {
             "$ref": "#/components/schemas/AzureOpenAILLMEndpointConfigurationUpdate"
           },
@@ -4102,7 +3974,30 @@
             "title": "Updatedat"
           },
           "configuration": {
-            "$ref": "#/components/schemas/MetricConfigurationRead"
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/GEvalMetricConfigurationRead"
+              },
+              {
+                "$ref": "#/components/schemas/AnswerRelevancyMetricConfigurationRead"
+              },
+              {
+                "$ref": "#/components/schemas/HallucinationMetricConfigurationRead"
+              },
+              {
+                "$ref": "#/components/schemas/FaithfulnessMetricConfigurationRead"
+              }
+            ],
+            "title": "Configuration",
+            "discriminator": {
+              "propertyName": "type",
+              "mapping": {
+                "ANSWER_RELEVANCY": "#/components/schemas/AnswerRelevancyMetricConfigurationRead",
+                "FAITHFULNESS": "#/components/schemas/FaithfulnessMetricConfigurationRead",
+                "G_EVAL": "#/components/schemas/GEvalMetricConfigurationRead",
+                "HALLUCINATION": "#/components/schemas/HallucinationMetricConfigurationRead"
+              }
+            }
           },
           "version": {
             "type": "integer",
@@ -4119,58 +4014,33 @@
         ],
         "title": "Metric"
       },
-      "MetricConfigurationCreate": {
-        "anyOf": [
-          {
-            "$ref": "#/components/schemas/GEvalMetricConfigurationCreate"
-          },
-          {
-            "$ref": "#/components/schemas/AnswerRelevancyMetricConfigurationCreate"
-          },
-          {
-            "$ref": "#/components/schemas/HallucinationMetricConfigurationCreate"
-          },
-          {
-            "$ref": "#/components/schemas/FaithfulnessMetricConfigurationCreate"
-          }
-        ]
-      },
-      "MetricConfigurationRead": {
-        "anyOf": [
-          {
-            "$ref": "#/components/schemas/GEvalMetricConfigurationRead"
-          },
-          {
-            "$ref": "#/components/schemas/AnswerRelevancyMetricConfigurationRead"
-          },
-          {
-            "$ref": "#/components/schemas/HallucinationMetricConfigurationRead"
-          },
-          {
-            "$ref": "#/components/schemas/FaithfulnessMetricConfigurationRead"
-          }
-        ]
-      },
-      "MetricConfigurationUpdate": {
-        "anyOf": [
-          {
-            "$ref": "#/components/schemas/GEvalMetricConfigurationUpdate"
-          },
-          {
-            "$ref": "#/components/schemas/AnswerRelevancyMetricConfigurationUpdate"
-          },
-          {
-            "$ref": "#/components/schemas/HallucinationMetricConfigurationUpdate"
-          },
-          {
-            "$ref": "#/components/schemas/FaithfulnessMetricConfigurationUpdate"
-          }
-        ]
-      },
       "MetricCreate": {
         "properties": {
           "configuration": {
-            "$ref": "#/components/schemas/MetricConfigurationCreate"
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/GEvalMetricConfigurationCreate"
+              },
+              {
+                "$ref": "#/components/schemas/AnswerRelevancyMetricConfigurationCreate"
+              },
+              {
+                "$ref": "#/components/schemas/HallucinationMetricConfigurationCreate"
+              },
+              {
+                "$ref": "#/components/schemas/FaithfulnessMetricConfigurationCreate"
+              }
+            ],
+            "title": "Configuration",
+            "discriminator": {
+              "propertyName": "type",
+              "mapping": {
+                "ANSWER_RELEVANCY": "#/components/schemas/AnswerRelevancyMetricConfigurationCreate",
+                "FAITHFULNESS": "#/components/schemas/FaithfulnessMetricConfigurationCreate",
+                "G_EVAL": "#/components/schemas/GEvalMetricConfigurationCreate",
+                "HALLUCINATION": "#/components/schemas/HallucinationMetricConfigurationCreate"
+              }
+            }
           }
         },
         "type": "object",
@@ -4307,7 +4177,30 @@
             "title": "Version"
           },
           "configuration": {
-            "$ref": "#/components/schemas/MetricConfigurationUpdate"
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/GEvalMetricConfigurationUpdate"
+              },
+              {
+                "$ref": "#/components/schemas/AnswerRelevancyMetricConfigurationUpdate"
+              },
+              {
+                "$ref": "#/components/schemas/HallucinationMetricConfigurationUpdate"
+              },
+              {
+                "$ref": "#/components/schemas/FaithfulnessMetricConfigurationUpdate"
+              }
+            ],
+            "title": "Configuration",
+            "discriminator": {
+              "propertyName": "type",
+              "mapping": {
+                "ANSWER_RELEVANCY": "#/components/schemas/AnswerRelevancyMetricConfigurationUpdate",
+                "FAITHFULNESS": "#/components/schemas/FaithfulnessMetricConfigurationUpdate",
+                "G_EVAL": "#/components/schemas/GEvalMetricConfigurationUpdate",
+                "HALLUCINATION": "#/components/schemas/HallucinationMetricConfigurationUpdate"
+              }
+            }
           }
         },
         "type": "object",
@@ -5128,10 +5021,6 @@
             "type": "string",
             "title": "Catalogid"
           },
-          "llmEndpointId": {
-            "type": "string",
-            "title": "Llmendpointid"
-          },
           "metrics": {
             "items": {
               "type": "string"
@@ -5143,14 +5032,29 @@
             "type": "integer",
             "title": "Testcasesperqapair",
             "default": 3
+          },
+          "c4AssistantId": {
+            "type": "integer",
+            "title": "C4Assistantid"
+          },
+          "c4AssistantName": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "C4Assistantname"
           }
         },
         "type": "object",
         "required": [
           "name",
           "catalogId",
-          "llmEndpointId",
-          "metrics"
+          "metrics",
+          "c4AssistantId"
         ],
         "title": "RunEvaluationByQaCatalog"
       },

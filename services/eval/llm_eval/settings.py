@@ -75,6 +75,13 @@ class FileStoreSettings(BaseSettings, prefix="FILE_STORE_"):
     s3_region_name: str | None = Field(default=None)
 
 
+class C4BackendSettings(BaseSettings, prefix="C4_BACKEND_"):
+    """Settings for connecting back to C4 backend for assistant queries."""
+
+    url: str = Field(default="http://localhost:3000/api")
+    internal_service_secret: str | None = Field(default=None)
+
+
 class Settings(BaseSettings):
     encryption_key: SecretBytes = Field(
         alias="LLM_EVAL_ENCRYPTION_KEY",
@@ -86,6 +93,7 @@ class Settings(BaseSettings):
     deepeval: DeepEvalSettings = DeepEvalSettings()
     ragas: RagasSettings = RagasSettings()
     file_store: FileStoreSettings = FileStoreSettings()
+    c4_backend: C4BackendSettings = C4BackendSettings()
 
     file_upload_temp_location: Path = Field(default=DATA_DIR / "uploaded_files")
 

@@ -484,8 +484,8 @@ export const de: typeof en = {
         sourceStepDescription: 'Auswählen oder erstellen',
         metricsStep: 'Metriken',
         metricsStepDescription: 'Metriken wählen',
-        endpointStep: 'LLM-Endpunkt',
-        endpointStepDescription: 'Endpunkt auswählen',
+        assistantStep: 'Assistent',
+        assistantStepDescription: 'Assistent auswählen',
         reviewStep: 'Überprüfung',
         reviewStepDescription: 'Details abschließen',
         // Cancel dialog

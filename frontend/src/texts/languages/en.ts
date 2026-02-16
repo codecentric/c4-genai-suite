@@ -491,8 +491,8 @@ export const en = {
         sourceStepDescription: 'Select or create',
         metricsStep: 'Metrics',
         metricsStepDescription: 'Choose metrics',
-        endpointStep: 'LLM Endpoint',
-        endpointStepDescription: 'Select endpoint',
+        assistantStep: 'Assistant',
+        assistantStepDescription: 'Select assistant',
         reviewStep: 'Review',
         reviewStepDescription: 'Finalize details',
         // Cancel dialog
