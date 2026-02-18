@@ -156,6 +156,7 @@ export function ExportedConfigurationDtoToJSON(value?: ExportedConfigurationDto 
         return value;
     }
     return {
+        
         'version': value['version'],
         'exportedAt': value['exportedAt'],
         'originId': value['originId'],
