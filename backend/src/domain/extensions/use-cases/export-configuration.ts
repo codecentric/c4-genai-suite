@@ -3,6 +3,7 @@ import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ConfigurationEntity } from '../../database';
+import { ChatSuggestion } from '../../shared';
 import { ExtensionObjectArgument } from '../interfaces';
 import { ExplorerService } from '../services';
 import { buildConfiguration, maskKeyValues } from './utils';
@@ -33,7 +34,7 @@ export interface PortableConfiguration {
   enabled: boolean;
   agentName?: string;
   chatFooter?: string;
-  chatSuggestions?: any[];
+  chatSuggestions?: ChatSuggestion[];
   executorEndpoint?: string;
   executorHeaders?: string;
   userGroupIds?: string[];
