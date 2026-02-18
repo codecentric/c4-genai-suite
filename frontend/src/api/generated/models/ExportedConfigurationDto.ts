@@ -104,7 +104,7 @@ export interface ExportedConfigurationDto {
      * @type {Array<string>}
      * @memberof ExportedConfigurationDto
      */
-    userGroupIds: Array<string>;
+    userGroupIds?: Array<string>;
     /**
      * The extensions configurations.
      * @type {Array<ExportedExtensionDto>}
@@ -120,7 +120,6 @@ export function instanceOfExportedConfigurationDto(value: object): value is Expo
     if (!('name' in value) || value['name'] === undefined) return false;
     if (!('description' in value) || value['description'] === undefined) return false;
     if (!('enabled' in value) || value['enabled'] === undefined) return false;
-    if (!('userGroupIds' in value) || value['userGroupIds'] === undefined) return false;
     if (!('extensions' in value) || value['extensions'] === undefined) return false;
     return true;
 }
@@ -146,7 +145,7 @@ export function ExportedConfigurationDtoFromJSONTyped(json: any, ignoreDiscrimin
         'chatSuggestions': json['chatSuggestions'] == null ? undefined : ((json['chatSuggestions'] as Array<any>).map(ChatSuggestionDtoFromJSON)),
         'executorEndpoint': json['executorEndpoint'] == null ? undefined : json['executorEndpoint'],
         'executorHeaders': json['executorHeaders'] == null ? undefined : json['executorHeaders'],
-        'userGroupIds': json['userGroupIds'],
+        'userGroupIds': json['userGroupIds'] == null ? undefined : json['userGroupIds'],
         'extensions': ((json['extensions'] as Array<any>).map(ExportedExtensionDtoFromJSON)),
     };
 }

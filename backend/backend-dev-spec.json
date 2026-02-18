@@ -3977,7 +3977,7 @@
             }
           }
         },
-        "required": ["name", "description", "enabled", "userGroupIds", "extensions"]
+        "required": ["name", "description", "enabled", "extensions"]
       },
       "ImportConfigurationDto": {
         "type": "object",
