@@ -999,13 +999,13 @@ export class ExportedConfigurationDto {
 
   @ApiProperty({
     description: 'The allowed user groups.',
-    required: true,
+    required: false,
     type: [String],
   })
-  @IsDefined()
+  @IsOptional()
   @IsArray()
   @IsString({ each: true })
-  userGroupIds!: string[];
+  userGroupIds?: string[];
 
   @ApiProperty({
     description: 'The extensions configurations.',
