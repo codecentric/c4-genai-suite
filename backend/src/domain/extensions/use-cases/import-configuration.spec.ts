@@ -4,7 +4,8 @@ import { ConfigurationEntity, ConfigurationStatus, ExtensionEntity, UserGroupRep
 import { ChatSuggestion } from '../../shared';
 import { Extension, ExtensionObjectArgument, ExtensionStringArgument } from '../interfaces';
 import { ExplorerService } from '../services';
-import { ImportConfiguration, ImportConfigurationData, ImportConfigurationHandler } from './import-configuration';
+import { PortableConfiguration } from './export-configuration';
+import { ImportConfiguration, ImportConfigurationHandler } from './import-configuration';
 
 interface MockConfigRepository {
   save: jest.Mock;
@@ -55,7 +56,7 @@ describe(ImportConfiguration.name, () => {
   it('should throw BadRequestException when extension is not available', async () => {
     jest.spyOn(explorer, 'getExtension').mockReturnValue(undefined);
 
-    const importData: ImportConfigurationData = {
+    const importData: PortableConfiguration = {
       name: 'Test Config',
       description: 'Test',
       enabled: true,
@@ -78,7 +79,7 @@ describe(ImportConfiguration.name, () => {
   it('should throw BadRequestException when multiple extensions are not available', async () => {
     jest.spyOn(explorer, 'getExtension').mockReturnValue(undefined);
 
-    const importData: ImportConfigurationData = {
+    const importData: PortableConfiguration = {
       name: 'Test Config',
       description: 'Test',
       enabled: true,
@@ -119,7 +120,7 @@ describe(ImportConfiguration.name, () => {
       getMiddlewares: () => Promise.resolve([]),
     } as Extension);
 
-    const importData: ImportConfigurationData = {
+    const importData: PortableConfiguration = {
       name: 'Test Config',
       description: 'Test',
       enabled: true,
@@ -157,7 +158,7 @@ describe(ImportConfiguration.name, () => {
       getMiddlewares: () => Promise.resolve([]),
     } as Extension);
 
-    const importData: ImportConfigurationData = {
+    const importData: PortableConfiguration = {
       name: 'Test Config',
       description: 'Test',
       enabled: true,
@@ -199,7 +200,7 @@ describe(ImportConfiguration.name, () => {
       getMiddlewares: () => Promise.resolve([]),
     } as Extension);
 
-    const importData: ImportConfigurationData = {
+    const importData: PortableConfiguration = {
       name: 'Test Config',
       description: 'Test',
       enabled: true,
@@ -271,7 +272,7 @@ describe(ImportConfiguration.name, () => {
       } as Extension;
     });
 
-    const importData: ImportConfigurationData = {
+    const importData: PortableConfiguration = {
       name: 'Imported Config',
       description: 'Imported Description',
       enabled: true,
@@ -327,7 +328,7 @@ describe(ImportConfiguration.name, () => {
       getMiddlewares: () => Promise.resolve([]),
     } as Extension);
 
-    const importData: ImportConfigurationData = {
+    const importData: PortableConfiguration = {
       name: 'Disabled Config',
       description: 'Test',
       enabled: false,
@@ -376,7 +377,7 @@ describe(ImportConfiguration.name, () => {
       getMiddlewares: () => Promise.resolve([]),
     } as Extension);
 
-    const importData: ImportConfigurationData = {
+    const importData: PortableConfiguration = {
       name: 'Test Config',
       description: 'Test',
       enabled: true,
@@ -449,7 +450,7 @@ describe(ImportConfiguration.name, () => {
       getMiddlewares: () => Promise.resolve([]),
     } as Extension);
 
-    const importData: ImportConfigurationData = {
+    const importData: PortableConfiguration = {
       name: 'Config with args',
       description: 'Test',
       enabled: true,
@@ -503,7 +504,7 @@ describe(ImportConfiguration.name, () => {
     // Set current VERSION
     process.env.VERSION = '2.0.0';
 
-    const importData: ImportConfigurationData = {
+    const importData: PortableConfiguration = {
       version: '1.0.0', // Different version
       name: 'Config from different version',
       description: 'Test',
@@ -554,7 +555,7 @@ describe(ImportConfiguration.name, () => {
     // Set current VERSION
     process.env.VERSION = '2.0.0';
 
-    const importData: ImportConfigurationData = {
+    const importData: PortableConfiguration = {
       version: '2.0.0', // Same version
       name: 'Config from same version',
       description: 'Test',
@@ -628,7 +629,7 @@ describe(ImportConfiguration.name, () => {
       getMiddlewares: () => Promise.resolve([]),
     } as Extension);
 
-    const importData: ImportConfigurationData = {
+    const importData: PortableConfiguration = {
       name: 'Config with masked nested values',
       description: 'Test',
       enabled: true,
@@ -692,7 +693,7 @@ describe(ImportConfiguration.name, () => {
 
     const exportedAt = new Date().toISOString();
 
-    const importData: ImportConfigurationData = {
+    const importData: PortableConfiguration = {
       version: '1.0.0',
       exportedAt,
       name: 'Config with timestamp',
@@ -723,7 +724,7 @@ describe(ImportConfiguration.name, () => {
     // No user groups found
     jest.spyOn(userGroupRepository, 'findBy').mockResolvedValue([]);
 
-    const importData: ImportConfigurationData = {
+    const importData: PortableConfiguration = {
       name: 'Config with invalid groups',
       description: 'Test',
       enabled: true,
@@ -772,7 +773,7 @@ describe(ImportConfiguration.name, () => {
       getMiddlewares: () => Promise.resolve([]),
     } as Extension);
 
-    const importData: ImportConfigurationData = {
+    const importData: PortableConfiguration = {
       name: 'Config with valid groups',
       description: 'Test',
       enabled: true,
@@ -826,7 +827,7 @@ describe(ImportConfiguration.name, () => {
 
     const loggerWarnSpy = jest.spyOn(handler['logger'], 'warn');
 
-    const importData: ImportConfigurationData = {
+    const importData: PortableConfiguration = {
       name: 'Config with partial groups',
       description: 'Test',
       enabled: true,
@@ -874,7 +875,7 @@ describe(ImportConfiguration.name, () => {
       getMiddlewares: () => Promise.resolve([]),
     } as Extension);
 
-    const importData: ImportConfigurationData = {
+    const importData: PortableConfiguration = {
       name: 'Config without groups',
       description: 'Test',
       enabled: true,

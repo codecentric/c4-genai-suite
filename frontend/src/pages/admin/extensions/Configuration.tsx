@@ -4,7 +4,7 @@ import { memo } from 'react';
 import { toast } from 'react-toastify';
 import { ConfigurationDto, useApi } from 'src/api';
 import { ConfirmDialog, TransientNavLink } from 'src/components';
-import { cn } from 'src/lib';
+import { cn, downloadJson, sanitizeFilename } from 'src/lib';
 import { texts } from 'src/texts';
 
 interface ConfigurationProps {
@@ -27,22 +27,7 @@ export const Configuration = memo((props: ConfigurationProps) => {
   const handleExport = async () => {
     try {
       const exportedData = await api.extensions.exportConfiguration(configuration.id);
-
-      // Sanitize filename: keep alphanumerics, hyphens, underscores, spaces
-      const sanitizedName = configuration.name.replace(/[^a-zA-Z0-9\-_ ]/g, '_');
-      const filename = `${sanitizedName}_config.json`;
-
-      // Create blob and download
-      const blob = new Blob([JSON.stringify(exportedData, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = filename;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-
+      downloadJson(exportedData, `${sanitizeFilename(configuration.name)}_config.json`);
       toast.success(texts.extensions.exportConfigurationSuccess);
     } catch (_error) {
       toast.error(texts.extensions.exportConfigurationFailed);

@@ -3,34 +3,13 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { ConfigurationEntity, ConfigurationStatus, ExtensionEntity, UserGroupEntity, UserGroupRepository } from '../../database';
-import { ConfigurationModel, ExtensionObjectArgument } from '../interfaces';
+import { ConfigurationModel } from '../interfaces';
 import { ExplorerService } from '../services';
+import { PortableConfiguration } from './export-configuration';
 import { buildConfiguration, validateConfiguration } from './utils';
 
-export interface ImportedExtension {
-  name: string;
-  enabled: boolean;
-  values: Record<string, unknown>;
-  configurableArguments?: ExtensionObjectArgument;
-}
-
-export interface ImportConfigurationData {
-  version?: string;
-  exportedAt?: string;
-  name: string;
-  description: string;
-  enabled: boolean;
-  agentName?: string;
-  chatFooter?: string;
-  chatSuggestions?: any[];
-  executorEndpoint?: string;
-  executorHeaders?: string;
-  userGroupIds?: string[];
-  extensions: ImportedExtension[];
-}
-
 export class ImportConfiguration {
-  constructor(public readonly data: ImportConfigurationData) {}
+  constructor(public readonly data: PortableConfiguration) {}
 }
 
 export interface ImportConfigurationResponse {

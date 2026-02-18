@@ -3,6 +3,7 @@ import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ConfigurationEntity } from '../../database';
+import { ExtensionObjectArgument } from '../interfaces';
 import { ExplorerService } from '../services';
 import { buildConfiguration, maskKeyValues } from './utils';
 
@@ -10,17 +11,23 @@ export class ExportConfiguration {
   constructor(public readonly id: number) {}
 }
 
-export interface ExportedExtension {
+/**
+ * Shared interface for extension data in import/export operations.
+ */
+export interface PortableExtension {
   name: string;
   enabled: boolean;
-  values: Record<string, any>;
-  configurableArguments?: any;
+  values: Record<string, unknown>;
+  configurableArguments?: ExtensionObjectArgument;
 }
 
-export interface ExportedConfiguration {
-  version: string;
-  exportedAt: string;
-  originId: number;
+/**
+ * Shared interface for configuration data in import/export operations.
+ */
+export interface PortableConfiguration {
+  version?: string;
+  exportedAt?: string;
+  originId?: number;
   name: string;
   description: string;
   enabled: boolean;
@@ -29,11 +36,11 @@ export interface ExportedConfiguration {
   chatSuggestions?: any[];
   executorEndpoint?: string;
   executorHeaders?: string;
-  userGroupIds: string[];
-  extensions: ExportedExtension[];
+  userGroupIds?: string[];
+  extensions: PortableExtension[];
 }
 
-export type ExportConfigurationResponse = ExportedConfiguration;
+export type ExportConfigurationResponse = PortableConfiguration;
 
 @QueryHandler(ExportConfiguration)
 export class ExportConfigurationHandler implements IQueryHandler<ExportConfiguration, ExportConfigurationResponse> {
@@ -57,19 +64,15 @@ export class ExportConfigurationHandler implements IQueryHandler<ExportConfigura
     const configuration = await buildConfiguration(configurationEntity, this.extensionExplorer, true, false);
 
     // Prepare export data with masked sensitive values
-    const exportedExtensions: ExportedExtension[] = [];
-
-    for (const ext of configuration.extensions || []) {
-      // Mask sensitive values (passwords)
+    const extensions: PortableExtension[] = (configuration.extensions || []).map((ext) => {
       maskKeyValues(ext);
-
-      exportedExtensions.push({
+      return {
         name: ext.name,
         enabled: ext.enabled,
         values: ext.values,
         configurableArguments: ext.configurableArguments,
-      });
-    }
+      };
+    });
 
     return {
       version: process.env.VERSION || 'unknown',
@@ -84,7 +87,7 @@ export class ExportConfigurationHandler implements IQueryHandler<ExportConfigura
       executorEndpoint: configuration.executorEndpoint,
       executorHeaders: configuration.executorHeaders,
       userGroupIds: configuration.userGroupIds,
-      extensions: exportedExtensions,
+      extensions,
     };
   }
 }
