@@ -42,6 +42,8 @@ export const Configuration = memo((props: ConfigurationProps) => {
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
+
+      toast.success(texts.extensions.exportConfigurationSuccess);
     } catch (_error) {
       toast.error(texts.extensions.exportConfigurationFailed);
     }

@@ -90,9 +90,10 @@ describe(ExportConfiguration.name, () => {
     expect(result.version).toBe('1.0.0');
     expect(result.exportedAt).toBeDefined();
     expect(new Date(result.exportedAt).getTime()).toBeLessThanOrEqual(new Date().getTime());
+    expect(result.originId).toBe(1);
     expect(result.name).toBe('Test Config');
     expect(result.description).toBe('Test Description');
-    expect(result.enabled).toBe(true);
+    expect(result.enabled).toBe(false);
     expect(result.agentName).toBe('Test Agent');
     expect(result.chatFooter).toBe('Footer');
     expect(result.chatSuggestions).toEqual([{ text: 'Hello', title: 'Hello', subtitle: 'Greeting' }]);
@@ -127,6 +128,7 @@ describe(ExportConfiguration.name, () => {
     const result = await handler.execute(new ExportConfiguration(2));
 
     expect(result).toBeDefined();
+    expect(result.originId).toBe(2);
     expect(result.name).toBe('Empty Config');
     expect(result.enabled).toBe(false);
     expect(result.extensions).toHaveLength(0);
@@ -178,6 +180,7 @@ describe(ExportConfiguration.name, () => {
 
     const result = await handler.execute(new ExportConfiguration(3));
 
+    expect(result.originId).toBe(3);
     expect(result.extensions).toHaveLength(2);
     expect(result.extensions[0].name).toBe('extension-1');
     expect(result.extensions[0].enabled).toBe(true);

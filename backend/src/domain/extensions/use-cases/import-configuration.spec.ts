@@ -1,17 +1,29 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { BadRequestException } from '@nestjs/common';
-import { ConfigurationEntity, ConfigurationStatus, ExtensionEntity } from '../../database';
-import { Extension, ExtensionStringArgument } from '../interfaces';
+import { Repository } from 'typeorm';
+import { ConfigurationEntity, ConfigurationStatus, ExtensionEntity, UserGroupRepository } from '../../database';
+import { ChatSuggestion } from '../../shared';
+import { Extension, ExtensionObjectArgument, ExtensionStringArgument } from '../interfaces';
 import { ExplorerService } from '../services';
 import { ImportConfiguration, ImportConfigurationData, ImportConfigurationHandler } from './import-configuration';
 
+interface MockConfigRepository {
+  save: jest.Mock;
+  findOne: jest.Mock;
+}
+
+interface MockExtensionRepository {
+  save: jest.Mock;
+}
+
+interface MockUserGroupRepository {
+  findBy: jest.Mock;
+}
+
 describe(ImportConfiguration.name, () => {
   let handler: ImportConfigurationHandler;
-  let configRepository: any;
-  let extensionRepository: any;
-  let userGroupRepository: any;
+  let configRepository: MockConfigRepository;
+  let extensionRepository: MockExtensionRepository;
+  let userGroupRepository: MockUserGroupRepository;
   let explorer: ExplorerService;
 
   beforeEach(() => {
@@ -32,7 +44,12 @@ describe(ImportConfiguration.name, () => {
       findBy: jest.fn().mockResolvedValue([]),
     };
 
-    handler = new ImportConfigurationHandler(configRepository, extensionRepository, userGroupRepository, explorer);
+    handler = new ImportConfigurationHandler(
+      configRepository as unknown as Repository<ConfigurationEntity>,
+      extensionRepository as unknown as Repository<ExtensionEntity>,
+      userGroupRepository as unknown as UserGroupRepository,
+      explorer,
+    );
   });
 
   it('should throw BadRequestException when extension is not available', async () => {
@@ -214,7 +231,7 @@ describe(ImportConfiguration.name, () => {
       status: ConfigurationStatus.ENABLED,
       agentName: 'Test Agent',
       chatFooter: 'Footer',
-      chatSuggestions: [{ text: 'Hello', title: 'Hello', subtitle: 'Greeting' }] as any,
+      chatSuggestions: [{ text: 'Hello', title: 'Hello', subtitle: 'Greeting' }] as ChatSuggestion[],
       executorEndpoint: undefined,
       executorHeaders: undefined,
       userGroupIds: ['group1'],
@@ -260,7 +277,7 @@ describe(ImportConfiguration.name, () => {
       enabled: true,
       agentName: 'Test Agent',
       chatFooter: 'Footer',
-      chatSuggestions: [{ text: 'Hello', title: 'Hello', subtitle: 'Greeting' }] as any,
+      chatSuggestions: [{ text: 'Hello', title: 'Hello', subtitle: 'Greeting' }] as ChatSuggestion[],
       userGroupIds: ['group1'],
       extensions: [
         {
@@ -321,84 +338,9 @@ describe(ImportConfiguration.name, () => {
     const result = await handler.execute(new ImportConfiguration(importData));
 
     expect(result.configuration.enabled).toBe(false);
-    const savedEntity = configRepository.save.mock.calls[0][0];
+    const mockCalls = configRepository.save.mock.calls as [[ConfigurationEntity]];
+    const savedEntity = mockCalls[0][0];
     expect(savedEntity.status).toBe(ConfigurationStatus.DISABLED);
-  });
-
-  it('should unmask password values during import', async () => {
-    const savedConfiguration: Partial<ConfigurationEntity> = {
-      id: 3,
-      name: 'Config with masked values',
-      description: 'Test',
-      status: ConfigurationStatus.ENABLED,
-      agentName: undefined,
-      chatFooter: undefined,
-      chatSuggestions: undefined,
-      executorEndpoint: undefined,
-      executorHeaders: undefined,
-      userGroupIds: [],
-      extensions: [],
-    };
-
-    jest.spyOn(configRepository, 'save').mockResolvedValue(savedConfiguration);
-    jest.spyOn(extensionRepository, 'save').mockImplementation((entities) => Promise.resolve(entities));
-    jest.spyOn(configRepository, 'findOne').mockResolvedValue({
-      ...savedConfiguration,
-      extensions: [
-        {
-          id: 1,
-          name: 'test-extension',
-          enabled: true,
-          values: { apiKey: 'real-key', endpoint: 'https://api.example.com' },
-        } as Partial<ExtensionEntity>,
-      ],
-    });
-
-    jest.spyOn(explorer, 'getExtension').mockImplementation((name) => {
-      return {
-        spec: {
-          name,
-          arguments: {
-            apiKey: {
-              type: 'string',
-              format: 'password',
-              required: false, // Make it optional so validation passes when masked value is removed
-            } as ExtensionStringArgument,
-            endpoint: {
-              type: 'string',
-              required: true,
-            } as ExtensionStringArgument,
-          },
-          title: 'Test Extension',
-          description: 'Test',
-          type: 'tool',
-        },
-        getMiddlewares: () => Promise.resolve([]),
-      } as Extension;
-    });
-
-    const importData: ImportConfigurationData = {
-      name: 'Config with masked values',
-      description: 'Test',
-      enabled: true,
-      userGroupIds: [],
-      extensions: [
-        {
-          name: 'test-extension',
-          enabled: true,
-          values: {
-            apiKey: '********************', // Masked value should be removed
-            endpoint: 'https://api.example.com',
-          },
-        },
-      ],
-    };
-
-    await handler.execute(new ImportConfiguration(importData));
-
-    const savedExtensions = extensionRepository.save.mock.calls[0][0];
-    expect(savedExtensions[0].values.apiKey).toBeUndefined(); // Masked value removed
-    expect(savedExtensions[0].values.endpoint).toBe('https://api.example.com');
   });
 
   it('should create extensions with correct externalId', async () => {
@@ -450,11 +392,23 @@ describe(ImportConfiguration.name, () => {
 
     await handler.execute(new ImportConfiguration(importData));
 
-    const savedExtensions = extensionRepository.save.mock.calls[0][0];
+    const mockCalls = extensionRepository.save.mock.calls as [[ExtensionEntity[]]];
+    const savedExtensions = mockCalls[0][0];
     expect(savedExtensions[0].externalId).toBe('5-test-ext');
   });
 
   it('should handle configurable arguments correctly', async () => {
+    const temperatureArg: ExtensionObjectArgument = {
+      type: 'object',
+      title: 'Configurable Args',
+      properties: {
+        temperature: {
+          type: 'number',
+          title: 'Temperature',
+        },
+      },
+    };
+
     const savedConfiguration: Partial<ConfigurationEntity> = {
       id: 6,
       name: 'Config with args',
@@ -479,7 +433,7 @@ describe(ImportConfiguration.name, () => {
           name: 'test-extension',
           enabled: true,
           values: {},
-          configurableArguments: { temperature: 0.7 } as any,
+          configurableArguments: temperatureArg,
         } as Partial<ExtensionEntity>,
       ],
     });
@@ -505,15 +459,16 @@ describe(ImportConfiguration.name, () => {
           name: 'test-extension',
           enabled: true,
           values: {},
-          configurableArguments: { temperature: 0.7 } as any,
+          configurableArguments: temperatureArg,
         },
       ],
     };
 
     await handler.execute(new ImportConfiguration(importData));
 
-    const savedExtensions = extensionRepository.save.mock.calls[0][0];
-    expect(savedExtensions[0].configurableArguments).toEqual({ temperature: 0.7 });
+    const mockCalls = extensionRepository.save.mock.calls as [[ExtensionEntity[]]];
+    const savedExtensions = mockCalls[0][0];
+    expect(savedExtensions[0].configurableArguments).toEqual(temperatureArg);
   });
 
   it('should warn when importing configuration from different version', async () => {
@@ -618,7 +573,7 @@ describe(ImportConfiguration.name, () => {
     delete process.env.VERSION;
   });
 
-  it('should properly remove masked values without using unmaskExtensionValues', async () => {
+  it('should preserve all values including masked ones during import', async () => {
     const savedConfiguration: Partial<ConfigurationEntity> = {
       id: 9,
       name: 'Config with masked nested values',
@@ -683,11 +638,11 @@ describe(ImportConfiguration.name, () => {
           name: 'test-extension',
           enabled: true,
           values: {
-            apiKey: '********************', // Masked - should be removed
-            endpoint: 'https://api.example.com', // Not masked - should remain
+            apiKey: '********************', // Masked - preserved as-is (user must re-enter)
+            endpoint: 'https://api.example.com',
             nested: {
-              secretKey: '********************', // Masked - should be removed
-              publicValue: 'public', // Not masked - should remain
+              secretKey: '********************', // Masked - preserved as-is (user must re-enter)
+              publicValue: 'public',
             },
           },
         },
@@ -696,11 +651,14 @@ describe(ImportConfiguration.name, () => {
 
     await handler.execute(new ImportConfiguration(importData));
 
-    const savedExtensions = extensionRepository.save.mock.calls[0][0];
-    expect(savedExtensions[0].values.apiKey).toBeUndefined(); // Masked value removed
-    expect(savedExtensions[0].values.endpoint).toBe('https://api.example.com'); // Kept
-    expect(savedExtensions[0].values.nested.secretKey).toBeUndefined(); // Nested masked removed
-    expect(savedExtensions[0].values.nested.publicValue).toBe('public'); // Nested kept
+    const mockCalls = extensionRepository.save.mock.calls as [[ExtensionEntity[]]];
+    const savedExtensions = mockCalls[0][0];
+    // All values are preserved as-is during import - user must manually update secrets
+    expect(savedExtensions[0].values.apiKey).toBe('********************');
+    expect(savedExtensions[0].values.endpoint).toBe('https://api.example.com');
+    const nestedValues = savedExtensions[0].values.nested as Record<string, unknown>;
+    expect(nestedValues.secretKey).toBe('********************');
+    expect(nestedValues.publicValue).toBe('public');
   });
 
   it('should include exportedAt timestamp in import data', async () => {

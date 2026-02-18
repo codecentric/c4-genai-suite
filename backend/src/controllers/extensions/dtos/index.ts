@@ -922,6 +922,14 @@ export class ExportedConfigurationDto {
   exportedAt?: string;
 
   @ApiProperty({
+    description: 'The ID of the original configuration from which this was exported.',
+    required: false,
+  })
+  @IsOptional()
+  @IsNumber()
+  originId?: number;
+
+  @ApiProperty({
     description: 'The name of the configuration.',
     required: true,
   })

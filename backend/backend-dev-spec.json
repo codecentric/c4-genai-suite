@@ -3923,6 +3923,10 @@
             "type": "string",
             "description": "The timestamp when this configuration was exported."
           },
+          "originId": {
+            "type": "number",
+            "description": "The ID of the original configuration from which this was exported."
+          },
           "name": {
             "type": "string",
             "description": "The name of the configuration."

@@ -210,8 +210,11 @@ export const en = {
     configurationsEmpty: 'No assistant created yet.',
     duplicateConfigurationFailed: 'Failed to duplicate assistant',
     exportConfigurationFailed: 'Failed to export assistant configuration',
+    exportConfigurationSuccess:
+      'Assistant configuration exported successfully. API keys are masked and need to be reconfigured after importing.',
     importConfiguration: 'Import Assistant Configuration',
-    importConfigurationSuccess: 'Assistant configuration imported successfully',
+    importConfigurationSuccess:
+      'Assistant configuration imported successfully. The assistant is disabled by default. Please configure API keys before enabling.',
     importConfigurationFailed: 'Failed to import assistant configuration',
     importConfigurationInvalidJson: 'Invalid JSON file. Please upload a valid configuration file.',
     executorEndpoint: 'Executor Endpoint',

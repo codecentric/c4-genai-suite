@@ -240,6 +240,7 @@ function load() {
       configurationsEmpty: translate('extensions.configurationsEmpty'),
       duplicateConfigurationFailed: translate('extensions.duplicateConfigurationFailed'),
       exportConfigurationFailed: translate('extensions.exportConfigurationFailed'),
+      exportConfigurationSuccess: translate('extensions.exportConfigurationSuccess'),
       importConfiguration: translate('extensions.importConfiguration'),
       importConfigurationSuccess: translate('extensions.importConfigurationSuccess'),
       importConfigurationFailed: translate('extensions.importConfigurationFailed'),

@@ -214,8 +214,11 @@ export const de: typeof en = {
     configurationsEmpty: 'Noch kein Assistent erstellt.',
     duplicateConfigurationFailed: 'Duplizieren des Assistenten fehlgeschlagen',
     exportConfigurationFailed: 'Exportieren der Assistentenkonfiguration fehlgeschlagen',
+    exportConfigurationSuccess:
+      'Assistentenkonfiguration erfolgreich exportiert. API-Schlüssel sind maskiert und müssen nach dem Import neu konfiguriert werden.',
     importConfiguration: 'Assistentenkonfiguration importieren',
-    importConfigurationSuccess: 'Assistentenkonfiguration erfolgreich importiert',
+    importConfigurationSuccess:
+      'Assistentenkonfiguration erfolgreich importiert. Der Assistent ist standardmäßig deaktiviert. Bitte konfigurieren Sie die API-Schlüssel vor der Aktivierung.',
     importConfigurationFailed: 'Importieren der Assistentenkonfiguration fehlgeschlagen',
     importConfigurationInvalidJson: 'Ungültige JSON-Datei. Bitte laden Sie eine gültige Konfigurationsdatei hoch.',
     executorEndpoint: 'Executor-Endpoint',

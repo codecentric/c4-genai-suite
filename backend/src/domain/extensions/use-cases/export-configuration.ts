@@ -20,6 +20,7 @@ export interface ExportedExtension {
 export interface ExportedConfiguration {
   version: string;
   exportedAt: string;
+  originId: number;
   name: string;
   description: string;
   enabled: boolean;
@@ -73,9 +74,10 @@ export class ExportConfigurationHandler implements IQueryHandler<ExportConfigura
     return {
       version: process.env.VERSION || 'unknown',
       exportedAt: new Date().toISOString(),
+      originId: configuration.id,
       name: configuration.name,
       description: configuration.description,
-      enabled: configuration.enabled,
+      enabled: false,
       agentName: configuration.agentName,
       chatFooter: configuration.chatFooter,
       chatSuggestions: configuration.chatSuggestions,

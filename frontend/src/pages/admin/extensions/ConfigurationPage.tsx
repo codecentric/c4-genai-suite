@@ -67,6 +67,7 @@ export function ConfigurationPage() {
     },
     onSuccess: (configuration) => {
       setConfiguration(configuration);
+      setToUpdate(configuration);
 
       toast.success(texts.extensions.importConfigurationSuccess);
       navigate(`/admin/assistants/${configuration.id}`);

@@ -3,15 +3,15 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { ConfigurationEntity, ConfigurationStatus, ExtensionEntity, UserGroupEntity, UserGroupRepository } from '../../database';
-import { ConfigurationModel } from '../interfaces';
+import { ConfigurationModel, ExtensionObjectArgument } from '../interfaces';
 import { ExplorerService } from '../services';
-import { buildConfiguration, unmaskExtensionValues, validateConfiguration } from './utils';
+import { buildConfiguration, validateConfiguration } from './utils';
 
 export interface ImportedExtension {
   name: string;
   enabled: boolean;
-  values: Record<string, any>;
-  configurableArguments?: any;
+  values: Record<string, unknown>;
+  configurableArguments?: ExtensionObjectArgument;
 }
 
 export interface ImportConfigurationData {
@@ -139,9 +139,7 @@ export class ImportConfigurationHandler implements ICommandHandler<ImportConfigu
       const extensionEntity = new ExtensionEntity();
       extensionEntity.name = ext.name;
       extensionEntity.enabled = ext.enabled;
-      // Unmask extension values to remove masked passwords before saving
-      extensionEntity.values = unmaskExtensionValues({ ...ext.values });
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      extensionEntity.values = { ...ext.values };
       extensionEntity.configurableArguments = ext.configurableArguments;
       extensionEntity.configuration = savedConfiguration;
       extensionEntity.externalId = `${savedConfiguration.id}-${ext.name}`;

@@ -46,6 +46,12 @@ export interface ExportedConfigurationDto {
      */
     exportedAt?: string;
     /**
+     * The ID of the original configuration from which this was exported.
+     * @type {number}
+     * @memberof ExportedConfigurationDto
+     */
+    originId?: number;
+    /**
      * The name of the configuration.
      * @type {string}
      * @memberof ExportedConfigurationDto
@@ -131,6 +137,7 @@ export function ExportedConfigurationDtoFromJSONTyped(json: any, ignoreDiscrimin
         
         'version': json['version'] == null ? undefined : json['version'],
         'exportedAt': json['exportedAt'] == null ? undefined : json['exportedAt'],
+        'originId': json['originId'] == null ? undefined : json['originId'],
         'name': json['name'],
         'description': json['description'],
         'enabled': json['enabled'],
@@ -149,9 +156,9 @@ export function ExportedConfigurationDtoToJSON(value?: ExportedConfigurationDto 
         return value;
     }
     return {
-        
         'version': value['version'],
         'exportedAt': value['exportedAt'],
+        'originId': value['originId'],
         'name': value['name'],
         'description': value['description'],
         'enabled': value['enabled'],
