@@ -138,7 +138,11 @@ export function ConfigurationPage() {
               <Icon icon="arrow-up" size={16} />
             </button>
 
-            <button className="btn btn-square btn-sm text-sm" onClick={() => setToCreate(true)}>
+            <button
+              className="btn btn-square btn-sm text-sm"
+              onClick={() => setToCreate(true)}
+              aria-label={texts.extensions.createConfiguration}
+            >
               <Icon icon="plus" size={16} />
             </button>
 

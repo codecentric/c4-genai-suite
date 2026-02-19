@@ -62,11 +62,7 @@ test('Documentation on Admin page', async ({ page }) => {
 
   await test.step('should still show documentation when an Assistant is selected', async () => {
     // create Fake Assistant for test
-    await page
-      .locator('div')
-      .filter({ hasText: /^Assistants$/ })
-      .getByRole('button')
-      .click();
+    await page.getByRole('button', { name: 'Create assistant' }).click();
     await page.getByRole('textbox', { name: 'Name' }).fill('Fake Assistant');
     await page.getByRole('textbox', { name: 'Description' }).fill('Test');
     await page.getByRole('button', { name: 'Save' }).click();

@@ -34,11 +34,7 @@ test('When using suggestions c4', async ({ page }) => {
 
   await test.step('will create empty assistant for global suggestions check', async () => {
     await page.getByRole('link', { name: 'Assistants' }).click();
-    await page
-      .locator('*')
-      .filter({ hasText: /^Assistants$/ })
-      .getByRole('button')
-      .click();
+    await page.getByRole('button', { name: 'Create assistant' }).click();
     await page.getByLabel(/^Name/).fill(ASSISTANT_NAME_GLOBAL);
     await page.getByLabel(/^Description/).fill('without llm');
     await page.getByRole('button', { name: 'Save' }).click();
@@ -46,11 +42,7 @@ test('When using suggestions c4', async ({ page }) => {
 
   await test.step('will open create dialog for new assistant', async () => {
     await page.getByRole('link', { name: 'Assistants' }).click();
-    await page
-      .locator('*')
-      .filter({ hasText: /^Assistants$/ })
-      .getByRole('button')
-      .click();
+    await page.getByRole('button', { name: 'Create assistant' }).click();
     await page.getByLabel(/^Name/).fill(ASSISTANT_NAME);
     await page.getByLabel(/^Description/).fill('without llm');
   });
