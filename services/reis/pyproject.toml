@@ -52,7 +52,7 @@ dev = [
     "pytest-github-report==0.0.1",
     "pytest-error-for-skips==2.0.2",
     "faker==40.4.0",
-    "responses==0.25.8",
+    "responses==0.26.0",
 ]
 
 [project.scripts]
