@@ -1035,7 +1035,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ConfigurationDto"
+                  "$ref": "#/components/schemas/ImportConfigurationResponseDto"
                 }
               }
             }
@@ -3992,6 +3992,27 @@
           }
         },
         "required": ["data"]
+      },
+      "ImportConfigurationResponseDto": {
+        "type": "object",
+        "properties": {
+          "configuration": {
+            "description": "The imported configuration.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ConfigurationDto"
+              }
+            ]
+          },
+          "warnings": {
+            "description": "Warnings that occurred during import.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": ["configuration", "warnings"]
       },
       "TestExtensionDto": {
         "type": "object",

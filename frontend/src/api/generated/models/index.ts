@@ -40,6 +40,7 @@ export * from './FileTypesDto';
 export * from './FilesDto';
 export * from './ImageUrlDto';
 export * from './ImportConfigurationDto';
+export * from './ImportConfigurationResponseDto';
 export * from './LoginDto';
 export * from './MessageContentDto';
 export * from './MessageContentImageUrlDto';

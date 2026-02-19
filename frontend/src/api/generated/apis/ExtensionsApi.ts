@@ -25,6 +25,7 @@ import type {
   ExtensionDto,
   ExtensionsDto,
   ImportConfigurationDto,
+  ImportConfigurationResponseDto,
   TestExtensionDto,
   UpdateExtensionDto,
   UpsertConfigurationDto,
@@ -48,6 +49,8 @@ import {
     ExtensionsDtoToJSON,
     ImportConfigurationDtoFromJSON,
     ImportConfigurationDtoToJSON,
+    ImportConfigurationResponseDtoFromJSON,
+    ImportConfigurationResponseDtoToJSON,
     TestExtensionDtoFromJSON,
     TestExtensionDtoToJSON,
     UpdateExtensionDtoFromJSON,
@@ -464,7 +467,7 @@ export class ExtensionsApi extends runtime.BaseAPI {
      * Import a configuration from JSON data.
      * 
      */
-    async importConfigurationRaw(requestParameters: ImportConfigurationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ConfigurationDto>> {
+    async importConfigurationRaw(requestParameters: ImportConfigurationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ImportConfigurationResponseDto>> {
         if (requestParameters['importConfigurationDto'] == null) {
             throw new runtime.RequiredError(
                 'importConfigurationDto',
@@ -486,14 +489,14 @@ export class ExtensionsApi extends runtime.BaseAPI {
             body: ImportConfigurationDtoToJSON(requestParameters['importConfigurationDto']),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => ConfigurationDtoFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => ImportConfigurationResponseDtoFromJSON(jsonValue));
     }
 
     /**
      * Import a configuration from JSON data.
      * 
      */
-    async importConfiguration(importConfigurationDto: ImportConfigurationDto, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ConfigurationDto> {
+    async importConfiguration(importConfigurationDto: ImportConfigurationDto, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ImportConfigurationResponseDto> {
         const response = await this.importConfigurationRaw({ importConfigurationDto: importConfigurationDto }, initOverrides);
         return await response.value();
     }

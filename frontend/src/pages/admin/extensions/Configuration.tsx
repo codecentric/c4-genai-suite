@@ -4,7 +4,7 @@ import { memo } from 'react';
 import { toast } from 'react-toastify';
 import { ConfigurationDto, useApi } from 'src/api';
 import { ConfirmDialog, TransientNavLink } from 'src/components';
-import { cn, downloadJson, sanitizeFilename } from 'src/lib';
+import { buildError, cn, downloadJson, sanitizeFilename } from 'src/lib';
 import { texts } from 'src/texts';
 
 interface ConfigurationProps {
@@ -29,8 +29,8 @@ export const Configuration = memo((props: ConfigurationProps) => {
       const exportedData = await api.extensions.exportConfiguration(configuration.id);
       downloadJson(exportedData, `${sanitizeFilename(configuration.name)}_config.json`);
       toast.success(texts.extensions.exportConfigurationSuccess);
-    } catch (_error) {
-      toast.error(texts.extensions.exportConfigurationFailed);
+    } catch (error) {
+      toast.error(await buildError(texts.extensions.exportConfigurationFailed, error as Error));
     }
   };
 

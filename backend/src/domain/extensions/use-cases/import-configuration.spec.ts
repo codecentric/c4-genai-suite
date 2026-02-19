@@ -1,5 +1,6 @@
 import { BadRequestException } from '@nestjs/common';
 import { DataSource } from 'typeorm';
+import { I18nService } from 'src/localization/i18n.service';
 import { ConfigurationEntity, ConfigurationStatus, ExtensionEntity } from '../../database';
 import { ChatSuggestion } from '../../shared';
 import { Extension, ExtensionObjectArgument, ExtensionStringArgument } from '../interfaces';
@@ -31,11 +32,27 @@ describe(ImportConfiguration.name, () => {
   let dataSource: MockDataSource;
   let queryRunner: MockQueryRunner;
   let explorer: ExplorerService;
+  let i18n: I18nService;
+  let i18nTranslate: jest.Mock;
 
   beforeEach(() => {
     explorer = {
       getExtension: jest.fn(),
     } as unknown as ExplorerService;
+
+    i18nTranslate = jest.fn((key: string, args?: Record<string, string>) => {
+      let result = key;
+      if (args) {
+        Object.entries(args).forEach(([k, v]) => {
+          result = result.replace(`{${k}}`, v);
+        });
+      }
+      return result;
+    });
+
+    i18n = {
+      t: i18nTranslate,
+    } as unknown as I18nService;
 
     queryRunner = {
       connect: jest.fn().mockResolvedValue(undefined),
@@ -56,7 +73,7 @@ describe(ImportConfiguration.name, () => {
       },
     };
 
-    handler = new ImportConfigurationHandler(dataSource as unknown as DataSource, explorer);
+    handler = new ImportConfigurationHandler(dataSource as unknown as DataSource, explorer, i18n);
   });
 
   it('should throw BadRequestException when extension is not available', async () => {
@@ -305,6 +322,7 @@ describe(ImportConfiguration.name, () => {
     expect(result.configuration).toBeDefined();
     expect(result.configuration.name).toBe('Imported Config');
     expect(result.configuration.enabled).toBe(true);
+    expect(result.warnings).toEqual([]);
     expect(queryRunner.manager.save).toHaveBeenCalled();
     expect(queryRunner.commitTransaction).toHaveBeenCalled();
   });
@@ -353,6 +371,7 @@ describe(ImportConfiguration.name, () => {
     const result = await handler.execute(new ImportConfiguration(importData));
 
     expect(result.configuration.enabled).toBe(false);
+    expect(result.warnings).toEqual([]);
     const mockCalls = queryRunner.manager.save.mock.calls as [[typeof ConfigurationEntity, ConfigurationEntity]];
     const savedEntity = mockCalls[0][1];
     expect(savedEntity.status).toBe(ConfigurationStatus.DISABLED);
@@ -414,9 +433,10 @@ describe(ImportConfiguration.name, () => {
       ],
     };
 
-    await handler.execute(new ImportConfiguration(importData));
+    const result = await handler.execute(new ImportConfiguration(importData));
 
     expect(savedExtensions[0].externalId).toBe('5-test-ext');
+    expect(result.warnings).toEqual([]);
   });
 
   it('should handle configurable arguments correctly', async () => {
@@ -495,9 +515,10 @@ describe(ImportConfiguration.name, () => {
       ],
     };
 
-    await handler.execute(new ImportConfiguration(importData));
+    const result = await handler.execute(new ImportConfiguration(importData));
 
     expect(savedExtensions[0].configurableArguments).toEqual(temperatureArg);
+    expect(result.warnings).toEqual([]);
   });
 
   it('should warn when importing configuration from different version', async () => {
@@ -545,11 +566,14 @@ describe(ImportConfiguration.name, () => {
       extensions: [],
     };
 
-    const loggerWarnSpy = jest.spyOn(handler['logger'], 'warn');
+    const result = await handler.execute(new ImportConfiguration(importData));
 
-    await handler.execute(new ImportConfiguration(importData));
-
-    expect(loggerWarnSpy).toHaveBeenCalledWith(expect.stringContaining('from version 1.0.0, but current version is 2.0.0'));
+    expect(result.warnings).toHaveLength(1);
+    expect(i18nTranslate).toHaveBeenCalledWith('texts.configuration.warningVersionMismatch', {
+      name: 'Config from different version',
+      version: '1.0.0',
+      currentVersion: '2.0.0',
+    });
 
     // Clean up
     delete process.env.VERSION;
@@ -600,11 +624,9 @@ describe(ImportConfiguration.name, () => {
       extensions: [],
     };
 
-    const loggerWarnSpy = jest.spyOn(handler['logger'], 'warn');
+    const result = await handler.execute(new ImportConfiguration(importData));
 
-    await handler.execute(new ImportConfiguration(importData));
-
-    expect(loggerWarnSpy).not.toHaveBeenCalled();
+    expect(result.warnings).toEqual([]);
 
     // Clean up
     delete process.env.VERSION;
@@ -695,7 +717,7 @@ describe(ImportConfiguration.name, () => {
       ],
     };
 
-    await handler.execute(new ImportConfiguration(importData));
+    const result = await handler.execute(new ImportConfiguration(importData));
 
     // All values are preserved as-is during import - user must manually update secrets
     expect(savedExtensions[0].values.apiKey).toBe('********************');
@@ -703,6 +725,7 @@ describe(ImportConfiguration.name, () => {
     const nestedValues = savedExtensions[0].values.nested as Record<string, unknown>;
     expect(nestedValues.secretKey).toBe('********************');
     expect(nestedValues.publicValue).toBe('public');
+    expect(result.warnings).toEqual([]);
   });
 
   it('should include exportedAt timestamp in import data', async () => {
@@ -754,6 +777,13 @@ describe(ImportConfiguration.name, () => {
 
     expect(result).toBeDefined();
     expect(result.configuration.name).toBe('Config with timestamp');
+    // Version '1.0.0' differs from default 'unknown', so a warning is expected
+    expect(result.warnings).toHaveLength(1);
+    expect(i18nTranslate).toHaveBeenCalledWith('texts.configuration.warningVersionMismatch', {
+      name: 'Config with timestamp',
+      version: '1.0.0',
+      currentVersion: 'unknown',
+    });
   });
 
   it('should throw BadRequestException when none of the specified user groups exist', async () => {
@@ -836,6 +866,7 @@ describe(ImportConfiguration.name, () => {
 
     expect(result).toBeDefined();
     expect(result.configuration.name).toBe('Config with valid groups');
+    expect(result.warnings).toEqual([]);
     expect(queryRunner.manager.save).toHaveBeenCalledWith(
       ConfigurationEntity,
       expect.objectContaining({
@@ -881,8 +912,6 @@ describe(ImportConfiguration.name, () => {
       getMiddlewares: () => Promise.resolve([]),
     } as Extension);
 
-    const loggerWarnSpy = jest.spyOn(handler['logger'], 'warn');
-
     const importData: PortableConfiguration = {
       name: 'Config with partial groups',
       description: 'Test',
@@ -894,7 +923,11 @@ describe(ImportConfiguration.name, () => {
     const result = await handler.execute(new ImportConfiguration(importData));
 
     expect(result).toBeDefined();
-    expect(loggerWarnSpy).toHaveBeenCalledWith(expect.stringContaining('Missing: missing-group'));
+    expect(result.warnings).toHaveLength(1);
+    expect(i18nTranslate).toHaveBeenCalledWith('texts.configuration.warningMissingUserGroups', {
+      name: 'Config with partial groups',
+      missingIds: 'missing-group',
+    });
     expect(queryRunner.manager.save).toHaveBeenCalledWith(
       ConfigurationEntity,
       expect.objectContaining({
@@ -946,6 +979,7 @@ describe(ImportConfiguration.name, () => {
     const result = await handler.execute(new ImportConfiguration(importData));
 
     expect(result).toBeDefined();
+    expect(result.warnings).toEqual([]);
     expect(queryRunner.manager.findBy).not.toHaveBeenCalled();
     expect(queryRunner.manager.save).toHaveBeenCalledWith(
       ConfigurationEntity,

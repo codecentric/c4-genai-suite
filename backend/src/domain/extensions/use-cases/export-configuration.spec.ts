@@ -140,6 +140,96 @@ describe(ExportConfiguration.name, () => {
     expect(result.extensions).toHaveLength(0);
   });
 
+  it('should export configuration with masked nested password values', async () => {
+    const extensions = [
+      {
+        id: 1,
+        name: 'test-extension',
+        enabled: true,
+        values: {
+          apiKey: 'secret-key-123',
+          endpoint: 'https://api.example.com',
+          nested: {
+            secretKey: 'nested-secret-456',
+            publicValue: 'public',
+          },
+        },
+        configurableArguments: undefined,
+      },
+    ] as unknown as ExtensionEntity[];
+
+    const configurationEntity: Partial<ConfigurationEntity> = {
+      id: 4,
+      name: 'Nested Password Config',
+      description: 'Config with nested password fields',
+      status: ConfigurationStatus.ENABLED,
+      agentName: undefined,
+      chatFooter: undefined,
+      chatSuggestions: undefined,
+      executorEndpoint: undefined,
+      executorHeaders: undefined,
+      userGroupIds: [],
+      extensions,
+    };
+
+    jest.spyOn(repository, 'findOne').mockResolvedValue(configurationEntity);
+    jest.spyOn(explorer, 'getExtension').mockImplementation((name) => {
+      return {
+        spec: {
+          name,
+          arguments: {
+            apiKey: {
+              type: 'string',
+              format: 'password',
+              required: true,
+            } as ExtensionStringArgument,
+            endpoint: {
+              type: 'string',
+              required: true,
+            } as ExtensionStringArgument,
+            nested: {
+              type: 'object',
+              title: 'Nested Object',
+              properties: {
+                secretKey: {
+                  type: 'string',
+                  format: 'password',
+                  required: false,
+                } as ExtensionStringArgument,
+                publicValue: {
+                  type: 'string',
+                  required: true,
+                } as ExtensionStringArgument,
+              },
+              required: false,
+            } as ExtensionObjectArgument,
+          },
+          title: 'Test Extension',
+          description: 'Test',
+          type: 'tool',
+        },
+        getMiddlewares: () => Promise.resolve([]),
+      } as Extension;
+    });
+
+    const result = await handler.execute(new ExportConfiguration(4));
+
+    expect(result).toBeDefined();
+    expect(result.originId).toBe(4);
+    expect(result.extensions).toHaveLength(1);
+
+    const ext = result.extensions[0];
+    // Top-level password field should be masked
+    expect(ext.values.apiKey).toBe('********************');
+    // Top-level non-password field should not be masked
+    expect(ext.values.endpoint).toBe('https://api.example.com');
+    // Nested password field should be masked
+    const nestedValues = ext.values.nested as Record<string, unknown>;
+    expect(nestedValues.secretKey).toBe('********************');
+    // Nested non-password field should not be masked
+    expect(nestedValues.publicValue).toBe('public');
+  });
+
   it('should export configuration with multiple extensions', async () => {
     const configurableArguments: ExtensionObjectArgument = {
       type: 'object',

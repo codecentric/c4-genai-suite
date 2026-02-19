@@ -1030,3 +1030,19 @@ export class ImportConfigurationDto {
   @Type(() => ExportedConfigurationDto)
   data!: ExportedConfigurationDto;
 }
+
+export class ImportConfigurationResponseDto {
+  @ApiProperty({
+    description: 'The imported configuration.',
+    required: true,
+    type: ConfigurationDto,
+  })
+  configuration!: ConfigurationDto;
+
+  @ApiProperty({
+    description: 'Warnings that occurred during import.',
+    required: true,
+    type: [String],
+  })
+  warnings!: string[];
+}

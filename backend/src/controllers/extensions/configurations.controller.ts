@@ -47,6 +47,7 @@ import {
   ExtensionDto,
   ExtensionsDto,
   ImportConfigurationDto,
+  ImportConfigurationResponseDto,
   UpdateExtensionDto,
   UpsertConfigurationDto,
 } from './dtos';
@@ -321,12 +322,15 @@ export class ConfigurationsController {
 
   @Post('/import')
   @ApiOperation({ operationId: 'importConfiguration', description: 'Import a configuration from JSON data.' })
-  @ApiOkResponse({ type: ConfigurationDto })
+  @ApiOkResponse({ type: ImportConfigurationResponseDto })
   @Role(BUILTIN_USER_GROUP_ADMIN)
   @UseGuards(RoleGuard)
-  async importConfiguration(@Body() body: ImportConfigurationDto) {
+  async importConfiguration(@Body() body: ImportConfigurationDto): Promise<ImportConfigurationResponseDto> {
     const command = new ImportConfiguration(body.data);
     const result: ImportConfigurationResponse = await this.commandBus.execute(command);
-    return ConfigurationDto.fromDomain(result.configuration);
+    const response = new ImportConfigurationResponseDto();
+    response.configuration = ConfigurationDto.fromDomain(result.configuration);
+    response.warnings = result.warnings;
+    return response;
   }
 }

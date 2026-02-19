@@ -48,6 +48,7 @@ models/FileTypesDto.ts
 models/FilesDto.ts
 models/ImageUrlDto.ts
 models/ImportConfigurationDto.ts
+models/ImportConfigurationResponseDto.ts
 models/LoginDto.ts
 models/MessageContentDto.ts
 models/MessageContentImageUrlDto.ts

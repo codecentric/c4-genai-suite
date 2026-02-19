@@ -65,11 +65,15 @@ export function ConfigurationPage() {
     mutationFn: (data: ExportedConfigurationDto) => {
       return api.extensions.importConfiguration({ data });
     },
-    onSuccess: (configuration) => {
+    onSuccess: (result) => {
+      const configuration = result._configuration;
       setConfiguration(configuration);
       setToUpdate(configuration);
 
       toast.success(texts.extensions.importConfigurationSuccess);
+      for (const warning of result.warnings) {
+        toast.warn(warning);
+      }
       navigate(`/admin/assistants/${configuration.id}`);
     },
     onError: async (error) => {
@@ -129,6 +133,7 @@ export function ConfigurationPage() {
               className="btn btn-square btn-sm text-sm"
               onClick={handleImportClick}
               title={texts.extensions.importConfiguration}
+              aria-label={texts.extensions.importConfiguration}
             >
               <Icon icon="arrow-up" size={16} />
             </button>

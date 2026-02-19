@@ -1,6 +1,7 @@
 import { BadRequestException, Logger } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { DataSource, In, QueryRunner } from 'typeorm';
+import { I18nService } from 'src/localization/i18n.service';
 import { ConfigurationEntity, ConfigurationStatus, ExtensionEntity, UserGroupEntity } from '../../database';
 import { ConfigurationModel } from '../interfaces';
 import { ExplorerService } from '../services';
@@ -13,6 +14,7 @@ export class ImportConfiguration {
 
 export interface ImportConfigurationResponse {
   configuration: ConfigurationModel;
+  warnings: string[];
 }
 
 @CommandHandler(ImportConfiguration)
@@ -22,18 +24,20 @@ export class ImportConfigurationHandler implements ICommandHandler<ImportConfigu
   constructor(
     private dataSource: DataSource,
     private readonly extensionExplorer: ExplorerService,
+    private readonly i18n: I18nService,
   ) {}
 
   async execute(command: ImportConfiguration): Promise<ImportConfigurationResponse> {
     const { data } = command;
-    this.check(data);
+    const warnings: string[] = [];
+    this.check(data, warnings);
 
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
     try {
-      const userGroups = await this.validateAndResolveUserGroups(data, queryRunner);
+      const userGroups = await this.validateAndResolveUserGroups(data, queryRunner, warnings);
       const configurationEntity = this.createConfigurationEntity(data, userGroups);
       const savedConfiguration = await queryRunner.manager.save(ConfigurationEntity, configurationEntity);
 
@@ -56,7 +60,7 @@ export class ImportConfigurationHandler implements ICommandHandler<ImportConfigu
         `Successfully imported configuration "${data.name}" (ID: ${savedConfiguration.id}) with ${extensionEntities.length} extension(s)`,
       );
 
-      return { configuration };
+      return { configuration, warnings };
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;
@@ -68,10 +72,11 @@ export class ImportConfigurationHandler implements ICommandHandler<ImportConfigu
   /**
    * Perform basic checks on the imported data before processing
    * @param data
+   * @param warnings
    * @private
    */
-  private check(data: PortableConfiguration) {
-    this.checkVersion(data);
+  private check(data: PortableConfiguration, warnings: string[]) {
+    this.checkVersion(data, warnings);
     this.validateExtensionsExists(data.extensions);
     this.validateExtensions(data.extensions);
   }
@@ -92,7 +97,7 @@ export class ImportConfigurationHandler implements ICommandHandler<ImportConfigu
     extensionEntity.enabled = ext.enabled;
     extensionEntity.values = { ...ext.values };
     extensionEntity.configurableArguments = ext.configurableArguments;
-    extensionEntity.configuration = savedConfiguration;
+    extensionEntity.configurationId = savedConfiguration.id;
     extensionEntity.externalId = `${savedConfiguration.id}-${ext.name}`;
     return extensionEntity;
   }
@@ -111,7 +116,7 @@ export class ImportConfigurationHandler implements ICommandHandler<ImportConfigu
     return configurationEntity;
   }
 
-  private async validateAndResolveUserGroups(data: PortableConfiguration, queryRunner: QueryRunner) {
+  private async validateAndResolveUserGroups(data: PortableConfiguration, queryRunner: QueryRunner, warnings: string[]) {
     if (!data.userGroupIds?.length) return [];
     const userGroups = await queryRunner.manager.findBy(UserGroupEntity, { id: In(data.userGroupIds) });
     if (userGroups.length === 0) {
@@ -122,6 +127,9 @@ export class ImportConfigurationHandler implements ICommandHandler<ImportConfigu
       const missingIds = data.userGroupIds.filter((id) => !foundIds.includes(id));
       this.logger.warn(
         `Some user groups not found during import of "${data.name}". Missing: ${missingIds.join(', ')}. Proceeding with available groups.`,
+      );
+      warnings.push(
+        this.i18n.t('texts.configuration.warningMissingUserGroups', { name: data.name, missingIds: missingIds.join(', ') }),
       );
     }
 
@@ -169,13 +177,18 @@ export class ImportConfigurationHandler implements ICommandHandler<ImportConfigu
   /**
    * Check version and warn if different
    * @param data
+   * @param warnings
    * @private
    */
-  private checkVersion(data: PortableConfiguration) {
+  private checkVersion(data: PortableConfiguration, warnings: string[]) {
     const currentVersion = process.env.VERSION || 'unknown';
     if (data.version && data.version !== currentVersion) {
-      this.logger.warn(
-        `Importing configuration "${data.name}" from version ${data.version}, but current version is ${currentVersion}. Proceeding with import, but compatibility issues may occur.`,
+      warnings.push(
+        this.i18n.t('texts.configuration.warningVersionMismatch', {
+          name: data.name,
+          version: data.version,
+          currentVersion,
+        }),
       );
     }
   }

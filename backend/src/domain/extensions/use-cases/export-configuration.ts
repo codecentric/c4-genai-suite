@@ -61,7 +61,6 @@ export class ExportConfigurationHandler implements IQueryHandler<ExportConfigura
       throw new NotFoundException(`Configuration with id ${query.id} not found`);
     }
 
-    // Build configuration with extensions
     const configuration = await buildConfiguration(configurationEntity, this.extensionExplorer, true, false);
 
     // Prepare export data with masked sensitive values
