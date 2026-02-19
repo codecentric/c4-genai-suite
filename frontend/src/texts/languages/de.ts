@@ -23,6 +23,8 @@ export const de: typeof en = {
     dropZoneDrop: 'Dateien ablegen.',
     edit: 'Bearbeiten',
     duplicate: 'Duplizieren',
+    export: 'Exportieren',
+    import: 'Importieren',
     email: 'E-Mail',
     enabled: 'Aktiviert',
     endpoint: 'Endpunkt',
@@ -211,6 +213,14 @@ export const de: typeof en = {
     configurations: 'Assistenten',
     configurationsEmpty: 'Noch kein Assistent erstellt.',
     duplicateConfigurationFailed: 'Duplizieren des Assistenten fehlgeschlagen',
+    exportConfigurationFailed: 'Exportieren der Assistentenkonfiguration fehlgeschlagen',
+    exportConfigurationSuccess:
+      'Assistentenkonfiguration erfolgreich exportiert. API-Schlüssel sind maskiert und müssen nach dem Import neu konfiguriert werden.',
+    importConfiguration: 'Assistentenkonfiguration importieren',
+    importConfigurationSuccess:
+      'Assistentenkonfiguration erfolgreich importiert. Der Assistent ist standardmäßig deaktiviert. Bitte konfigurieren Sie die API-Schlüssel vor der Aktivierung.',
+    importConfigurationFailed: 'Importieren der Assistentenkonfiguration fehlgeschlagen',
+    importConfigurationInvalidJson: 'Ungültige JSON-Datei. Bitte laden Sie eine gültige Konfigurationsdatei hoch.',
     executorEndpoint: 'Executor-Endpoint',
     executorEndpointHints:
       'Der Executor ist ein spezieller Dienst, der den gesamten Chat-Ablauf steuert und nur die Antwort bereitstellt. Für spezielle Fälle, in denen vollständige Kontrolle über den Chat benötigt wird.',

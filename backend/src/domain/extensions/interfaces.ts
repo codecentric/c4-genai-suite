@@ -228,8 +228,7 @@ export class ConfiguredExtension<T extends ExtensionConfiguration = ExtensionCon
     extensionUserValues
       .filter((values) => values != null)
       .forEach((values) => {
-        Object.entries(values).forEach(([key, value]) => {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        Object.entries(values).forEach(([key, value]: [string, unknown]) => {
           merged[key] = value;
         });
       });

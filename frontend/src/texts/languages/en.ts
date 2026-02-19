@@ -21,6 +21,8 @@ export const en = {
     dropZoneDrop: 'Drop files.',
     edit: 'Edit',
     duplicate: 'Duplicate',
+    export: 'Export',
+    import: 'Import',
     email: 'Email',
     enabled: 'Enabled',
     endpoint: 'Endpoint',
@@ -207,6 +209,14 @@ export const en = {
     configurations: 'Assistants',
     configurationsEmpty: 'No assistant created yet.',
     duplicateConfigurationFailed: 'Failed to duplicate assistant',
+    exportConfigurationFailed: 'Failed to export assistant configuration',
+    exportConfigurationSuccess:
+      'Assistant configuration exported successfully. API keys are masked and need to be reconfigured after importing.',
+    importConfiguration: 'Import Assistant Configuration',
+    importConfigurationSuccess:
+      'Assistant configuration imported successfully. The assistant is disabled by default. Please configure API keys before enabling.',
+    importConfigurationFailed: 'Failed to import assistant configuration',
+    importConfigurationInvalidJson: 'Invalid JSON file. Please upload a valid configuration file.',
     executorEndpoint: 'Executor Endpoint',
     executorEndpointHints:
       'The executor is a special service that handles the complete chat flow and only provides the answer. For special cases, where full control over the chat is needed.',

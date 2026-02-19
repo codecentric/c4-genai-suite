@@ -867,3 +867,182 @@ export class BucketAvailabilityDto {
     return result;
   }
 }
+
+export class ExportedExtensionDto {
+  @ApiProperty({
+    description: 'The name of the extension.',
+    required: true,
+  })
+  @IsDefined()
+  @IsString()
+  @IsNotEmpty()
+  name!: string;
+
+  @ApiProperty({
+    description: 'Indicates whether the extension is enabled.',
+    required: true,
+  })
+  @IsDefined()
+  @IsBoolean()
+  enabled!: boolean;
+
+  @ApiProperty({
+    description: 'The configuration values.',
+    required: true,
+    additionalProperties: true,
+  })
+  @IsDefined()
+  @IsObject()
+  values!: Record<string, any>;
+
+  @ApiProperty({
+    description: 'Configurable arguments.',
+    required: false,
+    type: ExtensionArgumentObjectSpecDto,
+  })
+  @IsOptional()
+  configurableArguments?: ExtensionArgumentObjectSpecDto;
+}
+
+export class ExportedConfigurationDto {
+  @ApiProperty({
+    description: 'The version of the application that exported this configuration.',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  version?: string;
+
+  @ApiProperty({
+    description: 'The timestamp when this configuration was exported.',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  exportedAt?: string;
+
+  @ApiProperty({
+    description: 'The ID of the original configuration from which this was exported.',
+    required: false,
+  })
+  @IsOptional()
+  @IsNumber()
+  originId?: number;
+
+  @ApiProperty({
+    description: 'The name of the configuration.',
+    required: true,
+  })
+  @IsDefined()
+  @IsString()
+  @IsNotEmpty()
+  name!: string;
+
+  @ApiProperty({
+    description: 'The description of the configuration.',
+    required: true,
+  })
+  @IsDefined()
+  @IsString()
+  description!: string;
+
+  @ApiProperty({
+    description: 'Indicates whether the configuration is enabled.',
+    required: true,
+  })
+  @IsDefined()
+  @IsBoolean()
+  enabled!: boolean;
+
+  @ApiProperty({
+    description: 'The name of the agent.',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  agentName?: string;
+
+  @ApiProperty({
+    description: 'The footer text to be shown below the chat.',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  chatFooter?: string;
+
+  @ApiProperty({
+    description: 'The suggestions to be shown for the chat.',
+    required: false,
+    type: [ChatSuggestionDto],
+  })
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => ChatSuggestionDto)
+  chatSuggestions?: ChatSuggestionDto[];
+
+  @ApiProperty({
+    description: 'The optional executor endpoint.',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  executorEndpoint?: string;
+
+  @ApiProperty({
+    description: 'The optional executor headers.',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  executorHeaders?: string;
+
+  @ApiProperty({
+    description: 'The allowed user groups.',
+    required: false,
+    type: [String],
+  })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  userGroupIds?: string[];
+
+  @ApiProperty({
+    description: 'The extensions configurations.',
+    required: true,
+    type: [ExportedExtensionDto],
+  })
+  @IsDefined()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => ExportedExtensionDto)
+  extensions!: ExportedExtensionDto[];
+}
+
+export class ImportConfigurationDto {
+  @ApiProperty({
+    description: 'The configuration data to import.',
+    required: true,
+    type: ExportedConfigurationDto,
+  })
+  @IsDefined()
+  @ValidateNested()
+  @Type(() => ExportedConfigurationDto)
+  data!: ExportedConfigurationDto;
+}
+
+export class ImportConfigurationResponseDto {
+  @ApiProperty({
+    description: 'The imported configuration.',
+    required: true,
+    type: ConfigurationDto,
+  })
+  configuration!: ConfigurationDto;
+
+  @ApiProperty({
+    description: 'Warnings that occurred during import.',
+    required: true,
+    type: [String],
+  })
+  warnings!: string[];
+}

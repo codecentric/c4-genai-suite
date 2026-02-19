@@ -314,6 +314,10 @@
     "errorMissingPrompt": "No prompt has been configured yet. Please configure an extension",
     "noSummary": "No Summary"
   },
+  "configuration": {
+    "warningMissingUserGroups": "Some user groups not found during import of \"{name}\". Missing: {missingIds}. Proceeding with available groups.",
+    "warningVersionMismatch": "Importing configuration \"{name}\" from version {version}, but current version is {currentVersion}. Proceeding with import, but compatibility issues may occur."
+  },
   "conversation": {
     "copySuffix": "COPY"
   }

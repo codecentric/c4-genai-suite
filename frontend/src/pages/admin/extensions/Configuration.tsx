@@ -1,9 +1,10 @@
 import { ActionIcon, Menu } from '@mantine/core';
-import { IconCopy, IconDots, IconEdit, IconTrash } from '@tabler/icons-react';
+import { IconCopy, IconDots, IconDownload, IconEdit, IconTrash } from '@tabler/icons-react';
 import { memo } from 'react';
-import { ConfigurationDto } from 'src/api';
+import { toast } from 'react-toastify';
+import { ConfigurationDto, useApi } from 'src/api';
 import { ConfirmDialog, TransientNavLink } from 'src/components';
-import { cn } from 'src/lib';
+import { buildError, cn, downloadJson, sanitizeFilename } from 'src/lib';
 import { texts } from 'src/texts';
 
 interface ConfigurationProps {
@@ -21,6 +22,17 @@ interface ConfigurationProps {
 
 export const Configuration = memo((props: ConfigurationProps) => {
   const { configuration, onDelete, onUpdate, onDuplicate } = props;
+  const api = useApi();
+
+  const handleExport = async () => {
+    try {
+      const exportedData = await api.extensions.exportConfiguration(configuration.id);
+      downloadJson(exportedData, `${sanitizeFilename(configuration.name)}_config.json`);
+      toast.success(texts.extensions.exportConfigurationSuccess);
+    } catch (error) {
+      toast.error(await buildError(texts.extensions.exportConfigurationFailed, error as Error));
+    }
+  };
 
   return (
     <li className="group flex items-center !px-0">
@@ -44,6 +56,9 @@ export const Configuration = memo((props: ConfigurationProps) => {
           </Menu.Item>
           <Menu.Item leftSection={<IconCopy size={14} />} onClick={() => onDuplicate(configuration)}>
             {texts.common.duplicate}
+          </Menu.Item>
+          <Menu.Item leftSection={<IconDownload size={14} />} onClick={handleExport}>
+            {texts.common.export}
           </Menu.Item>
           <ConfirmDialog
             title={texts.extensions.removeConfigurationConfirmTitle}
