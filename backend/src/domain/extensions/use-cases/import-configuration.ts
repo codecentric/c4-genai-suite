@@ -1,11 +1,10 @@
 import { BadRequestException, Logger } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
-import { ConfigurationEntity, ConfigurationStatus, ExtensionEntity, UserGroupEntity, UserGroupRepository } from '../../database';
+import { DataSource, In, QueryRunner } from 'typeorm';
+import { ConfigurationEntity, ConfigurationStatus, ExtensionEntity, UserGroupEntity } from '../../database';
 import { ConfigurationModel } from '../interfaces';
 import { ExplorerService } from '../services';
-import { PortableConfiguration } from './export-configuration';
+import { PortableConfiguration, PortableExtension } from './export-configuration';
 import { buildConfiguration, validateConfiguration } from './utils';
 
 export class ImportConfiguration {
@@ -21,83 +20,84 @@ export class ImportConfigurationHandler implements ICommandHandler<ImportConfigu
   private readonly logger = new Logger(ImportConfigurationHandler.name);
 
   constructor(
-    @InjectRepository(ConfigurationEntity)
-    private readonly repository: Repository<ConfigurationEntity>,
-    @InjectRepository(ExtensionEntity)
-    private readonly extensionRepository: Repository<ExtensionEntity>,
-    @InjectRepository(UserGroupEntity)
-    private readonly userGroupRepository: UserGroupRepository,
+    private dataSource: DataSource,
     private readonly extensionExplorer: ExplorerService,
   ) {}
 
   async execute(command: ImportConfiguration): Promise<ImportConfigurationResponse> {
     const { data } = command;
+    this.check(data);
 
-    // Check version and warn if different
-    const currentVersion = process.env.VERSION || 'unknown';
-    if (data.version && data.version !== currentVersion) {
-      this.logger.warn(
-        `Importing configuration "${data.name}" from version ${data.version}, but current version is ${currentVersion}. Proceeding with import, but compatibility issues may occur.`,
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      const userGroups = await this.validateAndResolveUserGroups(data, queryRunner);
+      const configurationEntity = this.createConfigurationEntity(data, userGroups);
+      const savedConfiguration = await queryRunner.manager.save(ConfigurationEntity, configurationEntity);
+
+      // Create extensions
+      const extensionEntities: ExtensionEntity[] = [];
+      for (const portableExtension of data.extensions) {
+        const extensionEntity = this.createExtensionEntity(portableExtension, savedConfiguration);
+        extensionEntities.push(extensionEntity);
+      }
+
+      await queryRunner.manager.save(ExtensionEntity, extensionEntities);
+      await queryRunner.commitTransaction();
+
+      // Reload configuration with extensions (outside transaction)
+      const reloadedConfiguration = await this.reloadConfiguration(savedConfiguration);
+
+      // Build configuration model
+      const configuration = await buildConfiguration(reloadedConfiguration, this.extensionExplorer, true, false);
+      this.logger.log(
+        `Successfully imported configuration "${data.name}" (ID: ${savedConfiguration.id}) with ${extensionEntities.length} extension(s)`,
       );
-    }
 
-    // Validate that all extensions exist in the system
-    const unavailableExtensions: string[] = [];
-    for (const ext of data.extensions) {
-      const extension = this.extensionExplorer.getExtension(ext.name);
-      if (!extension) {
-        unavailableExtensions.push(ext.name);
-      }
+      return { configuration };
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
     }
+  }
 
-    if (unavailableExtensions.length > 0) {
-      this.logger.error(
-        `Failed to import configuration "${data.name}": Extensions not available: ${unavailableExtensions.join(', ')}`,
-      );
-      throw new BadRequestException(
-        `The following extensions are not available in this system: ${unavailableExtensions.join(', ')}`,
-      );
-    }
+  /**
+   * Perform basic checks on the imported data before processing
+   * @param data
+   * @private
+   */
+  private check(data: PortableConfiguration) {
+    this.checkVersion(data);
+    this.validateExtensionsExists(data.extensions);
+    this.validateExtensions(data.extensions);
+  }
 
-    // Validate extension configurations
-    for (const ext of data.extensions) {
-      const extension = this.extensionExplorer.getExtension(ext.name);
-      if (extension) {
-        try {
-          const values = { ...ext.values };
-          // Validate configuration against extension spec
-          validateConfiguration(values, extension.spec);
-        } catch (error) {
-          const errorMessage = error instanceof Error ? error.message : String(error);
-          this.logger.error(
-            `Failed to import configuration "${data.name}": Invalid configuration for extension "${ext.name}": ${errorMessage}`,
-          );
-          throw new BadRequestException(`Invalid configuration for extension "${ext.name}": ${errorMessage}`);
-        }
-      }
-    }
+  private async reloadConfiguration(savedConfiguration: ConfigurationEntity) {
+    const reloadedConfiguration = await this.dataSource.manager.findOne(ConfigurationEntity, {
+      where: { id: savedConfiguration.id },
+      relations: ['extensions'],
+    });
 
-    // Validate and resolve user groups
-    let userGroups: UserGroupEntity[] = [];
-    if (data.userGroupIds && data.userGroupIds.length > 0) {
-      userGroups = await this.userGroupRepository.findBy({ id: In(data.userGroupIds) });
-      if (userGroups.length === 0) {
-        this.logger.warn(
-          `Cannot import configuration "${data.name}": none of the specified user groups exist in this system. ` +
-            `Requested userGroupIds: ${data.userGroupIds.join(', ')}`,
-        );
-        throw new BadRequestException('Cannot import configuration: none of the specified user groups exist in this system');
-      }
-      if (userGroups.length < data.userGroupIds.length) {
-        const foundIds = userGroups.map((ug) => ug.id);
-        const missingIds = data.userGroupIds.filter((id) => !foundIds.includes(id));
-        this.logger.warn(
-          `Some user groups not found during import of "${data.name}". Missing: ${missingIds.join(', ')}. Proceeding with available groups.`,
-        );
-      }
-    }
+    if (!reloadedConfiguration) throw new BadRequestException('Failed to reload imported configuration');
+    return reloadedConfiguration;
+  }
 
-    // Create a new configuration
+  private createExtensionEntity(ext: PortableExtension, savedConfiguration: ConfigurationEntity) {
+    const extensionEntity = new ExtensionEntity();
+    extensionEntity.name = ext.name;
+    extensionEntity.enabled = ext.enabled;
+    extensionEntity.values = { ...ext.values };
+    extensionEntity.configurableArguments = ext.configurableArguments;
+    extensionEntity.configuration = savedConfiguration;
+    extensionEntity.externalId = `${savedConfiguration.id}-${ext.name}`;
+    return extensionEntity;
+  }
+
+  private createConfigurationEntity(data: PortableConfiguration, userGroups: any[] | UserGroupEntity[]) {
     const configurationEntity = new ConfigurationEntity();
     configurationEntity.name = data.name;
     configurationEntity.description = data.description;
@@ -108,45 +108,75 @@ export class ImportConfigurationHandler implements ICommandHandler<ImportConfigu
     configurationEntity.executorEndpoint = data.executorEndpoint;
     configurationEntity.executorHeaders = data.executorHeaders;
     configurationEntity.userGroups = userGroups;
+    return configurationEntity;
+  }
 
-    // Save configuration first
-    const savedConfiguration = await this.repository.save(configurationEntity);
-
-    // Create extensions
-    const extensionEntities: ExtensionEntity[] = [];
-    for (const ext of data.extensions) {
-      const extensionEntity = new ExtensionEntity();
-      extensionEntity.name = ext.name;
-      extensionEntity.enabled = ext.enabled;
-      extensionEntity.values = { ...ext.values };
-      extensionEntity.configurableArguments = ext.configurableArguments;
-      extensionEntity.configuration = savedConfiguration;
-      extensionEntity.externalId = `${savedConfiguration.id}-${ext.name}`;
-
-      extensionEntities.push(extensionEntity);
+  private async validateAndResolveUserGroups(data: PortableConfiguration, queryRunner: QueryRunner) {
+    if (!data.userGroupIds?.length) return [];
+    const userGroups = await queryRunner.manager.findBy(UserGroupEntity, { id: In(data.userGroupIds) });
+    if (userGroups.length === 0) {
+      throw new BadRequestException('Cannot import configuration: none of the specified user groups exist in this system');
+    }
+    if (userGroups.length < data.userGroupIds.length) {
+      const foundIds = userGroups.map((ug) => ug.id);
+      const missingIds = data.userGroupIds.filter((id) => !foundIds.includes(id));
+      this.logger.warn(
+        `Some user groups not found during import of "${data.name}". Missing: ${missingIds.join(', ')}. Proceeding with available groups.`,
+      );
     }
 
-    // Save all extensions
-    await this.extensionRepository.save(extensionEntities);
+    return userGroups;
+  }
 
-    // Reload configuration with extensions
-    const reloadedConfiguration = await this.repository.findOne({
-      where: { id: savedConfiguration.id },
-      relations: ['extensions'],
-    });
+  /**
+   * Validate imported values against extension spec
+   * @private
+   * @param portableExtensions
+   */
+  private validateExtensions(portableExtensions: PortableExtension[]) {
+    for (const portableExtension of portableExtensions) {
+      const extension = this.extensionExplorer.getExtension(portableExtension.name);
+      if (!extension) continue; // Already handled missing extensions above
+      try {
+        const values = { ...portableExtension.values };
+        validateConfiguration(values, extension.spec);
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        throw new BadRequestException(`Invalid configuration for extension "${portableExtension.name}": ${errorMessage}`);
+      }
+    }
+  }
 
-    if (!reloadedConfiguration) {
-      this.logger.error(`Failed to import configuration "${data.name}": Could not reload configuration after save`);
-      throw new BadRequestException('Failed to reload imported configuration');
+  /**
+   * Validate that all extensions exist in the system
+   * @param portableExtensions
+   * @private
+   */
+  private validateExtensionsExists(portableExtensions: PortableExtension[]) {
+    const unavailableExtensions: string[] = [];
+    for (const portableExtension of portableExtensions) {
+      const extension = this.extensionExplorer.getExtension(portableExtension.name);
+      if (!extension) unavailableExtensions.push(portableExtension.name);
     }
 
-    // Build configuration model
-    const configuration = await buildConfiguration(reloadedConfiguration, this.extensionExplorer, true, false);
+    if (unavailableExtensions.length > 0) {
+      throw new BadRequestException(
+        `The following extensions are not available in this system: ${unavailableExtensions.join(', ')}`,
+      );
+    }
+  }
 
-    this.logger.log(
-      `Successfully imported configuration "${data.name}" (ID: ${savedConfiguration.id}) with ${extensionEntities.length} extension(s)`,
-    );
-
-    return { configuration };
+  /**
+   * Check version and warn if different
+   * @param data
+   * @private
+   */
+  private checkVersion(data: PortableConfiguration) {
+    const currentVersion = process.env.VERSION || 'unknown';
+    if (data.version && data.version !== currentVersion) {
+      this.logger.warn(
+        `Importing configuration "${data.name}" from version ${data.version}, but current version is ${currentVersion}. Proceeding with import, but compatibility issues may occur.`,
+      );
+    }
   }
 }

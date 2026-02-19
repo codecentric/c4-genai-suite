@@ -1,30 +1,35 @@
 import { BadRequestException } from '@nestjs/common';
-import { Repository } from 'typeorm';
-import { ConfigurationEntity, ConfigurationStatus, ExtensionEntity, UserGroupRepository } from '../../database';
+import { DataSource } from 'typeorm';
+import { ConfigurationEntity, ConfigurationStatus, ExtensionEntity } from '../../database';
 import { ChatSuggestion } from '../../shared';
 import { Extension, ExtensionObjectArgument, ExtensionStringArgument } from '../interfaces';
 import { ExplorerService } from '../services';
 import { PortableConfiguration } from './export-configuration';
 import { ImportConfiguration, ImportConfigurationHandler } from './import-configuration';
 
-interface MockConfigRepository {
-  save: jest.Mock;
-  findOne: jest.Mock;
+interface MockQueryRunner {
+  connect: jest.Mock;
+  startTransaction: jest.Mock;
+  commitTransaction: jest.Mock;
+  rollbackTransaction: jest.Mock;
+  release: jest.Mock;
+  manager: {
+    save: jest.Mock;
+    findBy: jest.Mock;
+  };
 }
 
-interface MockExtensionRepository {
-  save: jest.Mock;
-}
-
-interface MockUserGroupRepository {
-  findBy: jest.Mock;
+interface MockDataSource {
+  createQueryRunner: jest.Mock;
+  manager: {
+    findOne: jest.Mock;
+  };
 }
 
 describe(ImportConfiguration.name, () => {
   let handler: ImportConfigurationHandler;
-  let configRepository: MockConfigRepository;
-  let extensionRepository: MockExtensionRepository;
-  let userGroupRepository: MockUserGroupRepository;
+  let dataSource: MockDataSource;
+  let queryRunner: MockQueryRunner;
   let explorer: ExplorerService;
 
   beforeEach(() => {
@@ -32,25 +37,26 @@ describe(ImportConfiguration.name, () => {
       getExtension: jest.fn(),
     } as unknown as ExplorerService;
 
-    configRepository = {
-      save: jest.fn(),
-      findOne: jest.fn(),
+    queryRunner = {
+      connect: jest.fn().mockResolvedValue(undefined),
+      startTransaction: jest.fn().mockResolvedValue(undefined),
+      commitTransaction: jest.fn().mockResolvedValue(undefined),
+      rollbackTransaction: jest.fn().mockResolvedValue(undefined),
+      release: jest.fn().mockResolvedValue(undefined),
+      manager: {
+        save: jest.fn(),
+        findBy: jest.fn().mockResolvedValue([]),
+      },
     };
 
-    extensionRepository = {
-      save: jest.fn(),
+    dataSource = {
+      createQueryRunner: jest.fn().mockReturnValue(queryRunner),
+      manager: {
+        findOne: jest.fn(),
+      },
     };
 
-    userGroupRepository = {
-      findBy: jest.fn().mockResolvedValue([]),
-    };
-
-    handler = new ImportConfigurationHandler(
-      configRepository as unknown as Repository<ConfigurationEntity>,
-      extensionRepository as unknown as Repository<ExtensionEntity>,
-      userGroupRepository as unknown as UserGroupRepository,
-      explorer,
-    );
+    handler = new ImportConfigurationHandler(dataSource as unknown as DataSource, explorer);
   });
 
   it('should throw BadRequestException when extension is not available', async () => {
@@ -239,10 +245,14 @@ describe(ImportConfiguration.name, () => {
       extensions: [],
     };
 
-    jest.spyOn(userGroupRepository, 'findBy').mockResolvedValue(mockUserGroups);
-    jest.spyOn(configRepository, 'save').mockResolvedValue(savedConfiguration);
-    jest.spyOn(extensionRepository, 'save').mockResolvedValue([]);
-    jest.spyOn(configRepository, 'findOne').mockResolvedValue({
+    jest.spyOn(queryRunner.manager, 'findBy').mockResolvedValue(mockUserGroups);
+    jest.spyOn(queryRunner.manager, 'save').mockImplementation((entity, data) => {
+      if (entity === ConfigurationEntity) {
+        return Promise.resolve(savedConfiguration);
+      }
+      return Promise.resolve(data);
+    });
+    jest.spyOn(dataSource.manager, 'findOne').mockResolvedValue({
       ...savedConfiguration,
       extensions: [
         {
@@ -295,8 +305,8 @@ describe(ImportConfiguration.name, () => {
     expect(result.configuration).toBeDefined();
     expect(result.configuration.name).toBe('Imported Config');
     expect(result.configuration.enabled).toBe(true);
-    expect(configRepository.save).toHaveBeenCalled();
-    expect(extensionRepository.save).toHaveBeenCalled();
+    expect(queryRunner.manager.save).toHaveBeenCalled();
+    expect(queryRunner.commitTransaction).toHaveBeenCalled();
   });
 
   it('should import disabled configuration correctly', async () => {
@@ -314,9 +324,13 @@ describe(ImportConfiguration.name, () => {
       extensions: [],
     };
 
-    jest.spyOn(configRepository, 'save').mockResolvedValue(savedConfiguration);
-    jest.spyOn(extensionRepository, 'save').mockResolvedValue([]);
-    jest.spyOn(configRepository, 'findOne').mockResolvedValue(savedConfiguration);
+    jest.spyOn(queryRunner.manager, 'save').mockImplementation((entity, data) => {
+      if (entity === ConfigurationEntity) {
+        return Promise.resolve(savedConfiguration);
+      }
+      return Promise.resolve(data);
+    });
+    jest.spyOn(dataSource.manager, 'findOne').mockResolvedValue(savedConfiguration);
     jest.spyOn(explorer, 'getExtension').mockReturnValue({
       spec: {
         name: 'test',
@@ -339,8 +353,8 @@ describe(ImportConfiguration.name, () => {
     const result = await handler.execute(new ImportConfiguration(importData));
 
     expect(result.configuration.enabled).toBe(false);
-    const mockCalls = configRepository.save.mock.calls as [[ConfigurationEntity]];
-    const savedEntity = mockCalls[0][0];
+    const mockCalls = queryRunner.manager.save.mock.calls as [[typeof ConfigurationEntity, ConfigurationEntity]];
+    const savedEntity = mockCalls[0][1];
     expect(savedEntity.status).toBe(ConfigurationStatus.DISABLED);
   });
 
@@ -359,9 +373,18 @@ describe(ImportConfiguration.name, () => {
       extensions: [],
     };
 
-    jest.spyOn(configRepository, 'save').mockResolvedValue(savedConfiguration);
-    jest.spyOn(extensionRepository, 'save').mockImplementation((entities) => Promise.resolve(entities));
-    jest.spyOn(configRepository, 'findOne').mockResolvedValue({
+    let savedExtensions: ExtensionEntity[] = [];
+    jest.spyOn(queryRunner.manager, 'save').mockImplementation((entity, data) => {
+      if (entity === ConfigurationEntity) {
+        return Promise.resolve(savedConfiguration);
+      }
+      if (entity === ExtensionEntity) {
+        savedExtensions = data as ExtensionEntity[];
+        return Promise.resolve(data);
+      }
+      return Promise.resolve(data);
+    });
+    jest.spyOn(dataSource.manager, 'findOne').mockResolvedValue({
       ...savedConfiguration,
       extensions: [],
     });
@@ -393,8 +416,6 @@ describe(ImportConfiguration.name, () => {
 
     await handler.execute(new ImportConfiguration(importData));
 
-    const mockCalls = extensionRepository.save.mock.calls as [[ExtensionEntity[]]];
-    const savedExtensions = mockCalls[0][0];
     expect(savedExtensions[0].externalId).toBe('5-test-ext');
   });
 
@@ -424,9 +445,18 @@ describe(ImportConfiguration.name, () => {
       extensions: [],
     };
 
-    jest.spyOn(configRepository, 'save').mockResolvedValue(savedConfiguration);
-    jest.spyOn(extensionRepository, 'save').mockImplementation((entities) => Promise.resolve(entities));
-    jest.spyOn(configRepository, 'findOne').mockResolvedValue({
+    let savedExtensions: ExtensionEntity[] = [];
+    jest.spyOn(queryRunner.manager, 'save').mockImplementation((entity, data) => {
+      if (entity === ConfigurationEntity) {
+        return Promise.resolve(savedConfiguration);
+      }
+      if (entity === ExtensionEntity) {
+        savedExtensions = data as ExtensionEntity[];
+        return Promise.resolve(data);
+      }
+      return Promise.resolve(data);
+    });
+    jest.spyOn(dataSource.manager, 'findOne').mockResolvedValue({
       ...savedConfiguration,
       extensions: [
         {
@@ -467,8 +497,6 @@ describe(ImportConfiguration.name, () => {
 
     await handler.execute(new ImportConfiguration(importData));
 
-    const mockCalls = extensionRepository.save.mock.calls as [[ExtensionEntity[]]];
-    const savedExtensions = mockCalls[0][0];
     expect(savedExtensions[0].configurableArguments).toEqual(temperatureArg);
   });
 
@@ -487,9 +515,13 @@ describe(ImportConfiguration.name, () => {
       extensions: [],
     };
 
-    jest.spyOn(configRepository, 'save').mockResolvedValue(savedConfiguration);
-    jest.spyOn(extensionRepository, 'save').mockResolvedValue([]);
-    jest.spyOn(configRepository, 'findOne').mockResolvedValue(savedConfiguration);
+    jest.spyOn(queryRunner.manager, 'save').mockImplementation((entity, data) => {
+      if (entity === ConfigurationEntity) {
+        return Promise.resolve(savedConfiguration);
+      }
+      return Promise.resolve(data);
+    });
+    jest.spyOn(dataSource.manager, 'findOne').mockResolvedValue(savedConfiguration);
     jest.spyOn(explorer, 'getExtension').mockReturnValue({
       spec: {
         name: 'test',
@@ -538,9 +570,13 @@ describe(ImportConfiguration.name, () => {
       extensions: [],
     };
 
-    jest.spyOn(configRepository, 'save').mockResolvedValue(savedConfiguration);
-    jest.spyOn(extensionRepository, 'save').mockResolvedValue([]);
-    jest.spyOn(configRepository, 'findOne').mockResolvedValue(savedConfiguration);
+    jest.spyOn(queryRunner.manager, 'save').mockImplementation((entity, data) => {
+      if (entity === ConfigurationEntity) {
+        return Promise.resolve(savedConfiguration);
+      }
+      return Promise.resolve(data);
+    });
+    jest.spyOn(dataSource.manager, 'findOne').mockResolvedValue(savedConfiguration);
     jest.spyOn(explorer, 'getExtension').mockReturnValue({
       spec: {
         name: 'test',
@@ -589,9 +625,18 @@ describe(ImportConfiguration.name, () => {
       extensions: [],
     };
 
-    jest.spyOn(configRepository, 'save').mockResolvedValue(savedConfiguration);
-    jest.spyOn(extensionRepository, 'save').mockImplementation((entities) => Promise.resolve(entities));
-    jest.spyOn(configRepository, 'findOne').mockResolvedValue({
+    let savedExtensions: ExtensionEntity[] = [];
+    jest.spyOn(queryRunner.manager, 'save').mockImplementation((entity, data) => {
+      if (entity === ConfigurationEntity) {
+        return Promise.resolve(savedConfiguration);
+      }
+      if (entity === ExtensionEntity) {
+        savedExtensions = data as ExtensionEntity[];
+        return Promise.resolve(data);
+      }
+      return Promise.resolve(data);
+    });
+    jest.spyOn(dataSource.manager, 'findOne').mockResolvedValue({
       ...savedConfiguration,
       extensions: [],
     });
@@ -652,8 +697,6 @@ describe(ImportConfiguration.name, () => {
 
     await handler.execute(new ImportConfiguration(importData));
 
-    const mockCalls = extensionRepository.save.mock.calls as [[ExtensionEntity[]]];
-    const savedExtensions = mockCalls[0][0];
     // All values are preserved as-is during import - user must manually update secrets
     expect(savedExtensions[0].values.apiKey).toBe('********************');
     expect(savedExtensions[0].values.endpoint).toBe('https://api.example.com');
@@ -677,9 +720,13 @@ describe(ImportConfiguration.name, () => {
       extensions: [],
     };
 
-    jest.spyOn(configRepository, 'save').mockResolvedValue(savedConfiguration);
-    jest.spyOn(extensionRepository, 'save').mockResolvedValue([]);
-    jest.spyOn(configRepository, 'findOne').mockResolvedValue(savedConfiguration);
+    jest.spyOn(queryRunner.manager, 'save').mockImplementation((entity, data) => {
+      if (entity === ConfigurationEntity) {
+        return Promise.resolve(savedConfiguration);
+      }
+      return Promise.resolve(data);
+    });
+    jest.spyOn(dataSource.manager, 'findOne').mockResolvedValue(savedConfiguration);
     jest.spyOn(explorer, 'getExtension').mockReturnValue({
       spec: {
         name: 'test',
@@ -722,7 +769,7 @@ describe(ImportConfiguration.name, () => {
     } as Extension);
 
     // No user groups found
-    jest.spyOn(userGroupRepository, 'findBy').mockResolvedValue([]);
+    jest.spyOn(queryRunner.manager, 'findBy').mockResolvedValue([]);
 
     const importData: PortableConfiguration = {
       name: 'Config with invalid groups',
@@ -758,10 +805,14 @@ describe(ImportConfiguration.name, () => {
       extensions: [],
     };
 
-    jest.spyOn(userGroupRepository, 'findBy').mockResolvedValue(mockUserGroups);
-    jest.spyOn(configRepository, 'save').mockResolvedValue(savedConfiguration);
-    jest.spyOn(extensionRepository, 'save').mockResolvedValue([]);
-    jest.spyOn(configRepository, 'findOne').mockResolvedValue(savedConfiguration);
+    jest.spyOn(queryRunner.manager, 'findBy').mockResolvedValue(mockUserGroups);
+    jest.spyOn(queryRunner.manager, 'save').mockImplementation((entity, data) => {
+      if (entity === ConfigurationEntity) {
+        return Promise.resolve(savedConfiguration);
+      }
+      return Promise.resolve(data);
+    });
+    jest.spyOn(dataSource.manager, 'findOne').mockResolvedValue(savedConfiguration);
     jest.spyOn(explorer, 'getExtension').mockReturnValue({
       spec: {
         name: 'test',
@@ -785,7 +836,8 @@ describe(ImportConfiguration.name, () => {
 
     expect(result).toBeDefined();
     expect(result.configuration.name).toBe('Config with valid groups');
-    expect(configRepository.save).toHaveBeenCalledWith(
+    expect(queryRunner.manager.save).toHaveBeenCalledWith(
+      ConfigurationEntity,
       expect.objectContaining({
         userGroups: mockUserGroups,
       }),
@@ -810,10 +862,14 @@ describe(ImportConfiguration.name, () => {
     };
 
     // Only one of two groups found
-    jest.spyOn(userGroupRepository, 'findBy').mockResolvedValue(mockUserGroups);
-    jest.spyOn(configRepository, 'save').mockResolvedValue(savedConfiguration);
-    jest.spyOn(extensionRepository, 'save').mockResolvedValue([]);
-    jest.spyOn(configRepository, 'findOne').mockResolvedValue(savedConfiguration);
+    jest.spyOn(queryRunner.manager, 'findBy').mockResolvedValue(mockUserGroups);
+    jest.spyOn(queryRunner.manager, 'save').mockImplementation((entity, data) => {
+      if (entity === ConfigurationEntity) {
+        return Promise.resolve(savedConfiguration);
+      }
+      return Promise.resolve(data);
+    });
+    jest.spyOn(dataSource.manager, 'findOne').mockResolvedValue(savedConfiguration);
     jest.spyOn(explorer, 'getExtension').mockReturnValue({
       spec: {
         name: 'test',
@@ -839,7 +895,8 @@ describe(ImportConfiguration.name, () => {
 
     expect(result).toBeDefined();
     expect(loggerWarnSpy).toHaveBeenCalledWith(expect.stringContaining('Missing: missing-group'));
-    expect(configRepository.save).toHaveBeenCalledWith(
+    expect(queryRunner.manager.save).toHaveBeenCalledWith(
+      ConfigurationEntity,
       expect.objectContaining({
         userGroups: mockUserGroups,
       }),
@@ -861,9 +918,13 @@ describe(ImportConfiguration.name, () => {
       extensions: [],
     };
 
-    jest.spyOn(configRepository, 'save').mockResolvedValue(savedConfiguration);
-    jest.spyOn(extensionRepository, 'save').mockResolvedValue([]);
-    jest.spyOn(configRepository, 'findOne').mockResolvedValue(savedConfiguration);
+    jest.spyOn(queryRunner.manager, 'save').mockImplementation((entity, data) => {
+      if (entity === ConfigurationEntity) {
+        return Promise.resolve(savedConfiguration);
+      }
+      return Promise.resolve(data);
+    });
+    jest.spyOn(dataSource.manager, 'findOne').mockResolvedValue(savedConfiguration);
     jest.spyOn(explorer, 'getExtension').mockReturnValue({
       spec: {
         name: 'test',
@@ -885,8 +946,9 @@ describe(ImportConfiguration.name, () => {
     const result = await handler.execute(new ImportConfiguration(importData));
 
     expect(result).toBeDefined();
-    expect(userGroupRepository.findBy).not.toHaveBeenCalled();
-    expect(configRepository.save).toHaveBeenCalledWith(
+    expect(queryRunner.manager.findBy).not.toHaveBeenCalled();
+    expect(queryRunner.manager.save).toHaveBeenCalledWith(
+      ConfigurationEntity,
       expect.objectContaining({
         userGroups: [],
       }),
