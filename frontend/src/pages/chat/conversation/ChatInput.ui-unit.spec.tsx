@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react';
+import { fireEvent, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { ConfigurationDto, FileDto } from 'src/api';
 import { useConversationBucketAvailabilities } from 'src/hooks/api/extensions';
@@ -146,6 +146,17 @@ describe('ChatInput', () => {
 
     const textInput = await screen.findByRole('textbox');
     expect(textInput).toHaveValue('This is a suggestion');
+  });
+
+  it('should call stop generation when streaming and submit button is clicked', () => {
+    mockConversationFiles([]);
+    const stopGeneration = vi.fn();
+
+    render(<ChatInput chatId={0} submitMessage={() => {}} isStreaming={true} stopGeneration={stopGeneration} />);
+
+    fireEvent.click(screen.getByTestId('chat-submit-button'));
+
+    expect(stopGeneration).toHaveBeenCalledTimes(1);
   });
 });
 

@@ -27,7 +27,7 @@ export function ConversationPage(props: ConversationPageProps) {
 
   const chatParam = useParams<'id'>();
   const chatId = +chatParam.id!;
-  const { sendMessage, isChatLoading } = useChatStream(chatId);
+  const { sendMessage, stopGeneration, isChatLoading } = useChatStream(chatId);
   const chat = useStateOfChat();
   const messages = useStateOfMessages();
   const isAiWriting = useStateOfIsAiWriting();
@@ -94,9 +94,10 @@ export function ConversationPage(props: ConversationPageProps) {
                 textareaRef={textareaRef}
                 chatId={chat.id}
                 configuration={assistant}
-                isDisabled={isAiWriting}
+                isStreaming={isAiWriting}
                 isEmpty={isNewConversation}
                 submitMessage={submitMessage}
+                stopGeneration={stopGeneration}
               />
               <div
                 data-testid={'scrollToBottomButton'}
