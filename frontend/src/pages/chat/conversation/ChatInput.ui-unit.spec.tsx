@@ -18,6 +18,19 @@ vi.mock('src/hooks/api/files', () => ({
   useConversationFiles: vi.fn(),
 }));
 
+vi.stubGlobal(
+  'localStorage',
+  (() => {
+    const store: Record<string, string> = {};
+    return {
+      getItem: (key: string) => store[key] ?? null,
+      setItem: (key: string, value: string) => { store[key] = value; },
+      removeItem: (key: string) => { delete store[key]; },
+      clear: () => { Object.keys(store).forEach((k) => delete store[k]); },
+    };
+  })(),
+);
+
 vi.mocked(useConversationBucketAvailabilities)
   // @ts-expect-error we just mock the needed fields of the query
   .mockImplementation(() => ({
@@ -118,6 +131,35 @@ describe('ChatInput', () => {
     expect(getFileInputButton()).toBeDisabled();
     assertFilesInChatExtensionErrorMessageVisible(true);
     assertFilesVisionExtensionErrorMessageVisible(true);
+  });
+
+  it('should show submit button when not disabled', () => {
+    mockConversationFiles([]);
+
+    render(<ChatInput chatId={0} submitMessage={() => {}} />);
+
+    expect(screen.getByTestId('chat-submit-button')).toBeInTheDocument();
+    expect(screen.queryByTestId('chat-stop-button')).toBeNull();
+  });
+
+  it('should show stop button instead of submit button when disabled (AI is writing)', () => {
+    mockConversationFiles([]);
+
+    render(<ChatInput chatId={0} submitMessage={() => {}} isDisabled={true} />);
+
+    expect(screen.getByTestId('chat-stop-button')).toBeInTheDocument();
+    expect(screen.queryByTestId('chat-submit-button')).toBeNull();
+  });
+
+  it('should call onStopGeneration when stop button is clicked', () => {
+    mockConversationFiles([]);
+    const mockOnStop = vi.fn();
+
+    render(<ChatInput chatId={0} submitMessage={() => {}} isDisabled={true} onStopGeneration={mockOnStop} />);
+
+    screen.getByTestId('chat-stop-button').click();
+
+    expect(mockOnStop).toHaveBeenCalledOnce();
   });
 
   it('should prefill text input with suggestion, when clicking on a suggestion', async () => {
