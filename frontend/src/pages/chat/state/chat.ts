@@ -34,6 +34,9 @@ export const useChatStream = (chatId: number) => {
   }, [chatId]);
 
   const listOfChatsStore = useListOfChatsStore();
+  const stopGeneration = () => {
+    chatStore.cancelActiveStream(chatId);
+  };
 
   const {
     isLoading: isChatLoading,
@@ -188,7 +191,7 @@ export const useChatStream = (chatId: number) => {
     chatStore.setActiveStreamSubscription(chatId, subscription);
   };
 
-  return { sendMessage, isChatLoading };
+  return { sendMessage, stopGeneration, isChatLoading };
 };
 
 export const useStateMutateChat = (chatId: number) => {
