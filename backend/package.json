@@ -35,10 +35,10 @@
     "migration:revert": "npm run typeorm -- -d src/config/typeorm-migration.config.ts migration:revert"
   },
   "dependencies": {
-    "@ai-sdk/amazon-bedrock": "^4.0.61",
+    "@ai-sdk/amazon-bedrock": "^4.0.63",
     "@ai-sdk/azure": "^3.0.31",
     "@ai-sdk/google": "^3.0.30",
-    "@ai-sdk/google-vertex": "^4.0.60",
+    "@ai-sdk/google-vertex": "^4.0.61",
     "@ai-sdk/mistral": "^3.0.20",
     "@ai-sdk/openai": "^3.0.7",
     "@ai-sdk/openai-compatible": "^2.0.30",
@@ -60,7 +60,7 @@
     "@opentelemetry/sdk-node": "^0.211.0",
     "@types/mime-types": "^3.0.1",
     "@willsoto/nestjs-prometheus": "^6.0.2",
-    "ai": "^6.0.92",
+    "ai": "^6.0.95",
     "bcrypt": "^6.0.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.3",
