@@ -1,5 +1,5 @@
 import { fetchEventSource } from '@microsoft/fetch-event-source';
-import { Observable, ReplaySubject } from 'rxjs';
+import { Observable } from 'rxjs';
 import {
   AuthApi,
   Configuration,
@@ -66,17 +66,18 @@ class StreamApi {
   constructor(private readonly configuration: Configuration) {}
 
   streamPrompt(conversationId: number, message: SendMessageDto, messageId?: number): Observable<StreamEventDto> {
-    const replaySubject = new ReplaySubject<StreamEventDto>();
-
     const basePath = `${this.configuration.basePath}/api/conversations/${conversationId}`;
     const path = messageId ? `${basePath}/messages/${messageId}/sse` : `${basePath}/messages/sse`;
     const method = messageId ? 'PUT' : 'POST';
 
-    const observable = new Observable<StreamEventDto>((subscriber) => {
+    return new Observable<StreamEventDto>((subscriber) => {
+      const abortController = new AbortController();
+
       fetchEventSource(path, {
         method: method,
         body: JSON.stringify(message),
         openWhenHidden: true,
+        signal: abortController.signal,
         credentials: 'include',
         headers: {
           'Accept-Language': i18next.language,
@@ -87,23 +88,28 @@ class StreamApi {
           subscriber.next(data);
         },
         onerror(err) {
-          try {
-            subscriber.error(err);
-          } finally {
+          if (abortController.signal.aborted) {
             subscriber.complete();
+            return;
           }
 
+          subscriber.error(err);
           throw err;
         },
         onclose() {
           subscriber.complete();
         },
       }).catch((err) => {
+        if (abortController.signal.aborted) {
+          subscriber.complete();
+          return;
+        }
         subscriber.error(err);
-        subscriber.complete();
       });
+
+      return () => {
+        abortController.abort();
+      };
     });
-    observable.subscribe(replaySubject);
-    return replaySubject;
   }
 }
