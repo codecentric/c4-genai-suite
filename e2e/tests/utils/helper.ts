@@ -54,7 +54,7 @@ export async function sendMessage(page: Page, configuration: { name: string }, c
   await page.waitForLoadState('networkidle', { timeout: 30000 });
 }
 
-async function save(page: Page, expectDetached = true) {
+export async function save(page: Page, expectDetached = true) {
   const button = page.getByRole('button', { name: 'Save' });
   await button.click();
   if (expectDetached) {
