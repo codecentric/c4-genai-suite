@@ -64,6 +64,7 @@ function load() {
       headers: translate('common.headers'),
       loginButton: translate('common.loginButton'),
       loginFailed: translate('common.loginFailed'),
+      loginForbidden: translate('common.loginForbidden'),
       loginText: translate('common.loginText'),
       logout: translate('common.logout'),
       clearConversations: translate('common.clearConversations'),

@@ -33,6 +33,7 @@ export const de: typeof en = {
     headers: 'Header',
     loginButton: 'Anmelden',
     loginFailed: 'Benutzername oder Passwort ist nicht korrekt. Bitte versuch es erneut.',
+    loginForbidden: 'Dein Konto ist nicht für die Anmeldung berechtigt. Bitte wende dich an einen Administrator.',
     loginText: 'Mit Benutzername und Passwort anmelden',
     logout: 'Abmelden',
     clearConversations: 'Chatverlauf löschen',

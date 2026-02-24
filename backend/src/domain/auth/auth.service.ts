@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { ForbiddenException, Injectable, Logger, OnModuleInit, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
@@ -191,17 +191,15 @@ export class AuthService implements OnModuleInit {
   }
 
   async loginWithPassword(email: string, password: string, req: Request) {
-    const user = await this.users.findOneBy({ email });
-
+    const user = await this.users.findOne({ where: { email }, relations: ['userGroups'] });
     // We cannot compare the password in the database due to the salt.
     if (!user?.passwordHash) {
-      throw new BadRequestException('Unknown user.');
+      throw new UnauthorizedException('Unknown user.');
     }
-
     if (!(await bcrypt.compare(password, user.passwordHash))) {
-      throw new BadRequestException('Wrong password.');
+      throw new UnauthorizedException('Wrong password.');
     }
-
+    this.assertHasSystemGroup(user.userGroups ?? []);
     await this.setSessionUser(req, user);
   }
 
@@ -222,7 +220,17 @@ export class AuthService implements OnModuleInit {
       fromDB = await this.saveAndReloadUser({ ...user, userGroups }, userFilter);
     }
 
+    const userGroups = fromDB?.userGroups ?? [];
+    this.assertHasSystemGroup(userGroups);
+
     await this.setSessionUser(req, fromDB ?? undefined);
+  }
+
+  private assertHasSystemGroup(userGroups: UserGroupEntity[]) {
+    const hasSystemGroup = userGroups.some((g) => g.id === BUILTIN_USER_GROUP_ADMIN || g.id === BUILTIN_USER_GROUP_DEFAULT);
+    if (!hasSystemGroup) {
+      throw new ForbiddenException('User is not a member of any system group and is not allowed to log in.');
+    }
   }
 
   private async getUserGroupsOfUser(user: User) {

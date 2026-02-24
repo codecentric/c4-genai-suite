@@ -1,8 +1,9 @@
 import { Button, PasswordInput, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useMutation } from '@tanstack/react-query';
+import { useSearchParams } from 'react-router-dom';
 import { AuthSettingsDto, useApi } from 'src/api';
-import { LoginDto } from 'src/api/generated';
+import { LoginDto, ResponseError } from 'src/api/generated';
 import { Logo } from 'src/components';
 import { Theme, useLoginUrl, useTheme, useTransientNavigate } from 'src/hooks';
 import { useAuthSettings } from 'src/hooks/useAuthSettings';
@@ -10,26 +11,38 @@ import { texts } from 'src/texts';
 
 export function LoginPage() {
   const { theme } = useTheme();
-  const { data: authSettings, isError } = useAuthSettings();
+  const { data: authSettings, isError: isAuthSettingsError } = useAuthSettings();
+  const [searchParams] = useSearchParams();
+  const oauthError = searchParams.get('error');
 
   return (
     <div className="text-primary flex h-screen overflow-hidden font-medium">
       <div className="bg-primary-content flex w-96 flex-none flex-col items-center justify-center p-8">
-        <Sidebar theme={theme} authSettings={authSettings} error={isError} />
+        <Sidebar theme={theme} authSettings={authSettings} isAuthSettingsError={isAuthSettingsError} oauthError={oauthError} />
       </div>
       {theme.backgroundLogoUrl && <BackgroundImage logoUrl={theme.backgroundLogoUrl} />}
     </div>
   );
 }
 
-function Sidebar(props: { theme: Theme; authSettings?: AuthSettingsDto; error: true | false }) {
+function Sidebar(props: {
+  theme: Theme;
+  authSettings?: AuthSettingsDto;
+  isAuthSettingsError: true | false;
+  oauthError: string | null;
+}) {
   return (
     <>
       <div className="flex h-1/4 w-full items-start justify-start p-4">
         {props.theme.logoUrl && <Logo size={{ height: '2rem' }} url={props.theme.logoUrl} />}
       </div>
       <div className="mb-4 flex grow flex-col items-center justify-center p-4">
-        <LoginProviders welcomeText={props.theme.welcomeText} authSettings={props.authSettings} error={props.error} />
+        <LoginProviders
+          welcomeText={props.theme.welcomeText}
+          authSettings={props.authSettings}
+          error={props.isAuthSettingsError}
+          oauthError={props.oauthError}
+        />
       </div>
       <div className="flex h-1/4 w-full items-end justify-start space-x-4 p-4 text-xs">
         <LegalFooter siteLinks={props.theme.siteLinks} />
@@ -38,13 +51,29 @@ function Sidebar(props: { theme: Theme; authSettings?: AuthSettingsDto; error: t
   );
 }
 
-function LoginProviders(props: { welcomeText?: string; authSettings: AuthSettingsDto | undefined; error: true | false }) {
+function LoginProviders(props: {
+  welcomeText?: string;
+  authSettings: AuthSettingsDto | undefined;
+  error: true | false;
+  oauthError: string | null;
+}) {
   return (
     <>
       <h2 className="mb-4 w-full justify-start text-4xl font-medium">
         {renderTextWithBreaks(props.welcomeText || texts.login.welcome)}
       </h2>
 
+      {props.error && (
+        <div>
+          <LoginAuthError />
+        </div>
+      )}
+      {props.oauthError && (
+        <div role={'alert'} className="alert alert-error mb-4">
+          {props.oauthError === 'forbidden' && texts.common.loginForbidden}
+          {props.oauthError && props.oauthError !== 'forbidden' && texts.login.authError}
+        </div>
+      )}
       <div className="mb-4 w-full">
         {props.authSettings?.providers.map((p) => (
           <LoginButton key={p.name} name={p.name} label={p.displayName} />
@@ -52,10 +81,6 @@ function LoginProviders(props: { welcomeText?: string; authSettings: AuthSetting
       </div>
 
       {props.authSettings?.enablePasswordAuth && <LoginForm />}
-
-      <div className="mb-4 w-full text-sm">
-        <div>{props.error && <LoginAuthError />}</div>
-      </div>
 
       <div className="mb-4 w-full text-sm">
         <div>{props.authSettings?.providers.length === 0 && !props.authSettings.enablePasswordAuth && <NoAuthSettings />}</div>
@@ -90,7 +115,9 @@ function LoginForm() {
       {/* Error Message Placeholder */}
       {login.isError && (
         <div role={'alert'} className="alert alert-error mb-4">
-          {texts.common.loginFailed}
+          {login.error instanceof ResponseError && login.error.response.status === 403
+            ? texts.common.loginForbidden
+            : texts.common.loginFailed}
         </div>
       )}
 

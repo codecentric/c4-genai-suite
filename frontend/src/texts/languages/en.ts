@@ -33,6 +33,7 @@ export const en = {
     headers: 'Headers',
     loginButton: 'Login',
     loginFailed: 'Username or password not correct.',
+    loginForbidden: 'Your account is not allowed to log in. Please contact an administrator.',
     loginText: 'Login with username and password',
     logout: 'Logout',
     clearConversations: 'Clear conversations',
