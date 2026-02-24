@@ -1,5 +1,17 @@
 # Changelog
 
+## [9.15.0](https://github.com/codecentric/c4-genai-suite/compare/v9.14.0...v9.15.0) (2026-02-24)
+
+
+### Features
+
+* Deny login of users without group Default or Admin ([22a1dd9](https://github.com/codecentric/c4-genai-suite/commit/22a1dd9ee95581bbcbe7a5d8d369ec02029a6094))
+
+
+### Bug Fixes
+
+* **frontend:** default theme name is briefly shown as page title ([ca8908c](https://github.com/codecentric/c4-genai-suite/commit/ca8908cf7b821880888c27505892971e2485db95))
+
 ## [9.14.0](https://github.com/codecentric/c4-genai-suite/compare/v9.13.0...v9.14.0) (2026-02-13)
 
 
