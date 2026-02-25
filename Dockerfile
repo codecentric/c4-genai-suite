@@ -14,7 +14,7 @@ RUN npm ci
 COPY frontend .
 RUN VITE_VERSION="$VERSION" npm run build
 
-FROM caddy:2.10.2-alpine AS caddy
+FROM caddy:2.11.1-alpine AS caddy
 
 FROM base
 WORKDIR /app
