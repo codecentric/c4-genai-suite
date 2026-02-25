@@ -40,6 +40,7 @@ jobs:
           cache-dependency-path: backend/package-lock.json
       - run: npm ci
       - run: npm run generate-${{ matrix.service }}
+      - run: git diff
       - run: git diff --quiet # exits with exitcode != 0 if changes are detected
 
   backend-check-generated-specs:
