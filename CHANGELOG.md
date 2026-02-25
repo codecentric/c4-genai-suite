@@ -1,5 +1,13 @@
 # Changelog
 
+## [9.15.1](https://github.com/codecentric/c4-genai-suite/compare/v9.15.0...v9.15.1) (2026-02-25)
+
+
+### Bug Fixes
+
+* add setting to activate allowed groups for login ([4a75f7a](https://github.com/codecentric/c4-genai-suite/commit/4a75f7abadfa7362e6126f3952decc117ff577e7))
+* regenerate clients ([ba43efe](https://github.com/codecentric/c4-genai-suite/commit/ba43efee8b1aab030140a6e3cc72f654e5ac47f2))
+
 ## [9.15.0](https://github.com/codecentric/c4-genai-suite/compare/v9.14.0...v9.15.0) (2026-02-24)
 
 
