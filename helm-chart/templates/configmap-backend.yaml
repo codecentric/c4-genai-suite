@@ -18,6 +18,7 @@ data:
   AUTH_USER_GROUPS_PROPERTY_NAME: "{{ .Values.backend.auth.userGroupsPropertyName }}"
   {{- end }}
   {{- end }}
+  AUTH_LOGIN_ALLOWED_GROUPS: "{{ .Values.backend.auth.loginAllowedGroups }}"
   METRICS_PORT: "{{ .Values.backend.metrics.port }}"
   {{- if and .Values.backend.ssl.rootCertificateConfigMapName .Values.backend.ssl.rootCertificateConfigMapKey }}
   NODE_EXTRA_CA_CERTS: "/etc/ssl/certs/{{ .Values.backend.ssl.rootCertificateConfigMapKey }}"

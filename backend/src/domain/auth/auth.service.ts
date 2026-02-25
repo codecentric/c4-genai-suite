@@ -30,10 +30,11 @@ export class AuthService implements OnModuleInit {
     private readonly userGroups: UserGroupRepository,
   ) {
     const config: AuthConfig = {
-      baseUrl: configService.get('AUTH_BASEURL') || configService.getOrThrow('BASE_URL'),
-      trustProxy: configService.get('AUTH_TRUST_PROXY') === 'true',
-      acceptUserGroupsFromAuthProvider: configService.get('AUTH_USE_USER_GROUPS_FROM_AUTH_PROVIDER') === 'true',
-      userGroupsPropertyName: configService.get('AUTH_USER_GROUPS_PROPERTY_NAME', 'groups'),
+      baseUrl: configService.get<string>('AUTH_BASEURL') || configService.getOrThrow<string>('BASE_URL'),
+      trustProxy: configService.get<string>('AUTH_TRUST_PROXY') === 'true',
+      acceptUserGroupsFromAuthProvider: configService.get<string>('AUTH_USE_USER_GROUPS_FROM_AUTH_PROVIDER') === 'true',
+      loginAllowedGroups: this.parseAllowedUserGroups(this.configService.get<string>('AUTH_LOGIN_ALLOWED_GROUPS', '')),
+      userGroupsPropertyName: configService.get<string>('AUTH_USER_GROUPS_PROPERTY_NAME', 'groups'),
     };
 
     this.configureGithub(configService, config);
@@ -43,6 +44,23 @@ export class AuthService implements OnModuleInit {
     config.enablePassword = configService.get('AUTH_ENABLE_PASSWORD') === 'true';
 
     this.config = config;
+  }
+
+  private parseAllowedUserGroups(value: string): string[] {
+    const envValue = value.trim();
+    if (!envValue) return [];
+    const userGroups = [
+      ...new Set(
+        envValue
+          .split(',')
+          .map((s) => s.trim())
+          .filter((s) => s.length > 0),
+      ),
+    ];
+    if (userGroups.length > 0) {
+      this.logger.log(`Allowed user groups for login: ${userGroups.join(', ')}`);
+    }
+    return userGroups;
   }
 
   private async setSessionUser(req: Request, user: User | UserEntity | undefined) {
@@ -199,7 +217,7 @@ export class AuthService implements OnModuleInit {
     if (!(await bcrypt.compare(password, user.passwordHash))) {
       throw new UnauthorizedException('Wrong password.');
     }
-    this.assertHasSystemGroup(user.userGroups ?? []);
+    this.assertContainsRequiredUserGroup(user.userGroups ?? []);
     await this.setSessionUser(req, user);
   }
 
@@ -221,15 +239,16 @@ export class AuthService implements OnModuleInit {
     }
 
     const userGroups = fromDB?.userGroups ?? [];
-    this.assertHasSystemGroup(userGroups);
+    this.assertContainsRequiredUserGroup(userGroups);
 
     await this.setSessionUser(req, fromDB ?? undefined);
   }
 
-  private assertHasSystemGroup(userGroups: UserGroupEntity[]) {
-    const hasSystemGroup = userGroups.some((g) => g.id === BUILTIN_USER_GROUP_ADMIN || g.id === BUILTIN_USER_GROUP_DEFAULT);
-    if (!hasSystemGroup) {
-      throw new ForbiddenException('User is not a member of any system group and is not allowed to log in.');
+  private assertContainsRequiredUserGroup(userGroups: UserGroupEntity[]) {
+    if (this.config.loginAllowedGroups.length > 0 && !userGroups.some((g) => this.config.loginAllowedGroups.includes(g.name))) {
+      throw new ForbiddenException(
+        `User does not have one of the groups ${this.config.loginAllowedGroups.join(', ')}. Login is denied.`,
+      );
     }
   }
 
