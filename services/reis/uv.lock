@@ -1595,7 +1595,7 @@ wheels = [
 
 [[package]]
 name = "langchain-aws"
-version = "1.3.0"
+version = "1.3.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "boto3" },
@@ -1603,9 +1603,9 @@ dependencies = [
     { name = "numpy" },
     { name = "pydantic" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/12/fd/bde5b3ba38acefd065dd03471d10ac9bfe3f142e15c4db8837be2901cb6d/langchain_aws-1.3.0.tar.gz", hash = "sha256:e2d7c7c080b9828e6743721d6cdb1b5494bb5a8d799f2dac2a9ed911a90d7b5f", size = 423742, upload-time = "2026-02-23T15:17:41.388Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/7a/23/5c681e53480b046a255bd6525de49e7cac7e51b436525f7425a3bf5c7909/langchain_aws-1.3.1.tar.gz", hash = "sha256:2084a612ab965937329d4d9f4098e93277e23aef401dec001125fa3fd7ea751c", size = 425998, upload-time = "2026-02-27T01:16:18.631Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/62/94/5237b282e6ea78bfc9e23847d0c90754eda6e055e3c9a0517b95e9e12b90/langchain_aws-1.3.0-py3-none-any.whl", hash = "sha256:0bcfdd93d87468d2d71fff26bda9917c036879e9b1ce1b62aac70303e6449e34", size = 170578, upload-time = "2026-02-23T15:17:40.155Z" },
+    { url = "https://files.pythonhosted.org/packages/94/7b/b254f9271613bc8a5b6f454e67b9ea62921bc3d6fc17ad232278b8266f97/langchain_aws-1.3.1-py3-none-any.whl", hash = "sha256:b4bc4ea4a763202a32f68eed1f7b3c40b59ce8fb9d113e47e9839de0cedee816", size = 170903, upload-time = "2026-02-27T01:16:17.388Z" },
 ]
 
 [[package]]
