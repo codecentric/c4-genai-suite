@@ -55,7 +55,6 @@ export function ChatInput({
     uploadLimitReached,
     refetchConversationFiles,
     uploadMutations,
-    upload,
     userBucket,
     remove,
   } = useChatDropzone();
@@ -116,9 +115,11 @@ export function ChatInput({
     }
   });
 
+  const isUploadPending = uploadMutations.some((mutation) => mutation.status === 'pending');
+
   const doSubmit = useEventCallback((event: React.FormEvent) => {
     event.preventDefault();
-    if (isDisabled || isStreaming || !input || input.length === 0 || upload.status === 'pending') {
+    if (isDisabled || isStreaming || !input || input.length === 0 || isUploadPending) {
       return;
     }
     doSetText(input, chatFiles);
@@ -312,11 +313,7 @@ export function ChatInput({
                   type={isStreaming ? 'button' : 'submit'}
                   size="lg"
                   onClick={isStreaming ? stopGeneration : undefined}
-                  disabled={
-                    isStreaming
-                      ? isDisabled || !stopGeneration
-                      : !input || isDisabled || uploadMutations.some((m) => m.status === 'pending') || listening
-                  }
+                  disabled={isStreaming ? isDisabled || !stopGeneration : !input || isDisabled || isUploadPending || listening}
                   data-testid="chat-submit-button"
                 >
                   {isStreaming ? <IconX className="w-4" /> : <Icon icon="arrow-up" />}
