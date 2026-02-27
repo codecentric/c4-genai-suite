@@ -54,4 +54,18 @@ test('stop button cancels active streaming response', async ({ page, mockServerU
     expect(textAfterWait).toBe(textAfterStop);
     await expect(aiMessage).not.toContainText('ENDMARKER');
   });
+
+  await test.step('should keep first stopped response frozen after sending another prompt', async () => {
+    const submitButton = page.getByTestId('chat-submit-button');
+    const firstAiMessage = page.getByTestId('chat-item').nth(1);
+    const frozenFirstMessage = normalizeText(await firstAiMessage.textContent());
+
+    await page.getByPlaceholder(`Message ${configuration.name}`).fill('answer to life, the universe and everything');
+    await submitButton.click();
+    await expect(page.getByTestId('chat-item').last()).toContainText('42');
+
+    const firstMessageAfterSecondPrompt = normalizeText(await firstAiMessage.textContent());
+    expect(firstMessageAfterSecondPrompt).toBe(frozenFirstMessage);
+    await expect(firstAiMessage).not.toContainText('ENDMARKER');
+  });
 });
