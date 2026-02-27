@@ -48,9 +48,7 @@ test('stop button cancels active streaming response', async ({ page, mockServerU
     await expect(submitButton.locator('svg.tabler-icon-x')).toHaveCount(0);
 
     const textAfterStop = normalizeText(await aiMessage.textContent());
-    await expect
-      .poll(async () => normalizeText(await aiMessage.textContent()))
-      .toBe(textAfterStop);
+    await expect.poll(async () => normalizeText(await aiMessage.textContent())).toBe(textAfterStop);
     await expect(aiMessage).not.toContainText('ENDMARKER');
   });
 
