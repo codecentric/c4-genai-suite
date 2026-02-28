@@ -7,6 +7,8 @@ services:
       - ./dev/Caddyfile:/etc/caddy/Caddyfile
     ports:
       - "3333:3080"
+    environment:
+      VERSION: 1.0.0-dev
     depends_on:
       c4-backend:
         condition: service_started
@@ -34,6 +36,7 @@ services:
       AUTH_OAUTH_TOKEN_URL: http://oauth:9999/default/token
       AUTH_OAUTH_USER_INFO_URL: http://oauth:9999/default/userinfo
       AUTH_LOGOUT_REDIRECT: http://localhost:9999/default/endsession?post_logout_redirect_uri=http://localhost:3333
+      VERSION: 1.0.0-dev
     depends_on:
       postgres:
         condition: service_healthy
@@ -61,6 +64,7 @@ services:
       FILE_STORE_S3_ACCESS_KEY_ID: admin
       FILE_STORE_S3_SECRET_ACCESS_KEY: secretsecret
       FILE_STORE_S3_BUCKET_NAME: reisbucket
+      VERSION: 1.0.0-dev
     ports:
       - "3201:3201"
       - "3202:3202"

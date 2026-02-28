@@ -68,11 +68,7 @@ export async function createConfiguration(
   expect: { detached: boolean } = { detached: true },
 ) {
   await page.getByRole('link', { name: 'Assistants' }).click();
-  await page
-    .locator('*')
-    .filter({ hasText: /^Assistants$/ })
-    .getByRole('button')
-    .click();
+  await page.getByRole('button', { name: 'Create assistant' }).click();
 
   await page.getByLabel(/^Name/).fill(configuration.name);
   if (configuration.description) {
