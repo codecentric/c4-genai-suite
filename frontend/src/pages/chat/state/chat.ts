@@ -188,7 +188,11 @@ export const useChatStream = (chatId: number) => {
     chatStore.setActiveStreamSubscription(chatId, subscription);
   };
 
-  return { sendMessage, isChatLoading };
+  const cancelStream = () => {
+    chatStore.cancelActiveStream(chatId);
+  };
+
+  return { sendMessage, cancelStream, isChatLoading };
 };
 
 export const useStateMutateChat = (chatId: number) => {
