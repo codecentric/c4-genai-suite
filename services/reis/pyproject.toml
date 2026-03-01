@@ -41,7 +41,7 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-    "ruff==0.15.3",
+    "ruff==0.15.4",
     "ty>=0.0.9",
     "pip==26.0.1",
     "pre-commit==4.5.1",
@@ -51,7 +51,7 @@ dev = [
     "pytest-responses==0.5.1",
     "pytest-github-report==0.0.1",
     "pytest-error-for-skips==2.0.2",
-    "faker==40.4.0",
+    "faker==40.5.1",
     "responses==0.26.0",
 ]
 
