@@ -183,7 +183,9 @@ export async function buildConfiguration(
 
 export function buildConfigurationSnapshot(configuration: ConfigurationModel): Record<string, unknown> {
   // Explicitly pick only the fields defined in the ConfigurationModel interface (excluding extensions)
-  const snapshot: Omit<ConfigurationModel, 'extensions'> = {
+  // executorHeaders is omitted because it can contain secrets (bearer tokens / API keys).
+  // A boolean flag records whether headers were configured so diffs remain meaningful.
+  const snapshot: Omit<ConfigurationModel, 'extensions' | 'executorHeaders'> & { executorHeadersConfigured: boolean } = {
     id: configuration.id,
     name: configuration.name,
     description: configuration.description,
@@ -192,7 +194,7 @@ export function buildConfigurationSnapshot(configuration: ConfigurationModel): R
     chatFooter: configuration.chatFooter,
     chatSuggestions: configuration.chatSuggestions,
     executorEndpoint: configuration.executorEndpoint,
-    executorHeaders: configuration.executorHeaders,
+    executorHeadersConfigured: !!configuration.executorHeaders,
     userGroupIds: configuration.userGroupIds,
   };
   return JSON.parse(JSON.stringify(snapshot)) as Record<string, unknown>;
