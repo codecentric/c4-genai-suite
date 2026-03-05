@@ -37,7 +37,7 @@ jobs:
       MOCK_LLM_HOST: host.docker.internal
     steps:
       - uses: actions/checkout@v6
-      - uses: docker/setup-buildx-action@v3
+      - uses: docker/setup-buildx-action@v4
       - run: docker network create test-network
       - name: start database
         run: |
