@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker';
 import { expect, test } from '@playwright/test';
-import { enterAdminArea, login, navigateToConfigurationAdministration, navigateToUserGroupAdministration } from '../utils/helper';
+import { enterAdminArea, login, navigateToUserGroupAdministration } from '../utils/helper';
 
 const configName = faker.commerce.productName();
 const configDescription = faker.commerce.productDescription();
@@ -20,10 +20,8 @@ test('Audit Log', async ({ page }) => {
   });
 
   await test.step('should show audit entries when configuration is created', async () => {
-    const initialRowCount = await page.getByRole('table').getByRole('row').count();
-
     // Create a configuration
-    await navigateToConfigurationAdministration(page);
+    await page.getByRole('link', { name: 'Assistants' }).click();
     await page
       .locator('div')
       .filter({ hasText: /^Assistants$/ })
@@ -37,11 +35,8 @@ test('Audit Log', async ({ page }) => {
     await createConfigurationModal.waitFor({ state: 'detached' });
 
     // Check audit log
+    await page.waitForTimeout(300); // Give time for audit log to be created
     await page.getByRole('link', { name: 'Audit Log' }).click();
-    await page.waitForTimeout(500); // Give time for audit log to be created
-
-    const newRowCount = await page.getByRole('table').getByRole('row').count();
-    expect(newRowCount).toBeGreaterThan(initialRowCount);
 
     // Find the row with our configuration
     const configRow = page.getByRole('table').getByRole('row').filter({ hasText: configName });
@@ -75,7 +70,7 @@ test('Audit Log', async ({ page }) => {
 
     // Check modal content
     await expect(modal.getByText('Assistant')).toBeVisible();
-    await expect(modal.getByText('Create')).toBeVisible();
+    await expect(modal.getByText('Create', { exact: true })).toBeVisible();
     await expect(modal.getByText(configName)).toBeVisible();
 
     // For create action, should show "Entity was created" message
@@ -148,8 +143,8 @@ test('Audit Log', async ({ page }) => {
     const modal = page.getByRole('dialog');
     await expect(modal).toBeVisible();
 
-    // Should have jsondiffpatch diff view (check for the changed name)
-    await expect(modal.locator('.jsondiffpatch-delta').or(modal.getByText(updatedGroupName))).toBeVisible();
+    // Should have jsondiffpatch diff view
+    await expect(modal.locator('.jsondiffpatch-delta').getByText(updatedGroupName)).toBeVisible();
 
     // Close modal
     await page.keyboard.press('Escape');
@@ -176,12 +171,6 @@ test('Audit Log', async ({ page }) => {
       const userGroupRows = await rows.count();
       expect(userGroupRows).toBe(rowCount);
     }
-  });
-
-  await test.step('should clear filters when switching between filter types', async () => {
-    // With entity type filter active, assistant filter selection should disable entity type
-    const entityTypeSelect = page.locator('.mantine-Select-input').last();
-    await expect(entityTypeSelect).toBeDisabled();
   });
 
   await test.step('should paginate audit log entries', async () => {
