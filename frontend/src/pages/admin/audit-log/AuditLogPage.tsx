@@ -20,7 +20,8 @@ const diffpatcher = create({
 });
 
 function formatDate(date: Date): string {
-  return new Intl.DateTimeFormat('en-US', {
+  // Use the browser's locale so timestamps respect the user's language/region.
+  return new Intl.DateTimeFormat(navigator.language, {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
@@ -225,7 +226,9 @@ export function AuditLogPage() {
   }, []);
 
   const handleFilterChange = useCallback((value: string | null) => {
-    setEntityTypeFilter(value as GetAuditLogsEntityTypeEnum | undefined);
+    // Normalize '' (the "All Types" sentinel) and null both to undefined so no
+    // invalid enum value is kept in state or forwarded to the backend.
+    setEntityTypeFilter((value || undefined) as GetAuditLogsEntityTypeEnum | undefined);
     setPage(0);
   }, []);
 
