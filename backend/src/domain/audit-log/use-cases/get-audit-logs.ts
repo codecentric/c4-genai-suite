@@ -47,7 +47,7 @@ export class GetAuditLogsHandler implements IQueryHandler<GetAuditLogs, GetAudit
 
     const queryBuilder = this.auditLogs.createQueryBuilder('audit_log');
 
-    if (configurationId) {
+    if (configurationId != null) {
       // Filter for configuration changes and related extension changes
       queryBuilder.andWhere(
         `(

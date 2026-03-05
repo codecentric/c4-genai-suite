@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { AuditLogService, PerformedBy } from 'src/domain/audit-log';
 import { ConfigurationEntity, ConfigurationRepository, ExtensionEntity, ExtensionRepository } from 'src/domain/database';
 import { ExplorerService } from '../services';
-import { buildExtension, buildExtensionSnapshot } from './utils';
+import { buildExtension, buildExtensionSnapshot, maskKeyValues } from './utils';
 
 export class DeleteExtension {
   constructor(
@@ -36,6 +36,7 @@ export class DeleteExtensionHandler implements ICommandHandler<DeleteExtension, 
       const configuration = await this.configurations.findOneBy({ id: entity.configurationId });
       if (extensionConfig) {
         const configuredExtension = await buildExtension(entity, extensionConfig);
+        maskKeyValues(configuredExtension);
         extensionSnapshot = buildExtensionSnapshot(configuredExtension, entity.configurationId, configuration?.name);
       }
     }
