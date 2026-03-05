@@ -131,6 +131,18 @@ describe('GetAuditLogsHandler', () => {
       });
     });
 
+    it('should apply configuration filter when configurationId is 0', async () => {
+      queryBuilder.getManyAndCount.mockResolvedValue([[], 0]);
+
+      const query = new GetAuditLogs({ configurationId: 0 });
+      await handler.execute(query);
+
+      // configurationId 0 is a valid numeric ID and must not be treated as falsy
+      expect(queryBuilder.andWhere).toHaveBeenCalledWith(expect.stringContaining("audit_log.entityType = 'configuration'"), {
+        configId: '0',
+      });
+    });
+
     it('should not apply entity filters when configurationId is provided', async () => {
       queryBuilder.getManyAndCount.mockResolvedValue([[], 0]);
 
