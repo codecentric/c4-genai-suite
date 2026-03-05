@@ -1,5 +1,5 @@
 import { ActionIcon, Button, Portal } from '@mantine/core';
-import { IconFilter, IconPaperclip } from '@tabler/icons-react';
+import { IconFilter, IconPaperclip, IconX } from '@tabler/icons-react';
 import React, { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
 import { ConfigurationDto, FileDto } from 'src/api';
@@ -27,10 +27,21 @@ interface ChatInputProps {
   configuration?: ConfigurationDto;
   chatId: number;
   isDisabled?: boolean;
+  isStreaming?: boolean;
   isEmpty?: boolean;
   submitMessage: (input: string, files?: FileDto[]) => void;
+  stopGeneration?: () => void;
 }
-export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEmpty, submitMessage }: ChatInputProps) {
+export function ChatInput({
+  textareaRef,
+  chatId,
+  configuration,
+  isDisabled,
+  isStreaming,
+  isEmpty,
+  submitMessage,
+  stopGeneration,
+}: ChatInputProps) {
   const extensionsWithFilter = configuration?.extensions?.filter(isExtensionWithUserArgs) ?? [];
   const { updateContext, context } = useExtensionContext(chatId);
   const [defaultValues, setDefaultValues] = useState<UserArgumentDefaultValueByExtensionIDAndName>({});
@@ -44,7 +55,6 @@ export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEm
     uploadLimitReached,
     refetchConversationFiles,
     uploadMutations,
-    upload,
     userBucket,
     remove,
   } = useChatDropzone();
@@ -105,12 +115,14 @@ export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEm
     }
   });
 
+  const isUploadPending = uploadMutations.some((mutation) => mutation.status === 'pending');
+
   const doSubmit = useEventCallback((event: React.FormEvent) => {
-    if (isDisabled || !input || input.length === 0 || upload.status === 'pending') {
+    event.preventDefault();
+    if (isDisabled || isStreaming || !input || input.length === 0 || isUploadPending) {
       return;
     }
     doSetText(input, chatFiles);
-    event.preventDefault();
     void refetchConversationFiles();
   });
 
@@ -298,12 +310,15 @@ export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEm
                   <TranscribeButton isRecording={isRecording} isTranscribing={isTranscribing} onToggle={toggleRecording} />
                 ) : null}
                 <ActionIcon
-                  type="submit"
+                  type={isStreaming ? 'button' : 'submit'}
                   size="lg"
-                  disabled={!input || isDisabled || uploadMutations.some((m) => m.status === 'pending') || listening}
+                  onClick={isStreaming ? stopGeneration : undefined}
+                  disabled={isStreaming ? isDisabled || !stopGeneration : !input || isDisabled || isUploadPending || listening}
                   data-testid="chat-submit-button"
+                  aria-label={isStreaming ? 'Stop generating' : 'Send message'}
+                  title={isStreaming ? 'Stop generating' : 'Send message'}
                 >
-                  <Icon icon="arrow-up" />
+                  {isStreaming ? <IconX className="w-4" /> : <Icon icon="arrow-up" />}
                 </ActionIcon>
               </div>
             </div>
