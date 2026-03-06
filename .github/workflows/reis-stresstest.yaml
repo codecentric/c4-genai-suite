@@ -29,7 +29,7 @@ jobs:
       - if: ${{ steps.download_reis.outcome == 'failure' }}
         uses: actions/checkout@v6
       - if: ${{ steps.download_reis.outcome == 'failure' }}
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
       - if: ${{ steps.download_reis.outcome == 'failure' }}
         uses: docker/build-push-action@v6
         with:
