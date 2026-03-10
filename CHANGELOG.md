@@ -1,5 +1,12 @@
 # Changelog
 
+## [9.16.1](https://github.com/codecentric/c4-genai-suite/compare/v9.16.0...v9.16.1) (2026-03-10)
+
+
+### Bug Fixes
+
+* use ai-sdk buffer instead of data url ([#1410](https://github.com/codecentric/c4-genai-suite/issues/1410)) ([b0d11ea](https://github.com/codecentric/c4-genai-suite/commit/b0d11eafd57c9f9d6826523a0ff7ee15a751909e))
+
 ## [9.16.0](https://github.com/codecentric/c4-genai-suite/compare/v9.15.1...v9.16.0) (2026-03-06)
 
 
