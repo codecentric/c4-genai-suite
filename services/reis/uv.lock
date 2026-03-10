@@ -1675,16 +1675,17 @@ wheels = [
 
 [[package]]
 name = "langchain-nvidia-ai-endpoints"
-version = "1.1.0"
+version = "1.2.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiohttp" },
     { name = "filetype" },
     { name = "langchain-core" },
+    { name = "requests" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/4e/d1/f72ec11097694e24d93268ab031c7ec56ab4bec1c43ef7814c659f3e2493/langchain_nvidia_ai_endpoints-1.1.0.tar.gz", hash = "sha256:048a3e6d7231365fdb9fff7bcff18ce6a516b25500681f51dcb69c39e82512a0", size = 47433, upload-time = "2026-02-25T21:48:16.87Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/47/4b/e417af1b2b7f861f37e26bf4fa4b05cda4052002e3f84a966f0735baf94f/langchain_nvidia_ai_endpoints-1.2.0.tar.gz", hash = "sha256:4bd63b812707ea348a86539001aa9a89b3cba3ee56ade7379247a955e4bfd3eb", size = 53851, upload-time = "2026-03-10T17:55:08.127Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/0b/22/5f07957028f7fa8c3d695934af8e7309bfd5ab43f2a7a756d3c3d6ce44f3/langchain_nvidia_ai_endpoints-1.1.0-py3-none-any.whl", hash = "sha256:eb04251b2b21facf9d6f2e6e7fa593b89e4f5023ebe3af1e02813512d1cd9687", size = 51514, upload-time = "2026-02-25T21:48:15.695Z" },
+    { url = "https://files.pythonhosted.org/packages/66/e4/186f1a99e4d30bd91c8438d024dc73a71c8f7e0657c7acb6e79658aa19cf/langchain_nvidia_ai_endpoints-1.2.0-py3-none-any.whl", hash = "sha256:c8e075d5b3d31216374af0cfa9e690ab28ada3ebbde34dd6d36fe16a26d883cc", size = 58269, upload-time = "2026-03-10T17:55:06.339Z" },
 ]
 
 [[package]]
@@ -1702,16 +1703,16 @@ wheels = [
 
 [[package]]
 name = "langchain-openai"
-version = "1.1.10"
+version = "1.1.11"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "langchain-core" },
     { name = "openai" },
     { name = "tiktoken" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/d6/0f/01147f842499338ae3b0dd0a351fb83006d9ed623cf3a999bd68ba5bbe2d/langchain_openai-1.1.10.tar.gz", hash = "sha256:ca6fae7cf19425acc81814efed59c7d205ec9a1f284fd1d08aae9bda85d6501b", size = 1059755, upload-time = "2026-02-17T18:03:44.506Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/40/cd/439be2b8deb8bd0d4c470c7c7f66698a84d823e583c3d36a322483cb7cab/langchain_openai-1.1.11.tar.gz", hash = "sha256:44b003a2960d1f6699f23721196b3b97d0c420d2e04444950869213214b7a06a", size = 1088560, upload-time = "2026-03-09T23:02:36.894Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/72/17/3785cbcdc81c451179247e4176d2697879cb4f45ab2c59d949ca574e072d/langchain_openai-1.1.10-py3-none-any.whl", hash = "sha256:d91b2c09e9fbc70f7af45345d3aa477744962d41c73a029beb46b4f83b824827", size = 87205, upload-time = "2026-02-17T18:03:43.502Z" },
+    { url = "https://files.pythonhosted.org/packages/f0/0f/e4cb42848c25f65969adfb500a06dea1a541831604250fd0d8aa6e54fef5/langchain_openai-1.1.11-py3-none-any.whl", hash = "sha256:a03596221405d38d6852fb865467cb0d9ff9e79f335905eb6a576e8c4874ac71", size = 87694, upload-time = "2026-03-09T23:02:35.651Z" },
 ]
 
 [[package]]
@@ -2203,7 +2204,7 @@ wheels = [
 
 [[package]]
 name = "openai"
-version = "2.21.0"
+version = "2.26.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "anyio" },
@@ -2215,9 +2216,9 @@ dependencies = [
     { name = "tqdm" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/92/e5/3d197a0947a166649f566706d7a4c8f7fe38f1fa7b24c9bcffe4c7591d44/openai-2.21.0.tar.gz", hash = "sha256:81b48ce4b8bbb2cc3af02047ceb19561f7b1dc0d4e52d1de7f02abfd15aa59b7", size = 644374, upload-time = "2026-02-14T00:12:01.577Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/d7/91/2a06c4e9597c338cac1e5e5a8dd6f29e1836fc229c4c523529dca387fda8/openai-2.26.0.tar.gz", hash = "sha256:b41f37c140ae0034a6e92b0c509376d907f3a66109935fba2c1b471a7c05a8fb", size = 666702, upload-time = "2026-03-05T23:17:35.874Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/cc/56/0a89092a453bb2c676d66abee44f863e742b2110d4dbb1dbcca3f7e5fc33/openai-2.21.0-py3-none-any.whl", hash = "sha256:0bc1c775e5b1536c294eded39ee08f8407656537ccc71b1004104fe1602e267c", size = 1103065, upload-time = "2026-02-14T00:11:59.603Z" },
+    { url = "https://files.pythonhosted.org/packages/c6/2e/3f73e8ca53718952222cacd0cf7eecc9db439d020f0c1fe7ae717e4e199a/openai-2.26.0-py3-none-any.whl", hash = "sha256:6151bf8f83802f036117f06cc8a57b3a4da60da9926826cc96747888b57f394f", size = 1136409, upload-time = "2026-03-05T23:17:34.072Z" },
 ]
 
 [[package]]
