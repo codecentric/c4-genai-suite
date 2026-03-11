@@ -293,6 +293,8 @@ export const de: typeof en = {
       'Datei {{fileName}} konnte nicht hochgeladen werden. Bilder können über das 📎-Symbol im Nachrichtenfenster hochgeladen werden.',
     uploading: 'Datei wird hochgeladen',
     uploadMultiple: '{{fileCount}} Dateien werden hochgeladen...',
+    waitingMessage1: 'lädt...',
+    waitingMessage2: 'noch einige Minuten',
     wholeFileTooLarge: 'Die Datei ist größer als die definierte maximale Dateigröße',
   },
   login: {
