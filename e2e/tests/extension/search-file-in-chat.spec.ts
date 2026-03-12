@@ -201,7 +201,9 @@ test('files in chat', async ({ page, mockServerUrl }) => {
 
     await duplicateActiveConversation(page, originalConversationName);
 
-    const originalConversation = page.getByTestId('conversation-item').filter({ hasText: new RegExp(`^${originalConversationName}$`) });
+    const originalConversation = page
+      .getByTestId('conversation-item')
+      .filter({ hasText: new RegExp(`^${originalConversationName}$`) });
     await originalConversation.click();
     await deleteFirstFileFromPaperclip(page);
 

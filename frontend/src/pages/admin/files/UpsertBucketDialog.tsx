@@ -333,7 +333,12 @@ export function FileSizeDynamicFields({ form, name: _name, label, suffix, classN
           <button type="button" className="cursor-pointer" data-testid="fileSizeLimitsDynamic.add" onClick={handleAddField}>
             <Icon icon="plus" />
           </button>
-          <input placeholder="general" disabled className={cn('input input-bordered w-full', className)} aria-label={texts.accessibility.fileTypeGeneral} />
+          <input
+            placeholder="general"
+            disabled
+            className={cn('input input-bordered w-full', className)}
+            aria-label={texts.accessibility.fileTypeGeneral}
+          />
           <div className="relative w-full">
             <input
               type="number"

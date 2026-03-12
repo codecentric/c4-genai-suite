@@ -76,7 +76,10 @@ export const ConversationItem = memo(({ chat }: ChatProps) => {
               aria-haspopup="true"
               aria-expanded={menuOpen}
             >
-              <IconDots style={{ width: rem(18), height: rem(18) }} data-testid={isSelected ? 'active-conversation-item-more-actions' : 'conversation-item-more-actions'} />
+              <IconDots
+                style={{ width: rem(18), height: rem(18) }}
+                data-testid={isSelected ? 'active-conversation-item-more-actions' : 'conversation-item-more-actions'}
+              />
             </Button>
           </Menu.Target>
           <Menu.Dropdown>

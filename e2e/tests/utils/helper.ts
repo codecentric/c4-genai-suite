@@ -774,7 +774,7 @@ export function globalConversationBucketName(): string {
   return 'E2E-Conversation-Bucket';
 }
 
-export async function expectA11yCompliant(page: Page, exceptions: any[] = []) {
+export async function expectA11yCompliant(page: Page) {
   const accessibilityScanResults = await new AxeBuilder({ page }).analyze();
-  expect(accessibilityScanResults.violations).toEqual(exceptions);
+  expect(accessibilityScanResults.violations).toEqual([]);
 }

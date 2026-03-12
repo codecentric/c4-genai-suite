@@ -4,7 +4,7 @@ import { NavigationBar } from 'src/components/NavigationBar';
 import { render } from 'src/pages/admin/test-utils';
 import { InAppDocsProvider } from './InAppDocsProvider';
 
-describe('Markdown component', () => {
+describe('NavigationBar component', () => {
   it('renders logo without text if logo present', () => {
     const theme = { logoUrl: '/settings/logo', name: 'Test' };
     render(
