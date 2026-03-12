@@ -12,3 +12,5 @@ export * from './setting';
 export * from './usage';
 export * from './user';
 export * from './user-group';
+export * from './prompt';
+export * from './prompt-category';

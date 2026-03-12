@@ -16,6 +16,7 @@ import { ExtensionsController } from './controllers/extensions/extensions.contro
 import { FilesController } from './controllers/files/files.controller';
 import { UserFilesController } from './controllers/files/user-files.controller';
 import { HealthController } from './controllers/health/health.controller';
+import { PromptController } from './controllers/prompts/prompts.controller';
 import { ApiResponsesController } from './controllers/responses/api.responses.controller';
 import { SettingsController } from './controllers/settings/settings.controller';
 import { TranscriptionController } from './controllers/transcription/transcription.controller';
@@ -29,6 +30,7 @@ import { UserEntity } from './domain/database';
 import { initSchemaIfNotExistsAndMoveMigrations, schema } from './domain/database/typeorm.helper';
 import { ExtensionModule } from './domain/extensions';
 import { FilesModule } from './domain/files';
+import { PromptModule } from './domain/prompt';
 import { SettingsModule } from './domain/settings';
 import { TranscriptionModule } from './domain/transcription';
 import { UsersModule } from './domain/users/module';
@@ -56,6 +58,7 @@ import { PrometheusModule } from './metrics/prometheus.module';
     }),
     PrometheusModule.forRoot(),
     OpenTelemetryModule,
+    PromptModule,
     SettingsModule,
     TranscriptionModule,
     UsersModule,
@@ -95,6 +98,7 @@ import { PrometheusModule } from './metrics/prometheus.module';
     EvalController,
     ExtensionsController,
     FilesController,
+    PromptController,
     SettingsController,
     TranscriptionController,
     UsagesController,
