@@ -9,7 +9,7 @@ COPY . .
 RUN VITE_VERSION="$VERSION" npm run build
 
 
-FROM caddy:2.11.1
+FROM caddy:2.11.2
 
 RUN setcap -r /usr/bin/caddy
 
