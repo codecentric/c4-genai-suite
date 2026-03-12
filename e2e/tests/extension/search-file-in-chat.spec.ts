@@ -97,13 +97,13 @@ test('files in chat', async ({ page, mockServerUrl }) => {
 
     await duplicateActiveConversation(page, originalConversationWithChatWithFiles);
     const duplicatedName = `${originalConversationWithChatWithFiles} (2)`;
-    const duplicatedConversation = page.locator('role=navigation', { hasText: duplicatedName });
+    const duplicatedConversation = page.getByTestId('conversation-item').filter({ hasText: duplicatedName });
 
     await expect(duplicatedConversation).toBeVisible();
   });
 
   await test.step('should navigate to duplicated conversation with chat with files extension', async () => {
-    const duplicatedConversationLocator = page.getByRole('navigation').filter({
+    const duplicatedConversationLocator = page.getByTestId('conversation-item').filter({
       hasText: `${originalConversationWithChatWithFiles} (2)`,
     });
 
@@ -132,7 +132,7 @@ test('files in chat', async ({ page, mockServerUrl }) => {
     expect(originalConversationWithChatWithFiles).not.toBeNull();
 
     const originalConversationLocator = page
-      .getByRole('navigation')
+      .getByTestId('conversation-item')
       .filter({ hasText: new RegExp(`^${originalConversationWithChatWithFiles}$`) })
       .first();
 
@@ -182,7 +182,7 @@ test('files in chat', async ({ page, mockServerUrl }) => {
 
     await duplicateActiveConversation(page, originalConversationWithTwoFiles);
     const duplicatedName = `${originalConversationWithTwoFiles} (2)`;
-    const duplicatedConversation = page.getByRole('navigation').filter({ hasText: duplicatedName });
+    const duplicatedConversation = page.getByTestId('conversation-item').filter({ hasText: duplicatedName });
     await expect(duplicatedConversation).toBeVisible();
 
     const fileChips = page.getByTestId('file-chip');
@@ -201,12 +201,14 @@ test('files in chat', async ({ page, mockServerUrl }) => {
 
     await duplicateActiveConversation(page, originalConversationName);
 
-    const originalConversation = page.getByRole('navigation').filter({ hasText: new RegExp(`^${originalConversationName}$`) });
+    const originalConversation = page
+      .getByTestId('conversation-item')
+      .filter({ hasText: new RegExp(`^${originalConversationName}$`) });
     await originalConversation.click();
     await deleteFirstFileFromPaperclip(page);
 
     const duplicatedName = `${originalConversationName} (2)`;
-    const duplicatedConversation = page.getByRole('navigation').filter({ hasText: duplicatedName });
+    const duplicatedConversation = page.getByTestId('conversation-item').filter({ hasText: duplicatedName });
     await expect(duplicatedConversation).toBeVisible();
 
     await duplicatedConversation.click();

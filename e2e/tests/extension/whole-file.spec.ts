@@ -102,7 +102,7 @@ test('whole file extension', async ({ page, mockServerUrl }) => {
     await page.locator('text=Conversation duplicated successfully').waitFor({ state: 'visible' });
 
     const duplicatedName = `${originalConversationName} (2)`;
-    const duplicatedConversation = page.getByRole('navigation').filter({ hasText: duplicatedName });
+    const duplicatedConversation = page.getByTestId('conversation-item').filter({ hasText: duplicatedName });
     await expect(duplicatedConversation).toBeVisible();
   });
 
@@ -165,7 +165,7 @@ test('whole file extension', async ({ page, mockServerUrl }) => {
 
   await test.step('should navigate to duplicated conversation with complete file extension', async () => {
     await enterUserArea(page);
-    const duplicatedConversationLocator = page.getByRole('navigation').filter({
+    const duplicatedConversationLocator = page.getByTestId('conversation-item').filter({
       hasText: `${originalConversationName} (2)`,
     });
 
