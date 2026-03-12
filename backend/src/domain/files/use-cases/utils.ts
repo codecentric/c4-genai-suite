@@ -8,6 +8,25 @@ export function buildBucket(source: BucketEntity): Bucket {
   return source;
 }
 
+export function buildBucketSnapshot(bucket: Bucket): Record<string, unknown> {
+  // Explicitly pick only non-sensitive bucket fields.
+  // Headers are omitted because they can contain credentials (Authorization/API keys).
+  // A boolean flag records whether headers were configured so diffs remain meaningful.
+  const snapshot = {
+    id: bucket.id,
+    name: bucket.name,
+    endpoint: bucket.endpoint,
+    indexName: bucket.indexName,
+    isDefault: bucket.isDefault,
+    perUserQuota: bucket.perUserQuota,
+    allowedFileNameExtensions: bucket.allowedFileNameExtensions,
+    type: bucket.type,
+    fileSizeLimits: bucket.fileSizeLimits,
+    headersConfigured: !!bucket.headers,
+  };
+  return JSON.parse(JSON.stringify(snapshot)) as Record<string, unknown>;
+}
+
 export function buildFile(source: FileEntity): UploadedFile {
   const { createdAt: uploadedAt, ...other } = source;
 

@@ -1,6 +1,7 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Req, UseGuards } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { ApiNoContentResponse, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { Request } from 'express';
 import { LocalAuthGuard, Role, RoleGuard } from 'src/domain/auth';
 import { BUILTIN_USER_GROUP_ADMIN } from 'src/domain/database';
 import {
@@ -39,8 +40,8 @@ export class UserGroupsController {
   @ApiOkResponse({ type: UserGroupDto })
   @Role(BUILTIN_USER_GROUP_ADMIN)
   @UseGuards(RoleGuard)
-  async postUserGroup(@Body() body: UpsertUserGroupDto) {
-    const command = new CreateUserGroup(body);
+  async postUserGroup(@Body() body: UpsertUserGroupDto, @Req() req: Request) {
+    const command = new CreateUserGroup(body, req.user);
 
     const result: CreateUserGroupResponse = await this.commandBus.execute(command);
 
@@ -57,8 +58,8 @@ export class UserGroupsController {
   @ApiOkResponse({ type: UserGroupDto })
   @Role(BUILTIN_USER_GROUP_ADMIN)
   @UseGuards(RoleGuard)
-  async putUser(@Param('id') id: string, @Body() body: UpsertUserGroupDto) {
-    const command = new UpdateUserGroup(id, body);
+  async putUserGroup(@Param('id') id: string, @Body() body: UpsertUserGroupDto, @Req() req: Request) {
+    const command = new UpdateUserGroup(id, body, req.user);
 
     const result: UpdateUserGroupResponse = await this.commandBus.execute(command);
 
@@ -75,9 +76,8 @@ export class UserGroupsController {
   @ApiNoContentResponse()
   @Role(BUILTIN_USER_GROUP_ADMIN)
   @UseGuards(RoleGuard)
-  async deleteUserGroup(@Param('id') id: string) {
-    const command = new DeleteUserGroup(id);
-
+  async deleteUserGroup(@Param('id') id: string, @Req() req: Request) {
+    const command = new DeleteUserGroup(id, req.user);
     await this.commandBus.execute(command);
   }
 }

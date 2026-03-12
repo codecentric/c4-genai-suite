@@ -1,14 +1,19 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { DeepPartial } from 'typeorm';
+import { AuditLogService } from 'src/domain/audit-log';
 import { Extension, ExtensionStringArgument } from 'src/domain/extensions';
-import { ExtensionEntity, ExtensionRepository } from '../../database';
+import { ConfigurationRepository, ExtensionEntity, ExtensionRepository } from '../../database';
 import { ExplorerService } from '../services';
 import { CreateExtension, CreateExtensionHandler } from './create-extension';
+
+const mockPerformedBy = { id: 'test-user', name: 'Test User' };
 
 describe(CreateExtension.name, () => {
   let handler: CreateExtensionHandler;
   let repository: ExtensionRepository;
+  let configRepository: ConfigurationRepository;
   let explorer: ExplorerService;
+  let auditLogService: AuditLogService;
 
   beforeEach(() => {
     explorer = {
@@ -19,8 +24,14 @@ describe(CreateExtension.name, () => {
       create: jest.fn(),
       save: jest.fn(),
     } as unknown as ExtensionRepository;
+    configRepository = {
+      findOneBy: jest.fn().mockResolvedValue({ id: 1, name: 'Test Config' }),
+    } as unknown as ConfigurationRepository;
+    auditLogService = {
+      createAuditLog: jest.fn(),
+    } as unknown as AuditLogService;
 
-    handler = new CreateExtensionHandler(explorer, repository);
+    handler = new CreateExtensionHandler(explorer, repository, configRepository, auditLogService);
   });
 
   it('should throw bad request when extension does not exist', async () => {
@@ -28,11 +39,15 @@ describe(CreateExtension.name, () => {
 
     try {
       const result = await handler.execute(
-        new CreateExtension(1, {
-          enabled: true,
-          name: 'test',
-          values: {},
-        }),
+        new CreateExtension(
+          1,
+          {
+            enabled: true,
+            name: 'test',
+            values: {},
+          },
+          mockPerformedBy,
+        ),
       );
       expect(result).toBe(false);
     } catch (err) {
@@ -48,11 +63,15 @@ describe(CreateExtension.name, () => {
     });
 
     const result = await handler.execute(
-      new CreateExtension(1, {
-        enabled: true,
-        name: 'test',
-        values: {},
-      }),
+      new CreateExtension(
+        1,
+        {
+          enabled: true,
+          name: 'test',
+          values: {},
+        },
+        mockPerformedBy,
+      ),
     );
     expect(result).toBeDefined();
     expect(result.extension.enabled).toBe(true);
@@ -95,14 +114,18 @@ describe(CreateExtension.name, () => {
     });
 
     const result = await handler.execute(
-      new CreateExtension(1, {
-        enabled: true,
-        name: 'test',
-        values: {
-          foo: 'test',
-          bar: 'secure',
+      new CreateExtension(
+        1,
+        {
+          enabled: true,
+          name: 'test',
+          values: {
+            foo: 'test',
+            bar: 'secure',
+          },
         },
-      }),
+        mockPerformedBy,
+      ),
     );
 
     expect(saveArg).toEqual({

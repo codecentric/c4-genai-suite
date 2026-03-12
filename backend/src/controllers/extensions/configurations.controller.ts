@@ -95,8 +95,8 @@ export class ConfigurationsController {
   @ApiOkResponse({ type: ConfigurationDto })
   @Role(BUILTIN_USER_GROUP_ADMIN)
   @UseGuards(RoleGuard)
-  async postConfiguration(@Body() body: UpsertConfigurationDto) {
-    const command = new CreateConfiguration(body);
+  async postConfiguration(@Body() body: UpsertConfigurationDto, @Req() req: Request) {
+    const command = new CreateConfiguration(body, req.user);
 
     const result: CreateConfigurationResponse = await this.commandBus.execute(command);
 
@@ -114,8 +114,8 @@ export class ConfigurationsController {
   @ApiOkResponse({ type: ConfigurationDto })
   @Role(BUILTIN_USER_GROUP_ADMIN)
   @UseGuards(RoleGuard)
-  async putConfiguration(@Param('id') id: number, @Body() body: UpsertConfigurationDto) {
-    const command = new UpdateConfiguration(id, body);
+  async putConfiguration(@Param('id') id: number, @Body() body: UpsertConfigurationDto, @Req() req: Request) {
+    const command = new UpdateConfiguration(id, body, req.user);
 
     const result: UpdateConfigurationResponse = await this.commandBus.execute(command);
 
@@ -133,9 +133,8 @@ export class ConfigurationsController {
   @ApiNoContentResponse()
   @Role(BUILTIN_USER_GROUP_ADMIN)
   @UseGuards(RoleGuard)
-  async deleteConfiguration(@Param('id') id: number) {
-    const command = new DeleteConfiguration(id);
-
+  async deleteConfiguration(@Param('id') id: number, @Req() req: Request) {
+    const command = new DeleteConfiguration(id, req.user);
     await this.commandBus.execute(command);
   }
 
@@ -194,8 +193,8 @@ export class ConfigurationsController {
   @ApiOkResponse({ type: ExtensionDto })
   @Role(BUILTIN_USER_GROUP_ADMIN)
   @UseGuards(RoleGuard)
-  async postExtension(@Param('id') id: number, @Body() body: CreateExtensionDto) {
-    const command = new CreateExtension(id, body);
+  async postExtension(@Param('id') id: number, @Body() body: CreateExtensionDto, @Req() req: Request) {
+    const command = new CreateExtension(id, body, req.user);
     const result: CreateExtensionResponse = await this.commandBus.execute(command);
 
     return ExtensionDto.fromDomain(result.extension);
@@ -218,8 +217,13 @@ export class ConfigurationsController {
   @ApiOkResponse({ type: ExtensionDto })
   @Role(BUILTIN_USER_GROUP_ADMIN)
   @UseGuards(RoleGuard)
-  async putExtension(@Param('id') id: number, @Param('extensionId') extensionId: number, @Body() body: UpdateExtensionDto) {
-    const command = new UpdateExtension(+extensionId, body);
+  async putExtension(
+    @Param('id') id: number,
+    @Param('extensionId') extensionId: number,
+    @Body() body: UpdateExtensionDto,
+    @Req() req: Request,
+  ) {
+    const command = new UpdateExtension(+extensionId, body, req.user);
 
     const result: UpdateExtensionResponse = await this.commandBus.execute(command);
 
@@ -243,9 +247,8 @@ export class ConfigurationsController {
   @ApiNoContentResponse()
   @Role(BUILTIN_USER_GROUP_ADMIN)
   @UseGuards(RoleGuard)
-  async deleteExtension(@Param('id') id: number, @Param('extensionId') extensionId: number) {
-    const command = new DeleteExtension(+extensionId);
-
+  async deleteExtension(@Param('id') id: number, @Param('extensionId') extensionId: number, @Req() req: Request) {
+    const command = new DeleteExtension(+extensionId, req.user);
     await this.commandBus.execute(command);
   }
 
