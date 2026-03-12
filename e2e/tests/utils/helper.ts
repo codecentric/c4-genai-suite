@@ -775,6 +775,9 @@ export function globalConversationBucketName(): string {
 }
 
 export async function expectA11yCompliant(page: Page) {
+  // Give the browser time to wait for animations to finish
+  await page.waitForTimeout(2000);
+
   const accessibilityScanResults = await new AxeBuilder({ page }).analyze();
   expect(accessibilityScanResults.violations).toEqual([]);
 }

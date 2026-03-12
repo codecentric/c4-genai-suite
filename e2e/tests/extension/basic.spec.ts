@@ -216,10 +216,6 @@ test('chat with file search', async ({ page, mockServerUrl }) => {
   await test.step('should preview the used sources', async () => {
     await page.getByTestId('sources-section').locator('a').click();
     await page.waitForSelector(`blockquote:has-text("c4-test")`);
-
-    // Wait for .fade-in animations to finish, otherwise axe reports
-    // false-positive color-contrast violations due to intermediate opacity values.
-    await expect(page.locator('.fade-in').last()).toHaveCSS('opacity', '1');
     await expectA11yCompliant(page);
   });
 
