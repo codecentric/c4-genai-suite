@@ -1,5 +1,55 @@
 # Changelog
 
+## [9.16.1](https://github.com/codecentric/c4-genai-suite/compare/v9.16.0...v9.16.1) (2026-03-10)
+
+
+### Bug Fixes
+
+* use ai-sdk buffer instead of data url ([#1410](https://github.com/codecentric/c4-genai-suite/issues/1410)) ([b0d11ea](https://github.com/codecentric/c4-genai-suite/commit/b0d11eafd57c9f9d6826523a0ff7ee15a751909e))
+
+## [9.16.0](https://github.com/codecentric/c4-genai-suite/compare/v9.15.1...v9.16.0) (2026-03-06)
+
+
+### Features
+
+* add audit log containing changes performed by admins ([6156bd1](https://github.com/codecentric/c4-genai-suite/commit/6156bd13c38079173e0e15060c166b00fde548f7))
+* add audit log containing changes performed by admins ([2e6674e](https://github.com/codecentric/c4-genai-suite/commit/2e6674e4cd183ba81012465be772797007861b9c))
+* add audit log containing changes performed by admins ([c8fc93a](https://github.com/codecentric/c4-genai-suite/commit/c8fc93a6565e2052b2684ba472782bcf2f4cd5e4))
+* add audit log containing changes performed by admins ([322e9d6](https://github.com/codecentric/c4-genai-suite/commit/322e9d657c05c586d61d62132fed1e978d169f17))
+* add audit log containing changes performed by admins ([3f84e31](https://github.com/codecentric/c4-genai-suite/commit/3f84e3190f80637b1093cdebd647484a683c6305))
+* add audit log containing changes performed by admins ([19941e6](https://github.com/codecentric/c4-genai-suite/commit/19941e69f3df80d91ce7941dc1392e0c92a65710))
+* add audit log containing changes performed by admins ([84ccff6](https://github.com/codecentric/c4-genai-suite/commit/84ccff61681924f5c6c2ae283269e4f578beeea9))
+* add audit log containing changes performed by admins ([716fefc](https://github.com/codecentric/c4-genai-suite/commit/716fefccdd92eed0793b045a671e27df4a9874eb))
+* add audit log containing changes performed by admins ([ac23b67](https://github.com/codecentric/c4-genai-suite/commit/ac23b67c2bbce4f8ab6d45b0b5333de87278d0d4))
+* add audit log containing changes performed by admins ([5af65aa](https://github.com/codecentric/c4-genai-suite/commit/5af65aafd5b2ef35a9df6ca3de16c5a9cfad1097))
+* add audit log containing changes performed by admins ([8b138de](https://github.com/codecentric/c4-genai-suite/commit/8b138dea74ea404b4f6f1bd10a76a7c32eb87853))
+* add audit log containing changes performed by admins ([673dda2](https://github.com/codecentric/c4-genai-suite/commit/673dda23eac158582f33fa146387cb204121df70))
+
+
+### Bug Fixes
+
+* handle null values for configurableArguments in ExtensionForm correctly ([99d646a](https://github.com/codecentric/c4-genai-suite/commit/99d646a56062a0e9266ad3d18320f0efcb312637))
+
+## [9.15.1](https://github.com/codecentric/c4-genai-suite/compare/v9.15.0...v9.15.1) (2026-02-25)
+
+
+### Bug Fixes
+
+* add setting to activate allowed groups for login ([4a75f7a](https://github.com/codecentric/c4-genai-suite/commit/4a75f7abadfa7362e6126f3952decc117ff577e7))
+* regenerate clients ([ba43efe](https://github.com/codecentric/c4-genai-suite/commit/ba43efee8b1aab030140a6e3cc72f654e5ac47f2))
+
+## [9.15.0](https://github.com/codecentric/c4-genai-suite/compare/v9.14.0...v9.15.0) (2026-02-24)
+
+
+### Features
+
+* Deny login of users without group Default or Admin ([22a1dd9](https://github.com/codecentric/c4-genai-suite/commit/22a1dd9ee95581bbcbe7a5d8d369ec02029a6094))
+
+
+### Bug Fixes
+
+* **frontend:** default theme name is briefly shown as page title ([ca8908c](https://github.com/codecentric/c4-genai-suite/commit/ca8908cf7b821880888c27505892971e2485db95))
+
 ## [9.14.0](https://github.com/codecentric/c4-genai-suite/compare/v9.13.0...v9.14.0) (2026-02-13)
 
 

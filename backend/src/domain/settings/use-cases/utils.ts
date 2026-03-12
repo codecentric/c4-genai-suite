@@ -17,3 +17,7 @@ export function buildSettings(source: SettingEntity): Settings {
     ...other,
   };
 }
+
+export function buildSettingsSnapshot(settings: Settings): Record<string, unknown> {
+  return JSON.parse(JSON.stringify(settings)) as Record<string, unknown>;
+}

@@ -76,6 +76,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
         updatePassword.reset();
         onClose();
       }}
+      data-testid="user-profile-modal"
     >
       <div className="flex h-96">
         <div className="w-1/3 border-r border-gray-200 pr-4">

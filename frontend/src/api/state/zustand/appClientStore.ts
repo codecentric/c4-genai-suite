@@ -22,7 +22,7 @@ const createAppClientMiddleware: (navigate: TransientNavigateFn) => Middleware =
     return Promise.resolve();
   },
   post: async (context) => {
-    if (context.response?.status === 401) {
+    if (context.response?.status === 401 && !window.location.pathname.startsWith('/login')) {
       const secure = window.location.protocol === 'https:';
       const sameSite = secure ? 'none' : 'strict';
       const cookies = new Cookies(null, { path: '/', secure, sameSite });

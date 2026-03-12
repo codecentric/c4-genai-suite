@@ -2,6 +2,7 @@ import { IconFile, IconRotate2, IconTrash } from '@tabler/icons-react';
 import React from 'react';
 import { FileDto } from 'src/api';
 import { extractType } from 'src/pages/utils';
+import { texts } from 'src/texts';
 
 type FileItemProps = {
   file: FileDto | { fileName: string };
@@ -43,7 +44,7 @@ export const FileItemComponent = ({ file, onRemove, loading }: FileItemProps) =>
 
         {!loading && onRemove && (
           <div className="absolute top-0 right-0 bottom-0 flex items-center bg-gray-100 p-1 pr-2 opacity-0 transition-all group-hover:opacity-100">
-            <button className="text-red-500" onClick={handleRemove}>
+            <button className="text-red-500" onClick={handleRemove} aria-label={texts.chat.deleteFile(fileName)}>
               <IconTrash className="h-4 w-4" />
             </button>
           </div>

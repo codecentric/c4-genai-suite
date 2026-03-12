@@ -1,5 +1,6 @@
 import { randomInt } from 'crypto';
 import path from 'path';
+import AxeBuilder from '@axe-core/playwright';
 import { expect, Locator, Page } from '@playwright/test';
 import { config } from './config';
 
@@ -54,7 +55,7 @@ export async function sendMessage(page: Page, configuration: { name: string }, c
   await page.waitForLoadState('networkidle', { timeout: 30000 });
 }
 
-async function save(page: Page, expectDetached = true) {
+export async function save(page: Page, expectDetached = true) {
   const button = page.getByRole('button', { name: 'Save' });
   await button.click();
   if (expectDetached) {
@@ -767,4 +768,12 @@ export function globalUserBucketName(): string {
 
 export function globalConversationBucketName(): string {
   return 'E2E-Conversation-Bucket';
+}
+
+export async function expectA11yCompliant(page: Page) {
+  // Give the browser time to wait for animations to finish
+  await page.waitForTimeout(2000);
+
+  const accessibilityScanResults = await new AxeBuilder({ page }).analyze();
+  expect(accessibilityScanResults.violations).toEqual([]);
 }

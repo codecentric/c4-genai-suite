@@ -4,6 +4,9 @@
 @import 'react-pdf/dist/Page/AnnotationLayer.css';
 @import 'react-pdf/dist/Page/TextLayer.css';
 
+/* JSON diff styling for audit log */
+@import 'jsondiffpatch/formatters/styles/html.css';
+
 @plugin "daisyui" {
   themes:
     light --default,

@@ -57,10 +57,24 @@ export const AIChatItemActions = ({
           'my-1 flex items-center opacity-0 transition-all group-hover:opacity-100',
         )}
       >
-        <ActionIcon color="gray" c="black" size={'lg'} variant="subtle" onClick={copyTextToClipboard}>
+        <ActionIcon
+          color="gray"
+          c="black"
+          size={'lg'}
+          variant="subtle"
+          onClick={copyTextToClipboard}
+          aria-label={texts.common.copy}
+        >
           <IconClipboard className="w-4" />
         </ActionIcon>
-        <ActionIcon onClick={toggleVisibility} color="gray" c="black" size={'lg'} variant="subtle">
+        <ActionIcon
+          onClick={toggleVisibility}
+          color="gray"
+          c="black"
+          size={'lg'}
+          variant="subtle"
+          aria-label={texts.chat.rateMessage}
+        >
           <IconThumbDown className="w-4" />
         </ActionIcon>
 

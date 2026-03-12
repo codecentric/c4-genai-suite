@@ -40,6 +40,7 @@ jobs:
           cache-dependency-path: backend/package-lock.json
       - run: npm ci
       - run: npm run generate-${{ matrix.service }}
+      - run: git diff
       - run: git diff --quiet # exits with exitcode != 0 if changes are detected
 
   backend-check-generated-specs:
@@ -136,6 +137,8 @@ jobs:
       - run: npm run migration:run
       # changes the return code from 1 to 0 in case no schema was changed and vice versa
       - run: sh -c "! npm run migration:generate --name=test"
+      - if: failure()
+        run: cat backend/src/migrations/*-test.ts
 
   run-backend-without-schema-permissions:
     runs-on: ubuntu-latest

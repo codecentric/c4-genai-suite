@@ -96,8 +96,8 @@ export class UsersController {
   @ApiOkResponse({ type: UserDto })
   @Role(BUILTIN_USER_GROUP_ADMIN)
   @UseGuards(RoleGuard)
-  async postUser(@Body() body: UpsertUserDto) {
-    const command = new CreateUser(body);
+  async postUser(@Body() body: UpsertUserDto, @Req() req: Request) {
+    const command = new CreateUser(body, req.user);
 
     const result: CreateUserResponse = await this.commandBus.execute(command);
 
@@ -114,8 +114,8 @@ export class UsersController {
   @ApiOkResponse({ type: UserDto })
   @Role(BUILTIN_USER_GROUP_ADMIN)
   @UseGuards(RoleGuard)
-  async putUser(@Param('id') id: string, @Body() body: UpsertUserDto) {
-    const command = new UpdateUser(id, body);
+  async putUser(@Param('id') id: string, @Body() body: UpsertUserDto, @Req() req: Request) {
+    const command = new UpdateUser(id, body, req.user);
 
     const result: UpdateUserResponse = await this.commandBus.execute(command);
 
@@ -126,6 +126,7 @@ export class UsersController {
   @ApiOperation({ operationId: 'putMyPassword', description: 'Updates the user password.' })
   @ApiNoContentResponse()
   async putMyPassword(@Req() req: Request, @Body() body: ChangePasswordDto) {
+    // No performedBy - self password changes are not audit logged
     await this.commandBus.execute(
       new UpdateUser(req.user.id, { password: body.password, currentPassword: body.currentPassword }),
     );
@@ -141,9 +142,8 @@ export class UsersController {
   @ApiNoContentResponse()
   @Role(BUILTIN_USER_GROUP_ADMIN)
   @UseGuards(RoleGuard)
-  async deleteUser(@Param('id') id: string) {
-    const command = new DeleteUser(id);
-
+  async deleteUser(@Param('id') id: string, @Req() req: Request) {
+    const command = new DeleteUser(id, req.user);
     await this.commandBus.execute(command);
   }
 }

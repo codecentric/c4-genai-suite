@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Redirect, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, ForbiddenException, Get, Logger, Post, Redirect, Req, Res, UseGuards } from '@nestjs/common';
 import { ApiExcludeEndpoint, ApiNoContentResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Request, Response } from 'express';
 import { GithubAuthGuard, GoogleAuthGuard, LocalAuthGuard, MicrosoftAuthGuard, OAuthAuthGuard } from 'src/domain/auth';
@@ -10,6 +10,7 @@ import { AuthSettingsDto, LoginDto, ProfileDto } from './dtos';
 @ApiTags('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
+  private readonly logger = new Logger(AuthController.name);
 
   @Get('settings')
   @ApiOperation({ operationId: 'getAuthSettings', description: 'The settings.' })
@@ -52,8 +53,7 @@ export class AuthController {
   @ApiExcludeEndpoint()
   @UseGuards(GithubAuthGuard)
   async githubAuthCallback(@Req() req: Request, @Res() res: Response) {
-    await this.authService.login(req.user, req);
-    this.handleRedirect(req, res);
+    await this.loginAndRedirect(req, res);
   }
 
   @Get('login/google')
@@ -66,8 +66,7 @@ export class AuthController {
   @ApiExcludeEndpoint()
   @UseGuards(GoogleAuthGuard)
   async googleAuthCallback(@Req() req: Request, @Res() res: Response) {
-    await this.authService.login(req.user, req);
-    this.handleRedirect(req, res);
+    await this.loginAndRedirect(req, res);
   }
 
   @Get('login/microsoft')
@@ -80,8 +79,7 @@ export class AuthController {
   @ApiExcludeEndpoint()
   @UseGuards(MicrosoftAuthGuard)
   async microsoftAuthCallback(@Req() req: Request, @Res() res: Response) {
-    await this.authService.login(req.user, req);
-    this.handleRedirect(req, res);
+    await this.loginAndRedirect(req, res);
   }
 
   @Get('login/oauth')
@@ -94,12 +92,24 @@ export class AuthController {
   @ApiExcludeEndpoint()
   @UseGuards(OAuthAuthGuard)
   async oauthAuthCallback(@Req() req: Request, @Res() res: Response) {
-    await this.authService.login(req.user, req);
-
-    this.handleRedirect(req, res);
+    await this.loginAndRedirect(req, res);
   }
 
-  private handleRedirect(req: Request, res: Response) {
+  private async loginAndRedirect(req: Request, res: Response) {
+    try {
+      await this.authService.login(req.user, req);
+      this.redirectToApplication(req, res);
+    } catch (e) {
+      if (e instanceof ForbiddenException) {
+        res.redirect('/login?error=forbidden');
+      } else {
+        this.logger.warn('Unexpected error during login callback', e);
+        res.redirect('/login?error=auth');
+      }
+    }
+  }
+
+  private redirectToApplication(req: Request, res: Response) {
     const redirect = req.cookies['post-login-redirect'] as string | undefined;
     if (isString(redirect) && redirect.startsWith('/')) {
       const secure = this.authService.config.baseUrl.startsWith('https');

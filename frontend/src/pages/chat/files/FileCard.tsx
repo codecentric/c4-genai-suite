@@ -37,7 +37,12 @@ export const FileCard = memo((props: FileCardProps) => {
         </div>
 
         <div className="mt-1 flex gap-2 truncate" title={file.fileName}>
-          <input type="checkbox" checked={selectedIDs.includes(file.id)} onChange={() => toggleIdSelection(file)} />
+          <input
+            type="checkbox"
+            checked={selectedIDs.includes(file.id)}
+            onChange={() => toggleIdSelection(file)}
+            aria-label={texts.accessibility.selectFile(file.fileName)}
+          />
           {file.fileName}
         </div>
         <span className="text-sm">{formatDate(file.uploadedAt, 'Pp')}</span>
