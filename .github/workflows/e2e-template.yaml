@@ -28,7 +28,6 @@ jobs:
       contents: read
       packages: read
     env:
-      AZURE_OPEN_AI_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
       TEST_DIR: ./${{ inputs.testdir }}
       URL: http://localhost:3080
       REIS_ENDPOINT: http://reis:3201
@@ -93,21 +92,12 @@ jobs:
             -e BATCH_SIZE="100" \
             -e STORE_TYPE="pgvector" \
             -e STORE_PGVECTOR_URL="postgresql+psycopg://admin:secret@pgvector:5432/cccc" \
-            -e STORE_AZURE_AI_SEARCH_SERVICE_ENDPOINT="${{ vars.STORE_AZURE_AI_SEARCH_SERVICE_ENDPOINT }}" \
-            -e STORE_AZURE_AI_SEARCH_SERVICE_API_KEY="${{ secrets.STORE_AZURE_AI_SEARCH_SERVICE_API_KEY }}" \
-            -e STORE_AZURE_AI_SEARCH_SERVICE_INDEX_NAME="basis-reis-test" \
             -e FILE_STORE_TYPE="s3" \
             -e FILE_STORE_S3_ENDPOINT_URL="http://minio:9000" \
             -e FILE_STORE_S3_ACCESS_KEY_ID="admin" \
             -e FILE_STORE_S3_SECRET_ACCESS_KEY="secretsecret" \
             -e FILE_STORE_S3_BUCKET_NAME="e2e-test-bucket" \
-            -e EMBEDDINGS_TYPE="azure-openai" \
-            -e EMBEDDINGS_AZURE_OPENAI_ENDPOINT="${{ vars.AZURE_OPENAI_ENDPOINT }}" \
-            -e EMBEDDINGS_AZURE_OPENAI_API_KEY="${{ secrets.AZURE_OPENAI_API_KEY }}" \
-            -e EMBEDDINGS_AZURE_OPENAI_DEPLOYMENT_NAME="text-embedding-ada-002" \
-            -e EMBEDDINGS_AZURE_OPENAI_INSTANCE_NAME="cc-sweden-testing" \
-            -e EMBEDDINGS_AZURE_OPENAI_MODEL_NAME="text-embedding-ada-002" \
-            -e EMBEDDINGS_AZURE_OPENAI_API_VERSION="2023-05-15" \
+            -e EMBEDDINGS_TYPE="random-test-embeddings" \
             reis:commit-${{ github.sha }}
       - name: start mcp
         run: |
