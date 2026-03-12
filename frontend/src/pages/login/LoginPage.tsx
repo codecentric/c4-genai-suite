@@ -35,7 +35,7 @@ function Sidebar(props: {
     <>
       <header className="flex h-1/4 w-full items-start justify-start p-4">
         {props.theme.logoUrl && <Logo size={{ height: '2rem' }} url={props.theme.logoUrl} />}
-      </div>
+      </header>
       <div className="mb-4 flex grow flex-col items-center justify-center p-4">
         <LoginProviders
           welcomeText={props.theme.welcomeText}
@@ -44,7 +44,7 @@ function Sidebar(props: {
           oauthError={props.oauthError}
         />
       </div>
-      <div className="flex h-1/4 w-full items-end justify-start space-x-4 p-4 text-xs">
+      <nav className="flex h-1/4 w-full items-end justify-start space-x-4 p-4 text-xs">
         <LegalFooter siteLinks={props.theme.siteLinks} />
       </nav>
     </>

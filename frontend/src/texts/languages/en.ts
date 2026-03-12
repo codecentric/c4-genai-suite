@@ -180,7 +180,7 @@ export const en = {
     filterHeadline: 'Select filter',
     filterApply: 'Apply filter',
     filterResetAll: 'Reset all',
-    deleteFile: 'Delete {{filename}}',
+    deleteFile: 'Delete {{fileName}}',
     duplicateConversationSuccess: 'Conversation duplicated successfully',
     duplicateConversationFailed: 'Failed to duplicate conversation',
     settings: {

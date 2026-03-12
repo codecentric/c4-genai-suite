@@ -184,7 +184,7 @@ export const de: typeof en = {
     filterHeadline: 'Filter auswählen',
     filterApply: 'Filter anwenden',
     filterResetAll: 'Alles zurücksetzen',
-    deleteFile: 'Lösche {{filename}}',
+    deleteFile: 'Lösche {{fileName}}',
     duplicateConversationSuccess: 'Konversation erfolgreich dupliziert',
     duplicateConversationFailed: 'Duplizieren der Konversation fehlgeschlagen',
     settings: {

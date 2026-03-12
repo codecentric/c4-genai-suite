@@ -150,7 +150,7 @@ export function ChatPage() {
         )}
 
         <Panel id="center" {...panelSizes.content}>
-          <div className="chat-main relative min-h-0 grow overflow-hidden">
+          <main className="chat-main relative min-h-0 grow overflow-hidden">
             {isMobileView && (rightPanelVisible || sidebarLeft) ? (
               <div
                 className="h-screen w-screen bg-gray-300"
@@ -192,14 +192,15 @@ export function ChatPage() {
           <>
             {!isMobileView && <CustomResizeHandle />}
             <Panel style={{ overflow: 'auto' }} id="right" {...panelSizes.right} className="bg-gray-100">
-              {selectedDocument ? (
-                <Tabs defaultValue="sources-chunk-preview">
-                  <Tabs.List>
-                    <Tabs.Tab value="sources-chunk-preview">{texts.chat.sources.content}</Tabs.Tab>
-                    <Tabs.Tab value="source-document-viewer" hidden={!isSourceAvailable}>
-                      {texts.chat.sources.viewer}
-                    </Tabs.Tab>
-                  </Tabs.List>
+              <aside aria-label={selectedDocument ? texts.chat.sources.content : texts.common.files}>
+                {selectedDocument ? (
+                  <Tabs defaultValue="sources-chunk-preview">
+                    <Tabs.List>
+                      <Tabs.Tab value="sources-chunk-preview">{texts.chat.sources.content}</Tabs.Tab>
+                      <Tabs.Tab value="source-document-viewer" hidden={!isSourceAvailable}>
+                        {texts.chat.sources.viewer}
+                      </Tabs.Tab>
+                    </Tabs.List>
 
                     <Tabs.Panel value="sources-chunk-preview">
                       <SourcesChunkPreview onClose={() => setSelectedDocument(undefined)} document={selectedDocument} />
