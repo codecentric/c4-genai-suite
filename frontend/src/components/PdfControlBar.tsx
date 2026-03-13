@@ -11,6 +11,7 @@ import {
   IconZoomReset,
 } from '@tabler/icons-react';
 import { Dispatch, SetStateAction } from 'react';
+import { texts } from 'src/texts';
 
 interface IconConfigurationProps {
   style?: CSSProperties | undefined;
@@ -139,6 +140,7 @@ const PdfControlBar = ({
               clampBehavior="strict"
               hideControls
               disabled={!numPages}
+              aria-label={texts.accessibility.pageNumber}
             />
             {`/ ${numPages}`}
             <div className="doc-navigation-btns">

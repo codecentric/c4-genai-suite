@@ -187,6 +187,11 @@
                             "type": "string",
                             "description": "The property in the auth token from where the user groups are read. Default is \"groups\".",
                             "default": "\"\""
+                        },
+                        "loginAllowedGroups": {
+                            "type": "string",
+                            "description": "Defines which user groups are allowed to log in, separated by commas. A user must have at least one of the groups to log in. The default defines no groups which allows any group or none for login.",
+                            "default": "\"\""
                         }
                     }
                 },

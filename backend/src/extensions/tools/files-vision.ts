@@ -122,7 +122,7 @@ export class FilesVisionExtension implements Extension<FilesVisionExtensionConfi
               const images = matchingFiles.files
                 .flatMap(({ content }) => content ?? [])
                 .filter(({ original }) => original)
-                .map(({ type, buffer }) => `data:${type};base64,${buffer}`);
+                .map(({ type, buffer }) => ({ mimeType: type, data: Buffer.from(buffer, 'base64') }));
 
               if (images.length === 0) {
                 return '';
@@ -132,7 +132,10 @@ export class FilesVisionExtension implements Extension<FilesVisionExtensionConfi
                 const { text } = await generateText({
                   model: llm.model,
                   prompt: [
-                    { role: 'user' as const, content: images.map((x) => ({ type: 'image', image: x })) },
+                    {
+                      role: 'user' as const,
+                      content: images.map((x) => ({ type: 'image' as const, image: x.data, mimeType: x.mimeType })),
+                    },
                     { role: 'user' as const, content: context.input },
                   ],
                   ...llm.options,

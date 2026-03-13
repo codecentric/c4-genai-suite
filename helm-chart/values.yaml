@@ -75,6 +75,8 @@ backend:
     acceptUserGroupsFromAuthProvider: false
     ## @param backend.auth.userGroupsPropertyName [string] The property in the auth token from where the user groups are read. Default is "groups".
     userGroupsPropertyName: ""
+    ## @param backend.auth.loginAllowedGroups [string] Defines which user groups are allowed to log in, separated by commas. A user must have at least one of the groups to log in. The default defines no groups which allows any group or none for login.
+    loginAllowedGroups: ""
   postgresql:
     ## @param backend.postgresql.connectionString [string] Connection string of an external Postgres. Will be ignored when `postgresql.enabled` is `true`.
     connectionString: ""

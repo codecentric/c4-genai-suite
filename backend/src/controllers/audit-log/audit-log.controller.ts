@@ -1,0 +1,88 @@
+import { Controller, Get, NotFoundException, Param, ParseIntPipe, Query, UseGuards } from '@nestjs/common';
+import { QueryBus } from '@nestjs/cqrs';
+import { ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { GetAuditLogById, GetAuditLogByIdResponse, GetAuditLogs, GetAuditLogsResponse } from 'src/domain/audit-log';
+import { LocalAuthGuard, Role, RoleGuard } from 'src/domain/auth';
+import { AuditEntityType, BUILTIN_USER_GROUP_ADMIN } from 'src/domain/database';
+import { AuditLogDetailDto, AuditLogsDto } from './dtos';
+
+@Controller('audit-logs')
+@ApiTags('audit-logs')
+@UseGuards(LocalAuthGuard)
+export class AuditLogController {
+  constructor(private readonly queryBus: QueryBus) {}
+
+  @Get('')
+  @ApiOperation({ operationId: 'getAuditLogs', description: 'Gets the audit log entries.' })
+  @ApiQuery({
+    name: 'entityType',
+    description: 'Filter by entity type.',
+    required: false,
+    enum: ['extension', 'bucket', 'configuration', 'settings', 'userGroup', 'user'],
+  })
+  @ApiQuery({
+    name: 'entityId',
+    description: 'Filter by entity ID.',
+    required: false,
+    type: String,
+  })
+  @ApiQuery({
+    name: 'configurationId',
+    description: 'Filter by configuration/assistant ID. Returns configuration changes and related extension changes.',
+    required: false,
+    type: Number,
+  })
+  @ApiQuery({
+    name: 'page',
+    description: 'The page number (0-based).',
+    required: false,
+    type: Number,
+  })
+  @ApiQuery({
+    name: 'pageSize',
+    description: 'The number of items per page.',
+    required: false,
+    type: Number,
+  })
+  @ApiOkResponse({ type: AuditLogsDto })
+  @Role(BUILTIN_USER_GROUP_ADMIN)
+  @UseGuards(RoleGuard)
+  async getAuditLogs(
+    @Query('entityType') entityType?: AuditEntityType,
+    @Query('entityId') entityId?: string,
+    @Query('configurationId', new ParseIntPipe({ optional: true })) configurationId?: number,
+    @Query('page', new ParseIntPipe({ optional: true })) page?: number,
+    @Query('pageSize', new ParseIntPipe({ optional: true })) pageSize?: number,
+  ) {
+    const result: GetAuditLogsResponse = await this.queryBus.execute(
+      new GetAuditLogs({ entityType, entityId, configurationId, page, pageSize }),
+    );
+
+    return AuditLogsDto.fromDomain(result.auditLogs, result.total);
+  }
+
+  @Get(':id')
+  @ApiOperation({
+    operationId: 'getAuditLogById',
+    description: 'Gets a single audit log entry by ID, including the previous snapshot for diff.',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'The ID of the audit log entry.',
+    required: true,
+    type: Number,
+  })
+  @ApiOkResponse({ type: AuditLogDetailDto })
+  @ApiNotFoundResponse({ description: 'Audit log entry not found.' })
+  @Role(BUILTIN_USER_GROUP_ADMIN)
+  @UseGuards(RoleGuard)
+  async getAuditLogById(@Param('id', ParseIntPipe) id: number) {
+    const result: GetAuditLogByIdResponse = await this.queryBus.execute(new GetAuditLogById(id));
+
+    if (!result.auditLog) {
+      throw new NotFoundException('Audit log entry not found.');
+    }
+
+    return AuditLogDetailDto.fromDomainWithPrevious(result.auditLog, result.previousSnapshot);
+  }
+}

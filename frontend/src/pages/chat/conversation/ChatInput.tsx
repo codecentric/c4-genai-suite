@@ -1,9 +1,9 @@
 import { ActionIcon, Button, Portal } from '@mantine/core';
-import { IconFilter, IconPaperclip, IconPlayerStopFilled } from '@tabler/icons-react';
+import { IconArrowUp, IconFilter, IconPaperclip, IconPlayerStopFilled } from '@tabler/icons-react';
 import React, { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
 import { ConfigurationDto, FileDto } from 'src/api';
-import { Icon, Markdown } from 'src/components';
+import { Markdown } from 'src/components';
 import { ExtensionContext, JSONObject, useEventCallback, useExtensionContext, usePersistentState, useTheme } from 'src/hooks';
 import { useSpeechRecognitionToggle } from 'src/hooks/useSpeechRecognitionToggle';
 import { useTranscribe } from 'src/hooks/useTranscribe';
@@ -241,6 +241,7 @@ export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEm
               onKeyDown={doKeyDown}
               placeholder={texts.chat.placeholder(configuration?.name ?? '')}
               ref={textareaRef}
+              aria-label={texts.accessibility.chatMessageInput}
             />
             <div className="flex w-full justify-between gap-2">
               <div className="flex items-center gap-2">
@@ -308,14 +309,15 @@ export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEm
                     <IconPlayerStopFilled className="w-4" />
                   </ActionIcon>
                 ) : (
-                  <ActionIcon
-                    type="submit"
-                    size="lg"
-                    disabled={!input || uploadMutations.some((m) => m.status === 'pending') || listening}
-                    data-testid="chat-submit-button"
-                  >
-                    <Icon icon="arrow-up" />
-                  </ActionIcon>
+                <ActionIcon
+                  type="submit"
+                  size="lg"
+                  disabled={!input || isDisabled || uploadMutations.some((m) => m.status === 'pending') || listening}
+                  data-testid="chat-submit-button"
+                  aria-label={texts.common.send}
+                >
+                  <IconArrowUp />
+                </ActionIcon>
                 )}
               </div>
             </div>

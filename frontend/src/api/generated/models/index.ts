@@ -1,6 +1,9 @@
 //@ts-nocheck
 /* tslint:disable */
 /* eslint-disable */
+export * from './AuditLogDetailDto';
+export * from './AuditLogDto';
+export * from './AuditLogsDto';
 export * from './AuthProviderDto';
 export * from './AuthSettingsDto';
 export * from './BucketAvailabilityDto';

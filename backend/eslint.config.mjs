@@ -74,7 +74,16 @@ export default defineConfig([globalIgnores(["**/generated/**", "**/database/inte
         "@typescript-eslint/no-explicit-any": "off",
         "@typescript-eslint/no-unused-vars": ["error", {
             argsIgnorePattern: "^_",
+            varsIgnorePattern: "^_",
             caughtErrorsIgnorePattern: '^_'
         }],
+    },
+}, {
+    files: ["**/*.spec.ts", "**/*.test.ts"],
+    rules: {
+        // Jest mock objects (e.g. jest.fn()) are not real class methods, so
+        // `unbound-method` produces false positives when asserting on them via
+        // `expect(repo.method).toHaveBeenCalled()`. Disable in test files.
+        "@typescript-eslint/unbound-method": "off",
     },
 }]);

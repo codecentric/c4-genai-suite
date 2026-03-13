@@ -1,23 +1,36 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { DataSource, IsNull, Not } from 'typeorm';
+import { AuditLogService, PerformedBy } from 'src/domain/audit-log';
 import { ConfigurationEntity, ConfigurationStatus, ConversationEntity } from 'src/domain/database';
 import { assignDefined } from 'src/lib';
 import { I18nService } from 'src/localization/i18n.service';
+import { buildConfiguration, buildConfigurationSnapshot } from './utils';
 
 export class DeleteConfiguration {
-  constructor(public readonly id: number) {}
+  constructor(
+    public readonly id: number,
+    public readonly performedBy: PerformedBy,
+  ) {}
 }
 
 @CommandHandler(DeleteConfiguration)
-export class DeleteConfigurationHandler implements ICommandHandler<DeleteConfiguration, any> {
+export class DeleteConfigurationHandler implements ICommandHandler<DeleteConfiguration, void> {
   constructor(
     private dataSource: DataSource,
     private readonly i18n: I18nService,
+    private readonly auditLogService: AuditLogService,
   ) {}
 
-  async execute(command: DeleteConfiguration): Promise<any> {
-    const { id } = command;
+  async execute(command: DeleteConfiguration): Promise<void> {
+    const { id, performedBy } = command;
+
+    // Get configuration before deletion for audit log
+    const configEntity = await this.dataSource.manager.findOne(ConfigurationEntity, {
+      where: { id },
+      relations: { userGroups: true },
+    });
+    const configSnapshot = configEntity ? buildConfigurationSnapshot(await buildConfiguration(configEntity)) : null;
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
 
@@ -29,6 +42,17 @@ export class DeleteConfigurationHandler implements ICommandHandler<DeleteConfigu
       await queryRunner.manager.delete(ConfigurationEntity, { id: command.id });
       await queryRunner.commitTransaction();
       await queryRunner.release();
+
+      if (configSnapshot) {
+        await this.auditLogService.createAuditLog({
+          entityType: 'configuration',
+          entityId: String(id),
+          action: 'delete',
+          userId: performedBy.id,
+          userName: performedBy.name,
+          snapshot: configSnapshot,
+        });
+      }
       return;
     } catch (_error) {
       await queryRunner.rollbackTransaction();
@@ -79,6 +103,17 @@ export class DeleteConfigurationHandler implements ICommandHandler<DeleteConfigu
       await queryRunner.manager.save(ConfigurationEntity, toBeDeleted);
 
       await queryRunner.commitTransaction();
+
+      if (configSnapshot) {
+        await this.auditLogService.createAuditLog({
+          entityType: 'configuration',
+          entityId: String(id),
+          action: 'delete',
+          userId: performedBy.id,
+          userName: performedBy.name,
+          snapshot: configSnapshot,
+        });
+      }
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;
