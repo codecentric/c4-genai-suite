@@ -18,11 +18,7 @@ test('Configuration Management', async ({ page }) => {
   });
 
   await test.step('create a configuration', async () => {
-    await page
-      .locator('div')
-      .filter({ hasText: /^Assistants$/ })
-      .getByRole('button')
-      .click();
+    await page.getByRole('button', { name: 'Create assistant' }).click();
     await page.getByLabel('Name').click();
     await page.getByLabel('Name').fill(configName);
     await page.getByLabel('Description').click();
@@ -52,11 +48,7 @@ test('Configuration Management', async ({ page }) => {
   });
 
   await test.step('alert when configuration name is empty', async () => {
-    await page
-      .locator('div')
-      .filter({ hasText: /^Assistants$/ })
-      .getByRole('button')
-      .click();
+    await page.getByRole('button', { name: 'Create assistant' }).click();
     await page.getByRole('button', { name: 'Save' }).click();
 
     expect(page.getByRole('alert', { name: 'Name is a required field' })).toBeDefined();

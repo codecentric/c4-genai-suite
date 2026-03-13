@@ -29,6 +29,28 @@ export function formatFileSize(value: number, factor = 1024) {
   return (u ? `${value.toFixed(1)} ` : value) + ' kMGTPEZY'[u] + 'B';
 }
 
+/**
+ * Downloads data as a JSON file.
+ */
+export function downloadJson(data: unknown, filename: string) {
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+/**
+ * Sanitizes a string for use as a filename (keeps alphanumerics, hyphens, underscores, spaces).
+ */
+export function sanitizeFilename(name: string): string {
+  return name.replace(/[^a-zA-Z0-9\-_ ]/g, '_');
+}
+
 export async function buildError(common: string, details?: string | Error | null) {
   let detailString: string | null = null;
   if (isString(details)) {

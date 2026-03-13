@@ -12,3 +12,5 @@ export * from './update-extension';
 export * from './duplicate-configuration';
 export * from './get-bucket-availability';
 export * from './rebuild-extension';
+export * from './export-configuration';
+export * from './import-configuration';
