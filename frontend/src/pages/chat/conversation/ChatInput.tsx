@@ -316,8 +316,8 @@ export function ChatInput({
                   onClick={isStreaming ? stopGeneration : undefined}
                   disabled={isStreaming ? isDisabled || !stopGeneration : !input || isDisabled || isUploadPending || listening}
                   data-testid="chat-submit-button"
-                  aria-label={isStreaming ? 'Stop generating' : texts.common.send}
-                  title={isStreaming ? 'Stop generating' : 'Send message'}
+                  aria-label={isStreaming ? texts.accessibility.stopGenerating : texts.common.send}
+                  title={isStreaming ? texts.chat.stopGenerating : texts.chat.sendMessage}
                 >
                   {isStreaming ? <IconX className="w-4" /> : <IconArrowUp />}
                 </ActionIcon>
