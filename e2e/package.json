@@ -12,6 +12,7 @@
   "author": "",
   "license": "Apache-2.0",
   "devDependencies": {
+    "@axe-core/playwright": "^4.10.2",
     "@eslint/compat": "2.0.2",
     "@eslint/eslintrc": "3.3.3",
     "@faker-js/faker": "10.2.0",

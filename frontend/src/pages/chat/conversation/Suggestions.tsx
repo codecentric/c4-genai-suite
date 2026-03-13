@@ -21,15 +21,16 @@ export function Suggestions(props: SuggestionsProps) {
   return (
     <div className={cn('grid max-h-[calc(100vh-400px)] gap-2 overflow-auto', { 'grid-cols-3': !isMobile() })}>
       {suggestions.map((x, i) => (
-        <div
-          className="h-auto flex-col items-start overflow-hidden rounded-lg border border-gray-300 p-3 text-sm hover:bg-gray-50"
+        <button
+          type="button"
+          className="h-auto cursor-pointer flex-col items-start overflow-hidden rounded-lg border border-gray-300 bg-transparent p-3 text-left text-sm hover:bg-gray-50"
           key={i}
           onClick={() => onSelect(x.text)}
         >
           <div>{x.title}</div>
 
           <div className="text-gray-500">{x.subtitle}</div>
-        </div>
+        </button>
       ))}
     </div>
   );

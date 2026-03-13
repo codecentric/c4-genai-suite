@@ -60,15 +60,15 @@ test('Chat workflow with Mock LLM', async ({ page, mockServerUrl }) => {
     const userMessageContent = 'Hi!';
     await sendMessage(page, configuration, { message: userMessageContent });
 
-    const conversationNavItemsPre = page.getByRole('navigation');
-    await expect(conversationNavItemsPre.first()).toBeAttached({ timeout: 10000 });
-    await expect(conversationNavItemsPre).toHaveCount(1);
+    const conversationItems = page.getByTestId('conversation-item');
+    await expect(conversationItems.first()).toBeAttached({ timeout: 10000 });
+    await expect(conversationItems).toHaveCount(1);
   });
 
   await test.step('should not create conversations before first query', async () => {
     await page.getByRole('button', { name: 'New chat' }).click();
     await page.waitForLoadState('networkidle');
-    await expect(page.getByRole('navigation')).toHaveCount(1);
+    await expect(page.getByTestId('conversation-item')).toHaveCount(1);
   });
 
   await test.step('should not create multiple empty conversations via multiple clicks on the new chat button', async () => {
@@ -77,7 +77,7 @@ test('Chat workflow with Mock LLM', async ({ page, mockServerUrl }) => {
     await newChat(page);
     const secondChatUrl = page.url();
     expect(secondChatUrl).toBe(firstChatUrl);
-    await expect(page.getByRole('navigation')).toHaveCount(1);
+    await expect(page.getByTestId('conversation-item')).toHaveCount(1);
   });
 
   await test.step('should keep selected assistant in new chat when a conversation is deleted', async () => {
