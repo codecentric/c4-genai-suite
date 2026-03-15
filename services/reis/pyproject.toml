@@ -22,7 +22,7 @@ dependencies = [
     "psycopg[binary]>=3.3.2",
     "fastapi[standard]==0.135.1",
     "azure-search-documents==11.6.0",
-    "azure-identity==1.25.2",
+    "azure-identity==1.25.3",
     "pdfminer-six>=20260107",
     "pypdf>=6.6.0",
     "ffmpeg-python>=0.2.0",
@@ -41,7 +41,7 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-    "ruff==0.15.5",
+    "ruff==0.15.6",
     "ty>=0.0.9",
     "pip==26.0.1",
     "pre-commit==4.5.1",
@@ -51,7 +51,7 @@ dev = [
     "pytest-responses==0.5.1",
     "pytest-github-report==0.0.1",
     "pytest-error-for-skips==2.0.2",
-    "faker==40.8.0",
+    "faker==40.11.0",
     "responses==0.26.0",
 ]
 
