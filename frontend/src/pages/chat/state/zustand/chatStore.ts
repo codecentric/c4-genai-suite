@@ -204,12 +204,22 @@ export const useChatStore = create<ChatState & ChatActions>()((set, get) => {
     cancelActiveStream: (chatId) =>
       set((state) => {
         const chatData = state.chatDataMap.get(chatId);
-        if (!chatData?.activeStreamSubscription) return state;
+        if (!chatData) return state;
 
-        chatData.activeStreamSubscription.unsubscribe();
+        chatData.activeStreamSubscription?.unsubscribe();
+
+        const messages = [...chatData.messages];
+        if (chatData.streamingMessageId) {
+          const messageIndex = messages.findIndex((msg) => msg.id === chatData.streamingMessageId);
+          if (messageIndex !== -1) {
+            messages[messageIndex] = { ...messages[messageIndex], reasoningInProgress: false };
+          }
+        }
+
         const newMap = new Map(state.chatDataMap);
         newMap.set(chatId, {
           ...chatData,
+          messages,
           activeStreamSubscription: undefined,
           isAiWriting: false,
           streamingMessageId: undefined,
