@@ -88,43 +88,87 @@ export class ExecuteMiddleware implements ChatMiddleware {
 
     let error: GenericAIError | null = null;
     const text: string[] = [];
-    for await (const event of fullStream) {
-      if (event.type === 'tool-call') {
-        const toolName = tools.find((x) => x.name === event.toolName)?.displayName ?? event.toolName;
-        result.next({ type: 'tool_start', tool: { name: toolName } });
+    const persistCollectedText = async () => {
+      const collectedText = text.join('');
+      if (!collectedText.length) {
+        return { content: collectedText, messageId: undefined };
       }
-      if (event.type === 'tool-result') {
-        const toolName = tools.find((x) => x.name === event.toolName)?.displayName ?? event.toolName;
-        result.next({ type: 'tool_end', tool: { name: toolName } });
-      }
-      if (event.type === 'tool-error') {
-        this.logger.error({ event });
-        const toolName = tools.find((x) => x.name === event.toolName)?.displayName ?? event.toolName;
-        // TODO: maybe add a `tool_error` event type and indicate errors in the ui
-        result.next({ type: 'tool_end', tool: { name: toolName } });
-      }
-      if (event.type === 'reasoning-delta') {
-        result.next({ type: 'reasoning', content: event.text });
-      }
-      if (event.type === 'reasoning-end') {
-        result.next({ type: 'reasoning_end' });
-      }
-      if (event.type === 'text-delta') {
-        text.push(event.text);
-        result.next({ type: 'chunk', content: [{ type: 'text', text: event.text }] });
-      }
-      if (event.type === 'error') {
-        this.logger.error({ event });
-        error = event.error as GenericAIError;
-      }
-      if (event.type === 'finish') {
-        if (event.finishReason === 'content-filter') {
-          error = { error: { code: 'content_filter' } };
+
+      const messageId = await history?.addAIMessage(collectedText);
+      return { content: collectedText, messageId };
+    };
+
+    try {
+      for await (const event of fullStream) {
+        if (abort.signal.aborted) {
+          break;
+        }
+
+        if (event.type === 'tool-call') {
+          const toolName = tools.find((x) => x.name === event.toolName)?.displayName ?? event.toolName;
+          result.next({ type: 'tool_start', tool: { name: toolName } });
+        }
+        if (event.type === 'tool-result') {
+          const toolName = tools.find((x) => x.name === event.toolName)?.displayName ?? event.toolName;
+          result.next({ type: 'tool_end', tool: { name: toolName } });
+        }
+        if (event.type === 'tool-error') {
+          this.logger.error({ event });
+          const toolName = tools.find((x) => x.name === event.toolName)?.displayName ?? event.toolName;
+          // TODO: maybe add a `tool_error` event type and indicate errors in the ui
+          result.next({ type: 'tool_end', tool: { name: toolName } });
+        }
+        if (event.type === 'reasoning-delta') {
+          result.next({ type: 'reasoning', content: event.text });
+        }
+        if (event.type === 'reasoning-end') {
+          result.next({ type: 'reasoning_end' });
+        }
+        if (event.type === 'text-delta') {
+          text.push(event.text);
+          result.next({ type: 'chunk', content: [{ type: 'text', text: event.text }] });
+        }
+        if (event.type === 'error') {
+          this.logger.error({ event });
+          error = event.error as GenericAIError;
+        }
+        if (event.type === 'finish') {
+          if (event.finishReason === 'content-filter') {
+            error = { error: { code: 'content_filter' } };
+          }
         }
       }
+    } catch (err) {
+      if (abort.signal.aborted) {
+        const persistedMessage = await persistCollectedText();
+        result.next({
+          type: 'cancelled',
+          content: persistedMessage.content,
+          messageId: persistedMessage.messageId,
+          metadata: {
+            tokenCount: context.tokenUsage?.tokenCount ?? 0,
+          },
+        });
+        return;
+      }
+
+      await persistCollectedText();
+      throw err;
     }
 
-    await history?.addAIMessage(text.join(''));
+    const persistedMessage = await persistCollectedText();
+
+    if (abort.signal.aborted) {
+      result.next({
+        type: 'cancelled',
+        content: persistedMessage.content,
+        messageId: persistedMessage.messageId,
+        metadata: {
+          tokenCount: context.tokenUsage?.tokenCount ?? 0,
+        },
+      });
+      return;
+    }
 
     if (error) {
       // unwrap and throw the causing error to be handled by the ExceptionMiddleware

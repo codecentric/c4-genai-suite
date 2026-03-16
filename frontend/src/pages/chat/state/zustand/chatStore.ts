@@ -1,6 +1,6 @@
 import { Observable, Subscription } from 'rxjs';
 import { create } from 'zustand';
-import { AppClient, ConversationDto, FileDto, MessageDto, SourceDto, StreamEventDto } from 'src/api';
+import { AppClient, ChatStreamEventDto, ConversationDto, FileDto, MessageDto, SourceDto } from 'src/api';
 import { DocumentSource } from '../../SourcesChunkPreview';
 import { ChatMessage } from '../types';
 
@@ -46,7 +46,7 @@ type ChatActions = {
     files: FileDto[] | undefined,
     api: AppClient,
     editMessageId: number | undefined,
-  ) => Observable<StreamEventDto>;
+  ) => Observable<ChatStreamEventDto>;
 
   updateReasoning: (chatId: number, content: string) => void;
   clearReasoning: (chatId: number) => void;

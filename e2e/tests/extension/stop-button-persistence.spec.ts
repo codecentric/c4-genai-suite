@@ -1,4 +1,4 @@
-import { expect } from '@playwright/test';
+import { expect, Locator } from '@playwright/test';
 import { test } from '../utils/fixtures';
 import {
   addMockModelToConfiguration,
@@ -18,6 +18,9 @@ test('stopped response must not continue persisting after page refresh', async (
     const normalizedValue = normalizeText(value);
     const markerIndex = normalizedValue.indexOf('STARTMARKER');
     return markerIndex === -1 ? normalizedValue : normalizedValue.slice(markerIndex);
+  };
+  const getAiResponseText = async (itemLocator: Locator) => {
+    return extractStreamText(await itemLocator.locator('.markdown').textContent());
   };
 
   const getPersistedAiText = async (conversationId: number) =>
@@ -47,24 +50,23 @@ test('stopped response must not continue persisting after page refresh', async (
     await addMockModelToConfiguration(page, configuration, { endpoint: mockServerUrl });
   });
 
-  let conversationUrl = '';
   let conversationId = 0;
   let frozenText = '';
 
   await test.step('should stop a streaming response', async () => {
     await enterUserArea(page);
+    const messageInput = page.getByPlaceholder(`Message ${configuration.name}`);
 
     await page.getByTestId('chat-assistent-select').click();
     await page.getByRole('option', { name: new RegExp(configuration.name) }).click();
-    await page.waitForLoadState('networkidle');
+    await expect(messageInput).toBeVisible();
 
     const submitButton = page.getByTestId('chat-submit-button');
-    await page.getByPlaceholder(`Message ${configuration.name}`).fill(longStreamingPrompt);
+    await messageInput.fill(longStreamingPrompt);
     await submitButton.click();
 
     await expect(page).toHaveURL(/\/chat\/\d+$/);
-    conversationUrl = page.url();
-    conversationId = Number(conversationUrl.split('/').pop());
+    conversationId = Number(page.url().split('/').pop());
 
     const aiMessage = page.getByTestId('chat-item').last();
     await expect(aiMessage).toContainText('STARTMARKER');
@@ -72,24 +74,19 @@ test('stopped response must not continue persisting after page refresh', async (
     await submitButton.click();
     await expect(submitButton.locator('svg.tabler-icon-x')).toHaveCount(0);
 
-    frozenText = extractStreamText(await aiMessage.textContent());
-    await expect.poll(async () => extractStreamText(await aiMessage.textContent())).toBe(frozenText);
+    frozenText = await getAiResponseText(aiMessage);
+    await expect.poll(async () => await getAiResponseText(aiMessage)).toBe(frozenText);
   });
 
   await test.step('should not persist more tokens in the backend after stop', async () => {
-    await expect.poll(async () => normalizeText(await getPersistedAiText(conversationId))).toContain('STARTMARKER');
-
-    await page.waitForTimeout(1500);
-
-    const persistedText = normalizeText(await getPersistedAiText(conversationId));
-    expect(persistedText).toBe(frozenText);
+    await expect.poll(async () => normalizeText(await getPersistedAiText(conversationId))).toBe(frozenText);
   });
 
   await test.step('should not show more tokens after refreshing the conversation', async () => {
-    await page.goto(conversationUrl, { waitUntil: 'networkidle' });
+    await page.reload({ waitUntil: 'domcontentloaded' });
     await expect(page.getByTestId('chat-item')).toHaveCount(2);
 
     const refreshedAiMessage = page.getByTestId('chat-item').nth(1);
-    expect(extractStreamText(await refreshedAiMessage.textContent())).toBe(frozenText);
+    expect(await getAiResponseText(refreshedAiMessage)).toBe(frozenText);
   });
 });

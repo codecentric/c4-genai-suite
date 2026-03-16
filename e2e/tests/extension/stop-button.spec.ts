@@ -1,4 +1,4 @@
-import { expect } from '@playwright/test';
+import { expect, Locator } from '@playwright/test';
 import { test } from '../utils/fixtures';
 import {
   addMockModelToConfiguration,
@@ -15,6 +15,14 @@ test('stop button cancels active streaming response', async ({ page, mockServerU
   const longStreamingPrompt = 'stop-button-stream-test';
 
   const normalizeText = (value: string | null) => (value ?? '').replace(/\s+/g, ' ').trim();
+  const extractStreamText = (value: string | null) => {
+    const normalizedValue = normalizeText(value);
+    const markerIndex = normalizedValue.indexOf('STARTMARKER');
+    return markerIndex === -1 ? normalizedValue : normalizedValue.slice(markerIndex);
+  };
+  const getAiResponseText = async (itemLocator: Locator) => {
+    return extractStreamText(await itemLocator.locator('.markdown').textContent());
+  };
 
   await test.step('should login', async () => {
     await login(page);
@@ -47,21 +55,21 @@ test('stop button cancels active streaming response', async ({ page, mockServerU
 
     await expect(submitButton.locator('svg.tabler-icon-x')).toHaveCount(0);
 
-    const textAfterStop = normalizeText(await aiMessage.textContent());
-    await expect.poll(async () => normalizeText(await aiMessage.textContent())).toBe(textAfterStop);
+    const textAfterStop = await getAiResponseText(aiMessage);
+    await expect.poll(async () => await getAiResponseText(aiMessage)).toBe(textAfterStop);
     await expect(aiMessage).not.toContainText('ENDMARKER');
   });
 
   await test.step('should keep first stopped response frozen after sending another prompt', async () => {
     const submitButton = page.getByTestId('chat-submit-button');
     const firstAiMessage = page.getByTestId('chat-item').nth(1);
-    const frozenFirstMessage = normalizeText(await firstAiMessage.textContent());
+    const frozenFirstMessage = await getAiResponseText(firstAiMessage);
 
     await page.getByPlaceholder(`Message ${configuration.name}`).fill('answer to life, the universe and everything');
     await submitButton.click();
     await expect(page.getByTestId('chat-item').last()).toContainText('42');
 
-    const firstMessageAfterSecondPrompt = normalizeText(await firstAiMessage.textContent());
+    const firstMessageAfterSecondPrompt = await getAiResponseText(firstAiMessage);
     expect(firstMessageAfterSecondPrompt).toBe(frozenFirstMessage);
     await expect(firstAiMessage).not.toContainText('ENDMARKER');
   });

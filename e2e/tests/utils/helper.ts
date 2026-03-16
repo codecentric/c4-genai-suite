@@ -582,10 +582,8 @@ export async function checkSelectedConfiguration(page: Page, configuration: { na
 
 export async function selectConfiguration(page: Page, configuration: { name: string }) {
   await page.getByTestId('chat-assistent-select').click();
-  const element = page.locator('p').getByText(configuration.name, { exact: true });
-  await expect(element).toBeVisible();
-  await element.click();
-  await page.waitForLoadState('networkidle');
+  await page.getByRole('option', { name: new RegExp(configuration.name) }).click();
+  await checkSelectedConfiguration(page, configuration);
 }
 
 export async function navigateToUserAdministration(page: Page) {

@@ -34,6 +34,7 @@ import {
   SummarizeHistoryMiddleware,
   UIMiddleware,
 } from './middlewares';
+import { ActiveChatStreamService } from './services/active-chat-stream.service';
 import { CallbackService } from './services/callback-service';
 import {
   DeleteConversationHandler,
@@ -69,8 +70,9 @@ import {
       ConversationFileEntity,
     ]),
   ],
-  exports: [CallbackService],
+  exports: [ActiveChatStreamService, CallbackService],
   providers: [
+    ActiveChatStreamService,
     ChatCacheImpl,
     CallbackService,
     CheckUsageMiddleware,

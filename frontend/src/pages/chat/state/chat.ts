@@ -36,7 +36,7 @@ export const useChatStream = (chatId: number) => {
 
   const listOfChatsStore = useListOfChatsStore();
   const stopGeneration = () => {
-    chatStore.cancelActiveStream(chatId);
+    void api.stream.cancelPrompt(chatId);
   };
 
   const {
@@ -82,6 +82,7 @@ export const useChatStream = (chatId: number) => {
 
   const sendMessage = (input: string, files?: FileDto[], editMessageId?: number) => {
     // Only cancel existing stream for this specific chat if we're starting a new message
+    void api.stream.cancelPrompt(chatId);
     chatStore.cancelActiveStream(chatId);
 
     if (editMessageId) {
@@ -161,6 +162,19 @@ export const useChatStream = (chatId: number) => {
             return chatStore.updateMessage(chatId, actualAiMessageId, { error: msg.message });
           case 'completed':
             return chatStore.updateMessage(chatId, actualAiMessageId, { tokenCount: msg.metadata.tokenCount });
+          case 'cancelled':
+            if (msg.messageId && actualAiMessageId !== msg.messageId) {
+              actualAiMessageId = msg.messageId;
+              chatStore.setStreamingMessageId(chatId, msg.messageId);
+              chatStore.updateMessage(chatId, aiPlaceholderId, { id: msg.messageId });
+            }
+            chatStore.updateMessage(chatId, actualAiMessageId, {
+              content: [{ type: 'text', text: msg.content }],
+              reasoningInProgress: false,
+              tokenCount: msg.metadata.tokenCount,
+            });
+            chatStore.setIsAiWriting(chatId, false);
+            return chatStore.setStreamingMessageId(chatId, undefined);
           case 'saved':
             if (msg.messageType === 'ai') {
               actualAiMessageId = msg.messageId;

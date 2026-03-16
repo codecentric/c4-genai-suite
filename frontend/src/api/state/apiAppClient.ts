@@ -24,6 +24,17 @@ export function useApi() {
   return useAppClientStore((state) => state.getAppClient(navigate));
 }
 
+export type CancelledStreamEventDto = {
+  type: 'cancelled';
+  content: string;
+  messageId?: number;
+  metadata: {
+    tokenCount: number;
+  };
+};
+
+export type ChatStreamEventDto = StreamEventDto | CancelledStreamEventDto;
+
 export class AppClient {
   public readonly auditLogs: AuditLogsApi;
   public readonly auth: AuthApi;
@@ -69,13 +80,26 @@ export class AppClient {
 class StreamApi {
   constructor(private readonly configuration: Configuration) {}
 
-  streamPrompt(conversationId: number, message: SendMessageDto, messageId?: number): Observable<StreamEventDto> {
+  async cancelPrompt(conversationId: number): Promise<void> {
+    const path = `${this.configuration.basePath}/api/conversations/${conversationId}/messages/cancel`;
+    await fetch(path, {
+      method: 'POST',
+      keepalive: true,
+      credentials: 'include',
+      headers: {
+        'Accept-Language': i18next.language,
+      },
+    });
+  }
+
+  streamPrompt(conversationId: number, message: SendMessageDto, messageId?: number): Observable<ChatStreamEventDto> {
     const basePath = `${this.configuration.basePath}/api/conversations/${conversationId}`;
     const path = messageId ? `${basePath}/messages/${messageId}/sse` : `${basePath}/messages/sse`;
     const method = messageId ? 'PUT' : 'POST';
 
-    return new Observable<StreamEventDto>((subscriber) => {
+    return new Observable<ChatStreamEventDto>((subscriber) => {
       const abortController = new AbortController();
+      let streamClosed = false;
 
       fetchEventSource(path, {
         method: method,
@@ -88,11 +112,12 @@ class StreamApi {
           'Content-Type': 'application/json',
         },
         onmessage(msg) {
-          const data = JSON.parse(msg.data) as StreamEventDto;
+          const data = JSON.parse(msg.data) as ChatStreamEventDto;
           subscriber.next(data);
         },
         onerror(err) {
           if (abortController.signal.aborted) {
+            streamClosed = true;
             subscriber.complete();
             return;
           }
@@ -101,10 +126,12 @@ class StreamApi {
           throw err;
         },
         onclose() {
+          streamClosed = true;
           subscriber.complete();
         },
       }).catch((err) => {
         if (abortController.signal.aborted) {
+          streamClosed = true;
           subscriber.complete();
           return;
         }
@@ -112,6 +139,10 @@ class StreamApi {
       });
 
       return () => {
+        const shouldCancelBackend = !streamClosed;
+        if (shouldCancelBackend) {
+          void this.cancelPrompt(conversationId).catch(() => undefined);
+        }
         abortController.abort();
       };
     });

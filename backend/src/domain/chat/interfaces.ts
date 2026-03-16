@@ -104,14 +104,14 @@ export abstract class MessagesHistory {
   /** Returns a list of messages stored in the store. */
   public abstract getMessages(): Promise<BaseMessage[]>;
   /** Add a message object to the store. */
-  public abstract addMessage(message: BaseMessage): Promise<void>;
+  public abstract addMessage(message: BaseMessage): Promise<number | undefined>;
   /** Add source annotations. */
   public abstract addSources(externalExtensionId: string, sources: Source[]): void;
 
-  public addUserMessage(message: string): Promise<void> {
+  public addUserMessage(message: string): Promise<number | undefined> {
     return this.addMessage(new HumanMessage(message));
   }
-  public addAIMessage(message: string): Promise<void> {
+  public addAIMessage(message: string): Promise<number | undefined> {
     return this.addMessage(new AIMessage(message));
   }
   public async addMessages(messages: BaseMessage[]): Promise<void> {
@@ -318,6 +318,7 @@ export type MessageType = (typeof MESSAGE_TYPES)[number];
 export type StreamEvent =
   | StreamSummaryEvent
   | StreamCompletedEvent
+  | StreamCancelledEvent
   | StreamReasoningEvent
   | StreamReasoningEndEvent
   | StreamDebugEvent
@@ -392,6 +393,13 @@ export interface StreamReasoningEndEvent {
 
 export interface StreamCompletedEvent {
   type: 'completed';
+  metadata: ChatMetadata;
+}
+
+export interface StreamCancelledEvent {
+  type: 'cancelled';
+  content: string;
+  messageId?: number;
   metadata: ChatMetadata;
 }
 
