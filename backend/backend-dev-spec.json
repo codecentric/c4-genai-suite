@@ -564,6 +564,30 @@
         "tags": ["conversation"]
       }
     },
+    "/api/conversations/{id}/messages/cancel": {
+      "post": {
+        "description": "Cancels the active streamed message for the conversation.",
+        "operationId": "cancelMessage",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "The ID of the conversation.",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "summary": "",
+        "tags": ["conversation"]
+      }
+    },
     "/api/conversations/{id}/messages/{messageId}": {
       "patch": {
         "description": "Updates the rating of a message of the conversation.",
