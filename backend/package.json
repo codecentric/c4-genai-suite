@@ -77,7 +77,7 @@
     "nest-winston": "^1.10.2",
     "nestjs-i18n": "^10.6.0",
     "nunjucks": "^3.2.4",
-    "ollama-ai-provider-v2": "^3.4.0",
+    "ollama-ai-provider-v2": "^3.5.0",
     "openai": "6.18.0",
     "passport-custom": "^1.1.1",
     "passport-github2": "^0.1.12",
