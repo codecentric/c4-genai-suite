@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Rating, Usage } from 'src/domain/chat/use-cases';
 
-import { MessagesCount, UsagesCount } from '../../../domain/database';
+import { AssistantsCount, MessagesCount, UsagesCount } from '../../../domain/database';
 
 export class UsageDto {
   @ApiProperty({
@@ -178,6 +178,56 @@ export class UsersCountsDto {
   static fromDomain(source: UsersCountDto[]) {
     const result = new UsersCountsDto();
     result.items = source.map(UsersCountDto.fromDomain);
+
+    return result;
+  }
+}
+
+export class AssistantsCountDto {
+  @ApiProperty({
+    description: 'The date key.',
+    required: true,
+    type: String,
+    format: 'date',
+  })
+  date!: Date;
+
+  @ApiProperty({
+    description: 'The total number of assistant requests.',
+    required: true,
+  })
+  total!: number;
+
+  @ApiProperty({
+    description: 'The requests per assistant.',
+    required: true,
+    additionalProperties: {
+      type: 'number',
+    },
+  })
+  byAssistant!: Record<string, number>;
+
+  static fromDomain(this: void, source: AssistantsCount) {
+    const result = new AssistantsCountDto();
+    result.date = source.date;
+    result.total = source.total;
+    result.byAssistant = source.byAssistant;
+
+    return result;
+  }
+}
+
+export class AssistantsCountsDto {
+  @ApiProperty({
+    description: 'The assistant count items.',
+    required: true,
+    type: [AssistantsCountDto],
+  })
+  items!: AssistantsCountDto[];
+
+  static fromDomain(source: AssistantsCount[]) {
+    const result = new AssistantsCountsDto();
+    result.items = source.map(AssistantsCountDto.fromDomain);
 
     return result;
   }

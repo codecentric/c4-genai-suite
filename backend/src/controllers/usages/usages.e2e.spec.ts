@@ -18,7 +18,7 @@ import {
   UserEntity,
 } from '../../domain/database';
 import { initAppWithDataBaseAndValidUser } from '../../utils/testUtils';
-import { UsagesDto, UsersCountsDto } from './dtos';
+import { AssistantsCountsDto, UsagesDto, UsersCountsDto } from './dtos';
 import { UsagesController } from './usages.controller';
 
 describe('Usages', () => {
@@ -127,6 +127,18 @@ describe('Usages', () => {
     expect(itemsLastMonth.total).toBe(2);
     expect(itemsCurrentMonth.total).toBe(3);
   });
+  it('should retrieve assistant request counts with labels', async () => {
+    const response = await request(app.getHttpServer()).get('/usages/assistants-count').expect(200);
+    const typedBody = response.body as AssistantsCountsDto;
+    const items = typedBody.items;
+    const itemsFirstDayLastMonth = items[0];
+    const itemsToday = items[items.length - 1];
+
+    expect(itemsFirstDayLastMonth.total).toBe(2);
+    expect(itemsFirstDayLastMonth.byAssistant).toEqual({ 'Assistant-E2E': 2 });
+    expect(itemsToday.total).toBe(4);
+    expect(itemsToday.byAssistant).toEqual({ 'Assistant-E2E': 3, 'Assistant-Sales': 1 });
+  });
   it('should retrieve token usages using utc timezone dates', async () => {
     const today = startOfDay(new Date());
     const since = subDays(today, 1);
@@ -155,27 +167,31 @@ async function seedTestData(dataSource: DataSource) {
   const usageRepository = dataSource.getRepository(UsageEntity) as UsageRepository;
 
   const userEntities = await createUserEntities(3, userRepository);
-  const configurationEntity = await createConfigurationEntity(configurationRepository);
+  const supportAssistant = await createConfigurationEntity(configurationRepository, 1, 'Assistant-E2E');
+  const salesAssistant = await createConfigurationEntity(configurationRepository, 2, 'Assistant-Sales');
 
   const now = new Date();
 
   // All users send a message today
   for (const userEntity of userEntities) {
-    const conversationEntity = await createConversationEntity(userEntity.id, configurationEntity.id, conversationRepository);
+    const conversationEntity = await createConversationEntity(userEntity.id, supportAssistant.id, conversationRepository);
 
-    await createMessageEntity(conversationEntity.id, configurationEntity.id, now, messagesRepository);
+    await createMessageEntity(conversationEntity.id, supportAssistant.id, now, messagesRepository);
     await createUsageEntity(now, userEntity, usageRepository);
   }
 
+  const salesConversation = await createConversationEntity(userEntities[0].id, salesAssistant.id, conversationRepository);
+  await createMessageEntity(salesConversation.id, salesAssistant.id, now, messagesRepository);
+
   // two users send a message last month
   for (let i = 0; i < userEntities.length - 1; i++) {
-    const conversationEntity = await createConversationEntity(userEntities[i].id, configurationEntity.id, conversationRepository);
-    await createMessageEntity(conversationEntity.id, configurationEntity.id, startOfMonth(subMonths(now, 1)), messagesRepository);
+    const conversationEntity = await createConversationEntity(userEntities[i].id, supportAssistant.id, conversationRepository);
+    await createMessageEntity(conversationEntity.id, supportAssistant.id, startOfMonth(subMonths(now, 1)), messagesRepository);
   }
 
   const configurations = await configurationRepository.find();
 
-  expect(configurations).toHaveLength(1);
+  expect(configurations).toHaveLength(2);
 }
 
 const getMockDates = () => {
@@ -202,10 +218,14 @@ async function createUserEntities(quantity: number, userRepository: Repository<U
   return userRepository.save(userEntities);
 }
 
-async function createConfigurationEntity(configurationRepository: Repository<ConfigurationEntity>): Promise<ConfigurationEntity> {
+async function createConfigurationEntity(
+  configurationRepository: Repository<ConfigurationEntity>,
+  id: number,
+  name: string,
+): Promise<ConfigurationEntity> {
   const configurationEntity = new ConfigurationEntity();
-  configurationEntity.id = 1;
-  configurationEntity.name = 'Assistant-E2E';
+  configurationEntity.id = id;
+  configurationEntity.name = name;
   configurationEntity.status = ConfigurationStatus.ENABLED;
 
   return configurationRepository.save(configurationEntity);

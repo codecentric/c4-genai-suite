@@ -5,6 +5,7 @@ export * from './get-conversations';
 export * from './get-history';
 export * from './get-ratings';
 export * from './get-usage';
+export * from './get-assistants-count';
 export * from './rate-message';
 export * from './send-message';
 export * from './start-conversation';
