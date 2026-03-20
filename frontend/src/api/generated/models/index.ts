@@ -1,6 +1,8 @@
 //@ts-nocheck
 /* tslint:disable */
 /* eslint-disable */
+export * from './AssistantsCountDto';
+export * from './AssistantsCountsDto';
 export * from './AuditLogDetailDto';
 export * from './AuditLogDto';
 export * from './AuditLogsDto';

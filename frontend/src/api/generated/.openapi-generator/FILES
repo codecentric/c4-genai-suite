@@ -10,6 +10,8 @@ apis/UsagesApi.ts
 apis/UsersApi.ts
 apis/index.ts
 index.ts
+models/AssistantsCountDto.ts
+models/AssistantsCountsDto.ts
 models/AuditLogDetailDto.ts
 models/AuditLogDto.ts
 models/AuditLogsDto.ts

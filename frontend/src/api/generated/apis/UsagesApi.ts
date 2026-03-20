@@ -16,12 +16,15 @@
 
 import * as runtime from '../runtime';
 import type {
+  AssistantsCountsDto,
   MessagesCountsDto,
   RatingsDto,
   UsagesDto,
   UsersCountsDto,
 } from '../models/index';
 import {
+    AssistantsCountsDtoFromJSON,
+    AssistantsCountsDtoToJSON,
     MessagesCountsDtoFromJSON,
     MessagesCountsDtoToJSON,
     RatingsDtoFromJSON,
@@ -31,6 +34,11 @@ import {
     UsersCountsDtoFromJSON,
     UsersCountsDtoToJSON,
 } from '../models/index';
+
+export interface GetAssistantsCountRequest {
+    since?: Date;
+    groupBy?: GetAssistantsCountGroupByEnum;
+}
 
 export interface GetMessagesCountRequest {
     since?: Date;
@@ -56,6 +64,42 @@ export interface GetUsersCountRequest {
  * 
  */
 export class UsagesApi extends runtime.BaseAPI {
+
+    /**
+     * Retrieve the total count of assistant requests per day, week or month
+     * 
+     */
+    async getAssistantsCountRaw(requestParameters: GetAssistantsCountRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AssistantsCountsDto>> {
+        const queryParameters: any = {};
+
+        if (requestParameters['since'] != null) {
+            queryParameters['since'] = (requestParameters['since'] as any).toISOString();
+        }
+
+        if (requestParameters['groupBy'] != null) {
+            queryParameters['groupBy'] = requestParameters['groupBy'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/usages/assistants-count`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => AssistantsCountsDtoFromJSON(jsonValue));
+    }
+
+    /**
+     * Retrieve the total count of assistant requests per day, week or month
+     * 
+     */
+    async getAssistantsCount(since?: Date, groupBy?: GetAssistantsCountGroupByEnum, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AssistantsCountsDto> {
+        const response = await this.getAssistantsCountRaw({ since: since, groupBy: groupBy }, initOverrides);
+        return await response.value();
+    }
 
     /**
      * Retrieve the total count of messages
@@ -203,6 +247,15 @@ export class UsagesApi extends runtime.BaseAPI {
 
 }
 
+/**
+ * @export
+ */
+export const GetAssistantsCountGroupByEnum = {
+    Day: 'day',
+    Week: 'week',
+    Month: 'month'
+} as const;
+export type GetAssistantsCountGroupByEnum = typeof GetAssistantsCountGroupByEnum[keyof typeof GetAssistantsCountGroupByEnum];
 /**
  * @export
  */

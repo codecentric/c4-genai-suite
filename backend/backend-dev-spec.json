@@ -1949,6 +1949,48 @@
         "tags": ["usages"]
       }
     },
+    "/api/usages/assistants-count": {
+      "get": {
+        "description": "Retrieve the total count of assistant requests per day, week or month",
+        "operationId": "getAssistantsCount",
+        "parameters": [
+          {
+            "name": "since",
+            "required": false,
+            "in": "query",
+            "description": "Since when should the results be shown",
+            "schema": {
+              "format": "date-time",
+              "type": "string"
+            }
+          },
+          {
+            "name": "groupBy",
+            "required": false,
+            "in": "query",
+            "description": "Group the results by day, week, or month",
+            "schema": {
+              "enum": ["day", "week", "month"],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssistantsCountsDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "",
+        "tags": ["usages"]
+      }
+    },
     "/api/user-files": {
       "get": {
         "description": "Gets the files for the user bucket.",
@@ -4635,6 +4677,41 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/UsersCountDto"
+            }
+          }
+        },
+        "required": ["items"]
+      },
+      "AssistantsCountDto": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "description": "The date key.",
+            "format": "date"
+          },
+          "total": {
+            "type": "number",
+            "description": "The total number of assistant requests."
+          },
+          "byAssistant": {
+            "type": "object",
+            "description": "The requests per assistant.",
+            "additionalProperties": {
+              "type": "number"
+            }
+          }
+        },
+        "required": ["date", "total", "byAssistant"]
+      },
+      "AssistantsCountsDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "description": "The assistant count items.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AssistantsCountDto"
             }
           }
         },
