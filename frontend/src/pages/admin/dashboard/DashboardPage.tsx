@@ -4,13 +4,14 @@ import { useTranslation } from 'react-i18next';
 import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { Page } from 'src/components';
 import { texts } from 'src/texts';
-import { FilterInterval, useMessagesCount, useRatings, useUsage, useUsersCount } from './hooks';
+import { FilterInterval, useAssistantsCount, useMessagesCount, useRatings, useUsage, useUsersCount } from './hooks';
 
 export function DashboardPage() {
   const { t } = useTranslation();
   const [filterInterval, setFilterInterval] = useState(FilterInterval.Day);
   const statsUsage = useUsage(filterInterval);
   const statsRatings = useRatings(filterInterval);
+  const assistantsCount = useAssistantsCount(filterInterval);
   const messagesCount = useMessagesCount(filterInterval);
   const usersCount = useUsersCount(filterInterval);
   const version = (import.meta.env.VITE_VERSION as string) || 'No hash available';
@@ -47,6 +48,13 @@ export function DashboardPage() {
 
       <ChartContainer title={texts.dashboard.requests} data={messagesCount}>
         <Bar dataKey="total" fill="#003f5c" />
+      </ChartContainer>
+
+      <ChartContainer title={texts.dashboard.assistants} data={assistantsCount.items}>
+        {assistantsCount.byAssistant.map((b) => (
+          <Bar key={b.key} dataKey={b.dataKey} name={b.key} fill={b.color} />
+        ))}
+        <Legend />
       </ChartContainer>
 
       <ChartContainer title={texts.dashboard.users} data={usersCount}>

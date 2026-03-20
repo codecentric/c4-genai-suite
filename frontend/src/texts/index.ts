@@ -249,6 +249,7 @@ function load() {
       tokensPerModelChart: translate('dashboard.tokensPerModelChart'),
       tokensTotalChat: translate('dashboard.tokensTotalChat'),
       requests: translate('dashboard.requests'),
+      assistants: translate('dashboard.assistants'),
       users: translate('dashboard.users'),
       filterInterval: {
         day: translate('dashboard.users.filterInterval.day'),

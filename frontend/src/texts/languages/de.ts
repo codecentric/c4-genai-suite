@@ -223,6 +223,7 @@ export const de: typeof en = {
     tokensPerModelChart: 'Tokens pro Modell',
     tokensTotalChat: 'Tokens Gesamt',
     requests: 'Anfragen',
+    assistants: 'Assistenten',
     users: 'Nutzer',
     filterInterval: {
       day: 'Tage',
