@@ -9,12 +9,6 @@ export interface MessagesCount {
   date: Date;
 }
 
-export interface AssistantsCountItem {
-  total: number;
-  date: Date;
-  byAssistant: Record<string, number>;
-}
-
 export class MessageRepository extends Repository<MessageEntity> {
   async getMessageThread(conversationId: number, messageId?: number, fetchLatestConversation = true) {
     const messages = await this.findBy({ conversationId });
@@ -136,7 +130,7 @@ export class MessageRepository extends Repository<MessageEntity> {
       }>
     >(sql, params);
 
-    const itemsByDate = new Map<string, AssistantsCountItem>();
+    const itemsByDate = new Map<string, AssistantsCount>();
 
     for (const row of rawResults) {
       const dateKey = row.date.toISOString();
