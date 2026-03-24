@@ -175,7 +175,13 @@ export function UpsertExtensionDialog(props: UpsertExtensionDialogProps) {
           onClose={onClose}
           header={
             <div className="flex items-center gap-4">
-              {spec?.logo && <img className="h-6" src={`data:image/svg+xml;utf8,${encodeURIComponent(spec.logo)}`} />}
+              {spec?.logo && (
+                <img
+                  className="h-6"
+                  src={`data:image/svg+xml;utf8,${encodeURIComponent(spec.logo)}`}
+                  alt={`${spec.title} logo`}
+                />
+              )}
               {selected && texts.extensions.updateExtension}
               {!selected && texts.extensions.createExtension}
             </div>

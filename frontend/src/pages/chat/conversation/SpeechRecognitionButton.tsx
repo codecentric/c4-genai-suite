@@ -60,7 +60,7 @@ export function SpeechRecognitionButton({
                 <IconChevronDown className="w-3" />
               </ActionIcon>
             </Menu.Target>
-            <Menu.Dropdown>
+            <Menu.Dropdown aria-label={texts.accessibility.selectLanguage}>
               {languages.map((language) => (
                 <Menu.Item
                   key={language.code}

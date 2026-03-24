@@ -31,7 +31,7 @@ export function ChatSuggestionsInput<T extends ChatSuggestionsFormValues>({ form
     <Box>
       <InputLabel>Suggestions</InputLabel>
       {description && (
-        <Text size="xs" c="dimmed">
+        <Text size="xs" c="gray.7">
           {description}
         </Text>
       )}
