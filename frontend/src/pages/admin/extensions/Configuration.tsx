@@ -33,12 +33,17 @@ export const Configuration = memo((props: ConfigurationProps) => {
       </TransientNavLink>
       <Menu>
         <Menu.Target>
-          <ActionIcon className="opacity-0 group-hover:opacity-100" variant="subtle" data-testid={'more-actions'}>
+          <ActionIcon
+            className="opacity-0 group-hover:opacity-100"
+            variant="subtle"
+            data-testid={'more-actions'}
+            aria-label={texts.common.menu}
+          >
             <IconDots size={16} />
           </ActionIcon>
         </Menu.Target>
 
-        <Menu.Dropdown>
+        <Menu.Dropdown aria-label={texts.accessibility.assistantOptions}>
           <Menu.Item leftSection={<IconEdit size={14} />} onClick={() => onUpdate(configuration)}>
             {texts.common.edit}
           </Menu.Item>
@@ -51,7 +56,7 @@ export const Configuration = memo((props: ConfigurationProps) => {
             onPerform={() => onDelete(configuration)}
           >
             {({ onClick }) => (
-              <Menu.Item onClick={onClick} color="red" leftSection={<IconTrash size={14} />}>
+              <Menu.Item onClick={onClick} c="red.9" leftSection={<IconTrash size={14} />}>
                 {texts.common.remove}
               </Menu.Item>
             )}
