@@ -57,7 +57,7 @@
     "@nestjs/terminus": "^11.1.1",
     "@nestjs/typeorm": "^11.0.0",
     "@opentelemetry/auto-instrumentations-node": "^0.71.0",
-    "@opentelemetry/sdk-node": "^0.211.0",
+    "@opentelemetry/sdk-node": "^0.213.0",
     "@types/mime-types": "^3.0.1",
     "@willsoto/nestjs-prometheus": "^6.0.2",
     "ai": "^6.0.136",
