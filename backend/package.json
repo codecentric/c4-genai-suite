@@ -44,7 +44,7 @@
     "@ai-sdk/openai-compatible": "^2.0.37",
     "@azure/ai-agents": "^1.1.0",
     "@azure/core-util": "^1.13.1",
-    "@azure/identity": "^4.13.0",
+    "@azure/identity": "^4.13.1",
     "@modelcontextprotocol/sdk": "^1.27.1",
     "@n8n/json-schema-to-zod": "^1.6.0",
     "@nestjs/common": "^11.1.17",
@@ -89,7 +89,7 @@
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2",
     "typeorm": "^0.3.28",
-    "undici": "^7.24.4",
+    "undici": "^7.24.5",
     "uuid": "^11.1.0",
     "winston": "^3.19.0",
     "zod": "4.3.5"
