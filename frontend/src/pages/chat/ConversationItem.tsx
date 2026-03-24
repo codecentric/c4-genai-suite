@@ -82,7 +82,7 @@ export const ConversationItem = memo(({ chat }: ChatProps) => {
               />
             </Button>
           </Menu.Target>
-          <Menu.Dropdown>
+          <Menu.Dropdown aria-label={texts.accessibility.conversationOptions}>
             <Menu.Item
               leftSection={<IconEdit className="h-4 w-4" />}
               disabled={renameChat.isPending}
@@ -98,7 +98,7 @@ export const ConversationItem = memo(({ chat }: ChatProps) => {
               {texts.common.duplicate}
             </Menu.Item>
             <Menu.Item
-              color="red"
+              c="red.9"
               leftSection={<IconTrash className="h-4 w-4" />}
               disabled={removeChat.isPending}
               onClick={() => removeChat.mutate(chat.id)}

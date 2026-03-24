@@ -5,6 +5,7 @@ import { usePersistentState } from 'src/hooks';
 import { ConfigurationUserValuesModal } from 'src/pages/chat/conversation/ConfigurationUserValuesModal';
 import { useStateOfEnabledAssistants, useStateOfSelectedAssistant } from 'src/pages/chat/state/listOfAssistants';
 import { isMobile } from 'src/pages/utils';
+import { texts } from 'src/texts';
 import { useStateMutateChat, useStateOfChat } from '../state/chat';
 
 interface ConfigurationProps {
@@ -24,7 +25,7 @@ export const Configuration = ({ canEditConfiguration }: ConfigurationProps) => {
   const renderSelectOption: SelectProps['renderOption'] = ({ option }) => (
     <div>
       <Text size="sm">{option.label}</Text>
-      <Text size="xs" c="dimmed">
+      <Text size="xs" c="gray.7">
         {assistants.find((c) => c.id + '' === option.value)?.description}
       </Text>
     </div>
@@ -42,6 +43,7 @@ export const Configuration = ({ canEditConfiguration }: ConfigurationProps) => {
   return (
     <div className="flex flex-row gap-x-4">
       <Select
+        aria-label={texts.chat.selectAssistant}
         className={isMobile() ? 'w-full' : 'max-w-56'}
         radius={'md'}
         comboboxProps={{
@@ -61,10 +63,16 @@ export const Configuration = ({ canEditConfiguration }: ConfigurationProps) => {
         scrollAreaProps={{ type: 'always' }}
         rightSection={<IconChevronDown size={16} />}
         searchable
-        placeholder="Search assistants..."
+        placeholder={texts.chat.searchAssistantsPlaceholder}
       />
       {assistant?.configurableArguments && (
-        <ActionIcon data-testid="assistent-user-configuration" onClick={() => setShowModal(true)} size="xl" variant="subtle">
+        <ActionIcon
+          data-testid="assistent-user-configuration"
+          onClick={() => setShowModal(true)}
+          size="xl"
+          variant="subtle"
+          aria-label={texts.chat.configureAssistant}
+        >
           <IconSettings data-testid="configuration-settings-icon" />
         </ActionIcon>
       )}
