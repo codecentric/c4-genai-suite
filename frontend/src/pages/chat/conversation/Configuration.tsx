@@ -59,7 +59,7 @@ export const Configuration = ({ canEditConfiguration }: ConfigurationProps) => {
         data={assistants.map((c) => ({ value: c.id + '', label: c.name }))}
         disabled={!canEditConfiguration}
         size="md"
-        data-testid="chat-assistent-select"
+        data-testid="chat-assistant-select"
         scrollAreaProps={{ type: 'always' }}
         rightSection={<IconChevronDown size={16} />}
         searchable
@@ -67,7 +67,7 @@ export const Configuration = ({ canEditConfiguration }: ConfigurationProps) => {
       />
       {assistant?.configurableArguments && (
         <ActionIcon
-          data-testid="assistent-user-configuration"
+          data-testid="assistant-user-configuration"
           onClick={() => setShowModal(true)}
           size="xl"
           variant="subtle"
