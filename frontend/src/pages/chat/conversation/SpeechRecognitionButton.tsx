@@ -48,6 +48,7 @@ export function SpeechRecognitionButton({
                 size="xs"
                 className="rounded-l-none"
                 disabled={listening}
+                aria-label={texts.accessibility.selectLanguage}
                 style={{
                   borderTopLeftRadius: 0,
                   borderBottomLeftRadius: 0,
