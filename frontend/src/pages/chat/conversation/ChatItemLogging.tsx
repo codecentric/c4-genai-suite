@@ -25,6 +25,7 @@ export const ChatItemLogging = memo((props: ChatItemLoggingProps) => {
               className="cursor-pointer p-1 hover:rounded hover:bg-gray-300"
               onClick={toggleCollapse}
               aria-label={texts.accessibility.toggleChunksInformation}
+              aria-expanded={!isOpen}
             >
               <Icon icon={isOpen ? 'collapse-down' : 'collapse-up'} size={16} />
             </button>
