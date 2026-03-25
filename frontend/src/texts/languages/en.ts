@@ -118,6 +118,7 @@ export const en = {
     searchAssistantsPlaceholder: 'Search assistants...',
     configureAssistant: 'Configure assistant settings',
     reasoning: 'Reasoning',
+    chunksInformation: 'Chunks information',
     rating: {
       incorrect: 'Not factually correct',
       instructions_not_followed: "Didn't follow instructions",

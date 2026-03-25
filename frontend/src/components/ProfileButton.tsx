@@ -27,7 +27,10 @@ export const ProfileButton = ({ onClearConversations, section }: ProfileButtonPr
   return (
     <Menu width={250}>
       <Menu.Target data-testid="menu user">
-        <button className="btn btn-ghost h-auto w-full justify-start p-2 hover:bg-gray-200" aria-label={texts.common.menu}>
+        <button
+          className="btn btn-ghost h-auto w-full justify-start p-2 hover:bg-gray-200"
+          aria-label={texts.accessibility.userMenu}
+        >
           <div className="flex max-w-full items-center gap-2">
             <div className="shrink-0">
               <Avatar user={profile} />

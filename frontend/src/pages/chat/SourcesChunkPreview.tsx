@@ -31,7 +31,7 @@ export const SourcesChunkPreview = ({ onClose, document }: SourcesChunkPreviewPr
         <Group justify="space-between">
           <Text fw={500}>{t('chat.sources.content')}</Text>
           <ActionIcon onClick={onClose} variant="subtle" color="gray" aria-label={texts.accessibility.closeDialog}>
-            <IconX title="close" />
+            <IconX />
           </ActionIcon>
         </Group>
       </Card.Section>
