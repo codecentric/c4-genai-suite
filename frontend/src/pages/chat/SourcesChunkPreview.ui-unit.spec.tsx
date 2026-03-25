@@ -14,7 +14,7 @@ describe('SourcesChunkPreview', () => {
     render(<SourcesChunkPreview {...defaultProps} />);
 
     const user = userEvent.setup();
-    const cancelButton = screen.getByLabelText(/close/);
+    const cancelButton = screen.getByRole('button', { name: 'Close dialog' });
     await user.click(cancelButton);
 
     expect(defaultProps.onClose).toHaveBeenCalled();

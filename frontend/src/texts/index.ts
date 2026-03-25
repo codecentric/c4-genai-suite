@@ -136,6 +136,7 @@ function load() {
     },
     chat: {
       reasoning: translate('chat.reasoning'),
+      chunksInformation: translate('chat.chunksInformation'),
       conversationNotFound: translate('chat.conversationNotFound'),
       noAccessToConversation: translate('chat.noAccessToConversation'),
       errorLoadingMessagesOrConversation: translate('chat.errorLoadingMessagesOrConversation'),
