@@ -2,6 +2,7 @@ import { screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import { render } from 'src/pages/admin/test-utils';
+import { texts } from 'src/texts';
 import { ChatItemLogging, ChatItemLoggingProps } from './ChatItemLogging';
 
 describe('ChatItemLogging', () => {
@@ -27,24 +28,24 @@ describe('ChatItemLogging', () => {
 
   it('should render component with initial hidden chunks', () => {
     render(<ChatItemLogging {...defaultProps} />);
-    expect(screen.getByText('Chunks information')).toBeInTheDocument();
+    expect(screen.getByText(texts.chat.chunksInformation)).toBeInTheDocument();
     expectHiddenChunks();
   });
 
   it('should render chunks information', async () => {
     render(<ChatItemLogging {...defaultProps} />);
     const user = userEvent.setup();
-    const toggleButton = screen.getByRole('button', { name: 'Toggle chunks information' });
+    const toggleButton = screen.getByRole('button', { name: texts.accessibility.toggleChunksInformation });
 
     await user.click(toggleButton);
-    expect(screen.getByText('Chunks information')).toBeInTheDocument();
+    expect(screen.getByText(texts.chat.chunksInformation)).toBeInTheDocument();
     expectVisibleChunks();
   });
 
   it('should hide chunks information', async () => {
     render(<ChatItemLogging {...defaultProps} />);
     const user = userEvent.setup();
-    const toggleButton = screen.getByRole('button', { name: 'Toggle chunks information' });
+    const toggleButton = screen.getByRole('button', { name: texts.accessibility.toggleChunksInformation });
 
     await user.click(toggleButton);
     await user.click(toggleButton);
