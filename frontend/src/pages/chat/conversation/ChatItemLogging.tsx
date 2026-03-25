@@ -8,10 +8,10 @@ export interface ChatItemLoggingProps {
 
 export const ChatItemLogging = memo((props: ChatItemLoggingProps) => {
   const { logging } = props;
-  const [isOpen, setIsOpen] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const toggleCollapse = () => {
-    setIsOpen(!isOpen);
+    setIsExpanded(!isExpanded);
   };
 
   return (
@@ -25,19 +25,17 @@ export const ChatItemLogging = memo((props: ChatItemLoggingProps) => {
               className="cursor-pointer p-1 hover:rounded hover:bg-gray-300"
               onClick={toggleCollapse}
               aria-label={texts.accessibility.toggleChunksInformation}
-              aria-expanded={!isOpen}
+              aria-expanded={isExpanded}
             >
-              <Icon icon={isOpen ? 'collapse-down' : 'collapse-up'} size={16} />
+              <Icon icon={isExpanded ? 'collapse-up' : 'collapse-down'} size={16} />
             </button>
           </div>
-          {!isOpen ? (
+          {isExpanded && (
             <div className="mt-4 break-words">
               {logging.map((l, i) => (
                 <Markdown key={i}>{l}</Markdown>
               ))}
             </div>
-          ) : (
-            <></>
           )}
         </div>
       )}
