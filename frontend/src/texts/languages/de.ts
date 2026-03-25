@@ -120,6 +120,7 @@ export const de: typeof en = {
     searchAssistantsPlaceholder: 'Assistenten suchen...',
     configureAssistant: 'Assistenten-Einstellungen konfigurieren',
     reasoning: 'Reasoning',
+    chunksInformation: 'Chunks-Informationen',
     rating: {
       incorrect: 'Inhaltlich nicht korrekt',
       instructions_not_followed: 'Anweisungen nicht befolgt',

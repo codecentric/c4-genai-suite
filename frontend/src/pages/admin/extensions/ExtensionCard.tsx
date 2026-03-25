@@ -31,11 +31,7 @@ export function ExtensionCard(props: ExtensionCardProps) {
     >
       <div className="group card-body relative flex flex-row items-start gap-4 p-6">
         {spec.logo && (
-          <img
-            className="mt-2 w-16"
-            src={`data:image/svg+xml;utf8,${encodeURIComponent(spec.logo)}`}
-            alt={`${spec.title} logo`}
-          />
+          <img className="mt-2 w-16" src={`data:image/svg+xml;utf8,${encodeURIComponent(spec.logo)}`} alt="" aria-hidden="true" />
         )}
 
         <div className="flex min-w-0 flex-col gap-2">

@@ -34,9 +34,9 @@ describe('ChatItemLogging', () => {
   it('should render chunks information', async () => {
     render(<ChatItemLogging {...defaultProps} />);
     const user = userEvent.setup();
-    const icon = screen.getByLabelText('toggle chunks information');
+    const toggleButton = screen.getByRole('button', { name: 'Toggle chunks information' });
 
-    await user.click(icon);
+    await user.click(toggleButton);
     expect(screen.getByText('Chunks information')).toBeInTheDocument();
     expectVisibleChunks();
   });
@@ -44,10 +44,10 @@ describe('ChatItemLogging', () => {
   it('should hide chunks information', async () => {
     render(<ChatItemLogging {...defaultProps} />);
     const user = userEvent.setup();
-    const icon = screen.getByLabelText('toggle chunks information');
+    const toggleButton = screen.getByRole('button', { name: 'Toggle chunks information' });
 
-    await user.click(icon);
-    await user.click(icon);
+    await user.click(toggleButton);
+    await user.click(toggleButton);
     expectHiddenChunks();
   });
 });

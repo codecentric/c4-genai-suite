@@ -19,7 +19,7 @@ export const ChatItemLogging = memo((props: ChatItemLoggingProps) => {
       {logging?.length > 0 && (
         <div className="relative my-1 rounded-lg border-[1px] border-gray-300 bg-gray-100 p-4 text-sm">
           <div className="flex items-center justify-between">
-            <p className="font-bold">Chunks information</p>
+            <p className="font-bold">{texts.chat.chunksInformation}</p>
             <button
               type="button"
               className="cursor-pointer p-1 hover:rounded hover:bg-gray-300"
