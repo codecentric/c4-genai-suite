@@ -519,7 +519,7 @@ export async function addMockModelToConfiguration(
 }
 
 export async function configureAssistantByUser(page: Page, config: { values: { label: string; value: number | string }[] }) {
-  await page.getByTestId('assistent-user-configuration').click();
+  await page.getByTestId('assistant-user-configuration').click();
 
   for (const entry of config.values) {
     await page.getByLabel(entry.label).fill(String(entry.value));
@@ -581,7 +581,7 @@ export async function checkSelectedConfiguration(page: Page, configuration: { na
 }
 
 export async function selectConfiguration(page: Page, configuration: { name: string }) {
-  await page.getByTestId('chat-assistent-select').click();
+  await page.getByTestId('chat-assistant-select').click();
   const element = page.locator('p').getByText(configuration.name, { exact: true });
   await expect(element).toBeVisible();
   await element.click();
