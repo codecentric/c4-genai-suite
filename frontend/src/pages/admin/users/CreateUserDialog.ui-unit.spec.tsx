@@ -43,7 +43,7 @@ describe('User Page', () => {
     // Use the base label without asterisk for role-based queries since the asterisk is aria-hidden
     const userGroups = screen.getByRole('textbox', { name: texts.common.userGroups });
     await user.click(userGroups);
-    const adminOption = screen.getByRole('option', { name: /Admin/i });
+    const adminOption = document.querySelector('[data-combobox-option][value="admin"]') as HTMLElement;
     await user.click(adminOption); // add
     await user.click(adminOption); // remove again
 
@@ -58,7 +58,7 @@ describe('User Page', () => {
 
     const userGroup = screen.getByRole('textbox', { name: texts.common.userGroups });
     await user.click(userGroup);
-    const adminOption = screen.getByRole('option', { name: /Admin/i });
+    const adminOption = document.querySelector('[data-combobox-option][value="admin"]') as HTMLElement;
     await user.click(adminOption);
 
     const generateButton = screen.getByRole('button', { name: texts.users.generateAPIKey });
@@ -80,7 +80,7 @@ describe('User Page', () => {
 
     const userGroup = screen.getByRole('textbox', { name: texts.common.userGroups });
     await user.click(userGroup);
-    const groupOption = screen.getByRole('option', { name: /Group/i });
+    const groupOption = document.querySelector('[data-combobox-option][value="group"]') as HTMLElement;
     await user.click(groupOption);
 
     const pills = document.querySelectorAll('.mantine-Pill-label');
