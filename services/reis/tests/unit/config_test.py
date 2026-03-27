@@ -44,7 +44,7 @@ def empty_env() -> Generator[None, None, None]:
     ],
 )
 def test_env(empty_env: None, env_file: str, defined: list[str], undefined: list[str]) -> None:
-    settings = Config(_env_file=env_file, _env_file_encoding="utf-8")  # type: ignore[call-arg]
+    settings = Config(_env_file=env_file, _env_file_encoding="utf-8")  # type: ignore[call-arg]  # ty: ignore[missing-argument, unknown-argument]
 
     for name in undefined:
         assert getattr(settings, name) is None
@@ -72,7 +72,7 @@ def test_env(empty_env: None, env_file: str, defined: list[str], undefined: list
 )
 def test_env_missing(empty_env: None, env_file: str, expected_missing: list[str]) -> None:
     with pytest.raises(ValidationError) as exc_info:
-        Config(_env_file=env_file, _env_file_encoding="utf-8")  # type: ignore[call-arg]
+        Config(_env_file=env_file, _env_file_encoding="utf-8")  # type: ignore[call-arg]  # ty: ignore[missing-argument, unknown-argument]
 
     error_msgs = {i["msg"] for i in exc_info.value.errors()}
 
@@ -89,7 +89,7 @@ def test_env_missing(empty_env: None, env_file: str, expected_missing: list[str]
 )
 def test_env_wrong(empty_env: None, env_file: str) -> None:
     with pytest.raises(ValidationError) as exc_info:
-        Config(_env_file=env_file, _env_file_encoding="utf-8")  # type: ignore[call-arg]
+        Config(_env_file=env_file, _env_file_encoding="utf-8")  # type: ignore[call-arg]  # ty: ignore[missing-argument, unknown-argument]
 
     assert len(exc_info.value.errors()) == 1
 
