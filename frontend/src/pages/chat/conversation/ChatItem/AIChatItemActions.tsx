@@ -54,7 +54,7 @@ export const AIChatItemActions = ({
       <div
         className={cn(
           { 'fade-in opacity-100': renderAlways },
-          'my-1 flex items-center opacity-0 transition-all group-hover:opacity-100',
+          'flex items-center opacity-0 transition-all group-focus-within:opacity-100 group-hover:opacity-100',
         )}
       >
         <ActionIcon

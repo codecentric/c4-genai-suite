@@ -37,6 +37,12 @@
   ::file-selector-button {
     border-color: var(--color-gray-200, currentcolor);
   }
+
+  /* Global black focus rings for keyboard accessibility */
+  *:focus-visible {
+    outline: 2px solid black;
+    outline-offset: 2px;
+  }
 }
 
 .overflow-anchor-none {
