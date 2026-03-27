@@ -89,9 +89,17 @@ describe('UpdateUserDialog', () => {
     // Use base label without asterisk since the asterisk is aria-hidden
     const userGroup = screen.getByRole('textbox', { name: texts.common.userGroups });
     await user.click(userGroup);
-    const adminOption = document.querySelector('[data-combobox-option][value="admin"]') as HTMLElement;
+    const adminOption = await waitFor(() => {
+      const option = document.querySelector('[data-combobox-option][value="admin"]');
+      expect(option).toBeInTheDocument();
+      return option as HTMLElement;
+    });
     await user.click(adminOption); // Remove the Admin group.
-    const defaultOption = document.querySelector('[data-combobox-option][value="default"]') as HTMLElement;
+    const defaultOption = await waitFor(() => {
+      const option = document.querySelector('[data-combobox-option][value="default"]');
+      expect(option).toBeInTheDocument();
+      return option as HTMLElement;
+    });
     await user.click(defaultOption); // Add Default group.
 
     await user.click(screen.getByRole('button', { name: texts.common.save }));

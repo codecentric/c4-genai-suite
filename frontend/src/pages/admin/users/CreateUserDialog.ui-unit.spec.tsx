@@ -43,7 +43,11 @@ describe('User Page', () => {
     // Use the base label without asterisk for role-based queries since the asterisk is aria-hidden
     const userGroups = screen.getByRole('textbox', { name: texts.common.userGroups });
     await user.click(userGroups);
-    const adminOption = document.querySelector('[data-combobox-option][value="admin"]') as HTMLElement;
+    const adminOption = await waitFor(() => {
+      const option = document.querySelector('[data-combobox-option][value="admin"]');
+      expect(option).toBeInTheDocument();
+      return option as HTMLElement;
+    });
     await user.click(adminOption); // add
     await user.click(adminOption); // remove again
 
@@ -58,7 +62,11 @@ describe('User Page', () => {
 
     const userGroup = screen.getByRole('textbox', { name: texts.common.userGroups });
     await user.click(userGroup);
-    const adminOption = document.querySelector('[data-combobox-option][value="admin"]') as HTMLElement;
+    const adminOption = await waitFor(() => {
+      const option = document.querySelector('[data-combobox-option][value="admin"]');
+      expect(option).toBeInTheDocument();
+      return option as HTMLElement;
+    });
     await user.click(adminOption);
 
     const generateButton = screen.getByRole('button', { name: texts.users.generateAPIKey });
@@ -80,7 +88,11 @@ describe('User Page', () => {
 
     const userGroup = screen.getByRole('textbox', { name: texts.common.userGroups });
     await user.click(userGroup);
-    const groupOption = document.querySelector('[data-combobox-option][value="group"]') as HTMLElement;
+    const groupOption = await waitFor(() => {
+      const option = document.querySelector('[data-combobox-option][value="group"]');
+      expect(option).toBeInTheDocument();
+      return option as HTMLElement;
+    });
     await user.click(groupOption);
 
     const pills = document.querySelectorAll('.mantine-Pill-label');
