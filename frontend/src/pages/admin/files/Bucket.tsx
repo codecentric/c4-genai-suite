@@ -26,7 +26,7 @@ export const Bucket = memo(({ bucket, onDelete, onUpdate }: BucketProps) => {
         {bucket.name}
       </TransientNavLink>
 
-      <Menu>
+      <Menu withInitialFocusPlaceholder={false}>
         <Menu.Target>
           <ActionIcon
             className="opacity-0 group-hover:opacity-100"

@@ -25,7 +25,7 @@ export const ProfileButton = ({ onClearConversations, section }: ProfileButtonPr
   const { data: authSettings } = useAuthSettings();
 
   return (
-    <Menu width={250}>
+    <Menu width={250} withInitialFocusPlaceholder={false}>
       <Menu.Target data-testid="menu user">
         <button className="btn btn-ghost h-auto w-full justify-start p-2 hover:bg-gray-200" aria-haspopup="menu">
           <div className="flex max-w-full items-center gap-2">

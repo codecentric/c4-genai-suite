@@ -66,7 +66,7 @@ export const ConversationItem = memo(({ chat }: ChatProps) => {
         {chat.name}
       </Button>
       <div className={`flex items-center ${isMobile() ? '' : 'opacity-0 group-hover:opacity-100'}`}>
-        <Menu width={200} opened={menuOpen} onChange={setMenuOpen}>
+        <Menu width={200} opened={menuOpen} onChange={setMenuOpen} withInitialFocusPlaceholder={false}>
           <Menu.Target>
             <Button
               variant="subtle"

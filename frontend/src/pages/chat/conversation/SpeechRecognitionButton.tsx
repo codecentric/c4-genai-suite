@@ -41,7 +41,7 @@ export function SpeechRecognitionButton({
           >
             <IconMicrophone className="w-4" />
           </ActionIcon>
-          <Menu shadow="md">
+          <Menu shadow="md" withInitialFocusPlaceholder={false}>
             <Menu.Target>
               <ActionIcon
                 variant="outline"
