@@ -32,7 +32,7 @@ def test_add_files_multiple_workers(mocker: MockerFixture, app: FastAPI) -> None
         with open("tests/data/birthdays.pdf", "rb") as f:
             response = client.post(
                 "/files",
-                data=f,  # type: ignore[arg-type]
+                content=f,
                 headers={
                     "bucket": "15",
                     "id": "1",
@@ -63,7 +63,7 @@ def test_process_files_multiple_workers(mocker: MockerFixture, app: FastAPI) -> 
         with open("tests/data/birthdays.pdf", "rb") as f:
             response = client.post(
                 "/files/process",
-                data=f,  # type: ignore[arg-type]
+                content=f,
                 headers={
                     "bucket": "15",
                     "id": "1",

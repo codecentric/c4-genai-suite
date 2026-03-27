@@ -58,7 +58,7 @@ def test_upload_file(faker: Faker, client: TestClient, responses: RequestsMock) 
     f = BytesIO(content.encode())
     response = client.post(
         "/files",
-        data=f,  # type: ignore[arg-type]
+        content=f,
         headers={
             "bucket": "1",
             "id": "1",
