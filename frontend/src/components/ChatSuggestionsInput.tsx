@@ -19,11 +19,12 @@ type ChatSuggestionsInputProps<T> = {
 
 export function ChatSuggestionsInput<T extends ChatSuggestionsFormValues>({ form, description }: ChatSuggestionsInputProps<T>) {
   const handleAddSuggestion = () => {
-    form.insertListItem('chatSuggestions', {
+    const newSuggestion: Suggestion = {
       title: 'Title',
       subtitle: 'Subtitle',
       text: 'Suggested text',
-    });
+    };
+    (form.insertListItem as (path: 'chatSuggestions', value: Suggestion) => void)('chatSuggestions', newSuggestion);
   };
   const handleDeleteSuggestion = (index: number) => form.removeListItem(`chatSuggestions`, index);
   const values = form.values;

@@ -19,11 +19,6 @@ import { texts } from 'src/texts';
 
 type ExtensionUserInfoDtoUserArgumentsValue = ExtensionArgumentObjectSpecDtoPropertiesValue;
 
-function formatDateOnly(date: Date | null): string | null {
-  if (!date) return null;
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-}
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function setNestedFieldValue(form: UseFormReturnType<any>, path: string, value: unknown) {
   const parts = path.split('.');
@@ -176,7 +171,7 @@ export function Argument({
           key={form.key(fieldName)}
           {...form.getInputProps(fieldName)}
           value={value ? new Date(value) : null}
-          onChange={(date) => setNestedFieldValue(form, fieldName, formatDateOnly(date))}
+          onChange={(dateString) => setNestedFieldValue(form, fieldName, dateString)}
         />
       </FormRow>
     );
