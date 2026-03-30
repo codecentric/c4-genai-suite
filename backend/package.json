@@ -89,10 +89,10 @@
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2",
     "typeorm": "^0.3.28",
-    "undici": "^7.24.5",
+    "undici": "^7.24.6",
     "uuid": "^11.1.0",
     "winston": "^3.19.0",
-    "zod": "4.3.5"
+    "zod": "4.3.6"
   },
   "devDependencies": {
     "@eslint/compat": "2.0.2",
@@ -139,7 +139,7 @@
     "typescript": "5.9.3"
   },
   "overrides": {
-    "zod": "4.3.5",
+    "zod": "4.3.6",
     "chokidar": "^4.0.0"
   }
 }
