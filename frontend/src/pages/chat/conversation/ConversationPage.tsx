@@ -57,7 +57,11 @@ export function ConversationPage(props: ConversationPageProps) {
   const showRateThisConversation = !isChatLoading && !chat.rating && messages.length > 10;
   const showScrollToBottomButton = canScrollToBottom && !isAiWriting;
   return (
-    <div className={'relative mx-auto flex flex-col pb-2'} style={{ height: 'calc(100vh - 48px)' }} {...getRootProps()}>
+    <div
+      className={'relative mx-auto flex flex-col pb-2 focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-inset'}
+      style={{ height: 'calc(100vh - 48px)' }}
+      {...getRootProps()}
+    >
       <input {...getInputProps()} className="hidden" />
       {isDragActive && (
         <>
@@ -84,7 +88,7 @@ export function ConversationPage(props: ConversationPageProps) {
             {!messages.length && <h2 className="mb-6 text-center text-3xl font-bold">{texts.chat.welcomeText}</h2>}
             <div
               className={cn(
-                'fade-in relative mx-auto w-full max-w-200',
+                'fade-in relative mx-auto w-full max-w-[800px]',
                 (showScrollToBottomButton || showRateThisConversation) && 'white-shadow',
               )}
             >

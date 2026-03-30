@@ -178,6 +178,15 @@ input[type='number'] {
   }
 }
 
+/* Mantine Combobox active option styling */
+[data-combobox-selected]
+ {
+    background-color: #F1F3F5;
+    color: inherit;
+    @apply ring-1 ring-black ring-inset;
+}
+
+
 * {
   overflow-wrap: anywhere;
 }
