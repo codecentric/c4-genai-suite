@@ -65,18 +65,16 @@ export function ConversationPage(props: ConversationPageProps) {
           {isDragReject && <DragAndDropLayout.InvalidFileFormat allowedFileNameExtensions={allowedFileNameExtensions} />}
         </>
       )}
-      <div className="bg-white p-3">
+      <div className="p-3">
         <Configuration canEditConfiguration={true} />
       </div>
       {isChatLoading ? (
-        <div className="fade-in w-full bg-white" style={{ height: 'calc(100vh - 4rem)' }} />
+        <div className="fade-in w-full" style={{ height: 'calc(100vh - 4rem)' }} />
       ) : (
         <>
           {messages.length > 0 && (
             <div
-              className={
-                'fade-in overflow-anchor-none mx-auto box-border w-full max-w-[min(800px,_100%)] grow overflow-auto px-4'
-              }
+              className={'fade-in overflow-anchor-none mx-auto box-border w-full max-w-[min(800px,100%)] grow overflow-auto px-4'}
               ref={containerRef}
             >
               <ChatHistory agentName={agentName} editMessage={submitMessage} />
@@ -86,7 +84,7 @@ export function ConversationPage(props: ConversationPageProps) {
             {!messages.length && <h2 className="mb-6 text-center text-3xl font-bold">{texts.chat.welcomeText}</h2>}
             <div
               className={cn(
-                'fade-in relative mx-auto w-full max-w-[800px]',
+                'fade-in relative mx-auto w-full max-w-200',
                 (showScrollToBottomButton || showRateThisConversation) && 'white-shadow',
               )}
             >
