@@ -218,7 +218,7 @@ def test_add_files_without_filestore(mocker: MockerFixture, client: TestClient) 
     with open("tests/data/birthdays.pdf", "rb") as f:
         response = client.post(
             "/files",
-            data=f,  # type: ignore[arg-type]
+            content=f,
             headers={
                 "bucket": "15",
                 "id": "1",
@@ -240,7 +240,7 @@ def test_add_files_with_filestore(mocker: MockerFixture, client: TestClient) -> 
     with open("tests/data/birthdays.yaml", "rb") as f:
         response = client.post(
             "/files",
-            data=f,  # type: ignore[arg-type]
+            content=f,
             headers={
                 "bucket": "15",
                 "id": "1",
@@ -276,7 +276,7 @@ def test_process_files(mocker: MockerFixture, client: TestClient) -> None:
     with open("tests/data/birthdays.pdf", "rb") as f:
         response = client.post(
             "/files/process",
-            data=f,  # type: ignore[arg-type]
+            content=f,
             headers={
                 "id": "1",
                 "fileName": "test.pdf",
@@ -296,7 +296,7 @@ def test_add_damaged_file(mocker: MockerFixture, client: TestClient) -> None:
     with open("tests/data/birthdays.pptx", "rb") as f:
         response = client.post(
             "/files",
-            data=f,  # type: ignore[arg-type]
+            content=f,
             headers={
                 "bucket": "15",
                 "id": "1",
@@ -315,7 +315,7 @@ def test_add_damaged_large_file(mocker: MockerFixture, client: TestClient) -> No
     with open("tests/data_stress/gg.pdf", "rb") as f:
         response = client.post(
             "/files",
-            data=f,  # type: ignore[arg-type]
+            content=f,
             headers={
                 "id": "1",
                 "bucket": "15",
@@ -334,7 +334,7 @@ def test_add_unsupported_file(mocker: MockerFixture, client: TestClient) -> None
     with open("tests/data/birthdays.pdf", "rb") as f:
         response = client.post(
             "/files",
-            data=f,  # type: ignore[arg-type]
+            content=f,
             headers={
                 "id": "1",
                 "bucket": "15",

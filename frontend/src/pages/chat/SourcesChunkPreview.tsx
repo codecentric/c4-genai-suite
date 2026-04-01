@@ -4,6 +4,7 @@ import { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert } from 'src/components';
 import { useDocumentContent } from 'src/hooks/api/files';
+import { texts } from 'src/texts';
 
 export type SourcesChunkPreviewProps = {
   document: DocumentSource;
@@ -29,8 +30,8 @@ export const SourcesChunkPreview = ({ onClose, document }: SourcesChunkPreviewPr
       <Card.Section withBorder inheritPadding py="xs">
         <Group justify="space-between">
           <Text fw={500}>{t('chat.sources.content')}</Text>
-          <ActionIcon onClick={onClose} variant="subtle" color="gray" aria-label="close">
-            <IconX title="close" />
+          <ActionIcon onClick={onClose} variant="subtle" color="gray" aria-label={texts.accessibility.closeDialog}>
+            <IconX aria-hidden="true" />
           </ActionIcon>
         </Group>
       </Card.Section>

@@ -1,5 +1,14 @@
 # Changelog
 
+## [9.16.2](https://github.com/codecentric/c4-genai-suite/compare/v9.16.1...v9.16.2) (2026-03-30)
+
+
+### Bug Fixes
+
+* accessibility checks across user facing pages ([#1477](https://github.com/codecentric/c4-genai-suite/issues/1477)) ([def2e52](https://github.com/codecentric/c4-genai-suite/commit/def2e52badf31c334c0b76d61826b74f06a17409))
+* **frontend:** a11y for user facing pages ([#626](https://github.com/codecentric/c4-genai-suite/issues/626)) ([262c4e5](https://github.com/codecentric/c4-genai-suite/commit/262c4e5e1ce4fddb3d43cb2e1a14a6d3bac6d4b2))
+* **i18n:** Fix typo in German error loading message ([#1417](https://github.com/codecentric/c4-genai-suite/issues/1417)) ([2e761d8](https://github.com/codecentric/c4-genai-suite/commit/2e761d86296d618527db00f176c616d2e74c6cd0))
+
 ## [9.16.1](https://github.com/codecentric/c4-genai-suite/compare/v9.16.0...v9.16.1) (2026-03-10)
 
 

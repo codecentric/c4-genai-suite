@@ -82,7 +82,7 @@ def file_uploader(faker: Faker, client: TestClient) -> FileUploaderFixture:
         f = BytesIO(content.encode())
         response = client.post(
             "/files",
-            data=f,  # type: ignore[arg-type]
+            content=f,
             headers={
                 "bucket": str(bucket),
                 "id": str(file_id),

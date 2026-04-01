@@ -30,7 +30,9 @@ export function ExtensionCard(props: ExtensionCardProps) {
       onClick={() => onClick && onClick(spec, extension!)}
     >
       <div className="group card-body relative flex flex-row items-start gap-4 p-6">
-        {spec.logo && <img className="mt-2 w-16" src={`data:image/svg+xml;utf8,${encodeURIComponent(spec.logo)}`} />}
+        {spec.logo && (
+          <img className="mt-2 w-16" src={`data:image/svg+xml;utf8,${encodeURIComponent(spec.logo)}`} alt="" aria-hidden="true" />
+        )}
 
         <div className="flex min-w-0 flex-col gap-2">
           <div>

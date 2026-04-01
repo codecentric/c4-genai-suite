@@ -33,7 +33,7 @@ def test_add_files_write(mocker: MockerFixture, app: FastAPI, use_tmp_dir: None)
         with open("tests/data/birthdays.pptx", "rb") as f:
             response = client.post(
                 "/files",
-                data=f,  # type: ignore[arg-type]
+                content=f,
                 headers={
                     "bucket": "15",
                     "id": "1",
@@ -54,7 +54,7 @@ def test_add_files_read_only(mocker: MockerFixture, app: FastAPI, use_unknown_tm
         with open("tests/data/birthdays.pptx", "rb") as f:
             response = client.post(
                 "/files",
-                data=f,  # type: ignore[arg-type]
+                content=f,
                 headers={
                     "bucket": "15",
                     "id": "1",
