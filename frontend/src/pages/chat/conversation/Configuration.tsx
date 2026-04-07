@@ -56,7 +56,7 @@ export const Configuration = ({ canEditConfiguration }: ConfigurationProps) => {
           width: isMobile() ? '100%' : '280px',
         }}
         classNames={{
-          input: 'focus-visible:ring-1 focus-visible:ring-black',
+          input: 'outline-none focus-visible:ring-1 focus-visible:ring-black',
         }}
         maxDropdownHeight={480}
         renderOption={renderSelectOption}

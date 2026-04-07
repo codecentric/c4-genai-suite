@@ -29,7 +29,7 @@ export const Bucket = memo(({ bucket, onDelete, onUpdate }: BucketProps) => {
       <Menu withInitialFocusPlaceholder={false}>
         <Menu.Target>
           <ActionIcon
-            className="opacity-0 group-hover:opacity-100"
+            className="opacity-0 group-focus-within:opacity-100 group-hover:opacity-100"
             variant="subtle"
             data-testid={'more-actions'}
             aria-label={texts.common.menu}
