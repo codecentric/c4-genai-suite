@@ -85,6 +85,7 @@ function load() {
       reset: translate('common.reset'),
       roles: translate('common.roles'),
       rolesPlaceholder: translate('common.rolesPlaceholder'),
+      attachFile: translate('common.attachFile'),
       save: translate('common.save'),
       saved: translate('common.saved'),
       scrollToBottom: translate('common.scrollToBottom'),

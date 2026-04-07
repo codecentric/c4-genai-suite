@@ -37,7 +37,7 @@ const ThemeProviders = ({ children }: { children: ReactNode }) => {
           <ThemeStyle />
           <ThemeTitle />
           {children}
-          <Tooltip id="default" />
+          <Tooltip id="default" place="bottom" style={{ fontSize: '0.75rem', padding: '4px 8px' }} />
           <ToastContainer />
         </DialogProvider>
       </MantineThemeProvider>

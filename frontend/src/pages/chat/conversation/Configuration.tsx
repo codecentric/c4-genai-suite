@@ -80,6 +80,8 @@ export const Configuration = ({ canEditConfiguration }: ConfigurationProps) => {
           size="xl"
           variant="subtle"
           aria-label={texts.chat.configureAssistant}
+          data-tooltip-id="default"
+          data-tooltip-content={texts.chat.configureAssistant}
         >
           <IconSettings data-testid="configuration-settings-icon" />
         </ActionIcon>

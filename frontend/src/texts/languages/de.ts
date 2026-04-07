@@ -55,6 +55,7 @@ export const de: typeof en = {
     reset: 'reset',
     roles: 'Rollen',
     rolesPlaceholder: 'Optionale Rollen',
+    attachFile: 'Datei anhängen',
     save: 'Speichern',
     saved: 'Erfolgreich gespeichert.',
     scrollToBottom: 'Zum Ende scrollen',

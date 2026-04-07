@@ -64,6 +64,8 @@ export const AIChatItemActions = ({
           variant="subtle"
           onClick={copyTextToClipboard}
           aria-label={texts.common.copy}
+          data-tooltip-id="default"
+          data-tooltip-content={texts.common.copy}
         >
           <IconClipboard className="w-4" />
         </ActionIcon>
@@ -74,6 +76,8 @@ export const AIChatItemActions = ({
           size={'lg'}
           variant="subtle"
           aria-label={texts.chat.rateMessage}
+          data-tooltip-id="default"
+          data-tooltip-content={texts.chat.rateMessage}
         >
           <IconThumbDown className="w-4" />
         </ActionIcon>
@@ -92,6 +96,8 @@ export const AIChatItemActions = ({
               className="btn btn-ghost btn-sm absolute top-1 right-1 p-2"
               onClick={setHiddenVisibility}
               aria-label={texts.chat.updateRating.close}
+              data-tooltip-id="default"
+              data-tooltip-content={texts.chat.updateRating.close}
             >
               <Icon size={16} icon="close" />
             </button>

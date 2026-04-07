@@ -120,6 +120,8 @@ export function ConversationPage(props: ConversationPageProps) {
                   aria-label={texts.common.scrollToBottom}
                   tabIndex={showScrollToBottomButton ? 0 : -1}
                   onClick={handleScrollToBottom}
+                  data-tooltip-id="default"
+                  data-tooltip-content={texts.common.scrollToBottom}
                 >
                   <IconArrowDown className="w-4" />
                 </ActionIcon>
