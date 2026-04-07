@@ -87,8 +87,12 @@ export const AIChatItemActions = ({
 
       {isRatingSelectorVisible && (
         <>
-          <div className="relative mt-2 mb-8 rounded-xl border-[1px] border-gray-300 p-4">
-            <button className="btn btn-ghost btn-sm absolute top-1 right-1 p-2" onClick={setHiddenVisibility}>
+          <div className="relative mt-2 mb-8 rounded-xl border border-gray-300 p-4">
+            <button
+              className="btn btn-ghost btn-sm absolute top-1 right-1 p-2"
+              onClick={setHiddenVisibility}
+              aria-label={texts.chat.updateRating.close}
+            >
               <Icon size={16} icon="close" />
             </button>
 
@@ -103,13 +107,33 @@ export const AIChatItemActions = ({
                   icon={<IconCircleCheck />}
                   p="xs"
                   w="100%"
+                  classNames={{
+                    title: 'text-green-800',
+                  }}
+                  styles={{ root: { outlineOffset: '-2px' } }}
                 >
-                  <p>{texts.chat.updateRating.thanksForYourValuableFeedback}</p>
+                  <p className="text-green-800">{texts.chat.updateRating.thanksForYourValuableFeedback}</p>
                   <Flex>
-                    <Button variant="light" size="compact-xs" color="green" mt="xs" onClick={updateMessageRating.reset}>
+                    <Button
+                      variant="light"
+                      size="compact-xs"
+                      color="green"
+                      mt="xs"
+                      onClick={updateMessageRating.reset}
+                      classNames={{ label: 'text-green-800' }}
+                      styles={{ root: { outlineOffset: '-2px' } }}
+                    >
                       {texts.chat.updateRating.changeResponse}
                     </Button>
-                    <Button variant="subtle" size="compact-xs" color="green" mt="xs" onClick={setHiddenVisibility}>
+                    <Button
+                      variant="subtle"
+                      size="compact-xs"
+                      color="green"
+                      mt="xs"
+                      onClick={setHiddenVisibility}
+                      classNames={{ label: 'text-green-800' }}
+                      styles={{ root: { outlineOffset: '-2px' } }}
+                    >
                       {texts.chat.updateRating.close}
                     </Button>
                   </Flex>
@@ -123,14 +147,19 @@ export const AIChatItemActions = ({
                   icon={<IconAlertCircle />}
                   p="xs"
                   w="100%"
+                  classNames={{
+                    title: 'text-red-800',
+                  }}
                 >
-                  <p>{updateMessageRating.error.message}</p>
+                  <p className="text-red-800">{updateMessageRating.error.message}</p>
                   <Button
                     variant="light"
                     size="compact-xs"
                     color="red"
                     mt="xs"
                     onClick={() => updateMessageRating.variables && updateMessageRating.mutate(updateMessageRating.variables)}
+                    classNames={{ label: 'text-red-800' }}
+                    styles={{ root: { outlineOffset: '-2px' } }}
                   >
                     {texts.chat.updateRating.retry}
                   </Button>
