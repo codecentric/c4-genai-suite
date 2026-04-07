@@ -160,6 +160,7 @@ export function FilesPage() {
     [],
   );
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable<TData>({
     data: files,
     columns: columns,
