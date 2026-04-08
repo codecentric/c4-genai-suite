@@ -44,6 +44,10 @@ import {
     UpdateConversationDtoToJSON,
 } from '../models/index';
 
+export interface CancelMessageRequest {
+    id: number;
+}
+
 export interface ConfirmRequest {
     id: string;
     chatUICallbackResultDto: ChatUICallbackResultDto;
@@ -107,6 +111,40 @@ export interface RateMessageRequest {
  * 
  */
 export class ConversationApi extends runtime.BaseAPI {
+
+    /**
+     * Cancels the active streamed message for the conversation.
+     * 
+     */
+    async cancelMessageRaw(requestParameters: CancelMessageRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling cancelMessage().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/conversations/{id}/messages/cancel`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Cancels the active streamed message for the conversation.
+     * 
+     */
+    async cancelMessage(id: number, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.cancelMessageRaw({ id: id }, initOverrides);
+    }
 
     /**
      * 

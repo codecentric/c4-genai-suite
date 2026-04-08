@@ -25,8 +25,10 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Request, Response } from 'express';
+import { Subscription } from 'rxjs';
 import { LocalAuthGuard } from 'src/domain/auth';
 import {
+  ActiveChatStreamService,
   CallbackService,
   DeleteConversation,
   DeleteConversations,
@@ -68,6 +70,7 @@ export class ConversationsController {
   private logger = new Logger(this.constructor.name);
 
   constructor(
+    private readonly activeChatStreams: ActiveChatStreamService,
     private readonly callbacks: CallbackService,
     private readonly commandBus: CommandBus,
     private readonly queryBus: QueryBus,
@@ -242,7 +245,12 @@ export class ConversationsController {
     response.send(bytes);
   }
 
-  private async streamResponse(@Req() req: Request, @Res() response: Response, getStream: () => Promise<SendMessageResponse>) {
+  private async streamResponse(
+    @Req() req: Request,
+    @Res() response: Response,
+    conversationId: number,
+    getStream: () => Promise<SendMessageResponse>,
+  ) {
     response.set({
       'Cache-Control': 'private, no-cache, no-store, must-revalidate, max-age=0, no-transform',
       Connection: 'keep-alive',
@@ -261,17 +269,35 @@ export class ConversationsController {
 
     try {
       const { stream, abort } = await getStream();
-      const subscription = stream.subscribe({
+      this.activeChatStreams.register(conversationId, req.user.id, abort);
+
+      let cleanedUp = false;
+      const subscription: Subscription = stream.subscribe({
         next: (event) => sendEvent('message', event),
-        error: (err: Error) => sendEvent('error', err),
-        complete: () => response.end(),
+        error: (err: Error) => {
+          sendEvent('error', err);
+          cleanup(false);
+        },
+        complete: () => cleanup(false),
       });
 
-      req.on('close', () => {
+      const cleanup = (shouldAbort: boolean) => {
+        if (cleanedUp) {
+          return;
+        }
+
+        cleanedUp = true;
+        this.activeChatStreams.clear(conversationId, req.user.id, abort);
         subscription.unsubscribe();
-        response.end();
-        abort.abort('cancelled');
-      });
+        if (shouldAbort && !abort.signal.aborted) {
+          abort.abort('cancelled');
+        }
+        if (!response.writableEnded) {
+          response.end();
+        }
+      };
+
+      req.on('close', () => cleanup(true));
     } catch (err) {
       this.logger.error('Error during message processing', err);
       sendEvent('error', err as Error);
@@ -303,7 +329,7 @@ export class ConversationsController {
     @Param('messageId', ParseIntPipe) messageId: number,
     @Body() dto: SendMessageDto,
   ) {
-    return this.streamResponse(req, response, () =>
+    return this.streamResponse(req, response, id, () =>
       this.queryBus.execute(new SendMessage(id, req.user, dto.query, dto.files, messageId)),
     );
   }
@@ -322,7 +348,22 @@ export class ConversationsController {
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: SendMessageDto,
   ) {
-    return this.streamResponse(req, response, () => this.queryBus.execute(new SendMessage(id, req.user, dto.query, dto.files)));
+    return this.streamResponse(req, response, id, () =>
+      this.queryBus.execute(new SendMessage(id, req.user, dto.query, dto.files)),
+    );
+  }
+
+  @Post(':id/messages/cancel')
+  @ApiOperation({ operationId: 'cancelMessage', description: 'Cancels the active streamed message for the conversation.' })
+  @ApiParam({
+    name: 'id',
+    description: 'The ID of the conversation.',
+    required: true,
+    type: Number,
+  })
+  @ApiNoContentResponse()
+  cancelMessage(@Req() req: Request, @Param('id', ParseIntPipe) id: number) {
+    this.activeChatStreams.cancel(id, req.user.id);
   }
 
   @Patch(':id/messages/:messageId')

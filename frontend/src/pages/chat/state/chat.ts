@@ -9,7 +9,6 @@ import {
   FileDto,
   MessageDtoRatingEnum,
   ResponseError,
-  StreamMessageSavedDtoMessageTypeEnum,
   UpdateConversationDto,
   useApi,
 } from 'src/api';
@@ -17,8 +16,10 @@ import { texts } from 'src/texts';
 import { useChatStore } from './zustand/chatStore';
 import { useListOfChatsStore } from './zustand/listOfChatsStore';
 
-const getMessagePlaceholderId = (messageType: StreamMessageSavedDtoMessageTypeEnum) => {
-  return messageType === 'ai' ? -1 : 0;
+let pendingMessageId = 0;
+const createPendingMessageId = () => {
+  pendingMessageId -= 1;
+  return pendingMessageId;
 };
 
 export const useChatStream = (chatId: number) => {
@@ -34,6 +35,9 @@ export const useChatStream = (chatId: number) => {
   }, [chatId]);
 
   const listOfChatsStore = useListOfChatsStore();
+  const stopGeneration = () => {
+    void api.stream.cancelPrompt(chatId);
+  };
 
   const {
     isLoading: isChatLoading,
@@ -78,6 +82,7 @@ export const useChatStream = (chatId: number) => {
 
   const sendMessage = (input: string, files?: FileDto[], editMessageId?: number) => {
     // Only cancel existing stream for this specific chat if we're starting a new message
+    void api.stream.cancelPrompt(chatId);
     chatStore.cancelActiveStream(chatId);
 
     if (editMessageId) {
@@ -87,28 +92,29 @@ export const useChatStream = (chatId: number) => {
     }
 
     const configurationId = chatStore.chatDataMap.get(chatId)?.chat.configurationId;
+    const humanMessageId = editMessageId ?? createPendingMessageId();
+    const aiPlaceholderId = createPendingMessageId();
 
     chatStore.addMessage(chatId, {
       type: 'human',
       content: [{ type: 'text', text: input }],
       configurationId: configurationId ?? 0,
-      id: editMessageId ?? getMessagePlaceholderId('human'),
+      id: humanMessageId,
     });
 
-    const aiMessageId = getMessagePlaceholderId('ai');
     chatStore.addMessage(chatId, {
       type: 'ai',
       content: [{ type: 'text', text: '' }],
       configurationId: configurationId ?? 0,
-      id: aiMessageId,
+      id: aiPlaceholderId,
     });
 
     // Set which message is being streamed to
-    chatStore.setStreamingMessageId(chatId, aiMessageId);
+    chatStore.setStreamingMessageId(chatId, aiPlaceholderId);
     chatStore.setIsAiWriting(chatId, true);
 
     // Keep track of the actual message ID after it's saved
-    let actualAiMessageId = aiMessageId;
+    let actualAiMessageId = aiPlaceholderId;
 
     const subscription = chatStore.getStream(chatId, input, files, api, editMessageId).subscribe({
       next: (msg) => {
@@ -156,12 +162,26 @@ export const useChatStream = (chatId: number) => {
             return chatStore.updateMessage(chatId, actualAiMessageId, { error: msg.message });
           case 'completed':
             return chatStore.updateMessage(chatId, actualAiMessageId, { tokenCount: msg.metadata.tokenCount });
+          case 'cancelled':
+            if (msg.messageId && actualAiMessageId !== msg.messageId) {
+              actualAiMessageId = msg.messageId;
+              chatStore.setStreamingMessageId(chatId, msg.messageId);
+              chatStore.updateMessage(chatId, aiPlaceholderId, { id: msg.messageId });
+            }
+            chatStore.updateMessage(chatId, actualAiMessageId, {
+              content: [{ type: 'text', text: msg.content }],
+              reasoningInProgress: false,
+              tokenCount: msg.metadata.tokenCount,
+            });
+            chatStore.setIsAiWriting(chatId, false);
+            return chatStore.setStreamingMessageId(chatId, undefined);
           case 'saved':
             if (msg.messageType === 'ai') {
               actualAiMessageId = msg.messageId;
               chatStore.setStreamingMessageId(chatId, msg.messageId);
+              return chatStore.updateMessage(chatId, aiPlaceholderId, { id: msg.messageId });
             }
-            return chatStore.updateMessage(chatId, getMessagePlaceholderId(msg.messageType), { id: msg.messageId });
+            return chatStore.updateMessage(chatId, humanMessageId, { id: msg.messageId });
           case 'ui':
             return chatStore.updateMessage(chatId, actualAiMessageId, { ui: msg.request });
           case 'summary':
@@ -188,7 +208,7 @@ export const useChatStream = (chatId: number) => {
     chatStore.setActiveStreamSubscription(chatId, subscription);
   };
 
-  return { sendMessage, isChatLoading };
+  return { sendMessage, stopGeneration, isChatLoading };
 };
 
 export const useStateMutateChat = (chatId: number) => {
@@ -215,7 +235,13 @@ export const useConfirmAiAction = (requestId: string) => {
       return api.conversations.confirm(requestId, result);
     },
     onSuccess: () => {
-      chatStore.updateMessage(currentChatId, getMessagePlaceholderId('ai'), { ui: undefined });
+      const currentChatData = chatStore.chatDataMap.get(currentChatId);
+      const aiMessageWithUi = [...(currentChatData?.messages ?? [])]
+        .reverse()
+        .find((message) => message.type === 'ai' && message.ui);
+      if (aiMessageWithUi) {
+        chatStore.updateMessage(currentChatId, aiMessageWithUi.id, { ui: undefined });
+      }
     },
   });
 };

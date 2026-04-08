@@ -154,7 +154,7 @@ class InternalChatHistory extends MessagesHistory {
     }
   }
 
-  async addMessage(message: BaseMessage, persistHuman?: boolean, editMessageId?: number): Promise<void> {
+  async addMessage(message: BaseMessage, persistHuman?: boolean, editMessageId?: number): Promise<number | undefined> {
     const data = {
       type: message.getType(),
       data: {
@@ -182,6 +182,7 @@ class InternalChatHistory extends MessagesHistory {
         this.currentParentId = entity.id;
         // Notifo the UI about the message ID, because it is needed to rate messages.
         this.context.result.next({ type: 'saved', messageId: entity.id, messageType: 'ai' });
+        return entity.id;
       } else if (persistHuman) {
         if (editMessageId) {
           const message = await this.messages.findOneBy({ id: editMessageId });
@@ -211,6 +212,7 @@ class InternalChatHistory extends MessagesHistory {
         this.currentParentId = entity.id;
         await this.attachNewFilesToConversation(entity.conversationId, entity.id, this.context.files);
         this.context.result.next({ type: 'saved', messageId: entity.id, messageType: 'human' });
+        return entity.id;
       }
 
       // also mark the conversation as updated
@@ -220,6 +222,8 @@ class InternalChatHistory extends MessagesHistory {
     } catch (err) {
       this.logger.error('Failed to store message in history.', err);
     }
+
+    return undefined;
   }
 }
 

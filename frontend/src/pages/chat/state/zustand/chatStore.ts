@@ -1,6 +1,6 @@
 import { Observable, Subscription } from 'rxjs';
 import { create } from 'zustand';
-import { AppClient, ConversationDto, FileDto, MessageDto, SourceDto, StreamEventDto } from 'src/api';
+import { AppClient, ChatStreamEventDto, ConversationDto, FileDto, MessageDto, SourceDto } from 'src/api';
 import { DocumentSource } from '../../SourcesChunkPreview';
 import { ChatMessage } from '../types';
 
@@ -46,7 +46,7 @@ type ChatActions = {
     files: FileDto[] | undefined,
     api: AppClient,
     editMessageId: number | undefined,
-  ) => Observable<StreamEventDto>;
+  ) => Observable<ChatStreamEventDto>;
 
   updateReasoning: (chatId: number, content: string) => void;
   clearReasoning: (chatId: number) => void;
@@ -204,12 +204,22 @@ export const useChatStore = create<ChatState & ChatActions>()((set, get) => {
     cancelActiveStream: (chatId) =>
       set((state) => {
         const chatData = state.chatDataMap.get(chatId);
-        if (!chatData?.activeStreamSubscription) return state;
+        if (!chatData) return state;
 
-        chatData.activeStreamSubscription.unsubscribe();
+        chatData.activeStreamSubscription?.unsubscribe();
+
+        const messages = [...chatData.messages];
+        if (chatData.streamingMessageId) {
+          const messageIndex = messages.findIndex((msg) => msg.id === chatData.streamingMessageId);
+          if (messageIndex !== -1) {
+            messages[messageIndex] = { ...messages[messageIndex], reasoningInProgress: false };
+          }
+        }
+
         const newMap = new Map(state.chatDataMap);
         newMap.set(chatId, {
           ...chatData,
+          messages,
           activeStreamSubscription: undefined,
           isAiWriting: false,
           streamingMessageId: undefined,

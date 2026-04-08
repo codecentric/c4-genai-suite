@@ -45,6 +45,10 @@ const DEFAULT_RESPONSES: MockResponse[] = [
     matchSystem: /Summarize the following content/i,
     response: 'Generic Title',
   },
+  {
+    match: /stop-button-stream-test/i,
+    response: `STARTMARKER ${'token '.repeat(1200)}ENDMARKER`,
+  },
   // Debug helper - dumps the full context as pretty-printed JSON
   { match: /dump context|debug context|show context/i, dumpContext: true },
   { match: /banane/i, response: 'banana' },
