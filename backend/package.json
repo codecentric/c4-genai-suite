@@ -98,7 +98,7 @@
     "@eslint/compat": "2.0.2",
     "@eslint/eslintrc": "3.3.3",
     "@eslint/js": "9.39.2",
-    "@nestjs/cli": "11.0.17",
+    "@nestjs/cli": "11.0.18",
     "@nestjs/schematics": "11.0.10",
     "@nestjs/testing": "11.1.18",
     "@openapitools/openapi-generator-cli": "2.30.2",
