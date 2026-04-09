@@ -726,7 +726,7 @@ export async function duplicateActiveConversation(page: Page, renameBeforeDuplic
 }
 
 export async function selectOption(page: Page, name: string, value: string | RegExp) {
-  await page.getByRole('textbox', { name: name }).click();
+  await page.getByRole('combobox', { name: name }).click();
   if (typeof value === 'string') {
     await page.getByRole('option', { name: value, exact: true }).click();
   } else {
