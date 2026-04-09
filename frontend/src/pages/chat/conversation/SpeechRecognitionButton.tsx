@@ -35,13 +35,14 @@ export function SpeechRecognitionButton({
             color={listening ? 'red' : 'black'}
             className={`border-gray-200 ${listening ? 'animate-pulse' : ''} rounded-r-none border-r-0`}
             onClick={toggleSpeechRecognition}
-            title={toolTipText}
+            data-tooltip-id="default"
+            data-tooltip-content={toolTipText}
             style={{ borderTopRightRadius: 0, borderBottomRightRadius: 0, width: '36px' }}
             aria-label={toolTipText}
           >
             <IconMicrophone className="w-4" />
           </ActionIcon>
-          <Menu shadow="md">
+          <Menu shadow="md" withInitialFocusPlaceholder={false}>
             <Menu.Target>
               <ActionIcon
                 variant="outline"

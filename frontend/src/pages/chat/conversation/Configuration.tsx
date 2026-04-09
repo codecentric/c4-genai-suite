@@ -1,5 +1,5 @@
-import { ActionIcon, Select, SelectProps, Text } from '@mantine/core';
-import { IconChevronDown, IconSettings } from '@tabler/icons-react';
+import { ActionIcon, Group, Select, SelectProps, Text } from '@mantine/core';
+import { IconCheck, IconChevronDown, IconSettings } from '@tabler/icons-react';
 import { useState } from 'react';
 import { usePersistentState } from 'src/hooks';
 import { ConfigurationUserValuesModal } from 'src/pages/chat/conversation/ConfigurationUserValuesModal';
@@ -22,13 +22,16 @@ export const Configuration = ({ canEditConfiguration }: ConfigurationProps) => {
 
   const [, setPersistentAssistantId] = usePersistentState<number | null>('selectedAssistantId', null);
 
-  const renderSelectOption: SelectProps['renderOption'] = ({ option }) => (
-    <div>
-      <Text size="sm">{option.label}</Text>
-      <Text size="xs" c="gray.7">
-        {assistants.find((c) => c.id + '' === option.value)?.description}
-      </Text>
-    </div>
+  const renderSelectOption: SelectProps['renderOption'] = ({ option, checked }) => (
+    <Group flex="1" gap="xs">
+      <div>
+        <Text size="sm">{option.label}</Text>
+        <Text size="xs" c="gray.7">
+          {assistants.find((c) => c.id + '' === option.value)?.description}
+        </Text>
+      </div>
+      {checked && <IconCheck size={20} style={{ marginInlineStart: 'auto' }} />}
+    </Group>
   );
 
   const close = () => setShowModal(false);
@@ -52,6 +55,9 @@ export const Configuration = ({ canEditConfiguration }: ConfigurationProps) => {
           position: 'bottom-start',
           width: isMobile() ? '100%' : '280px',
         }}
+        classNames={{
+          input: 'outline-none focus-visible:ring-1 focus-visible:ring-black',
+        }}
         maxDropdownHeight={480}
         renderOption={renderSelectOption}
         onChange={handleOnChange}
@@ -63,6 +69,8 @@ export const Configuration = ({ canEditConfiguration }: ConfigurationProps) => {
         scrollAreaProps={{ type: 'always' }}
         rightSection={<IconChevronDown size={16} />}
         searchable
+        withCheckIcon
+        checkIconPosition="right"
         placeholder={texts.chat.searchAssistantsPlaceholder}
       />
       {assistant?.configurableArguments && (
@@ -72,6 +80,8 @@ export const Configuration = ({ canEditConfiguration }: ConfigurationProps) => {
           size="xl"
           variant="subtle"
           aria-label={texts.chat.configureAssistant}
+          data-tooltip-id="default"
+          data-tooltip-content={texts.chat.configureAssistant}
         >
           <IconSettings data-testid="configuration-settings-icon" />
         </ActionIcon>

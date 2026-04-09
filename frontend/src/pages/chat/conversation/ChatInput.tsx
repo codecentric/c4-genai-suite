@@ -229,7 +229,7 @@ export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEm
             ),
         )}
         <form onSubmit={doSubmit}>
-          <div className="box-border rounded-2xl border border-gray-200 p-4 pb-3 leading-none shadow-2xl shadow-gray-100 focus-within:border-gray-400">
+          <div className="box-border rounded-2xl border border-gray-200 p-4 pb-3 leading-none shadow-2xl shadow-gray-100 focus-within:ring-1 focus-within:ring-black">
             <TextareaAutosize
               className={`w-full resize-none bg-transparent pb-4 outline-none`}
               maxRows={15}
@@ -267,6 +267,9 @@ export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEm
                         variant="outline"
                         color="black"
                         disabled={uploadLimitReached}
+                        aria-label={texts.common.attachFile}
+                        data-tooltip-id="default"
+                        data-tooltip-content={texts.common.attachFile}
                         className={`cursor-pointer border-gray-200 ${uploadLimitReached ? 'pointer-events-none opacity-50' : ''}`}
                       >
                         <IconPaperclip className="w-4" />
@@ -304,6 +307,8 @@ export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEm
                   disabled={!input || isDisabled || uploadMutations.some((m) => m.status === 'pending') || listening}
                   data-testid="chat-submit-button"
                   aria-label={texts.common.send}
+                  data-tooltip-id="default"
+                  data-tooltip-content={texts.common.send}
                 >
                   <IconArrowUp />
                 </ActionIcon>

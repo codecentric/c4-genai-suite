@@ -55,6 +55,7 @@ export const en = {
     reset: 'reset',
     roles: 'Roles',
     rolesPlaceholder: 'Optional roles',
+    attachFile: 'Attach file',
     save: 'Save',
     saved: 'Saved successfully.',
     scrollToBottom: 'Scroll to bottom',

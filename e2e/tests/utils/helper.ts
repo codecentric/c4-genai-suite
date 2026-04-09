@@ -778,6 +778,9 @@ export async function expectA11yCompliant(page: Page) {
   // Give the browser time to wait for animations to finish
   await page.waitForTimeout(2000);
 
-  const accessibilityScanResults = await new AxeBuilder({ page }).analyze();
+  // Exclude react-tooltip portal from axe scan: it renders into <body> outside any landmark,
+  // which violates the "region" rule. Tooltips are transient supplementary content and do not
+  // need landmark containment per WCAG best practices.
+  const accessibilityScanResults = await new AxeBuilder({ page }).exclude('#default[role="tooltip"]').analyze();
   expect(accessibilityScanResults.violations).toEqual([]);
 }

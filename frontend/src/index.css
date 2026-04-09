@@ -37,6 +37,12 @@
   ::file-selector-button {
     border-color: var(--color-gray-200, currentcolor);
   }
+
+  /* Global black focus rings for keyboard accessibility */
+  *:focus-visible {
+    outline: 2px solid black;
+    outline-offset: 2px;
+  }
 }
 
 .overflow-anchor-none {
@@ -171,6 +177,15 @@ input[type='number'] {
     @apply bg-white;
   }
 }
+
+/* Mantine Combobox active option styling */
+[data-combobox-selected]
+ {
+    background-color: #F1F3F5;
+    color: inherit;
+    @apply ring-1 ring-black ring-inset;
+}
+
 
 * {
   overflow-wrap: anywhere;
