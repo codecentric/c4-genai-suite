@@ -31,7 +31,6 @@ export function TranscribeButton({ isRecording, isTranscribing, onToggle }: Tran
       color={getButtonColor()}
       className={`border-gray-200 ${isRecording ? 'animate-pulse' : ''}`}
       onClick={onToggle}
-      title={getButtonText()}
       data-tooltip-id="default"
       data-tooltip-content={getButtonText()}
       disabled={isTranscribing}
