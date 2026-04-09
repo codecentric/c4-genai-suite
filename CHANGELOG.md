@@ -1,5 +1,12 @@
 # Changelog
 
+## [9.16.3](https://github.com/codecentric/c4-genai-suite/compare/v9.16.2...v9.16.3) (2026-04-09)
+
+
+### Bug Fixes
+
+* **a11y:** keyboard navigation on user-facing pages ([#1499](https://github.com/codecentric/c4-genai-suite/issues/1499)) ([63820cd](https://github.com/codecentric/c4-genai-suite/commit/63820cdf930f5b84367e8f39b8cd8c620eccad0d))
+
 ## [9.16.2](https://github.com/codecentric/c4-genai-suite/compare/v9.16.1...v9.16.2) (2026-03-30)
 
 
