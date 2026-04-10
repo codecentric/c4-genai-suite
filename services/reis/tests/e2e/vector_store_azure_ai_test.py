@@ -99,7 +99,7 @@ def test_file_lifecycle(client: TestClient, faker: Faker) -> None:
     f = BytesIO(input_content1.encode())
     response = client.post(
         "/files",
-        data=f,  # type: ignore[arg-type]
+        content=f,
         headers={
             "bucket": "1",
             "id": "1",
@@ -129,7 +129,7 @@ def test_file_lifecycle(client: TestClient, faker: Faker) -> None:
     f = BytesIO(input_content2.encode())
     response = client.post(
         "/files",
-        data=f,  # type: ignore[arg-type]
+        content=f,
         headers={
             "bucket": "1",
             "id": "2",
@@ -146,7 +146,7 @@ def test_file_lifecycle(client: TestClient, faker: Faker) -> None:
     f = BytesIO(input_content3.encode())
     response = client.post(
         "/files",
-        data=f,  # type: ignore[arg-type]
+        content=f,
         headers={
             "bucket": "2",
             "id": "3",

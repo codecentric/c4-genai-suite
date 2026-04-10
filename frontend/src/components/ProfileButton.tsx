@@ -25,9 +25,9 @@ export const ProfileButton = ({ onClearConversations, section }: ProfileButtonPr
   const { data: authSettings } = useAuthSettings();
 
   return (
-    <Menu width={250}>
+    <Menu width={250} withInitialFocusPlaceholder={false}>
       <Menu.Target data-testid="menu user">
-        <button className="btn btn-ghost h-auto w-full justify-start p-2 hover:bg-gray-200">
+        <button className="btn btn-ghost h-auto w-full justify-start p-2 hover:bg-gray-200" aria-haspopup="menu">
           <div className="flex max-w-full items-center gap-2">
             <div className="shrink-0">
               <Avatar user={profile} />
@@ -41,7 +41,7 @@ export const ProfileButton = ({ onClearConversations, section }: ProfileButtonPr
         </button>
       </Menu.Target>
 
-      <Menu.Dropdown>
+      <Menu.Dropdown aria-label={texts.accessibility.userMenu}>
         {section === 'admin' && (
           <Menu.Item leftSection={<IconMessage size={14} />} component={NavLink} to={`/chat/${chatId || ''}`}>
             {texts.common.chat}
@@ -68,7 +68,7 @@ export const ProfileButton = ({ onClearConversations, section }: ProfileButtonPr
             onPerform={() => onClearConversations()}
           >
             {({ onClick }) => (
-              <Menu.Item color="red" leftSection={<IconTrash size={14} />} onClick={onClick}>
+              <Menu.Item c="red.9" leftSection={<IconTrash size={14} />} onClick={onClick}>
                 {texts.common.clearConversations}
               </Menu.Item>
             )}

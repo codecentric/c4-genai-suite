@@ -242,6 +242,6 @@ class Config(BaseSettings):
 def get_config() -> Config:
     # We need to ignore the missing argument errors, because we want Config to raise in case
     # a mandatory argument was not passed via an env variable.
-    config = Config()  # type: ignore[call-arg]
+    config = Config()  # type: ignore[call-arg]  # ty: ignore[missing-argument]
     logger.info(f"starting REIS with following configuration:\n{json.dumps(config.model_dump(mode='json'), indent=2)}")
     return config

@@ -1,6 +1,6 @@
 import { ActionIcon } from '@mantine/core';
 import { IconArrowDown } from '@tabler/icons-react';
-import { RefObject, useMemo } from 'react';
+import { RefObject, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useParams } from 'react-router-dom';
 
@@ -54,10 +54,29 @@ export function ConversationPage(props: ConversationPageProps) {
     noClick: true,
   });
 
+  const scrollToBottomButtonRef = useRef<HTMLButtonElement>(null);
+
+  const handleScrollToBottom = useCallback(() => {
+    scrollToBottom();
+    textareaRef.current?.focus();
+  }, [scrollToBottom, textareaRef]);
+
   const showRateThisConversation = !isChatLoading && !chat.rating && messages.length > 10;
   const showScrollToBottomButton = canScrollToBottom && !isAiWriting;
+
+  useEffect(() => {
+    if (!showScrollToBottomButton && document.activeElement === scrollToBottomButtonRef.current) {
+      textareaRef.current?.focus();
+    }
+  }, [showScrollToBottomButton, textareaRef]);
   return (
-    <div className={'relative mx-auto flex flex-col pb-2'} style={{ height: 'calc(100vh - 48px)' }} {...getRootProps()}>
+    <div
+      className={
+        'relative mx-auto flex flex-col pb-2 outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-inset'
+      }
+      style={{ height: 'calc(100vh - 48px)' }}
+      {...getRootProps()}
+    >
       <input {...getInputProps()} className="hidden" />
       {isDragActive && (
         <>
@@ -65,18 +84,16 @@ export function ConversationPage(props: ConversationPageProps) {
           {isDragReject && <DragAndDropLayout.InvalidFileFormat allowedFileNameExtensions={allowedFileNameExtensions} />}
         </>
       )}
-      <div className="bg-white p-3">
+      <div className="p-3">
         <Configuration canEditConfiguration={true} />
       </div>
       {isChatLoading ? (
-        <div className="fade-in w-full bg-white" style={{ height: 'calc(100vh - 4rem)' }} />
+        <div className="fade-in w-full" style={{ height: 'calc(100vh - 4rem)' }} />
       ) : (
         <>
           {messages.length > 0 && (
             <div
-              className={
-                'fade-in overflow-anchor-none mx-auto box-border w-full max-w-[min(800px,_100%)] grow overflow-auto px-4'
-              }
+              className={'fade-in overflow-anchor-none mx-auto box-border w-full max-w-[min(800px,100%)] grow overflow-auto px-4'}
               ref={containerRef}
             >
               <ChatHistory agentName={agentName} editMessage={submitMessage} />
@@ -90,6 +107,25 @@ export function ConversationPage(props: ConversationPageProps) {
                 (showScrollToBottomButton || showRateThisConversation) && 'white-shadow',
               )}
             >
+              <div
+                data-testid={'scrollToBottomButton'}
+                aria-hidden={!showScrollToBottomButton}
+                className={cn(
+                  'absolute inset-x-0 top-0 flex w-full -translate-y-full justify-center p-2 opacity-0 transition-all',
+                  showScrollToBottomButton ? 'fade-in opacity-100 delay-200' : 'pointer-events-none opacity-0',
+                )}
+              >
+                <ActionIcon
+                  ref={scrollToBottomButtonRef}
+                  aria-label={texts.common.scrollToBottom}
+                  tabIndex={showScrollToBottomButton ? 0 : -1}
+                  onClick={handleScrollToBottom}
+                  data-tooltip-id="default"
+                  data-tooltip-content={texts.common.scrollToBottom}
+                >
+                  <IconArrowDown className="w-4" />
+                </ActionIcon>
+              </div>
               <ChatInput
                 textareaRef={textareaRef}
                 chatId={chat.id}
@@ -98,18 +134,6 @@ export function ConversationPage(props: ConversationPageProps) {
                 isEmpty={isNewConversation}
                 submitMessage={submitMessage}
               />
-              <div
-                data-testid={'scrollToBottomButton'}
-                className={cn(
-                  'absolute inset-x-0 top-0 flex w-full -translate-y-full justify-center p-2 opacity-0 transition-all',
-                  showScrollToBottomButton ? 'fade-in opacity-100 delay-200' : 'pointer-events-none opacity-0',
-                )}
-                onClick={() => scrollToBottom()}
-              >
-                <ActionIcon aria-label={texts.common.scrollToBottom}>
-                  <IconArrowDown className="w-4" />
-                </ActionIcon>
-              </div>
               <div
                 className={cn(
                   'absolute inset-x-0 top-0 flex w-full -translate-y-full justify-center p-2 transition-all delay-1000',

@@ -49,7 +49,13 @@ export function Dialog({
           <Text size="sm" fw={500}>
             {thankYouText}
           </Text>
-          <ActionIcon variant="subtle" onClick={() => handleResult('dismiss')}>
+          <ActionIcon
+            variant="subtle"
+            onClick={() => handleResult('dismiss')}
+            aria-label={texts.chat.updateRating.close}
+            data-tooltip-id="default"
+            data-tooltip-content={texts.chat.updateRating.close}
+          >
             <IconX className="w-4" />
           </ActionIcon>
         </Flex>
@@ -64,7 +70,13 @@ export function Dialog({
           <Text size="sm" fw={500}>
             {title}
           </Text>
-          <ActionIcon variant="subtle" onClick={() => handleResult('dismiss')}>
+          <ActionIcon
+            variant="subtle"
+            onClick={() => handleResult('dismiss')}
+            aria-label={texts.chat.updateRating.close}
+            data-tooltip-id="default"
+            data-tooltip-content={texts.chat.updateRating.close}
+          >
             <IconX className="w-4" />
           </ActionIcon>
         </Flex>

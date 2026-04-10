@@ -52,21 +52,26 @@ export const ConversationItem = memo(({ chat }: ChatProps) => {
   }
 
   return (
-    <div className="group flex w-full items-stretch overflow-hidden" data-testid="conversation-item">
+    <div className="group flex w-full min-w-0 items-stretch" data-testid="conversation-item">
       <Button
         size="sm"
         p="xs"
         onClick={async () => await navigate(`/chat/${chat.id}`)}
         justify="flex-start"
         variant={isSelected ? 'filled' : 'subtle'}
-        classNames={{ root: 'transition-all flex-1 min-w-0 overflow-hidden', label: 'truncate text-left block' }}
+        classNames={{
+          root: 'transition-all flex-1 min-w-0',
+          label: 'block w-full min-w-0 text-left truncate',
+        }}
         onDoubleClick={() => isSelected && setShowRenameInput(true)}
         title={chat.name}
       >
         {chat.name}
       </Button>
-      <div className={`flex items-center ${isMobile() ? '' : 'opacity-0 group-hover:opacity-100'}`}>
-        <Menu width={200} opened={menuOpen} onChange={setMenuOpen}>
+      <div
+        className={`flex shrink-0 items-center ${isMobile() ? '' : 'opacity-0 group-focus-within:opacity-100 group-hover:opacity-100'}`}
+      >
+        <Menu width={200} opened={menuOpen} onChange={setMenuOpen} withInitialFocusPlaceholder={false}>
           <Menu.Target>
             <Button
               variant="subtle"
@@ -82,7 +87,7 @@ export const ConversationItem = memo(({ chat }: ChatProps) => {
               />
             </Button>
           </Menu.Target>
-          <Menu.Dropdown>
+          <Menu.Dropdown aria-label={texts.accessibility.conversationOptions}>
             <Menu.Item
               leftSection={<IconEdit className="h-4 w-4" />}
               disabled={renameChat.isPending}
@@ -98,7 +103,7 @@ export const ConversationItem = memo(({ chat }: ChatProps) => {
               {texts.common.duplicate}
             </Menu.Item>
             <Menu.Item
-              color="red"
+              c="red.9"
               leftSection={<IconTrash className="h-4 w-4" />}
               disabled={removeChat.isPending}
               onClick={() => removeChat.mutate(chat.id)}
