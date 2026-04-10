@@ -22,11 +22,7 @@ test('Audit Log', async ({ page }) => {
   await test.step('should show audit entries when configuration is created', async () => {
     // Create a configuration
     await page.getByRole('link', { name: 'Assistants' }).click();
-    await page
-      .locator('div')
-      .filter({ hasText: /^Assistants$/ })
-      .getByRole('button')
-      .click();
+    await page.getByRole('button', { name: 'Create assistant' }).click();
     await page.getByLabel('Name').fill(configName);
     await page.getByLabel('Description').fill(configDescription);
     await page.getByRole('button', { name: 'Save' }).click();
