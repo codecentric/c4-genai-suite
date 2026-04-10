@@ -160,6 +160,11 @@ export function FilesPage() {
     [],
   );
 
+  // @tanstack/react-table v8 hasn't declared React 19 compatibility yet (v9 is still in alpha).
+  // The rule flags useReactTable as incompatible with React Compiler memoization, which is
+  // irrelevant here since we don't use React Compiler. Safe to suppress until TanStack v9 stable.
+  // See: https://github.com/TanStack/table/issues/6137
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable<TData>({
     data: files,
     columns: columns,

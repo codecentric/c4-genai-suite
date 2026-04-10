@@ -23,7 +23,7 @@ export function DashboardPage() {
           id="filter-interval"
           data={Object.values(FilterInterval).map((value) => ({ label: t(`dashboard.filterInterval.${value}`), value }))}
           value={filterInterval}
-          onChange={(_, { value }) => setFilterInterval(value as FilterInterval)}
+          onChange={(_, { value }) => setFilterInterval(value)}
         />
       </div>
       <ChartContainer title={texts.dashboard.tokensTotalChat} data={statsUsage.items}>

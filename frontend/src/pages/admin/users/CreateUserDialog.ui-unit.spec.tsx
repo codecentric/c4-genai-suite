@@ -41,7 +41,7 @@ describe('User Page', () => {
 
     // Because the Default user group is already selected, we do not have to add it.
     // Use the base label without asterisk for role-based queries since the asterisk is aria-hidden
-    const userGroups = screen.getByRole('textbox', { name: texts.common.userGroups });
+    const userGroups = screen.getByRole('combobox', { name: texts.common.userGroups });
     await user.click(userGroups);
     const adminOption = await waitFor(() => {
       const option = document.querySelector('[data-combobox-option][value="admin"]');
@@ -60,7 +60,7 @@ describe('User Page', () => {
 
     const user = userEvent.setup();
 
-    const userGroup = screen.getByRole('textbox', { name: texts.common.userGroups });
+    const userGroup = screen.getByRole('combobox', { name: texts.common.userGroups });
     await user.click(userGroup);
     const adminOption = await waitFor(() => {
       const option = document.querySelector('[data-combobox-option][value="admin"]');
@@ -86,7 +86,7 @@ describe('User Page', () => {
 
     const user = userEvent.setup();
 
-    const userGroup = screen.getByRole('textbox', { name: texts.common.userGroups });
+    const userGroup = screen.getByRole('combobox', { name: texts.common.userGroups });
     await user.click(userGroup);
     const groupOption = await waitFor(() => {
       const option = document.querySelector('[data-combobox-option][value="group"]');

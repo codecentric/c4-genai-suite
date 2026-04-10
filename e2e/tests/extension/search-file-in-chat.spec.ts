@@ -58,7 +58,7 @@ test('files in chat', async ({ page, mockServerUrl }) => {
     await page.getByTestId('sidebar-admin').getByRole('tab', { name: 'Tools' }).click();
     await page.getByRole('heading', { name: 'Search Files in Chat', exact: true }).click();
 
-    const bucketInput = page.getByRole('textbox', { name: 'Bucket' });
+    const bucketInput = page.getByRole('combobox', { name: 'Bucket' });
     await expect(bucketInput).toHaveValue(conversationFilesBucket);
 
     await page.getByRole('button', { name: 'Cancel' }).click();
