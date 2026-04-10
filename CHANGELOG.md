@@ -1,5 +1,12 @@
 # Changelog
 
+## [9.17.0](https://github.com/codecentric/c4-genai-suite/compare/v9.16.3...v9.17.0) (2026-04-10)
+
+
+### Features
+
+* import export assistant configuration ([#1284](https://github.com/codecentric/c4-genai-suite/issues/1284)) ([7535fbd](https://github.com/codecentric/c4-genai-suite/commit/7535fbd8692fb4ac632f28eea170c478249bca9b))
+
 ## [9.16.3](https://github.com/codecentric/c4-genai-suite/compare/v9.16.2...v9.16.3) (2026-04-09)
 
 
