@@ -314,6 +314,10 @@
     "errorMissingPrompt": "Kein Prompt wurde bisher konfiguriert. Bitte eine Erweiterung konfigurieren.",
     "noSummary": "Keine Zusammenfassung"
   },
+  "configuration": {
+    "warningMissingUserGroups": "Einige Benutzergruppen wurden beim Import von \"{name}\" nicht gefunden. Fehlend: {missingIds}. Der Import wird mit den verfügbaren Gruppen fortgesetzt.",
+    "warningVersionMismatch": "Die Konfiguration \"{name}\" wurde mit Version {version} exportiert, die aktuelle Version ist jedoch {currentVersion}. Der Import wird fortgesetzt, es können jedoch Kompatibilitätsprobleme auftreten."
+  },
   "conversation": {
     "copySuffix": "KOPIE"
   }

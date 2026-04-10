@@ -31,11 +31,7 @@ test('Chat', async ({ page, browserName }) => {
 
   await test.step('should add empty configuration', async () => {
     await page.getByRole('link', { name: 'Assistants' }).click();
-    await page
-      .locator('*')
-      .filter({ hasText: /^Assistants$/ })
-      .getByRole('button')
-      .click();
+    await page.getByRole('button', { name: 'Create assistant' }).click();
     await page.getByLabel(/^Name/).fill(assistantWithoutLlmName);
     await page.getByLabel(/^Description/).fill('A Simple Configuration without llm');
     await page.getByRole('button', { name: 'Save' }).click();
