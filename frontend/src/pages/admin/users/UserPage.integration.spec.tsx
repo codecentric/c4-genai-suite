@@ -1,5 +1,5 @@
 import { userEvent } from '@testing-library/user-event';
-import { afterAll, beforeAll, describe, it, vi } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { UserDto } from 'src/api';
 import { texts } from 'src/texts';
 import { server } from '../../../../mock/node';
@@ -35,6 +35,7 @@ vi.mock('src/api', () => ({
           items: mockUsers.slice(20, 40),
           total: mockUsers.length,
         }),
+      getUserGroups: vi.fn().mockResolvedValue({ items: [] }),
     },
   })),
 }));
@@ -43,6 +44,13 @@ beforeAll(() => server.listen());
 afterAll(() => server.close());
 
 describe('UsersPage Integration Tests', () => {
+  it('should render a level-one heading for accessibility', async () => {
+    render(<UsersPage />);
+
+    const heading = await screen.findByRole('heading', { level: 1, name: texts.users.headline });
+    expect(heading).toBeInTheDocument();
+  });
+
   it('should return to page 1 after searching when on a page greater than 1', async () => {
     render(<UsersPage />);
     const user = userEvent.setup();

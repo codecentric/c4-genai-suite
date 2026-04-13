@@ -58,7 +58,7 @@ export function UsersPage() {
     <>
       <Page>
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-3xl">{texts.users.headline}</h2>
+          <h1 className="text-3xl">{texts.users.headline}</h1>
 
           <div className="flex gap-4">
             <Search value={query} onSearch={handleSearch} />

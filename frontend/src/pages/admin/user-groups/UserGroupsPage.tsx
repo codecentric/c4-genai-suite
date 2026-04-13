@@ -38,7 +38,7 @@ export function UserGroupsPage() {
   return (
     <Page>
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-3xl">{texts.userGroups.headline}</h2>
+        <h1 className="text-3xl">{texts.userGroups.headline}</h1>
 
         <div className="flex gap-4">
           <Button leftSection={<IconPlus />} onClick={() => setToCreate(true)}>

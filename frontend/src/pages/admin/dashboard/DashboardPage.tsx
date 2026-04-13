@@ -19,7 +19,7 @@ export function DashboardPage() {
   return (
     <Page>
       <div className="sticky top-0 z-[10] -mx-4 flex justify-between bg-gray-50 p-4">
-        <h2 className="text-3xl">{texts.common.dashboard}</h2>
+        <h1 className="text-3xl">{texts.common.dashboard}</h1>
         <Select
           id="filter-interval"
           data={Object.values(FilterInterval).map((value) => ({ label: t(`dashboard.filterInterval.${value}`), value }))}
