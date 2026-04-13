@@ -1,6 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { generateText, stepCountIs, streamText, tool, ToolSet } from 'ai';
-import * as z from 'zod';
 import { I18nService } from '../../../localization/i18n.service';
 import { MetricsService } from '../../../metrics/metrics.service';
 import { ChatContext, ChatError, ChatMiddleware, LanguageModelContext, NamedStructuredTool } from '../interfaces';
@@ -35,6 +34,17 @@ export class ExecuteMiddleware implements ChatMiddleware {
     }
   }
 
+  private buildToolSet(tools: NamedStructuredTool[]): ToolSet {
+    return tools.reduce((prev, curr) => {
+      prev[curr.name] = tool({
+        description: curr.description,
+        inputSchema: curr.schema,
+        execute: async (input) => curr.execute(input),
+      });
+      return prev;
+    }, {} as ToolSet);
+  }
+
   async handleAiSdkChainExecution(llm: LanguageModelContext, context: ChatContext) {
     if (llm.disableStreaming) {
       return this.handleAiSdkNonStreamingExecution(llm, context);
@@ -46,23 +56,7 @@ export class ExecuteMiddleware implements ChatMiddleware {
     const { input, systemMessages, abort, result, history, tools } = context;
 
     const messages = await history?.getMessages();
-
-    const mapTool = <TSchema extends z.ZodObject<z.ZodRawShape>>(namedTool: NamedStructuredTool<any, TSchema>) => {
-      return {
-        name: namedTool.name,
-        tool: tool({
-          description: namedTool.description,
-          inputSchema: namedTool.schema,
-          execute: async (input: z.infer<TSchema>) => namedTool.execute(input),
-        }),
-      };
-    };
-
-    const allTools = tools.reduce((prev, curr) => {
-      const { name, tool } = mapTool(curr);
-      prev[name] = tool;
-      return prev;
-    }, {} as ToolSet);
+    const allTools = this.buildToolSet(tools);
 
     const { fullStream } = streamText({
       model: llm.model,
@@ -143,23 +137,7 @@ export class ExecuteMiddleware implements ChatMiddleware {
     const { input, systemMessages, abort, result, history, tools } = context;
 
     const messages = await history?.getMessages();
-
-    const mapTool = <TSchema extends z.ZodObject<z.ZodRawShape>>(namedTool: NamedStructuredTool<any, TSchema>) => {
-      return {
-        name: namedTool.name,
-        tool: tool({
-          description: namedTool.description,
-          inputSchema: namedTool.schema,
-          execute: async (input: z.infer<TSchema>) => namedTool.execute(input),
-        }),
-      };
-    };
-
-    const allTools = tools.reduce((prev, curr) => {
-      const { name, tool } = mapTool(curr);
-      prev[name] = tool;
-      return prev;
-    }, {} as ToolSet);
+    const allTools = this.buildToolSet(tools);
 
     const response = await generateText({
       model: llm.model,
