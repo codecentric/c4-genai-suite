@@ -48,7 +48,7 @@ export class OllamaModelExtension implements Extension<OllamaModelExtensionConfi
     const middleware = {
       invoke: async (context: ChatContext, _: GetContext, next: ChatNextDelegate): Promise<any> => {
         context.llms[this.spec.name] = await context.cache.get(this.spec.name, extension.values, () => {
-          return this.createModel(extension.values, true);
+          return this.createModel(extension.values);
         });
 
         return next(context);
@@ -58,7 +58,7 @@ export class OllamaModelExtension implements Extension<OllamaModelExtensionConfi
     return Promise.resolve([middleware]);
   }
 
-  private createModel(configuration: OllamaModelExtensionConfiguration, streaming = false) {
+  private createModel(configuration: OllamaModelExtensionConfiguration) {
     const { endpoint, modelName } = configuration;
 
     // Ensure endpoint ends with /api for compatibility with ollama-ai-provider-v2
@@ -74,9 +74,7 @@ export class OllamaModelExtension implements Extension<OllamaModelExtensionConfi
 
     return {
       model: open(modelName),
-      options: {
-        streaming,
-      } as Partial<CallSettings>,
+      options: {} as Partial<CallSettings>,
       modelName: modelName,
       providerName: 'ollama',
     };

@@ -86,6 +86,12 @@ export class NvidiaModelExtension implements Extension<NvidiaModelExtensionConfi
           title: this.i18n.t('texts.extensions.common.parallelToolCalls'),
           default: true,
         },
+        disableStreaming: {
+          type: 'boolean',
+          title: this.i18n.t('texts.extensions.common.disableStreaming'),
+          default: false,
+          description: this.i18n.t('texts.extensions.common.disableStreamingHint'),
+        },
         summary: {
           type: 'string',
           title: this.i18n.t('texts.extensions.common.reasoningSummary'),
@@ -113,7 +119,7 @@ export class NvidiaModelExtension implements Extension<NvidiaModelExtensionConfi
     const middleware = {
       invoke: async (context: ChatContext, _: GetContext, next: ChatNextDelegate): Promise<any> => {
         context.llms[this.spec.name] = await context.cache.get(this.spec.name, extension.values, () => {
-          return this.createModel(extension.values, true);
+          return this.createModel(extension.values);
         });
 
         return next(context);
@@ -133,7 +139,7 @@ export class NvidiaModelExtension implements Extension<NvidiaModelExtensionConfi
     return await fetchFunction(url, options);
   };
 
-  private createModel(config: NvidiaModelExtensionConfiguration, streaming = false) {
+  private createModel(config: NvidiaModelExtensionConfiguration) {
     const openAi = createOpenAICompatible({
       name: 'nvidia',
       apiKey: config.apiKey,
@@ -149,7 +155,6 @@ export class NvidiaModelExtension implements Extension<NvidiaModelExtensionConfi
         frequencyPenalty: config.frequencyPenalty,
         seed: config.seed,
         temperature: config.temperature,
-        streaming,
         providerOptions: {
           openai: {
             reasoningEffort: config.effort ? config.effort : undefined,
@@ -160,6 +165,7 @@ export class NvidiaModelExtension implements Extension<NvidiaModelExtensionConfi
       } as Partial<CallSettings>,
       modelName: config.modelName,
       providerName: 'nvidia',
+      disableStreaming: config.disableStreaming ?? false,
     };
   }
 }
@@ -175,5 +181,6 @@ type NvidiaModelExtensionConfiguration = ExtensionConfiguration & {
   effort?: 'minimal' | 'low' | 'medium' | 'high';
   reasoningTagName?: string;
   parallelToolCalls?: boolean;
+  disableStreaming?: boolean;
   summary?: 'detailed' | 'auto';
 };

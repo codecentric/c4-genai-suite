@@ -110,7 +110,7 @@ export class AzureOpenAIModelExtension implements Extension<AzureOpenAIModelExte
     const middleware = {
       invoke: async (context: ChatContext, getContext: GetContext, next: ChatNextDelegate): Promise<any> => {
         context.llms[this.spec.name] = await context.cache.get(this.spec.name, extension.values, () => {
-          return this.createModel(extension.values, true);
+          return this.createModel(extension.values);
         });
 
         return next(context);
@@ -120,7 +120,7 @@ export class AzureOpenAIModelExtension implements Extension<AzureOpenAIModelExte
     return Promise.resolve([middleware]);
   }
 
-  private createModel(configuration: AzureOpenAIModelExtensionConfiguration, streaming = false): LanguageModelContext {
+  private createModel(configuration: AzureOpenAIModelExtensionConfiguration): LanguageModelContext {
     const { apiKey, deploymentName, frequencyPenalty, instanceName, presencePenalty, effort, summary, temperature, seed, topP } =
       configuration;
 
@@ -144,7 +144,6 @@ export class AzureOpenAIModelExtension implements Extension<AzureOpenAIModelExte
       options: {
         ...reasoningOptions,
         seed,
-        streaming,
         providerOptions: {
           openai: effort
             ? {

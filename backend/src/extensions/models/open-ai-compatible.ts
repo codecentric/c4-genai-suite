@@ -91,6 +91,12 @@ export class OpenAICompatibleModelExtension implements Extension<OpenAICompatibl
           title: this.i18n.t('texts.extensions.common.parallelToolCalls'),
           default: true,
         },
+        disableStreaming: {
+          type: 'boolean',
+          title: this.i18n.t('texts.extensions.common.disableStreaming'),
+          default: false,
+          description: this.i18n.t('texts.extensions.common.disableStreamingHint'),
+        },
         summary: {
           type: 'string',
           title: this.i18n.t('texts.extensions.common.reasoningSummary'),
@@ -118,7 +124,7 @@ export class OpenAICompatibleModelExtension implements Extension<OpenAICompatibl
     const middleware = {
       invoke: async (context: ChatContext, getContext: GetContext, next: ChatNextDelegate): Promise<any> => {
         context.llms[this.spec.name] = await context.cache.get(this.spec.name, extension.values, () => {
-          return this.createModel(extension.values, true);
+          return this.createModel(extension.values);
         });
 
         return next(context);
@@ -128,7 +134,7 @@ export class OpenAICompatibleModelExtension implements Extension<OpenAICompatibl
     return Promise.resolve([middleware]);
   }
 
-  private createModel(configuration: OpenAICompatibleModelExtensionConfiguration, streaming = false) {
+  private createModel(configuration: OpenAICompatibleModelExtensionConfiguration) {
     const {
       apiKey,
       baseUrl,
@@ -141,6 +147,7 @@ export class OpenAICompatibleModelExtension implements Extension<OpenAICompatibl
       effort,
       reasoningTagName,
       parallelToolCalls = true,
+      disableStreaming = false,
       summary,
     } = configuration;
 
@@ -159,7 +166,6 @@ export class OpenAICompatibleModelExtension implements Extension<OpenAICompatibl
         frequencyPenalty,
         temperature,
         seed,
-        streaming,
         maxOutputTokens,
         providerOptions: {
           openai: effort
@@ -175,6 +181,7 @@ export class OpenAICompatibleModelExtension implements Extension<OpenAICompatibl
       } as Partial<CallSettings>,
       modelName: modelName,
       providerName: 'openai-compatible',
+      disableStreaming,
     };
   }
 }
@@ -191,5 +198,6 @@ type OpenAICompatibleModelExtensionConfiguration = ExtensionConfiguration & {
   effort?: 'low' | 'medium' | 'high';
   reasoningTagName?: string;
   parallelToolCalls?: boolean;
+  disableStreaming?: boolean;
   summary?: 'detailed' | 'auto';
 };
