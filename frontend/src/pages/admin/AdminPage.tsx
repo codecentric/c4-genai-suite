@@ -69,7 +69,7 @@ export function AdminPage() {
             </div>
           </div>
         )}
-        <div className="flex min-w-0 grow flex-col items-stretch bg-gray-50">
+        <main className="flex min-w-0 grow flex-col items-stretch bg-gray-50">
           <Routes>
             <Route path="/dashboard" element={<DashboardPage />} />
 
@@ -94,7 +94,7 @@ export function AdminPage() {
             onClick={() => setIsNavigationBarOpen(!isNavigationBarOpen)}
             tooltip={isNavigationBarOpen ? texts.common.hide(texts.common.menu) : texts.common.show(texts.common.menu)}
           />
-        </div>
+        </main>
       </div>
     </div>
   );
