@@ -15,7 +15,7 @@ test('Audit Log', async ({ page }) => {
 
   await test.step('should display audit log page', async () => {
     await page.getByRole('link', { name: 'Audit Log' }).click();
-    await expect(page.getByRole('heading', { name: 'Audit Log' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Audit Log', level: 1 })).toBeVisible();
     await expect(page.getByRole('table')).toBeVisible();
   });
 
