@@ -121,6 +121,50 @@ export function useRatings(filterInterval: FilterInterval) {
   return { byCategory, items, totalKey: 'total' };
 }
 
+type AssistantsResultItem = {
+  date: string;
+  total: number;
+  byAssistant: {
+    [key: string]: number;
+  };
+} & {
+  [key: `byAssistant_${string}`]: number;
+};
+
+export function useAssistantsCount(filterInterval: FilterInterval) {
+  const api = useApi();
+  const since = mapFilterIntervalToStartDate(filterInterval);
+
+  const { data } = useQuery({
+    queryKey: ['assistantsCount', filterInterval],
+    queryFn: () => api.usages.getAssistantsCount(since, mapFilterIntervalToGroupBy(filterInterval)),
+  });
+
+  const items = useMemo(() => {
+    const result: AssistantsResultItem[] = [];
+
+    for (const item of data?.items || []) {
+      const clone: AssistantsResultItem = {
+        date: format(item.date, 'yyyy-MM-dd'),
+        total: item.total,
+        byAssistant: item.byAssistant,
+      };
+
+      for (const [assistantId, value] of Object.entries(item.byAssistant)) {
+        clone[`byAssistant_${assistantId}`] = value;
+      }
+
+      result.push(clone);
+    }
+
+    return result;
+  }, [data?.items]);
+
+  const byAssistant = useBars(items, 'byAssistant', 'byAssistant_');
+
+  return { byAssistant, items };
+}
+
 export function useMessagesCount(filterInterval: FilterInterval) {
   const since = mapFilterIntervalToStartDate(filterInterval);
   const api = useApi();
@@ -147,7 +191,11 @@ export function useUsersCount(filterInterval: FilterInterval) {
   }, [data]);
 }
 
-function useBars<T extends UsageResultItem | RatingsResultItem>(items: T[], property: keyof T, path: string) {
+function useBars<T extends UsageResultItem | RatingsResultItem | AssistantsResultItem>(
+  items: T[],
+  property: keyof T,
+  path: string,
+) {
   const bars = useMemo(() => {
     const uniqueKeys = new Set(items.flatMap((item) => Object.keys(item[property] as object)));
 

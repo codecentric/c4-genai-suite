@@ -3,4 +3,4 @@ export { MessagesCount } from './repositories/message.repository';
 export { MessageRepository } from './repositories/message.repository';
 export { ConversationRepository } from './repositories/conversation.repository';
 export { UsageRepository } from './repositories/usage.repository';
-export { UsagesCount } from './interfaces';
+export { AssistantsCount, UsagesCount } from './interfaces';

@@ -219,6 +219,7 @@ export const en = {
     tokensPerModelChart: 'Tokens per Model',
     tokensTotalChat: 'Total Tokens',
     requests: 'Requests',
+    assistants: 'Assistants',
     users: 'Users',
     filterInterval: {
       day: 'Day',

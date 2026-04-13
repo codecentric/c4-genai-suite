@@ -1,6 +1,7 @@
 import { Repository } from 'typeorm';
 import { getStartDate, GroupBy } from '../../chat/statistics';
 import { MessageEntity } from '../entities';
+import { AssistantsCount } from '../interfaces';
 import { dateTrunc, interval, schema } from '../typeorm.helper';
 
 export interface MessagesCount {
@@ -82,5 +83,72 @@ export class MessageRepository extends Repository<MessageEntity> {
       ...x,
       total: Number(x.total),
     }));
+  }
+
+  async getAssistantsCount(since: Date | undefined, groupBy: GroupBy): Promise<AssistantsCount[]> {
+    const dateColumn = 'm."createdAt"';
+    const condition = since ? `m.type = 'human' AND ${dateColumn} >= $1` : `m.type = 'human'`;
+    const params = since ? [getStartDate(since, groupBy)] : [];
+
+    const start = since
+      ? dateTrunc(groupBy, '($1)::date')
+      : dateTrunc(groupBy, `(SELECT MIN(${dateColumn}) FROM ${schema}.messages m WHERE ${condition})`);
+    const end = dateTrunc(groupBy, 'NOW()');
+
+    const sql = `
+      WITH series AS (
+        SELECT generate_series(
+          ${start},
+          ${end},
+          ${interval(groupBy)}
+        )::date AS "date"
+      ),
+      dataset AS (
+        SELECT
+          ${dateTrunc(groupBy, dateColumn)} AS "date",
+          cfg."name" AS "assistantName",
+          COUNT(*) AS total
+        FROM ${schema}.messages m
+        INNER JOIN ${schema}.configurations cfg ON cfg.id = m."configurationId"
+        WHERE ${condition}
+        GROUP BY ${dateTrunc(groupBy, dateColumn)}, cfg."name"
+      )
+      SELECT
+        s."date",
+        d."assistantName",
+        COALESCE(d.total, 0) AS "total"
+      FROM series s
+      LEFT JOIN dataset d ON s."date" = d."date"
+      ORDER BY s."date", d."assistantName"
+    `;
+
+    const rawResults = await this.query<
+      Array<{
+        date: Date;
+        assistantName: string | null;
+        total: string;
+      }>
+    >(sql, params);
+
+    const itemsByDate = new Map<string, AssistantsCount>();
+
+    for (const row of rawResults) {
+      const dateKey = row.date.toISOString();
+      const item = itemsByDate.get(dateKey) ?? {
+        date: row.date,
+        total: 0,
+        byAssistant: {},
+      };
+
+      if (row.assistantName) {
+        const total = Number(row.total);
+        item.total += total;
+        item.byAssistant[row.assistantName] = total;
+      }
+
+      itemsByDate.set(dateKey, item);
+    }
+
+    return [...itemsByDate.values()];
   }
 }
