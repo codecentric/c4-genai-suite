@@ -60,7 +60,7 @@ export class MistralModelExtension implements Extension<MistralModelExtensionCon
     const middleware = {
       invoke: async (context: ChatContext, getContext: GetContext, next: ChatNextDelegate): Promise<any> => {
         context.llms[this.spec.name] = await context.cache.get(this.spec.name, extension.values, () => {
-          return this.createModel(extension.values, true);
+          return this.createModel(extension.values);
         });
 
         return next(context);
@@ -70,7 +70,7 @@ export class MistralModelExtension implements Extension<MistralModelExtensionCon
     return Promise.resolve([middleware]);
   }
 
-  private createModel(configuration: MistralModelExtensionConfiguration, streaming = false) {
+  private createModel(configuration: MistralModelExtensionConfiguration) {
     const { apiKey, modelName } = configuration;
 
     const open = createMistral({
@@ -80,9 +80,7 @@ export class MistralModelExtension implements Extension<MistralModelExtensionCon
 
     return {
       model: open(modelName),
-      options: {
-        streaming,
-      } as Partial<CallSettings>,
+      options: {} as Partial<CallSettings>,
       modelName: modelName,
       providerName: 'mistral',
     };

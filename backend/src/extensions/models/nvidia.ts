@@ -119,7 +119,7 @@ export class NvidiaModelExtension implements Extension<NvidiaModelExtensionConfi
     const middleware = {
       invoke: async (context: ChatContext, _: GetContext, next: ChatNextDelegate): Promise<any> => {
         context.llms[this.spec.name] = await context.cache.get(this.spec.name, extension.values, () => {
-          return this.createModel(extension.values, true);
+          return this.createModel(extension.values);
         });
 
         return next(context);
@@ -139,7 +139,7 @@ export class NvidiaModelExtension implements Extension<NvidiaModelExtensionConfi
     return await fetchFunction(url, options);
   };
 
-  private createModel(config: NvidiaModelExtensionConfiguration, streaming = false) {
+  private createModel(config: NvidiaModelExtensionConfiguration) {
     const openAi = createOpenAICompatible({
       name: 'nvidia',
       apiKey: config.apiKey,
@@ -155,7 +155,6 @@ export class NvidiaModelExtension implements Extension<NvidiaModelExtensionConfi
         frequencyPenalty: config.frequencyPenalty,
         seed: config.seed,
         temperature: config.temperature,
-        streaming,
         providerOptions: {
           openai: {
             reasoningEffort: config.effort ? config.effort : undefined,

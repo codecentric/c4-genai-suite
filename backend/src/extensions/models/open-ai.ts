@@ -100,7 +100,7 @@ export class OpenAIModelExtension implements Extension<OpenAIModelExtensionConfi
     const middleware = {
       invoke: async (context: ChatContext, _: GetContext, next: ChatNextDelegate): Promise<any> => {
         context.llms[this.spec.name] = await context.cache.get(this.spec.name, extension.values, () => {
-          return this.createModel(extension.values, true);
+          return this.createModel(extension.values);
         });
 
         return next(context);
@@ -110,7 +110,7 @@ export class OpenAIModelExtension implements Extension<OpenAIModelExtensionConfi
     return Promise.resolve([middleware]);
   }
 
-  private createModel(configuration: OpenAIModelExtensionConfiguration, streaming = false) {
+  private createModel(configuration: OpenAIModelExtensionConfiguration) {
     const {
       apiKey,
       modelName,
@@ -136,7 +136,6 @@ export class OpenAIModelExtension implements Extension<OpenAIModelExtensionConfi
         frequencyPenalty,
         temperature,
         seed,
-        streaming,
         providerOptions: {
           openai: effort
             ? {
