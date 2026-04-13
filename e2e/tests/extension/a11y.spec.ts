@@ -1,6 +1,6 @@
 import { test } from '@playwright/test';
 import { config } from '../utils/config';
-import { expectA11yCompliant, login } from '../utils/helper';
+import { enterAdminArea, expectA11yCompliant, login } from '../utils/helper';
 
 test('accessibility', async ({ page }) => {
   await test.step('login page accessible', async () => {
@@ -11,6 +11,12 @@ test('accessibility', async ({ page }) => {
 
   await test.step('main page accessible', async () => {
     await login(page);
+    await expectA11yCompliant(page);
+  });
+
+  await test.step('admin dashboard accessible', async () => {
+    await enterAdminArea(page);
+    await page.waitForURL(`${config.URL}/admin/dashboard`);
     await expectA11yCompliant(page);
   });
 });
