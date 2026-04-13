@@ -17,7 +17,7 @@ export function Page(props: PageProps) {
         </div>
       )}
 
-      <div
+      <main
         className={cn('absolute top-0 right-0 bottom-0 overflow-y-auto bg-gray-50', {
           'left-[270px]': !!menu,
           'left-0': !menu,
@@ -31,7 +31,7 @@ export function Page(props: PageProps) {
         >
           {children}
         </div>
-      </div>
+      </main>
     </div>
   );
 }
