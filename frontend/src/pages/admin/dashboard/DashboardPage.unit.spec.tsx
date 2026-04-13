@@ -29,6 +29,6 @@ describe('DashboardPage', () => {
   it('should have a level-one heading for accessibility', () => {
     render(<DashboardPage />);
 
-    expect(screen.getByRole('heading', { level: 1 })).toBeDefined();
+    expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument();
   });
 });
