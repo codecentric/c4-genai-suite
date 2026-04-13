@@ -25,4 +25,10 @@ describe('DashboardPage', () => {
 
     expect(screen.getByTestId('version').innerHTML).toEqual('Version: No hash available§');
   });
+
+  it('should have a level-one heading for accessibility', () => {
+    render(<DashboardPage />);
+
+    expect(screen.getByRole('heading', { level: 1 })).toBeDefined();
+  });
 });

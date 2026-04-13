@@ -166,7 +166,7 @@ export function ExtensionsPage() {
             <div className="flex items-start justify-between">
               <div className="flex flex-col gap-y-2">
                 <div className="flex items-center gap-x-4">
-                  <h2 className="text-3xl">{thisConfiguration.name}</h2>
+                  <h1 className="text-3xl">{thisConfiguration.name}</h1>
                 </div>
                 <div className="text-gray-600">{thisConfiguration.description}</div>
                 <div className="text-gray-400">id: {thisConfiguration.id}</div>

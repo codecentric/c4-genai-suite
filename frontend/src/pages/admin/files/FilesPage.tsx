@@ -193,7 +193,7 @@ export function FilesPage() {
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-8">
             <div className="flex items-end justify-between">
-              <h2 className="text-3xl">{thisBucket.name}</h2>
+              <h1 className="text-3xl">{thisBucket.name}</h1>
               <div className="flex gap-2">
                 <Button leftSection={<IconEdit size={20} />} onClick={() => setToUpdate(true)}>
                   {texts.common.edit}
