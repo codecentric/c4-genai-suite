@@ -1,5 +1,13 @@
 # Changelog
 
+## [9.18.0](https://github.com/codecentric/c4-genai-suite/compare/v9.17.0...v9.18.0) (2026-04-13)
+
+
+### Features
+
+* add assistants usage chart to admin dashboard ([#1491](https://github.com/codecentric/c4-genai-suite/issues/1491)) ([ce448f6](https://github.com/codecentric/c4-genai-suite/commit/ce448f68007a03b6018f17f74d1f2f7c75f0b7a0))
+* add option to disable streaming in openai compatible model extensions ([#1578](https://github.com/codecentric/c4-genai-suite/issues/1578)) ([3d94fa6](https://github.com/codecentric/c4-genai-suite/commit/3d94fa68d8b30c71e0687a8b5d8d1f82696be8cc))
+
 ## [9.17.0](https://github.com/codecentric/c4-genai-suite/compare/v9.16.3...v9.17.0) (2026-04-10)
 
 
