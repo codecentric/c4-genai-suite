@@ -86,6 +86,12 @@ export class NvidiaModelExtension implements Extension<NvidiaModelExtensionConfi
           title: this.i18n.t('texts.extensions.common.parallelToolCalls'),
           default: true,
         },
+        disableStreaming: {
+          type: 'boolean',
+          title: this.i18n.t('texts.extensions.common.disableStreaming'),
+          default: false,
+          description: this.i18n.t('texts.extensions.common.disableStreamingHint'),
+        },
         summary: {
           type: 'string',
           title: this.i18n.t('texts.extensions.common.reasoningSummary'),
@@ -160,6 +166,7 @@ export class NvidiaModelExtension implements Extension<NvidiaModelExtensionConfi
       } as Partial<CallSettings>,
       modelName: config.modelName,
       providerName: 'nvidia',
+      disableStreaming: config.disableStreaming ?? false,
     };
   }
 }
@@ -175,5 +182,6 @@ type NvidiaModelExtensionConfiguration = ExtensionConfiguration & {
   effort?: 'minimal' | 'low' | 'medium' | 'high';
   reasoningTagName?: string;
   parallelToolCalls?: boolean;
+  disableStreaming?: boolean;
   summary?: 'detailed' | 'auto';
 };

@@ -91,6 +91,12 @@ export class OpenAICompatibleModelExtension implements Extension<OpenAICompatibl
           title: this.i18n.t('texts.extensions.common.parallelToolCalls'),
           default: true,
         },
+        disableStreaming: {
+          type: 'boolean',
+          title: this.i18n.t('texts.extensions.common.disableStreaming'),
+          default: false,
+          description: this.i18n.t('texts.extensions.common.disableStreamingHint'),
+        },
         summary: {
           type: 'string',
           title: this.i18n.t('texts.extensions.common.reasoningSummary'),
@@ -141,6 +147,7 @@ export class OpenAICompatibleModelExtension implements Extension<OpenAICompatibl
       effort,
       reasoningTagName,
       parallelToolCalls = true,
+      disableStreaming = false,
       summary,
     } = configuration;
 
@@ -175,6 +182,7 @@ export class OpenAICompatibleModelExtension implements Extension<OpenAICompatibl
       } as Partial<CallSettings>,
       modelName: modelName,
       providerName: 'openai-compatible',
+      disableStreaming,
     };
   }
 }
@@ -191,5 +199,6 @@ type OpenAICompatibleModelExtensionConfiguration = ExtensionConfiguration & {
   effort?: 'low' | 'medium' | 'high';
   reasoningTagName?: string;
   parallelToolCalls?: boolean;
+  disableStreaming?: boolean;
   summary?: 'detailed' | 'auto';
 };

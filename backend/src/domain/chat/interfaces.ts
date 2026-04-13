@@ -127,6 +127,8 @@ export interface LanguageModelContext {
   // metadata (e.g. for usage counting)
   modelName: string;
   providerName: string;
+  // when true, uses generateText instead of streamText
+  disableStreaming?: boolean;
 }
 
 export abstract class NamedStructuredTool<

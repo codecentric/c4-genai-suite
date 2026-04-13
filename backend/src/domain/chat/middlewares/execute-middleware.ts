@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { stepCountIs, streamText, tool, ToolSet } from 'ai';
+import { generateText, stepCountIs, streamText, tool, ToolSet } from 'ai';
 import * as z from 'zod';
 import { I18nService } from '../../../localization/i18n.service';
 import { MetricsService } from '../../../metrics/metrics.service';
@@ -36,6 +36,13 @@ export class ExecuteMiddleware implements ChatMiddleware {
   }
 
   async handleAiSdkChainExecution(llm: LanguageModelContext, context: ChatContext) {
+    if (llm.disableStreaming) {
+      return this.handleAiSdkNonStreamingExecution(llm, context);
+    }
+    return this.handleAiSdkStreamingExecution(llm, context);
+  }
+
+  private async handleAiSdkStreamingExecution(llm: LanguageModelContext, context: ChatContext) {
     const { input, systemMessages, abort, result, history, tools } = context;
 
     const messages = await history?.getMessages();
@@ -130,6 +137,83 @@ export class ExecuteMiddleware implements ChatMiddleware {
       // unwrap and throw the causing error to be handled by the ExceptionMiddleware
       throw error.error;
     }
+  }
+
+  private async handleAiSdkNonStreamingExecution(llm: LanguageModelContext, context: ChatContext) {
+    const { input, systemMessages, abort, result, history, tools } = context;
+
+    const messages = await history?.getMessages();
+
+    const mapTool = <TSchema extends z.ZodObject<z.ZodRawShape>>(namedTool: NamedStructuredTool<any, TSchema>) => {
+      return {
+        name: namedTool.name,
+        tool: tool({
+          description: namedTool.description,
+          inputSchema: namedTool.schema,
+          execute: async (input: z.infer<TSchema>) => namedTool.execute(input),
+        }),
+      };
+    };
+
+    const allTools = tools.reduce((prev, curr) => {
+      const { name, tool } = mapTool(curr);
+      prev[name] = tool;
+      return prev;
+    }, {} as ToolSet);
+
+    const response = await generateText({
+      model: llm.model,
+      tools: allTools,
+      toolChoice: 'auto',
+      prompt: [
+        ...systemMessages.map((x) => ({ role: 'system' as const, content: x })),
+        ...(messages?.filter((x) => !!x) ?? []),
+        { role: 'user' as const, content: input },
+      ],
+      ...llm.options,
+      abortSignal: abort.signal,
+      stopWhen: stepCountIs(1000),
+      experimental_telemetry: {
+        isEnabled: context.telemetry ?? false,
+        metadata: {
+          conversationId: context.conversationId,
+          assistantId: context.configuration.id,
+          assistantName: context.configuration.name,
+          modelName: llm.modelName,
+          providerName: llm.providerName,
+        },
+      },
+    });
+
+    const totalTokens = response.usage?.totalTokens ?? 0;
+    context.tokenUsage ??= { tokenCount: 0, model: llm.modelName, llm: llm.providerName };
+    context.tokenUsage.tokenCount += totalTokens;
+
+    if (response.finishReason === 'content-filter') {
+      throw { code: 'content_filter' } as unknown;
+    }
+
+    // Emit tool events for each step
+    for (const step of response.steps) {
+      for (const toolCall of step.toolCalls) {
+        const toolName = tools.find((x) => x.name === toolCall.toolName)?.displayName ?? toolCall.toolName;
+        result.next({ type: 'tool_start', tool: { name: toolName } });
+        result.next({ type: 'tool_end', tool: { name: toolName } });
+      }
+    }
+
+    // Emit reasoning if present
+    if (response.reasoningText) {
+      result.next({ type: 'reasoning', content: response.reasoningText });
+      result.next({ type: 'reasoning_end' });
+    }
+
+    // Emit the complete text as a single chunk
+    if (response.text) {
+      result.next({ type: 'chunk', content: [{ type: 'text', text: response.text }] });
+    }
+
+    await history?.addAIMessage(response.text ?? '');
   }
 
   async execute(context: ChatContext) {
