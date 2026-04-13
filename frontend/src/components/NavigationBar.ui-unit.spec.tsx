@@ -2,6 +2,7 @@ import { screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { NavigationBar } from 'src/components/NavigationBar';
 import { render } from 'src/pages/admin/test-utils';
+import { texts } from 'src/texts';
 import { InAppDocsProvider } from './InAppDocsProvider';
 
 describe('NavigationBar component', () => {
@@ -47,5 +48,19 @@ describe('NavigationBar component', () => {
 
     const logo = screen.queryByRole('img');
     expect(logo).not.toBeInTheDocument();
+  });
+
+  it('uses app name as fallback h1 when theme name is not set', () => {
+    const theme = {};
+    render(
+      <InAppDocsProvider>
+        <NavigationBar theme={theme}></NavigationBar>
+      </InAppDocsProvider>,
+    );
+
+    // Should have an sr-only h1 with the default app name for accessibility
+    const heading = screen.getByRole('heading', { level: 1, name: texts.common.appName });
+    expect(heading).toBeInTheDocument();
+    expect(heading).toHaveClass('sr-only');
   });
 });
