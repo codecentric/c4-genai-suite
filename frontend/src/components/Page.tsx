@@ -10,7 +10,7 @@ export function Page(props: PageProps) {
   const { children, menu } = props;
 
   return (
-    <div className="relative grow">
+    <main className="relative grow">
       {menu && (
         <div className="absolute top-0 bottom-0 left-0 flex w-[270px] shrink-0 flex-grow flex-col overflow-y-hidden border-l border-l-gray-200 bg-white">
           {menu}
@@ -32,6 +32,6 @@ export function Page(props: PageProps) {
           {children}
         </div>
       </div>
-    </div>
+    </main>
   );
 }
