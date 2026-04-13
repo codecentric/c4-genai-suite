@@ -51,12 +51,15 @@ export function BucketsPage() {
     <Page
       menu={
         <div className="flex flex-col overflow-y-hidden">
-          <div className="flex p-8 pb-4">
-            <h3 className="grow text-xl">{texts.files.buckets}</h3>
+          <div className="flex flex-col p-8 pb-4 gap-2">
+            <h1 className="text-2xl font-semibold">{texts.files.headline}</h1>
+            <div className="flex items-center">
+              <h2 className="grow text-xl">{texts.files.buckets}</h2>
 
-            <button className="btn btn-square btn-sm text-sm" onClick={() => setToCreate(true)}>
-              <IconPlus size={16} />
-            </button>
+              <button className="btn btn-square btn-sm text-sm" onClick={() => setToCreate(true)}>
+                <IconPlus size={16} />
+              </button>
+            </div>
           </div>
 
           <div className="grow overflow-y-auto p-4 pt-4">
