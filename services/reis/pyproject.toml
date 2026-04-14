@@ -24,12 +24,12 @@ dependencies = [
     "azure-search-documents==11.6.0",
     "azure-identity==1.25.3",
     "pdfminer-six>=20260107",
-    "pypdf>=6.6.0",
+    "pypdf>=6.10.1",
     "ffmpeg-python>=0.2.0",
     "python-oxmsg>=0.0.2",
     "aiofiles>=25.1.0",
     "prometheus-fastapi-instrumentator>=7.0.0",
-    "fastmcp>=2.14.2",
+    "fastmcp>=3.2.4",
     "boto3>=1.42.89",
     "boto3-stubs[s3]>=1.42.89",
     "weasyprint>=67.0",
@@ -42,7 +42,7 @@ dependencies = [
 [dependency-groups]
 dev = [
     "ruff==0.15.10",
-    "ty>=0.0.9",
+    "ty>=0.0.30",
     "pip==26.0.1",
     "pre-commit==4.5.1",
     "pytest==9.0.3",
