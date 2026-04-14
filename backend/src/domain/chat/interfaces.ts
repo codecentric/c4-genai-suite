@@ -129,6 +129,8 @@ export interface LanguageModelContext {
   providerName: string;
   // when true, uses generateText instead of streamText
   disableStreaming?: boolean;
+  // when true, reasoning events are not emitted to the frontend
+  suppressReasoning?: boolean;
 }
 
 export abstract class NamedStructuredTool<
