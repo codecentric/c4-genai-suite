@@ -101,7 +101,7 @@
     "@nestjs/cli": "11.0.19",
     "@nestjs/schematics": "11.0.10",
     "@nestjs/testing": "11.1.19",
-    "@openapitools/openapi-generator-cli": "2.30.2",
+    "@openapitools/openapi-generator-cli": "2.31.1",
     "@testcontainers/postgresql": "^11.14.0",
     "@types/bcrypt": "6.0.0",
     "@types/cookie-parser": "1.4.10",
