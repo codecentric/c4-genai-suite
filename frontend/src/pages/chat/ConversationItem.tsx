@@ -61,7 +61,7 @@ export const ConversationItem = memo(({ chat }: ChatProps) => {
         variant={isSelected ? 'filled' : 'subtle'}
         classNames={{
           root: 'transition-all flex-1 min-w-0',
-          label: 'block w-full min-w-0 text-left truncate',
+          label: 'block w-full min-w-0 text-left truncate overflow-y-visible',
         }}
         onDoubleClick={() => isSelected && setShowRenameInput(true)}
         title={chat.name}
