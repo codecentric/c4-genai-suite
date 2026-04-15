@@ -1,0 +1,133 @@
+name: Accessibility Scanner
+
+on:
+  workflow_dispatch:
+  # TODO: remove push trigger before merging — workflow_dispatch only works from the default branch
+  push:
+    branches:
+      - a11y-scanner-setup
+
+jobs:
+  accessibility_scanner:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+    env:
+      AUTH_INITIAL_ADMIN_USERNAME: admin@example.com
+      AUTH_INITIAL_ADMIN_PASSWORD: secret
+    steps:
+      - name: Create Docker network
+        run: docker network create a11y-network
+
+      - name: Start database
+        run: |
+          docker run -d \
+            --network a11y-network \
+            --name postgres \
+            -e POSTGRES_USER=admin \
+            -e POSTGRES_PASSWORD=secret \
+            -e POSTGRES_DB=cccc \
+            pgvector/pgvector:pg16
+
+      - name: Wait for database
+        run: |
+          db_ready=false
+          for i in $(seq 1 30); do
+            if docker exec postgres pg_isready -U admin -d cccc; then
+              echo "Database is ready"
+              db_ready=true
+              break
+            fi
+            echo "Waiting for database... ($i/30)"
+            sleep 1
+          done
+
+          if [ "$db_ready" != "true" ]; then
+            echo "Database did not become ready in time"
+            exit 1
+          fi
+
+      - name: Start backend
+        run: |
+          docker run -d \
+            --network a11y-network \
+            --name backend \
+            -e BASE_URL="http://localhost:3080" \
+            -e DB_URL="postgres://admin:secret@postgres:5432/cccc" \
+            -e C4_DB_RETRY_DELAY="6000" \
+            -e NODE_ENV="development" \
+            -e AUTH_ENABLE_PASSWORD="true" \
+            -e AUTH_INITIAL_ADMIN_USERNAME="${{ env.AUTH_INITIAL_ADMIN_USERNAME }}" \
+            -e AUTH_INITIAL_ADMIN_PASSWORD="${{ env.AUTH_INITIAL_ADMIN_PASSWORD }}" \
+            -e SESSION_SECRET="a11y-scanner-session-secret" \
+            ghcr.io/codecentric/c4-genai-suite/backend:latest
+
+      - name: Start frontend
+        run: |
+          docker run -d \
+            --network a11y-network \
+            --name frontend \
+            ghcr.io/codecentric/c4-genai-suite/frontend:latest
+
+      - name: Start gateway proxy
+        run: |
+          docker run -d \
+            -p 3080:3080 \
+            --network a11y-network \
+            --name gateway \
+            -e FRONTEND_PORT=3080 \
+            -e PORT=3080 \
+            -e BACKEND_PORT=3000 \
+            ghcr.io/codecentric/c4-genai-suite/dev-helper/caddy-gateway-proxy:latest
+
+      - name: Wait for application
+        run: |
+          app_ready=false
+          for i in $(seq 1 60); do
+            if curl -sf http://localhost:3080/api/health > /dev/null 2>&1; then
+              echo "Application is ready!"
+              app_ready=true
+              break
+            fi
+            echo "Waiting for application... ($i/60)"
+            sleep 2
+          done
+
+          if [ "$app_ready" != "true" ]; then
+            echo "Application did not become ready in time"
+            exit 1
+          fi
+
+      - uses: github/accessibility-scanner@v2
+        with:
+          urls: |
+            http://localhost:3080
+            http://localhost:3080/chat
+            http://localhost:3080/admin/dashboard
+            http://localhost:3080/admin/theme
+            http://localhost:3080/admin/files
+            http://localhost:3080/admin/users
+            http://localhost:3080/admin/user-groups
+            http://localhost:3080/admin/audit-log
+          repository: ${{ github.repository }}
+          token: ${{ secrets.GH_TOKEN_A11Y }}
+          cache_key: cached_results-c4-local.json
+          login_url: http://localhost:3080 # Optional: URL of the login page if authentication is required
+          username: ${{ env.AUTH_INITIAL_ADMIN_USERNAME }} # Optional: Username for authentication
+          password: ${{ env.AUTH_INITIAL_ADMIN_PASSWORD }} # Optional: Password for authentication (use secrets!)
+          open_grouped_issues: true # Optional: Set to true to open an issue grouping individual issues per violation
+          # auth_context: # Optional: Stringified JSON object for complex authentication
+          # skip_copilot_assignment: false # Optional: Set to true to skip assigning issues to GitHub Copilot (or if you don't have GitHub Copilot)
+          # include_screenshots: false # Optional: Set to true to capture screenshots and include links to them in filed issues
+          # reduced_motion: no-preference # Optional: Playwright reduced motion configuration option
+          # color_scheme: light # Optional: Playwright color scheme configuration option
+          # scans: '["axe","reflow-scan"]' # Optional: An array of scans (or plugins) to be performed. If not provided, only Axe will be performed.
+
+      - name: Get backend logs
+        if: ${{ !cancelled() }}
+        run: docker logs backend
+
+      - name: Get gateway logs
+        if: ${{ !cancelled() }}
+        run: docker logs gateway
