@@ -78,7 +78,7 @@ export class OpenAIModelExtension implements Extension<OpenAIModelExtensionConfi
           title: this.i18n.t('texts.extensions.common.reasoningSummary'),
           required: false,
           default: 'detailed',
-          enum: ['detailed', 'auto'],
+          enum: ['detailed', 'auto', 'off'],
         },
       },
     };
@@ -140,7 +140,7 @@ export class OpenAIModelExtension implements Extension<OpenAIModelExtensionConfi
           openai: effort
             ? {
                 reasoningEffort: effort ? effort : undefined,
-                reasoningSummary: summary || 'detailed',
+                reasoningSummary: summary === 'off' ? undefined : summary || 'detailed',
                 parallelToolCalls,
               }
             : {
@@ -150,6 +150,7 @@ export class OpenAIModelExtension implements Extension<OpenAIModelExtensionConfi
       } as Partial<CallSettings>,
       modelName: modelName,
       providerName: 'open-ai',
+      suppressReasoning: summary === 'off',
     };
   }
 }
@@ -163,5 +164,5 @@ type OpenAIModelExtensionConfiguration = ExtensionConfiguration & {
   frequencyPenalty?: number;
   effort?: 'minimal' | 'low' | 'medium' | 'high';
   parallelToolCalls?: boolean;
-  summary?: 'detailed' | 'auto';
+  summary?: 'detailed' | 'auto' | 'off';
 };

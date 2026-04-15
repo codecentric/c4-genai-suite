@@ -104,10 +104,10 @@ export class ExecuteMiddleware implements ChatMiddleware {
         // TODO: maybe add a `tool_error` event type and indicate errors in the ui
         result.next({ type: 'tool_end', tool: { name: toolName } });
       }
-      if (event.type === 'reasoning-delta') {
+      if (event.type === 'reasoning-delta' && !llm.suppressReasoning) {
         result.next({ type: 'reasoning', content: event.text });
       }
-      if (event.type === 'reasoning-end') {
+      if (event.type === 'reasoning-end' && !llm.suppressReasoning) {
         result.next({ type: 'reasoning_end' });
       }
       if (event.type === 'text-delta') {
@@ -181,7 +181,7 @@ export class ExecuteMiddleware implements ChatMiddleware {
     }
 
     // Emit reasoning if present
-    if (response.reasoningText) {
+    if (response.reasoningText && !llm.suppressReasoning) {
       result.next({ type: 'reasoning', content: response.reasoningText });
       result.next({ type: 'reasoning_end' });
     }

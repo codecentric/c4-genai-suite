@@ -97,7 +97,7 @@ export class NvidiaModelExtension implements Extension<NvidiaModelExtensionConfi
           title: this.i18n.t('texts.extensions.common.reasoningSummary'),
           required: false,
           default: 'detailed',
-          enum: ['detailed', 'auto'],
+          enum: ['detailed', 'auto', 'off'],
         },
       },
     };
@@ -158,7 +158,7 @@ export class NvidiaModelExtension implements Extension<NvidiaModelExtensionConfi
         providerOptions: {
           openai: {
             reasoningEffort: config.effort ? config.effort : undefined,
-            reasoningSummary: config.summary || 'detailed',
+            reasoningSummary: config.summary === 'off' ? undefined : config.summary || 'detailed',
             parallelToolCalls: config.parallelToolCalls ?? true,
           },
         },
@@ -166,6 +166,7 @@ export class NvidiaModelExtension implements Extension<NvidiaModelExtensionConfi
       modelName: config.modelName,
       providerName: 'nvidia',
       disableStreaming: config.disableStreaming ?? false,
+      suppressReasoning: config.summary === 'off',
     };
   }
 }
@@ -182,5 +183,5 @@ type NvidiaModelExtensionConfiguration = ExtensionConfiguration & {
   reasoningTagName?: string;
   parallelToolCalls?: boolean;
   disableStreaming?: boolean;
-  summary?: 'detailed' | 'auto';
+  summary?: 'detailed' | 'auto' | 'off';
 };

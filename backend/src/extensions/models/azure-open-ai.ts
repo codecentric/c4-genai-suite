@@ -88,7 +88,7 @@ export class AzureOpenAIModelExtension implements Extension<AzureOpenAIModelExte
           title: this.i18n.t('texts.extensions.common.reasoningSummary'),
           required: false,
           default: 'detailed',
-          enum: ['detailed', 'auto'],
+          enum: ['detailed', 'auto', 'off'],
         },
       },
     };
@@ -148,13 +148,14 @@ export class AzureOpenAIModelExtension implements Extension<AzureOpenAIModelExte
           openai: effort
             ? {
                 reasoningEffort: effort ? effort : undefined,
-                reasoningSummary: summary || 'detailed',
+                reasoningSummary: summary === 'off' ? undefined : summary || 'detailed',
               }
             : {},
         },
       } as Partial<CallSettings>,
       modelName: deploymentName,
       providerName: 'azure-open-ai',
+      suppressReasoning: summary === 'off',
     };
   }
 }
@@ -169,5 +170,5 @@ type AzureOpenAIModelExtensionConfiguration = ExtensionConfiguration & {
   frequencyPenalty?: number;
   topP?: number;
   effort?: 'low' | 'medium' | 'high';
-  summary?: 'detailed' | 'auto';
+  summary?: 'detailed' | 'auto' | 'off';
 };

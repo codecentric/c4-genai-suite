@@ -102,7 +102,7 @@ export class OpenAICompatibleModelExtension implements Extension<OpenAICompatibl
           title: this.i18n.t('texts.extensions.common.reasoningSummary'),
           required: false,
           default: 'detailed',
-          enum: ['detailed', 'auto'],
+          enum: ['detailed', 'auto', 'off'],
         },
       },
     };
@@ -171,7 +171,7 @@ export class OpenAICompatibleModelExtension implements Extension<OpenAICompatibl
           openai: effort
             ? {
                 reasoningEffort: effort ? effort : undefined,
-                reasoningSummary: summary || 'detailed',
+                reasoningSummary: summary === 'off' ? undefined : summary || 'detailed',
                 parallelToolCalls,
               }
             : {
@@ -182,6 +182,7 @@ export class OpenAICompatibleModelExtension implements Extension<OpenAICompatibl
       modelName: modelName,
       providerName: 'openai-compatible',
       disableStreaming,
+      suppressReasoning: summary === 'off',
     };
   }
 }
@@ -199,5 +200,5 @@ type OpenAICompatibleModelExtensionConfiguration = ExtensionConfiguration & {
   reasoningTagName?: string;
   parallelToolCalls?: boolean;
   disableStreaming?: boolean;
-  summary?: 'detailed' | 'auto';
+  summary?: 'detailed' | 'auto' | 'off';
 };
