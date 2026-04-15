@@ -1,5 +1,13 @@
 # Changelog
 
+## [9.19.1](https://github.com/codecentric/c4-genai-suite/compare/v9.19.0...v9.19.1) (2026-04-15)
+
+
+### Bug Fixes
+
+* handle rendering errors in system messages ([#1635](https://github.com/codecentric/c4-genai-suite/issues/1635)) ([71b5d36](https://github.com/codecentric/c4-genai-suite/commit/71b5d360f28c5f6fa3496fc09f3e5fb66b084b1f))
+* visual bug clipping the descenders in conversation overview ([#1638](https://github.com/codecentric/c4-genai-suite/issues/1638)) ([551a968](https://github.com/codecentric/c4-genai-suite/commit/551a968c755e891d33f275c0a79f1775abc4e5d0))
+
 ## [9.19.0](https://github.com/codecentric/c4-genai-suite/compare/v9.18.0...v9.19.0) (2026-04-15)
 
 
