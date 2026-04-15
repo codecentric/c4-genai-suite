@@ -55,13 +55,13 @@ export const ConversationItem = memo(({ chat }: ChatProps) => {
     <div className="group flex w-full min-w-0 items-stretch" data-testid="conversation-item">
       <Button
         size="sm"
-        p="xs"
+        px="xs"
         onClick={async () => await navigate(`/chat/${chat.id}`)}
         justify="flex-start"
         variant={isSelected ? 'filled' : 'subtle'}
         classNames={{
           root: 'transition-all flex-1 min-w-0',
-          label: 'block w-full min-w-0 text-left truncate overflow-y-visible',
+          label: 'w-full min-w-0 text-left truncate',
         }}
         onDoubleClick={() => isSelected && setShowRenameInput(true)}
         title={chat.name}
