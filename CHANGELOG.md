@@ -1,5 +1,17 @@
 # Changelog
 
+## [9.19.0](https://github.com/codecentric/c4-genai-suite/compare/v9.18.0...v9.19.0) (2026-04-15)
+
+
+### Features
+
+* add suppressReasoning option to control reasoning event emission ([#1628](https://github.com/codecentric/c4-genai-suite/issues/1628)) ([d3d7f03](https://github.com/codecentric/c4-genai-suite/commit/d3d7f030f535e44de54ef7ac91e0f7557af55f6e))
+
+
+### Bug Fixes
+
+* fix clipped glyphs problem ([#1625](https://github.com/codecentric/c4-genai-suite/issues/1625)) ([09eee4c](https://github.com/codecentric/c4-genai-suite/commit/09eee4cfffd0a54c4c753c56b42c18cc1437ffaf))
+
 ## [9.18.0](https://github.com/codecentric/c4-genai-suite/compare/v9.17.0...v9.18.0) (2026-04-13)
 
 
