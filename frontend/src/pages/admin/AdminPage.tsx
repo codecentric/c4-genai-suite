@@ -23,7 +23,10 @@ export function AdminPage() {
       <NavigationBar theme={theme} redirectTo={`/chat/${chatId || ''}`} />
       <div className="sidebar-admin flex min-h-0 grow" data-testid="sidebar-admin">
         {isNavigationBarOpen && (
-          <div className="shadow-xxl flex w-48 shrink-0 flex-col justify-between bg-white">
+          <nav
+            aria-label={texts.common.administration}
+            className="shadow-xxl flex w-48 shrink-0 flex-col justify-between bg-white"
+          >
             <div>
               <ul className="nav-menu nav-menu-bordered mt-4 gap-1">
                 <li>
@@ -67,9 +70,9 @@ export function AdminPage() {
             <div className="p-2">
               <ProfileButton section="admin" />
             </div>
-          </div>
+          </nav>
         )}
-        <div className="flex min-w-0 grow flex-col items-stretch bg-gray-50">
+        <main className="flex min-w-0 grow flex-col items-stretch bg-gray-50">
           <Routes>
             <Route path="/dashboard" element={<DashboardPage />} />
 
@@ -94,7 +97,7 @@ export function AdminPage() {
             onClick={() => setIsNavigationBarOpen(!isNavigationBarOpen)}
             tooltip={isNavigationBarOpen ? texts.common.hide(texts.common.menu) : texts.common.show(texts.common.menu)}
           />
-        </div>
+        </main>
       </div>
     </div>
   );
