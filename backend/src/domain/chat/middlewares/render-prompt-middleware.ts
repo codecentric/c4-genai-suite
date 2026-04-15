@@ -1,10 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { renderString } from 'nunjucks';
 import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from '../interfaces';
 import { ExecuteMiddleware } from './execute-middleware';
 
 @Injectable()
 export class RenderPromptMiddleware implements ChatMiddleware {
+  private readonly logger = new Logger(RenderPromptMiddleware.name);
+
   order = ExecuteMiddleware.ORDER - 8;
 
   async invoke(context: ChatContext, getContext: GetContext, next: ChatNextDelegate): Promise<any> {
@@ -20,7 +22,12 @@ export class RenderPromptMiddleware implements ChatMiddleware {
     };
 
     context.systemMessages = context.systemMessages.map((msg) => {
-      return renderString(msg, data);
+      try {
+        return renderString(msg, data);
+      } catch (error: unknown) {
+        this.logger.warn(`Failed to render template, falling back to raw template: ${String(error)}`);
+        return msg;
+      }
     });
 
     await next(context);
