@@ -113,13 +113,13 @@ jobs:
           repository: ${{ github.repository }}
           token: ${{ secrets.GH_TOKEN_A11Y }}
           cache_key: cached_results-c4-local.json
-          login_url: http://localhost:3080 # Optional: URL of the login page if authentication is required
+          login_url: http://localhost:3080/login # Optional: URL of the login page if authentication is required
           username: ${{ env.AUTH_INITIAL_ADMIN_USERNAME }} # Optional: Username for authentication
           password: ${{ env.AUTH_INITIAL_ADMIN_PASSWORD }} # Optional: Password for authentication (use secrets!)
           open_grouped_issues: true # Optional: Set to true to open an issue grouping individual issues per violation
+          skip_copilot_assignment: true # Optional: Set to true to skip assigning issues to GitHub Copilot (or if you don't have GitHub Copilot)
+          include_screenshots: true # Optional: Set to true to capture screenshots and include links to them in filed issues
           # auth_context: # Optional: Stringified JSON object for complex authentication
-          # skip_copilot_assignment: false # Optional: Set to true to skip assigning issues to GitHub Copilot (or if you don't have GitHub Copilot)
-          # include_screenshots: false # Optional: Set to true to capture screenshots and include links to them in filed issues
           # reduced_motion: no-preference # Optional: Playwright reduced motion configuration option
           # color_scheme: light # Optional: Playwright color scheme configuration option
           # scans: '["axe","reflow-scan"]' # Optional: An array of scans (or plugins) to be performed. If not provided, only Axe will be performed.
