@@ -20,7 +20,11 @@ export class RenderPromptMiddleware implements ChatMiddleware {
     };
 
     context.systemMessages = context.systemMessages.map((msg) => {
-      return renderString(msg, data);
+      try {
+        return renderString(msg, data);
+      } catch {
+        return msg;
+      }
     });
 
     await next(context);
