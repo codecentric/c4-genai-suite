@@ -115,6 +115,37 @@ jobs:
             exit 1
           fi
 
+      - name: Authenticate via API
+        id: auth
+        run: |
+          # Login via backend API and capture session cookie
+          curl -s -c /tmp/cookies.txt \
+            -X POST http://localhost:3080/api/auth/login \
+            -H 'Content-Type: application/json' \
+            -d '{"email":"${{ env.AUTH_INITIAL_ADMIN_USERNAME }}","password":"${{ env.AUTH_INITIAL_ADMIN_PASSWORD }}"}'
+
+          # Convert Netscape cookie jar to Playwright auth_context JSON
+          # HttpOnly cookies are prefixed with #HttpOnly_ in curl's cookie jar
+          AUTH_CONTEXT=$(awk '
+            /^#HttpOnly_/ {
+              sub(/^#HttpOnly_/, "", $1)
+              printf "{\"name\":\"%s\",\"value\":\"%s\",\"domain\":\"%s\",\"path\":\"%s\",\"secure\":%s,\"httpOnly\":true}\n",
+                $6, $7, $1, $3, ($4=="TRUE"?"true":"false")
+              next
+            }
+            !/^#/ && NF {
+              printf "{\"name\":\"%s\",\"value\":\"%s\",\"domain\":\"%s\",\"path\":\"%s\",\"secure\":%s,\"httpOnly\":false}\n",
+                $6, $7, $1, $3, ($4=="TRUE"?"true":"false")
+            }
+          ' /tmp/cookies.txt | jq -sc '{
+            username: "${{ env.AUTH_INITIAL_ADMIN_USERNAME }}",
+            password: "${{ env.AUTH_INITIAL_ADMIN_PASSWORD }}",
+            cookies: .,
+            localStorage: {}
+          }')
+
+          echo "auth_context=$AUTH_CONTEXT" >> "$GITHUB_OUTPUT"
+
       - uses: github/accessibility-scanner@v2
         with:
           urls: |
@@ -129,13 +160,13 @@ jobs:
           repository: ${{ github.repository }}
           token: ${{ secrets.GH_TOKEN_A11Y }}
           cache_key: cached_results-c4-local.json
-          login_url: http://localhost:3080/login # Optional: URL of the login page if authentication is required
-          username: ${{ env.AUTH_INITIAL_ADMIN_USERNAME }} # Optional: Username for authentication
-          password: ${{ env.AUTH_INITIAL_ADMIN_PASSWORD }} # Optional: Password for authentication (use secrets!)
-          open_grouped_issues: true # Optional: Set to true to open an issue grouping individual issues per violation
-          skip_copilot_assignment: true # Optional: Set to true to skip assigning issues to GitHub Copilot (or if you don't have GitHub Copilot)
-          include_screenshots: true # Optional: Set to true to capture screenshots and include links to them in filed issues
-          # auth_context: # Optional: Stringified JSON object for complex authentication
+          auth_context: ${{ steps.auth.outputs.auth_context }}
+          open_grouped_issues: true
+          skip_copilot_assignment: true
+          include_screenshots: true
+          # login_url: # Optional: URL of the login page if authentication is required
+          # username: # Optional: Username for authentication
+          # password: ${{ secrets.PASSWORD }} # Optional: Password for authentication (use secrets!)
           # reduced_motion: no-preference # Optional: Playwright reduced motion configuration option
           # color_scheme: light # Optional: Playwright color scheme configuration option
           # scans: '["axe","reflow-scan"]' # Optional: An array of scans (or plugins) to be performed. If not provided, only Axe will be performed.
