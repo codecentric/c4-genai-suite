@@ -146,7 +146,53 @@ jobs:
 
           echo "auth_context=$AUTH_CONTEXT" >> "$GITHUB_OUTPUT"
 
-      - uses: github/accessibility-scanner@v2
+      - name: Verify axe timing issue (immediate vs after wait)
+        run: |
+          npm install playwright @axe-core/playwright
+          npx playwright install chromium --with-deps
+
+          node << 'SCRIPT'
+          const { chromium } = require('playwright');
+          const { default: AxeBuilder } = require('@axe-core/playwright');
+          const AUTH_CONTEXT = JSON.parse(process.env.AUTH_CONTEXT);
+
+          (async () => {
+            const browser = await chromium.launch();
+            const context = await browser.newContext({
+              storageState: {
+                cookies: AUTH_CONTEXT.cookies.map(c => ({ ...c, sameSite: 'Lax', expires: -1 })),
+                origins: []
+              }
+            });
+
+            const urls = [
+              'http://localhost:3080/admin/theme',
+              'http://localhost:3080/admin/dashboard',
+              'http://localhost:3080/chat'
+            ];
+
+            for (const url of urls) {
+              const page = await context.newPage();
+              await page.goto(url);
+
+              const immediate = await new AxeBuilder({ page }).analyze();
+              console.log(`\n=== ${url} ===`);
+              console.log('Without wait:', immediate.violations.map(v => v.id));
+
+              await page.waitForLoadState('networkidle');
+              const waited = await new AxeBuilder({ page }).analyze();
+              console.log('With wait:   ', waited.violations.map(v => v.id));
+
+              await page.close();
+            }
+
+            await browser.close();
+          })();
+          SCRIPT
+        env:
+          AUTH_CONTEXT: ${{ steps.auth.outputs.auth_context }}
+
+      - uses: github/accessibility-scanner@v3
         with:
           urls: |
             http://localhost:3080
