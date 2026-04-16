@@ -20,7 +20,7 @@ dependencies = [
     "langchain-aws>=1.4.4",
     "langchain-nvidia-ai-endpoints>=0.3.19",
     "psycopg[binary]>=3.3.3",
-    "fastapi[standard]==0.135.3",
+    "fastapi[standard]==0.136.0",
     "azure-search-documents==11.6.0",
     "azure-identity==1.25.3",
     "pdfminer-six>=20260107",
