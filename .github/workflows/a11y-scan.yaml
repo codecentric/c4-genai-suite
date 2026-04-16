@@ -8,7 +8,11 @@ on:
       - a11y-scanner-setup
 
 jobs:
+  build:
+    uses: ./.github/workflows/build-container-images.yaml
+
   accessibility_scanner:
+    needs: build
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -48,8 +52,14 @@ jobs:
             exit 1
           fi
 
+      - uses: actions/download-artifact@v8
+        with:
+          name: backend
+          path: /tmp/
+
       - name: Start backend
         run: |
+          docker load --input /tmp/backend.tar
           docker run -d \
             --network a11y-network \
             --name backend \
@@ -61,14 +71,20 @@ jobs:
             -e AUTH_INITIAL_ADMIN_USERNAME="${{ env.AUTH_INITIAL_ADMIN_USERNAME }}" \
             -e AUTH_INITIAL_ADMIN_PASSWORD="${{ env.AUTH_INITIAL_ADMIN_PASSWORD }}" \
             -e SESSION_SECRET="a11y-scanner-session-secret" \
-            ghcr.io/codecentric/c4-genai-suite/backend:latest
+            backend:commit-${{ github.sha }}
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: frontend
+          path: /tmp/
 
       - name: Start frontend
         run: |
+          docker load --input /tmp/frontend.tar
           docker run -d \
             --network a11y-network \
             --name frontend \
-            ghcr.io/codecentric/c4-genai-suite/frontend:latest
+            frontend:commit-${{ github.sha }}
 
       - name: Start gateway proxy
         run: |
