@@ -1,0 +1,6 @@
+# UNCHANGED_API_KEY is a sentinel/placeholder UUID, not a real secret.
+# It signals the backend that the API key was not changed during an edit operation.
+db543bdd4fc2605dd6d757e99a18c5d89bfcc7c5:frontend/src/pages/admin/evals/llm-endpoints/forms/type-specific/OpenAiEndpointFields.tsx:generic-api-key:6
+db543bdd4fc2605dd6d757e99a18c5d89bfcc7c5:frontend/src/pages/admin/evals/llm-endpoints/forms/type-specific/C4EndpointFields.tsx:generic-api-key:5
+db543bdd4fc2605dd6d757e99a18c5d89bfcc7c5:frontend/src/pages/admin/evals/llm-endpoints/forms/type-specific/AzureOpenAiEndpointFields.tsx:generic-api-key:6
+db543bdd4fc2605dd6d757e99a18c5d89bfcc7c5:frontend/src/pages/admin/evals/llm-endpoints/hooks/useLlmEndpointMutations.ts:generic-api-key:8
