@@ -17,7 +17,9 @@
     "preview": "vite preview",
     "generate-api": "npx rimraf ./src/api/generated && npx @openapitools/openapi-generator-cli generate && node gen-helper.mjs",
     "copy:pdfjs-wasm": "node copy-pdfjs-wasm.mjs",
-    "postinstall": "npm run copy:pdfjs-wasm"
+    "predev": "npm run copy:pdfjs-wasm",
+    "prestart": "npm run copy:pdfjs-wasm",
+    "prebuild": "npm run copy:pdfjs-wasm"
   },
   "dependencies": {
     "@floating-ui/react-dom": "^2.1.8",

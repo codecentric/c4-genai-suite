@@ -3,7 +3,6 @@ ARG VERSION
 WORKDIR /src
 
 COPY package*.json ./
-COPY copy-pdfjs-wasm.mjs ./
 RUN npm ci
 
 COPY . .
