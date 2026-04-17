@@ -1,22 +1,20 @@
-import { Button, Group, Modal, Stack, Text } from '@mantine/core';
+import { Button, Portal } from '@mantine/core';
 import { IconAlertTriangle } from '@tabler/icons-react';
 import type { EvaluationDetailSummary } from 'src/api/generated-eval';
+import { Modal } from 'src/components';
 import { texts } from 'src/texts';
 import { useDeleteEvaluation } from '../hooks/useEvaluationMutations';
 
 interface DeleteEvaluationDialogProps {
-  evaluation: EvaluationDetailSummary | null;
-  opened: boolean;
+  evaluation: EvaluationDetailSummary;
   onClose: () => void;
-  onSuccess?: () => void;
+  onDeleted?: () => void;
 }
 
-export function DeleteEvaluationDialog({ evaluation, opened, onClose, onSuccess }: DeleteEvaluationDialogProps) {
+export function DeleteEvaluationDialog({ evaluation, onClose, onDeleted }: DeleteEvaluationDialogProps) {
   const deleteMutation = useDeleteEvaluation();
 
-  const handleDelete = () => {
-    if (!evaluation) return;
-
+  const handleConfirm = () => {
     deleteMutation.mutate(
       {
         id: evaluation.id,
@@ -24,32 +22,36 @@ export function DeleteEvaluationDialog({ evaluation, opened, onClose, onSuccess 
       },
       {
         onSuccess: () => {
+          onDeleted?.();
           onClose();
-          onSuccess?.();
         },
       },
     );
   };
 
-  if (!evaluation) return null;
-
   return (
-    <Modal opened={opened} onClose={onClose} title={texts.evals.evaluations.deleteConfirmTitle} centered>
-      <Stack gap="md">
-        <Group gap="sm">
-          <IconAlertTriangle size={24} className="text-error" />
-          <Text size="sm">{texts.evals.evaluations.deleteConfirmText(evaluation.name)}</Text>
-        </Group>
-
-        <Group justify="flex-end" gap="sm">
-          <Button variant="default" onClick={onClose} disabled={deleteMutation.isPending}>
-            {texts.common.cancel}
-          </Button>
-          <Button color="red" onClick={handleDelete} loading={deleteMutation.isPending} disabled={deleteMutation.isPending}>
-            {texts.common.remove}
-          </Button>
-        </Group>
-      </Stack>
-    </Modal>
+    <Portal>
+      <Modal
+        onClose={onClose}
+        header={texts.evals.evaluations.deleteConfirmTitle}
+        footer={
+          <fieldset disabled={deleteMutation.isPending}>
+            <div className="flex flex-row justify-end gap-4">
+              <Button type="button" variant="subtle" onClick={onClose}>
+                {texts.common.cancel}
+              </Button>
+              <Button type="button" color="red" onClick={handleConfirm} loading={deleteMutation.isPending}>
+                {texts.common.remove}
+              </Button>
+            </div>
+          </fieldset>
+        }
+      >
+        <div className="flex items-start gap-3">
+          <IconAlertTriangle size={24} className="text-error shrink-0" />
+          <p className="text-gray-700">{texts.evals.evaluations.deleteConfirmText(evaluation.name)}</p>
+        </div>
+      </Modal>
+    </Portal>
   );
 }

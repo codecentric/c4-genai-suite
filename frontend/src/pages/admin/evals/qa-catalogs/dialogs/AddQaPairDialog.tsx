@@ -1,27 +1,28 @@
 import { ActionIcon, Button, Portal, Textarea, Tooltip } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconPlus, IconX } from '@tabler/icons-react';
+import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { z } from 'zod';
 import { Modal } from 'src/components';
-import { typedZodResolver } from 'src/lib';
 import { texts } from 'src/texts';
+
+// Module-level schema (C4 pattern)
+const SCHEME = z.object({
+  question: z.string().min(1, texts.evals.qaCatalog.questionRequired),
+  expectedOutput: z.string().min(1, texts.evals.qaCatalog.expectedOutputRequired),
+  contexts: z.array(z.string()),
+});
+
+type FormValues = z.infer<typeof SCHEME>;
 
 interface AddQaPairDialogProps {
   onClose: () => void;
   onAdd: (data: { question: string; expectedOutput: string; contexts: string[] }) => void;
 }
 
-const schema = z.object({
-  question: z.string().min(1, texts.evals.qaCatalog.questionRequired),
-  expectedOutput: z.string().min(1, texts.evals.qaCatalog.expectedOutputRequired),
-  contexts: z.array(z.string()),
-});
-
-type FormValues = z.infer<typeof schema>;
-
 export function AddQaPairDialog({ onClose, onAdd }: AddQaPairDialogProps) {
   const form = useForm<FormValues>({
-    validate: typedZodResolver(schema),
+    validate: zod4Resolver(SCHEME),
     initialValues: {
       question: '',
       expectedOutput: '',

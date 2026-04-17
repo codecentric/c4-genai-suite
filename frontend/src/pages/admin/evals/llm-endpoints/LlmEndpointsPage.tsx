@@ -6,9 +6,8 @@ import { Page, Pagination, Search } from 'src/components';
 import { useEventCallback } from 'src/hooks';
 import { texts } from 'src/texts';
 import { LlmEndpointsTable } from './components/LlmEndpointsTable';
-import { CreateLlmEndpointDialog } from './dialogs/CreateLlmEndpointDialog';
 import { DeleteLlmEndpointDialog } from './dialogs/DeleteLlmEndpointDialog';
-import { EditLlmEndpointDialog } from './dialogs/EditLlmEndpointDialog';
+import { CreateLlmEndpointDialog, UpdateLlmEndpointDialog } from './dialogs/UpsertLlmEndpointDialog';
 import { PAGE_SIZE, useLlmEndpoints } from './hooks/useLlmEndpointQueries';
 
 export function LlmEndpointsPage() {
@@ -107,10 +106,15 @@ export function LlmEndpointsPage() {
         </div>
       </Page>
 
-      {showCreateDialog && <CreateLlmEndpointDialog onClose={handleCloseCreateDialog} onCreated={handleCreated} />}
+      {showCreateDialog && <CreateLlmEndpointDialog onClose={handleCloseCreateDialog} onCreate={handleCreated} />}
 
       {endpointToEdit && (
-        <EditLlmEndpointDialog endpoint={endpointToEdit} onClose={handleCloseEditDialog} onUpdated={handleUpdated} />
+        <UpdateLlmEndpointDialog
+          target={endpointToEdit}
+          onClose={handleCloseEditDialog}
+          onUpdate={handleUpdated}
+          onDelete={handleDeleted}
+        />
       )}
 
       {endpointToDelete && (
