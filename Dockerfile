@@ -10,6 +10,7 @@ FROM base AS frontend_build
 ARG VERSION
 WORKDIR /src/frontend
 COPY frontend/package*.json ./
+COPY frontend/copy-pdfjs-wasm.mjs ./
 RUN npm ci
 COPY frontend .
 RUN VITE_VERSION="$VERSION" npm run build

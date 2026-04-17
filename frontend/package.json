@@ -15,7 +15,9 @@
     "lint:fix": "eslint . --fix",
     "find-unused-resources": "knip",
     "preview": "vite preview",
-    "generate-api": "npx rimraf ./src/api/generated && npx @openapitools/openapi-generator-cli generate && node gen-helper.mjs"
+    "generate-api": "npx rimraf ./src/api/generated && npx @openapitools/openapi-generator-cli generate && node gen-helper.mjs",
+    "copy:pdfjs-wasm": "node copy-pdfjs-wasm.mjs",
+    "postinstall": "npm run copy:pdfjs-wasm"
   },
   "dependencies": {
     "@floating-ui/react-dom": "^2.1.8",
