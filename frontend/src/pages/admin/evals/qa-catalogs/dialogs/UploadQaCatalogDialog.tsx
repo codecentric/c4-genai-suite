@@ -2,11 +2,11 @@ import { Button, FileInput, Portal } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconUpload } from '@tabler/icons-react';
 import { useMutation } from '@tanstack/react-query';
+import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { toast } from 'react-toastify';
 import { z } from 'zod';
 import { useEvalApi } from 'src/api/state/apiEvalClient';
 import { FormAlert, Modal } from 'src/components';
-import { typedZodResolver } from 'src/lib';
 import { texts } from 'src/texts';
 
 interface UploadQaCatalogDialogProps {
@@ -17,17 +17,18 @@ interface UploadQaCatalogDialogProps {
 
 const ACCEPTED_FILE_TYPES = '.csv,.json,.xlsx';
 
-const schema = z.object({
+// Module-level schema (C4 pattern)
+const SCHEME = z.object({
   file: z.instanceof(File, { message: texts.evals.qaCatalog.fileRequired }),
 });
 
-type FormValues = z.infer<typeof schema>;
+type FormValues = z.infer<typeof SCHEME>;
 
 export function UploadQaCatalogDialog({ catalogId, onClose, onSuccess }: UploadQaCatalogDialogProps) {
   const evalApi = useEvalApi();
 
   const form = useForm<FormValues>({
-    validate: typedZodResolver(schema),
+    validate: zod4Resolver(SCHEME),
     initialValues: {
       file: null as unknown as File,
     },

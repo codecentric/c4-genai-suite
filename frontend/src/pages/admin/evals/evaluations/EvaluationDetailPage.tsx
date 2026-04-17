@@ -187,19 +187,21 @@ export function EvaluationDetailPage() {
       </Container>
 
       {/* Dialogs */}
-      <DeleteEvaluationDialog
-        evaluation={evaluation}
-        opened={deleteDialogOpened}
-        onClose={() => setDeleteDialogOpened(false)}
-        onSuccess={handleDeleteSuccess}
-      />
+      {deleteDialogOpened && (
+        <DeleteEvaluationDialog
+          evaluation={evaluation}
+          onClose={() => setDeleteDialogOpened(false)}
+          onDeleted={handleDeleteSuccess}
+        />
+      )}
 
-      <EditEvaluationNameDialog
-        evaluation={evaluation}
-        opened={editNameDialogOpened}
-        onClose={() => setEditNameDialogOpened(false)}
-        onSuccess={handleEditSuccess}
-      />
+      {editNameDialogOpened && (
+        <EditEvaluationNameDialog
+          evaluation={evaluation}
+          onClose={() => setEditNameDialogOpened(false)}
+          onUpdated={handleEditSuccess}
+        />
+      )}
     </Page>
   );
 }

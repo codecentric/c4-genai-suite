@@ -7,7 +7,7 @@ import { useEventCallback } from 'src/hooks';
 import { texts } from 'src/texts';
 import { MetricTypeChip } from './components/MetricTypeChip';
 import { DeleteMetricDialog } from './dialogs/DeleteMetricDialog';
-import { EditMetricDialog } from './dialogs/EditMetricDialog';
+import { UpdateMetricDialog } from './dialogs/UpsertMetricDialog';
 import { useMetric } from './hooks/useMetricQueries';
 
 export function MetricDetailPage() {
@@ -196,7 +196,9 @@ export function MetricDetailPage() {
         </div>
       </Page>
 
-      {showEditDialog && metric && <EditMetricDialog metric={metric} onClose={handleCloseEditDialog} onUpdated={handleUpdated} />}
+      {showEditDialog && metric && (
+        <UpdateMetricDialog target={metric} onClose={handleCloseEditDialog} onUpdate={handleUpdated} onDelete={handleDeleted} />
+      )}
 
       {showDeleteDialog && metric && (
         <DeleteMetricDialog metric={metric} onClose={handleCloseDeleteDialog} onDeleted={handleDeleted} />
