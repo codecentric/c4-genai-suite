@@ -1,39 +1,37 @@
-import { Button, Group, Modal, Stack, TextInput } from '@mantine/core';
+import { Button, Portal, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { useEffect } from 'react';
+import { zod4Resolver } from 'mantine-form-zod-resolver';
+import { z } from 'zod';
 import type { EvaluationDetailSummary } from 'src/api/generated-eval';
+import { Modal } from 'src/components';
 import { texts } from 'src/texts';
 import { useUpdateEvaluation } from '../hooks/useEvaluationMutations';
 
+// Module-level schema (C4 pattern)
+const SCHEME = z.object({
+  name: z.string().min(1, texts.evals.evaluations.nameRequired),
+});
+
+type FormValues = z.infer<typeof SCHEME>;
+
 interface EditEvaluationNameDialogProps {
-  evaluation: EvaluationDetailSummary | null;
-  opened: boolean;
+  evaluation: EvaluationDetailSummary;
   onClose: () => void;
-  onSuccess?: () => void;
+  onUpdated?: () => void;
 }
 
-export function EditEvaluationNameDialog({ evaluation, opened, onClose, onSuccess }: EditEvaluationNameDialogProps) {
+export function EditEvaluationNameDialog({ evaluation, onClose, onUpdated }: EditEvaluationNameDialogProps) {
   const updateMutation = useUpdateEvaluation();
 
-  const form = useForm({
+  const form = useForm<FormValues>({
+    validate: zod4Resolver(SCHEME),
     initialValues: {
-      name: evaluation?.name || '',
+      name: evaluation.name,
     },
-    validate: {
-      name: (value) => (value.trim().length === 0 ? texts.evals.evaluations.nameRequired : null),
-    },
+    mode: 'controlled',
   });
 
-  // Update form when evaluation changes
-  useEffect(() => {
-    if (evaluation) {
-      form.setValues({ name: evaluation.name });
-    }
-  }, [evaluation]);
-
   const handleSubmit = form.onSubmit((values) => {
-    if (!evaluation) return;
-
     updateMutation.mutate(
       {
         id: evaluation.id,
@@ -41,37 +39,45 @@ export function EditEvaluationNameDialog({ evaluation, opened, onClose, onSucces
       },
       {
         onSuccess: () => {
+          onUpdated?.();
           onClose();
-          onSuccess?.();
         },
       },
     );
   });
 
-  if (!evaluation) return null;
-
   return (
-    <Modal opened={opened} onClose={onClose} title={texts.evals.evaluations.editNameTitle} centered>
-      <form onSubmit={handleSubmit}>
-        <Stack gap="md">
-          <TextInput
-            label={texts.evals.evaluations.nameLabel}
-            placeholder={texts.evals.evaluations.namePlaceholder}
-            required
-            {...form.getInputProps('name')}
-            disabled={updateMutation.isPending}
-          />
-
-          <Group justify="flex-end" gap="sm">
-            <Button variant="default" onClick={onClose} disabled={updateMutation.isPending}>
-              {texts.common.cancel}
-            </Button>
-            <Button type="submit" loading={updateMutation.isPending} disabled={updateMutation.isPending}>
-              {texts.common.save}
-            </Button>
-          </Group>
-        </Stack>
+    <Portal>
+      <form noValidate onSubmit={handleSubmit}>
+        <Modal
+          onClose={onClose}
+          header={texts.evals.evaluations.editNameTitle}
+          footer={
+            <fieldset disabled={updateMutation.isPending}>
+              <div className="flex flex-row justify-end gap-4">
+                <Button type="button" variant="subtle" onClick={onClose}>
+                  {texts.common.cancel}
+                </Button>
+                <Button type="submit" loading={updateMutation.isPending}>
+                  {texts.common.save}
+                </Button>
+              </div>
+            </fieldset>
+          }
+        >
+          <fieldset disabled={updateMutation.isPending}>
+            <TextInput
+              id="name"
+              withAsterisk
+              label={texts.evals.evaluations.nameLabel}
+              placeholder={texts.evals.evaluations.namePlaceholder}
+              className="mb-4"
+              key={form.key('name')}
+              {...form.getInputProps('name')}
+            />
+          </fieldset>
+        </Modal>
       </form>
-    </Modal>
+    </Portal>
   );
 }

@@ -2,33 +2,34 @@ import { Button, FileInput, Portal, Tabs, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconFile, IconFileUpload, IconUpload } from '@tabler/icons-react';
 import { useMutation } from '@tanstack/react-query';
+import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { z } from 'zod';
 import { useEvalApi } from 'src/api/state/apiEvalClient';
 import { FormAlert, Modal } from 'src/components';
-import { typedZodResolver } from 'src/lib';
 import { texts } from 'src/texts';
+
+const ACCEPTED_FILE_TYPES = '.csv,.json,.xlsx';
+
+// Module-level schemas (C4 pattern)
+const EMPTY_SCHEME = z.object({
+  name: z.string().min(1, texts.evals.qaCatalog.catalogNameRequired),
+});
+
+const UPLOAD_SCHEME = z.object({
+  name: z.string().min(1, texts.evals.qaCatalog.catalogNameRequired),
+  file: z.instanceof(File, { message: texts.evals.qaCatalog.fileRequired }),
+});
+
+type EmptyFormValues = z.infer<typeof EMPTY_SCHEME>;
+type UploadFormValues = z.infer<typeof UPLOAD_SCHEME>;
 
 interface CreateQaCatalogDialogProps {
   onClose: () => void;
   onCreated?: () => void;
 }
-
-const ACCEPTED_FILE_TYPES = '.csv,.json,.xlsx';
-
-const emptySchema = z.object({
-  name: z.string().min(1, texts.evals.qaCatalog.catalogNameRequired),
-});
-
-const uploadSchema = z.object({
-  name: z.string().min(1, texts.evals.qaCatalog.catalogNameRequired),
-  file: z.instanceof(File, { message: texts.evals.qaCatalog.fileRequired }),
-});
-
-type EmptyFormValues = z.infer<typeof emptySchema>;
-type UploadFormValues = z.infer<typeof uploadSchema>;
 
 export function CreateQaCatalogDialog({ onClose, onCreated }: CreateQaCatalogDialogProps) {
   const evalApi = useEvalApi();
@@ -36,7 +37,7 @@ export function CreateQaCatalogDialog({ onClose, onCreated }: CreateQaCatalogDia
   const [activeTab, setActiveTab] = useState<string | null>('empty');
 
   const emptyForm = useForm<EmptyFormValues>({
-    validate: typedZodResolver(emptySchema),
+    validate: zod4Resolver(EMPTY_SCHEME),
     initialValues: {
       name: '',
     },
@@ -44,7 +45,7 @@ export function CreateQaCatalogDialog({ onClose, onCreated }: CreateQaCatalogDia
   });
 
   const uploadForm = useForm<UploadFormValues>({
-    validate: typedZodResolver(uploadSchema),
+    validate: zod4Resolver(UPLOAD_SCHEME),
     initialValues: {
       name: '',
       file: null as unknown as File,

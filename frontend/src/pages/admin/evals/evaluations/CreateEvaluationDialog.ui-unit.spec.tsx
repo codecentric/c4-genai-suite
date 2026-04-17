@@ -4,7 +4,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { CreateEvaluationPage } from './CreateEvaluationPage';
+import { CreateEvaluationDialog } from './CreateEvaluationDialog';
 import { useWizardStore } from './state/hooks';
 
 // Mock the API client
@@ -55,6 +55,9 @@ vi.mock('./create/steps/ReviewStep', () => ({
   ReviewStep: () => <div data-testid="review-step">Review Step</div>,
 }));
 
+const mockOnClose = vi.fn();
+const mockOnCreate = vi.fn();
+
 function renderWithProviders(ui: React.ReactElement) {
   const queryClient = new QueryClient({
     defaultOptions: {
@@ -66,9 +69,9 @@ function renderWithProviders(ui: React.ReactElement) {
   return render(
     <MantineProvider>
       <QueryClientProvider client={queryClient}>
-        <MemoryRouter initialEntries={['/admin/evals/evaluations/new']}>
+        <MemoryRouter initialEntries={['/admin/evals/evaluations']}>
           <Routes>
-            <Route path="/admin/evals/evaluations/new" element={ui} />
+            <Route path="/admin/evals/evaluations" element={ui} />
             <Route path="/admin/evals/evaluations/:id" element={<div>Detail Page</div>} />
           </Routes>
         </MemoryRouter>
@@ -77,20 +80,20 @@ function renderWithProviders(ui: React.ReactElement) {
   );
 }
 
-describe('CreateEvaluationPage', () => {
+describe('CreateEvaluationDialog', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     // Reset wizard state before each test
     useWizardStore.getState().reset();
   });
 
-  it('should render the page with title', () => {
-    renderWithProviders(<CreateEvaluationPage />);
+  it('should render the dialog with title', () => {
+    renderWithProviders(<CreateEvaluationDialog onClose={mockOnClose} onCreate={mockOnCreate} />);
     expect(screen.getByText(/create evaluation/i)).toBeInTheDocument();
   });
 
   it('should render stepper component', () => {
-    renderWithProviders(<CreateEvaluationPage />);
+    renderWithProviders(<CreateEvaluationDialog onClose={mockOnClose} onCreate={mockOnCreate} />);
     // Mantine stepper should be present with step buttons
     const stepButtons = screen
       .getAllByRole('button')
@@ -106,34 +109,34 @@ describe('CreateEvaluationPage', () => {
   });
 
   it('should display mode selection step initially', () => {
-    renderWithProviders(<CreateEvaluationPage />);
+    renderWithProviders(<CreateEvaluationDialog onClose={mockOnClose} onCreate={mockOnCreate} />);
     expect(screen.getByTestId('mode-step')).toBeInTheDocument();
   });
 
   it('should display back button when not on first step', () => {
     useWizardStore.getState().setStep('metrics');
-    renderWithProviders(<CreateEvaluationPage />);
+    renderWithProviders(<CreateEvaluationDialog onClose={mockOnClose} onCreate={mockOnCreate} />);
     expect(screen.getByRole('button', { name: /back/i })).toBeInTheDocument();
   });
 
   it('should not display back button on first step', () => {
-    renderWithProviders(<CreateEvaluationPage />);
+    renderWithProviders(<CreateEvaluationDialog onClose={mockOnClose} onCreate={mockOnCreate} />);
     expect(screen.queryByRole('button', { name: /back/i })).not.toBeInTheDocument();
   });
 
   it('should display next button when not on last step', () => {
-    renderWithProviders(<CreateEvaluationPage />);
+    renderWithProviders(<CreateEvaluationDialog onClose={mockOnClose} onCreate={mockOnCreate} />);
     expect(screen.getByRole('button', { name: /next/i })).toBeInTheDocument();
   });
 
   it('should display create button on last step', () => {
     useWizardStore.getState().setStep('review');
-    renderWithProviders(<CreateEvaluationPage />);
+    renderWithProviders(<CreateEvaluationDialog onClose={mockOnClose} onCreate={mockOnCreate} />);
     expect(screen.getByRole('button', { name: /create evaluation/i })).toBeInTheDocument();
   });
 
   it('should disable next button when cannot proceed', () => {
-    renderWithProviders(<CreateEvaluationPage />);
+    renderWithProviders(<CreateEvaluationDialog onClose={mockOnClose} onCreate={mockOnCreate} />);
     const nextButton = screen.getByRole('button', { name: /next/i });
     expect(nextButton).toBeDisabled();
   });
@@ -141,31 +144,30 @@ describe('CreateEvaluationPage', () => {
   it('should enable next button when can proceed', () => {
     // Set mode so we can proceed from first step
     useWizardStore.getState().setMode('catalog');
-    renderWithProviders(<CreateEvaluationPage />);
+    renderWithProviders(<CreateEvaluationDialog onClose={mockOnClose} onCreate={mockOnCreate} />);
     const nextButton = screen.getByRole('button', { name: /next/i });
     expect(nextButton).not.toBeDisabled();
   });
 
   it('should display cancel button', () => {
-    renderWithProviders(<CreateEvaluationPage />);
+    renderWithProviders(<CreateEvaluationDialog onClose={mockOnClose} onCreate={mockOnCreate} />);
     expect(screen.getByRole('button', { name: /cancel/i })).toBeInTheDocument();
   });
 
-  it('should show cancel confirmation when cancel button is clicked', async () => {
+  it('should call onClose when cancel button is clicked', async () => {
     const user = userEvent.setup();
-    renderWithProviders(<CreateEvaluationPage />);
+    renderWithProviders(<CreateEvaluationDialog onClose={mockOnClose} onCreate={mockOnCreate} />);
 
     const cancelButton = screen.getByRole('button', { name: /cancel/i });
     await user.click(cancelButton);
 
-    // Modal should appear
     await waitFor(() => {
-      expect(screen.getByText(/are you sure/i)).toBeInTheDocument();
+      expect(mockOnClose).toHaveBeenCalled();
     });
   });
 
   it('should render all 5 steps in stepper', () => {
-    renderWithProviders(<CreateEvaluationPage />);
+    renderWithProviders(<CreateEvaluationDialog onClose={mockOnClose} onCreate={mockOnCreate} />);
     // Check for step labels (this depends on Mantine Stepper implementation)
     // We can verify by checking the data structure
     const { currentStep } = useWizardStore.getState();
@@ -175,7 +177,7 @@ describe('CreateEvaluationPage', () => {
   it('should advance to next step when next button is clicked', async () => {
     const user = userEvent.setup();
     useWizardStore.getState().setMode('catalog');
-    renderWithProviders(<CreateEvaluationPage />);
+    renderWithProviders(<CreateEvaluationDialog onClose={mockOnClose} onCreate={mockOnCreate} />);
 
     const nextButton = screen.getByRole('button', { name: /next/i });
     await user.click(nextButton);
@@ -189,7 +191,7 @@ describe('CreateEvaluationPage', () => {
   it('should go back to previous step when back button is clicked', async () => {
     const user = userEvent.setup();
     useWizardStore.getState().setStep('metrics');
-    renderWithProviders(<CreateEvaluationPage />);
+    renderWithProviders(<CreateEvaluationDialog onClose={mockOnClose} onCreate={mockOnCreate} />);
 
     const backButton = screen.getByRole('button', { name: /back/i });
     await user.click(backButton);
@@ -211,7 +213,7 @@ describe('CreateEvaluationPage', () => {
 
     steps.forEach(({ step, testId }) => {
       useWizardStore.getState().setStep(step);
-      const { unmount } = renderWithProviders(<CreateEvaluationPage />);
+      const { unmount } = renderWithProviders(<CreateEvaluationDialog onClose={mockOnClose} onCreate={mockOnCreate} />);
       expect(screen.getByTestId(testId)).toBeInTheDocument();
       unmount();
     });

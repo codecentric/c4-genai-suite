@@ -7,9 +7,8 @@ import { Page, Pagination, Search } from 'src/components';
 import { useEventCallback } from 'src/hooks';
 import { texts } from 'src/texts';
 import { MetricsTable } from './components/MetricsTable';
-import { CreateMetricDialog } from './dialogs/CreateMetricDialog';
 import { DeleteMetricDialog } from './dialogs/DeleteMetricDialog';
-import { EditMetricDialog } from './dialogs/EditMetricDialog';
+import { CreateMetricDialog, UpdateMetricDialog } from './dialogs/UpsertMetricDialog';
 import { PAGE_SIZE, useMetrics } from './hooks/useMetricQueries';
 
 export function MetricsPage() {
@@ -101,9 +100,16 @@ export function MetricsPage() {
         </div>
       </Page>
 
-      {showCreateDialog && <CreateMetricDialog onClose={handleCloseCreateDialog} onCreated={handleCreated} />}
+      {showCreateDialog && <CreateMetricDialog onClose={handleCloseCreateDialog} onCreate={handleCreated} />}
 
-      {metricToEdit && <EditMetricDialog metric={metricToEdit} onClose={handleCloseEditDialog} onUpdated={handleUpdated} />}
+      {metricToEdit && (
+        <UpdateMetricDialog
+          target={metricToEdit}
+          onClose={handleCloseEditDialog}
+          onUpdate={handleUpdated}
+          onDelete={handleDeleted}
+        />
+      )}
 
       {metricToDelete && (
         <DeleteMetricDialog metric={metricToDelete} onClose={handleCloseDeleteDialog} onDeleted={handleDeleted} />
