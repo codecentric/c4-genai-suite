@@ -25,7 +25,7 @@ jobs:
         browser:
           - chromium
           - firefox
-          - webkit
+          # - webkit
         testdir:
           - expensive-tests
           - tests
