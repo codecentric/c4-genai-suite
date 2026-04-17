@@ -99,7 +99,7 @@ This process is described in detail in [the `services/reis` subdirectory](servic
 
 The application consists of a **Frontend** , a **Backend**  and a **REI-S**  service.
 
-```
+```plain
 ┌──────────┐
 │   User   │
 └─────┬────┘
