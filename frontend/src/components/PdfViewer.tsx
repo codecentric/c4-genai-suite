@@ -16,6 +16,10 @@ import PdfControlBar from './PdfControlBar';
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString();
 
+const documentOptions = {
+  wasmUrl: `${import.meta.env.BASE_URL}wasm/`,
+};
+
 interface PdfViewerProps {
   selectedDocument?: DocumentSource;
   selectedSource?: SourceDto;
@@ -125,8 +129,13 @@ export function PdfViewer({ selectedDocument, selectedSource, onClose }: PdfView
       </Card.Section>
       {pdfFileUrl && displayPdfViewer && (
         <Card.Section className="pdf-viewer pt-0 pr-4 pb-4 pl-4">
-          <div className="pdf-viewport h-ful w-full overflow-auto border-1" style={VIEWPORT_STYLING_RULES}>
-            <Document file={pdfFileUrl} onLoadSuccess={onDocumentLoadSuccess} onLoadError={console.error}>
+          <div className="pdf-viewport h-full w-full overflow-auto border-1" style={VIEWPORT_STYLING_RULES}>
+            <Document
+              file={pdfFileUrl}
+              options={documentOptions}
+              onLoadSuccess={onDocumentLoadSuccess}
+              onLoadError={console.error}
+            >
               <Page pageNumber={pageNumber} scale={scale} />
             </Document>
           </div>
