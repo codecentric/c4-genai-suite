@@ -1,5 +1,12 @@
 # Changelog
 
+## [9.19.2](https://github.com/codecentric/c4-genai-suite/compare/v9.19.1...v9.19.2) (2026-04-17)
+
+
+### Bug Fixes
+
+* **frontend:** add JPEG2000 support for pdf viewer ([#1657](https://github.com/codecentric/c4-genai-suite/issues/1657)) ([ff41916](https://github.com/codecentric/c4-genai-suite/commit/ff41916bb2089761fd21bc004a61771807213260))
+
 ## [9.19.1](https://github.com/codecentric/c4-genai-suite/compare/v9.19.0...v9.19.1) (2026-04-15)
 
 
