@@ -1,5 +1,12 @@
 # Changelog
 
+## [9.19.3](https://github.com/codecentric/c4-genai-suite/compare/v9.19.2...v9.19.3) (2026-04-20)
+
+
+### Bug Fixes
+
+* **REIS:** explicitly request float encoding for maximal compatiblity ([#1672](https://github.com/codecentric/c4-genai-suite/issues/1672)) ([27ffae6](https://github.com/codecentric/c4-genai-suite/commit/27ffae69c9d85445e7829ed942be818303a2c557))
+
 ## [9.19.2](https://github.com/codecentric/c4-genai-suite/compare/v9.19.1...v9.19.2) (2026-04-17)
 
 
