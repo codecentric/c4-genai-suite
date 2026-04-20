@@ -40,6 +40,10 @@ def get_embeddings(config: Config) -> Embeddings:
             max_retries=max_retries,
             openai_api_base=config.embeddings_openai_compatible_endpoint,
             check_embedding_ctx_length=False,
+            # Explicitly request float encoding. Some providers do not
+            # support the base64 encoding format that newer langchain_openai versions
+            # default to, causing 500 errors on the provider side.
+            model_kwargs={"encoding_format": "float"},
         )
     elif config.embeddings_type.lower() == "ollama":
         # this is ensured by the config validation, the following lines are there to help the ty typechecker
