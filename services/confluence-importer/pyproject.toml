@@ -24,7 +24,7 @@ convention = "google"
 
 [dependency-groups]
 dev = [
-    "mypy>=1.20.1",
+    "mypy>=1.20.2",
     "pip>=25.2",
     "pytest>=9.0.2",
     "pytest-mock>=3.14.1",
