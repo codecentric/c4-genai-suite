@@ -17,7 +17,7 @@ dependencies = [
     "langchain-openai>=1.1.16",
     "langchain-postgres>=0.0.16",
     "langchain-ollama>=0.3.10",
-    "langchain-aws>=1.4.4",
+    "langchain-aws>=1.4.5",
     "langchain-nvidia-ai-endpoints>=0.3.19",
     "psycopg[binary]>=3.3.3",
     "fastapi[standard]==0.136.0",
