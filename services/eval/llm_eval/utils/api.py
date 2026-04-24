@@ -15,7 +15,7 @@ class PaginationParams:
 PaginationParamsDep = Annotated[PaginationParams, Depends()]
 
 
-async def get_user_principal(
+async def get_c4_user_principal(
     x_user_id: Annotated[Optional[str], Header()] = None,
     x_user_name: Annotated[Optional[str], Header()] = None,
     x_user_email: Annotated[Optional[str], Header()] = None,
@@ -38,4 +38,4 @@ async def get_user_principal(
     )
 
 
-UserPrincipalDep = Annotated[UserPrincipal, Depends(get_user_principal)]
+C4UserPrincipalDep = Annotated[UserPrincipal, Depends(get_c4_user_principal)]
