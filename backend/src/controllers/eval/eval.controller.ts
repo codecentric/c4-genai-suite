@@ -1,6 +1,6 @@
 import { All, Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiExcludeEndpoint, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Request, Response } from 'express';
 import { fetch as undiciFetch } from 'undici';
 import { LocalAuthGuard, RoleGuard } from 'src/domain/auth';
@@ -64,10 +64,7 @@ export class EvalController {
    * Access: Admin users only
    */
   @All('*')
-  @ApiOperation({
-    summary: 'Proxy requests to eval service',
-    description: 'All eval service endpoints are proxied through this controller with authentication',
-  })
+  @ApiExcludeEndpoint()
   async proxy(@Req() req: Request, @Res() res: Response) {
     const evalServiceUrl = this.configService.get<string>('EVAL_SERVICE_URL', 'http://localhost:3202');
 

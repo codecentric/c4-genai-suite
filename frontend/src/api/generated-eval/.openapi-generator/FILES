@@ -1,4 +1,3 @@
-.openapi-generator-ignore
 apis/DashboardApi.ts
 apis/EvaluationResultsApi.ts
 apis/EvaluationsApi.ts
