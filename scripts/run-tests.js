@@ -1,3 +1,7 @@
+import dotenv from 'dotenv';
+import fs from 'fs';
+import path from 'path';
+import url from 'url';
 import {
   execute,
   isPortAvailabe,
@@ -33,6 +37,15 @@ if (testFile) {
   withExpensiveTests = !process.argv.includes('--withoutExpensiveTests');
   withNormalTests = !process.argv.includes('--withoutNormalTests');
 }
+
+// Read EVAL_SERVICE_ENABLED from backend/.env to decide whether to start
+// the eval service, its Celery worker, and RabbitMQ.
+const scriptDir = path.dirname(url.fileURLToPath(import.meta.url));
+const backendEnvPath = path.resolve(scriptDir, '..', 'backend', '.env');
+const backendEnv = fs.existsSync(backendEnvPath)
+  ? dotenv.parse(fs.readFileSync(backendEnvPath, 'utf8'))
+  : {};
+const evalServiceEnabled = backendEnv.EVAL_SERVICE_ENABLED === 'true';
 
 let playwrightFlags = '--project="chromium" ';
 if (process.argv.includes('--ui')) playwrightFlags += '--ui ';
@@ -95,10 +108,13 @@ const startCelery = `${waitForRabbitMQ} && cd services/eval && ${evalEnv} uv run
 
 const statusCommands = [
   'mkdir -p output',
-  'printf "Starting backend, postgres, REIS, frontend, minio, eval, rabbitmq ..."',
+  `printf "Starting backend, postgres, REIS, frontend, minio${evalServiceEnabled ? ', eval, rabbitmq' : ''} ..."`,
   forceUsingRunningServices
     ? `echo "YOU ARE RUNNING IN FORCE MODE: THIS WILL USE WHATEVER YOU HAVE ALREADY RUNNING IF POSSIBLE!"`
     : `echo`,
+  evalServiceEnabled
+    ? `echo`
+    : `echo "(eval service disabled via EVAL_SERVICE_ENABLED)"`,
   `printf 'Tip: run "nvm i && npm i" before this script to fix setup issues.'`,
   'echo ""',
   `${waitForPostgres} && echo "==> localhost:${portForPostgres} <== postgres is up"`,
@@ -107,8 +123,12 @@ const statusCommands = [
   `${waitForREIS} && echo "==> localhost:${portForREIS} <== REIS is up"`,
   `${waitForMinio} && echo "==> localhost:${portForMinio} <== Minio is up"`,
   `${waitForMcpTool} && echo "==> localhost:${portForMcpTool} <== MCP-Tool is up"`,
-  `${waitForRabbitMQ} && echo "==> localhost:${portForRabbitMQ} <== RabbitMQ is up"`,
-  `${waitForEval} && echo "==> localhost:${portForEval} <== Eval is up"`,
+  evalServiceEnabled
+    ? `${waitForRabbitMQ} && echo "==> localhost:${portForRabbitMQ} <== RabbitMQ is up"`
+    : ':',
+  evalServiceEnabled
+    ? `${waitForEval} && echo "==> localhost:${portForEval} <== Eval is up"`
+    : ':',
 ];
 
 const installPlaywright =
@@ -130,9 +150,11 @@ const serverStartCommands = async () => [
   await serverStart('Backend', portForBackend, startBackend),
   await serverStart('Minio', portForMinio, startMinio),
   await serverStart('MCP-Tool', portForMcpTool, startMcpTool),
-  await serverStart('RabbitMQ', portForRabbitMQ, startRabbitMQ),
-  await serverStart('Eval', portForEval, startEval),
-  startCelery,
+  evalServiceEnabled
+    ? await serverStart('RabbitMQ', portForRabbitMQ, startRabbitMQ)
+    : ':',
+  evalServiceEnabled ? await serverStart('Eval', portForEval, startEval) : ':',
+  evalServiceEnabled ? startCelery : ':',
 ];
 
 const runTest = [
@@ -158,8 +180,8 @@ const mainScript = async () => {
       await isPortAvailabe(portForREIS, 'REIS', true),
       await isPortAvailabe(portForMinio, 'Minio', true),
       await isPortAvailabe(portForMcpTool, 'MCP-Tool', true),
-      await isPortAvailabe(portForRabbitMQ, 'RabbitMQ', true),
-      await isPortAvailabe(portForEval, 'Eval', true),
+      await isPortAvailabe(portForRabbitMQ, 'RabbitMQ', evalServiceEnabled),
+      await isPortAvailabe(portForEval, 'Eval', evalServiceEnabled),
     ].includes(false);
     if (somePortNotAvailable) {
       console.log(' ==> kill running processes before restarting.');

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Route, Routes } from 'react-router-dom';
+import { useEvalAvailability } from 'src/api/state/useEvalAvailability';
 import { CollapseButton, ProfileButton, TransientNavigate, TransientNavLink } from 'src/components';
 import { NavigationBar } from 'src/components/NavigationBar';
 import { useTheme } from 'src/hooks';
@@ -25,6 +26,7 @@ export function AdminPage() {
   const [isEvalsOpen, setIsEvalsOpen] = useState(false);
   const { theme } = useTheme();
   const chatId = useStateOfSelectedChatId();
+  const { isEvalAvailable } = useEvalAvailability();
 
   return (
     <div className="flex h-screen flex-col">
@@ -69,48 +71,47 @@ export function AdminPage() {
                     {texts.auditLog.headline}
                   </TransientNavLink>
                 </li>
-                <li>
-                  <button
-                    className="block w-full text-left"
-                    onClick={() => setIsEvalsOpen(!isEvalsOpen)}
-                  >
-                    <span className="flex items-center justify-between">
-                      {texts.evals.headline}
-                      <svg
-                        className={`h-4 w-4 transition-transform ${isEvalsOpen ? 'rotate-90' : ''}`}
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </span>
-                  </button>
-                  {isEvalsOpen && (
-                    <ul className="ml-4 mt-1 space-y-1">
-                      <li>
-                        <TransientNavLink className="block" to="/admin/evals/evaluations">
-                          {texts.evals.evaluationsLabel}
-                        </TransientNavLink>
-                      </li>
-                      <li>
-                        <TransientNavLink className="block" to="/admin/evals/qa-catalogs">
-                          {texts.evals.qaCatalogs}
-                        </TransientNavLink>
-                      </li>
-                      <li>
-                        <TransientNavLink className="block" to="/admin/evals/metrics">
-                          {texts.evals.metrics}
-                        </TransientNavLink>
-                      </li>
-                      <li>
-                        <TransientNavLink className="block" to="/admin/evals/llm-endpoints">
-                          {texts.evals.llmEndpoints}
-                        </TransientNavLink>
-                      </li>
-                    </ul>
-                  )}
-                </li>
+                {isEvalAvailable && (
+                  <li>
+                    <button className="block w-full text-left" onClick={() => setIsEvalsOpen(!isEvalsOpen)}>
+                      <span className="flex items-center justify-between">
+                        {texts.evals.headline}
+                        <svg
+                          className={`h-4 w-4 transition-transform ${isEvalsOpen ? 'rotate-90' : ''}`}
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </span>
+                    </button>
+                    {isEvalsOpen && (
+                      <ul className="mt-1 ml-4 space-y-1">
+                        <li>
+                          <TransientNavLink className="block" to="/admin/evals/evaluations">
+                            {texts.evals.evaluationsLabel}
+                          </TransientNavLink>
+                        </li>
+                        <li>
+                          <TransientNavLink className="block" to="/admin/evals/qa-catalogs">
+                            {texts.evals.qaCatalogs}
+                          </TransientNavLink>
+                        </li>
+                        <li>
+                          <TransientNavLink className="block" to="/admin/evals/metrics">
+                            {texts.evals.metrics}
+                          </TransientNavLink>
+                        </li>
+                        <li>
+                          <TransientNavLink className="block" to="/admin/evals/llm-endpoints">
+                            {texts.evals.llmEndpoints}
+                          </TransientNavLink>
+                        </li>
+                      </ul>
+                    )}
+                  </li>
+                )}
               </ul>
             </div>
 
@@ -135,18 +136,17 @@ export function AdminPage() {
 
             <Route path="/assistants/*" element={<ConfigurationPage />} />
 
-            <Route path="/evals/evaluations" element={<EvaluationsPage />} />
-            <Route path="/evals/evaluations/:id" element={<EvaluationDetailPage />} />
-
-            <Route path="/evals/qa-catalogs" element={<QaCatalogsPage />} />
-
-            <Route path="/evals/qa-catalogs/:catalogId" element={<QaCatalogDetailPage />} />
-
-            <Route path="/evals/metrics" element={<MetricsPage />} />
-
-            <Route path="/evals/metrics/:metricId" element={<MetricDetailPage />} />
-
-            <Route path="/evals/llm-endpoints" element={<LlmEndpointsPage />} />
+            {isEvalAvailable && (
+              <>
+                <Route path="/evals/evaluations" element={<EvaluationsPage />} />
+                <Route path="/evals/evaluations/:id" element={<EvaluationDetailPage />} />
+                <Route path="/evals/qa-catalogs" element={<QaCatalogsPage />} />
+                <Route path="/evals/qa-catalogs/:catalogId" element={<QaCatalogDetailPage />} />
+                <Route path="/evals/metrics" element={<MetricsPage />} />
+                <Route path="/evals/metrics/:metricId" element={<MetricDetailPage />} />
+                <Route path="/evals/llm-endpoints" element={<LlmEndpointsPage />} />
+              </>
+            )}
 
             <Route path="*" element={<TransientNavigate to="/admin/dashboard" />} />
           </Routes>
