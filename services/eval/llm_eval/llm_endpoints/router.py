@@ -32,7 +32,7 @@ from llm_eval.llm_endpoints.plugins.factory import (
 from llm_eval.llm_endpoints.plugins.interface import PluginFeature
 from llm_eval.responses import not_found, not_found_response
 from llm_eval.schemas import ApiModel
-from llm_eval.utils.api import PaginationParamsDep, UserPrincipalDep
+from llm_eval.utils.api import C4UserPrincipalDep, PaginationParamsDep
 
 router = APIRouter(prefix="/llm-endpoints", tags=["llm-endpoints"])
 
@@ -120,7 +120,7 @@ async def delete(
 
 @router.post("", status_code=status.HTTP_201_CREATED)
 async def post(
-    db: SessionDep, llm_endpoint_create: LLMEndpointCreate, principal: UserPrincipalDep
+    db: SessionDep, llm_endpoint_create: LLMEndpointCreate, principal: C4UserPrincipalDep
 ) -> LLMEndpoint:
     llm_endpoint = await create_llm_endpoint(db, llm_endpoint_create, principal.id)
 
@@ -132,7 +132,7 @@ async def patch(
     db: SessionDep,
     llm_endpoint_id: str,
     llm_endpoint_update: LLMEndpointUpdate,
-    principal: UserPrincipalDep,
+    principal: C4UserPrincipalDep,
 ) -> LLMEndpoint:
     llm_endpoint = await update_llm_endpoint(
         db, llm_endpoint_id, llm_endpoint_update, principal.id

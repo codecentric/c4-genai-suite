@@ -15,7 +15,7 @@ from llm_eval.metrics.plugins.factory import (
 )
 from llm_eval.responses import not_found, not_found_response
 from llm_eval.schemas import ApiModel
-from llm_eval.utils.api import PaginationParamsDep, UserPrincipalDep
+from llm_eval.utils.api import C4UserPrincipalDep, PaginationParamsDep
 
 router = APIRouter(prefix="/metrics", tags=["metrics"])
 
@@ -76,7 +76,7 @@ async def delete(db: SessionDep, metric_id: str, metric_delete: MetricDelete) ->
 
 @router.post("", status_code=status.HTTP_201_CREATED)
 async def post(
-    db: SessionDep, metric_create: MetricCreate, principal: UserPrincipalDep
+    db: SessionDep, metric_create: MetricCreate, principal: C4UserPrincipalDep
 ) -> Metric:
     metric = await create_metric(db, metric_create, principal.id)
 
@@ -88,7 +88,7 @@ async def patch(
     db: SessionDep,
     metric_id: str,
     metric_update: MetricUpdate,
-    principal: UserPrincipalDep,
+    principal: C4UserPrincipalDep,
 ) -> Metric:
     metric = await update_metric(db, metric_id, metric_update, principal.id)
     if not metric:

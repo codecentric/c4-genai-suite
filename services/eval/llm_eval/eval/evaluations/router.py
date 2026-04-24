@@ -39,7 +39,7 @@ from llm_eval.eval.evaluations.models import (
     GetAllEvaluationResult,
 )
 from llm_eval.responses import not_found, not_found_response
-from llm_eval.utils.api import PaginationParamsDep, UserPrincipalDep
+from llm_eval.utils.api import C4UserPrincipalDep, PaginationParamsDep
 from llm_eval.utils.io import Echo
 
 router = APIRouter(prefix="/evaluations", tags=["evaluations"])
@@ -79,7 +79,7 @@ async def post(
     run_evaluation_logic_by_qa_catalog: Annotated[
         StartRunEvaluationByQaCatalogLogic, Depends()
     ],
-    principal: UserPrincipalDep,
+    principal: C4UserPrincipalDep,
     dto: RunEvaluationByQaCatalog | RunEvaluationByTestCases,
 ) -> EvaluationResult:
     if isinstance(dto, RunEvaluationByQaCatalog):
@@ -114,7 +114,7 @@ async def patch(
     db: SessionDep,
     evaluation_id: str,
     evaluation_update: EvaluationUpdate,
-    principal: UserPrincipalDep,
+    principal: C4UserPrincipalDep,
 ) -> EvaluationResult:
     evaluation = await update_evaluation(
         db, evaluation_id, evaluation_update, principal.id
