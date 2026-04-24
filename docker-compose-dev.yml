@@ -114,6 +114,21 @@ services:
       timeout: 1s
       retries: 20
 
+  rabbitmq:
+    image: rabbitmq:4.0-management
+    hostname: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=rabbit
+      - RABBITMQ_DEFAULT_PASS=rabbit
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   oauth:
     image: ghcr.io/codecentric/c4-genai-suite/dev-helper/oauth-mock:latest
     ports:
@@ -168,3 +183,6 @@ services:
 volumes:
   extension-volume:
   ollama-data:
+  postgres-dev-data:
+  rabbitmq-dev-data:
+  minio-dev-data:
