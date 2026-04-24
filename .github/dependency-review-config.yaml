@@ -51,3 +51,8 @@ allow-dependencies-licenses:
   - 'pkg:pypi/jaraco-functools' # False positive, is MIT
   - 'pkg:pypi/pydocket' # False positive, is MIT
   - 'pkg:pypi/typing-extensions' # False positive, it is PSF
+  - 'pkg:pypi/chroma-hnswlib' # False positive, no PyPI metadata but actual license is Apache-2.0 (verified from LICENSE file in wheel)
+  - 'pkg:pypi/dirtyjson' # Dual-licensed MIT OR AFL-2.1 (SPDX misreports as MIT AND AFL-3.0); we use under MIT
+  - 'pkg:pypi/gitdb' # Reported as BSD-2-Clause AND BSD-3-Clause AND GPL-1.0-or-later; actual LICENSE file is BSD-3-Clause only, only tests fixtures are gpl
+  - 'pkg:pypi/mmh3' # CC-BY-4.0 AND public-domain AND MIT compound; CC-BY-4.0 is for the JOSS paper, code is MIT
+  - 'pkg:pypi/wcwidth' # MIT AND HPND-Markus-Kuhn compound; HPND-Markus-Kuhn is a permissive license

@@ -4,6 +4,7 @@
 export * from './AuditLogsApi';
 export * from './AuthApi';
 export * from './ConversationApi';
+export * from './EvalApi';
 export * from './ExtensionsApi';
 export * from './FilesApi';
 export * from './SettingsApi';
