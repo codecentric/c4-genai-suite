@@ -1,5 +1,6 @@
 import { Server } from 'http';
 import { HttpStatus, INestApplication } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getDataSourceToken } from '@nestjs/typeorm';
 import * as request from 'supertest';
@@ -29,6 +30,7 @@ describe('EvalController (e2e)', () => {
   let app: INestApplication<Server>;
   let localStrategy: LocalStrategy;
   let roleGuard: RoleGuard;
+  let configService: ConfigService;
   let mockAgent: MockAgent;
   let mockPool: MockPool;
 
@@ -51,6 +53,7 @@ describe('EvalController (e2e)', () => {
 
     localStrategy = app.get<LocalStrategy>(LocalStrategy);
     roleGuard = app.get<RoleGuard>(RoleGuard);
+    configService = app.get<ConfigService>(ConfigService);
 
     await app.init();
   }, 30000);
@@ -295,6 +298,63 @@ describe('EvalController (e2e)', () => {
 
       expect(Buffer.from(response.body)).toEqual(binaryData);
       expect(response.headers['content-type']).toBe('application/octet-stream');
+    });
+  });
+
+  describe('Eval Service Status', () => {
+    beforeEach(() => {
+      jest.spyOn(localStrategy, 'validate').mockResolvedValue(mockAdminUser);
+      jest.spyOn(roleGuard, 'canActivate').mockReturnValue(true);
+    });
+
+    it('should return available: true when EVAL_SERVICE_ENABLED is true', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      jest.spyOn(configService, 'get').mockImplementation(((key: string, defaultValue?: string) => {
+        if (key === 'EVAL_SERVICE_ENABLED') return 'true';
+        return defaultValue;
+      }) as any);
+
+      const response = await request(app.getHttpServer()).get('/api/eval/status').expect(HttpStatus.OK);
+
+      expect(response.body).toEqual({ available: true });
+    });
+
+    it('should return available: false when EVAL_SERVICE_ENABLED is false', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      jest.spyOn(configService, 'get').mockImplementation(((key: string, defaultValue?: string) => {
+        if (key === 'EVAL_SERVICE_ENABLED') return 'false';
+        return defaultValue;
+      }) as any);
+
+      const response = await request(app.getHttpServer()).get('/api/eval/status').expect(HttpStatus.OK);
+
+      expect(response.body).toEqual({ available: false });
+    });
+
+    it('should return available: false when EVAL_SERVICE_ENABLED is not set (default)', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      jest.spyOn(configService, 'get').mockImplementation(((key: string, defaultValue?: string) => {
+        if (key === 'EVAL_SERVICE_ENABLED') return defaultValue; // returns 'false' default
+        return defaultValue;
+      }) as any);
+
+      const response = await request(app.getHttpServer()).get('/api/eval/status').expect(HttpStatus.OK);
+
+      expect(response.body).toEqual({ available: false });
+    });
+
+    it('should deny unauthenticated requests to status endpoint (401)', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      jest.spyOn(localStrategy, 'validate').mockResolvedValue(null as any);
+
+      await request(app.getHttpServer()).get('/api/eval/status').expect(HttpStatus.UNAUTHORIZED);
+    });
+
+    it('should deny non-admin requests to status endpoint (403)', async () => {
+      jest.spyOn(localStrategy, 'validate').mockResolvedValue(mockNonAdminUser);
+      jest.spyOn(roleGuard, 'canActivate').mockReturnValue(false);
+
+      await request(app.getHttpServer()).get('/api/eval/status').expect(HttpStatus.FORBIDDEN);
     });
   });
 

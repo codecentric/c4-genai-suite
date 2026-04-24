@@ -36,7 +36,7 @@ export function EvaluationCard({ evaluation }: EvaluationCardProps) {
 
   return (
     <Card padding="lg" radius="md" withBorder>
-      <Grid gutter="lg">
+      <Grid gap="lg">
         {/* Left side: Evaluation Details */}
         <Grid.Col span={{ base: 12, md: showPieChart ? 8 : 12 }}>
           <Stack gap="md">
