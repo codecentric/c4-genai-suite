@@ -1,11 +1,12 @@
-import { All, Controller, Req, Res, UseGuards } from '@nestjs/common';
+import { All, Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Request, Response } from 'express';
 import { fetch as undiciFetch } from 'undici';
 import { LocalAuthGuard, RoleGuard } from 'src/domain/auth';
 import { Role } from 'src/domain/auth/role.decorator';
 import { BUILTIN_USER_GROUP_ADMIN } from 'src/domain/database';
+import { EvalServiceStatusDto } from './dtos';
 
 /**
  * Authenticated controller for eval service requests.
@@ -22,6 +23,36 @@ import { BUILTIN_USER_GROUP_ADMIN } from 'src/domain/database';
 @ApiTags('eval')
 export class EvalController {
   constructor(private readonly configService: ConfigService) {}
+
+  /**
+   * Check whether the eval service feature is enabled.
+   *
+   * Returns `{ available: true }` when the `EVAL_SERVICE_ENABLED` environment
+   * variable is set to `"true"`, otherwise `{ available: false }`.
+   *
+   * The frontend uses this to conditionally show/hide the Evaluations section
+   * in the admin sidebar. When the eval service is not deployed, the entire
+   * UI section is hidden so users don't encounter dead functionality.
+   *
+   * This route is defined BEFORE the wildcard `@All('*')` so NestJS matches
+   * it first and doesn't forward it to the eval service proxy.
+   *
+   * Access: Admin users only (inherits controller-level guards)
+   */
+  @Get('status')
+  @ApiOperation({
+    operationId: 'getEvalServiceStatus',
+    summary: 'Check if the eval service feature is enabled',
+    description:
+      'Returns whether the evaluation service is enabled via the EVAL_SERVICE_ENABLED env var. ' +
+      'Used by the frontend to conditionally render the evaluations UI.',
+  })
+  @ApiOkResponse({ type: EvalServiceStatusDto })
+  getStatus(): EvalServiceStatusDto {
+    const dto = new EvalServiceStatusDto();
+    dto.available = this.configService.get<string>('EVAL_SERVICE_ENABLED', 'false') === 'true';
+    return dto;
+  }
 
   /**
    * Proxy all requests to eval service.
