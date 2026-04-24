@@ -15,6 +15,7 @@ from llm_eval.eval.evaluations.tasks.start_evaluation_task import (
     submit_start_evaluation_task,
 )
 from llm_eval.metrics.db.find_metric import find_metrics_by_ids
+from llm_eval.responses import bad_request
 from llm_eval.schemas import ApiModel
 
 

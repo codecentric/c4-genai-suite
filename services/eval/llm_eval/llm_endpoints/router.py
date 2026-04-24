@@ -120,7 +120,9 @@ async def delete(
 
 @router.post("", status_code=status.HTTP_201_CREATED)
 async def post(
-    db: SessionDep, llm_endpoint_create: LLMEndpointCreate, principal: C4UserPrincipalDep
+    db: SessionDep,
+    llm_endpoint_create: LLMEndpointCreate,
+    principal: C4UserPrincipalDep,
 ) -> LLMEndpoint:
     llm_endpoint = await create_llm_endpoint(db, llm_endpoint_create, principal.id)
 

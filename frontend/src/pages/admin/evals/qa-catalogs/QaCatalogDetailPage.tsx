@@ -141,6 +141,7 @@ export function QaCatalogDetailPage() {
     },
   });
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- pendingChanges is needed to trigger recomputation; getEffectiveQaPairs uses get() internally
   const effectivePairs = useMemo(() => getEffectiveQaPairs(pairsData ?? []), [getEffectiveQaPairs, pairsData, pendingChanges]);
   const pendingCounts = useMemo(() => getPendingChangeCounts(), [getPendingChangeCounts]);
   const hasChanges = hasPendingChanges();

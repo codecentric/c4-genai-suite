@@ -3,7 +3,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from llm_eval.database.model import TestCaseStatus
 from llm_eval.eval.evaluate_results.db.find_test_case import find_test_case
-from llm_eval.eval.evaluations.tasks.utils.test_case import fail_test_case
 from llm_eval.llm_query.c4_assistant_query import C4AssistantQuery
 from llm_eval.tasks import app
 from llm_eval.utils.task import async_task, with_session
