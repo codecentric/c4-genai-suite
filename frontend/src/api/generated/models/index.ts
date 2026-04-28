@@ -24,6 +24,7 @@ export * from './ConversationsDto';
 export * from './CreateConversationDto';
 export * from './CreateExtensionDto';
 export * from './DocumentDto';
+export * from './EvalServiceStatusDto';
 export * from './ExportedConfigurationDto';
 export * from './ExportedExtensionDto';
 export * from './ExtensionArgumentArraySpecDto';

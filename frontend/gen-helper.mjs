@@ -3,7 +3,8 @@ import { globSync } from 'glob';
 import { EOL } from "node:os";
 
 const main = async () => {
-  const files = globSync('src/api/generated/**/*.ts');
+  // Process both C4 backend generated files and eval service generated files
+  const files = globSync('src/api/generated*/**/*.ts');
 
   const headerString = `//@ts-nocheck${EOL}`;
 

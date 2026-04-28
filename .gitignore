@@ -18,3 +18,5 @@ backend/dev/local-dev.pem
 # Outputs of `npm run test` and `npm run dev` etc.
 output/*.log
 /reports/
+
+services/data/

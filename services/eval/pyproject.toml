@@ -1,0 +1,100 @@
+[project]
+name = "rag-eval"
+version = "0.1.0"
+description = "Rag-Eval Pipeline including QA-Catalog, DeepEval and visualization"
+authors = [
+    { name = "Johannes Widera", email = "johannes.widera@codecentric.de" },
+    { name = "Benjamin Bauer", email = "benjamin.bauer@codecentric.de" },
+    { name = "Ahmet Tolga Erdönmez", email = "tolga.erdoenmez@codecentric.de" },
+    { name = "Dominik Fladung", email = "dominik.fladung@codecentric.de" },
+    { name = "Daniel Ladischenski", email = "daniel.ladischenski@codecentric.de" },
+    { name = "Karl Södler", email = "karl.soedler@codecentric.de" },
+]
+requires-python = ">=3.12,<4,<3.13"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    "python-dotenv>=1.1.0,<2",
+    "pydantic>=2.11.1,<3",
+    "loguru>=0.7.3,<0.8",
+    "pypdf>=5.4.0,<6",
+    "deepeval==2.7.1",
+    "langchain-openai>=0.3.11,<0.4",
+    "pyyaml>=6.0.2,<7",
+    "sqlalchemy>=2.0.40,<3",
+    "alembic>=1.15.2,<2",
+    "asyncpg>=0.30.0,<0.31",
+    "greenlet>=3.0.3,<4",
+    "anyio>=4.9.0,<5",
+    "httpx>=0.28.1,<0.29",
+    "fastapi[standard]>=0.115.12,<0.116",
+    "langchain-core>=0.3.49,<0.4",
+    "email-validator>=2.2.0,<3",
+    "cryptography>=46.0.6,<47",
+    "pyjwt>=2.10.1,<3",
+    "openpyxl>=3.1.5,<4",
+    "celery[redis]>=5.4.0,<6",
+    "pydantic-settings>=2.9.1,<3",
+    "rapidfuzz>=3.13.0,<4",
+    "ragas>=0.3.0,<0.4",
+    "boto3>=1.35.0,<2",
+    "boto3-stubs[s3]>=1.35.0,<2",
+    "python-multipart>=0.0.22,<0.0.23",
+]
+
+[project.scripts]
+generate-api-spec = "generate_openapi:generate"
+
+[dependency-groups]
+dev = [
+    "psycopg2-binary>=2.9.9,<3",
+    "pre-commit>=4.2.0,<5",
+    "ruff>=0.11.2,<0.12",
+    "langchain-chroma>=0.1.2,<0.2",
+    "debugpy>=1.8.8,<2",
+    "black>=24.10.0,<25",
+    "flower>=2.0.1,<3",
+]
+test = [
+    "pytest>=8.3.2,<9",
+    "pytest-asyncio>=0.24.0,<0.25",
+    "pytest-cov>=6.0.0,<7",
+    "pytest-dotenv>=0.5.2,<0.6",
+    "sqlalchemy-utils>=0.41.2,<0.42",
+    "pytest-env>=1.1.5,<2",
+    "pytest-mock>=3.14.0,<4",
+]
+
+[tool.uv]
+default-groups = "all"
+
+[tool.uv.build-backend]
+module-name = ["llm_eval"]
+module-root = ""
+namespace = true
+
+[build-system]
+requires = ["uv_build>=0.11.7,<0.12.0"]
+build-backend = "uv_build"
+
+[tool.ruff]
+lint.select = ["E", "F", "ANN"]
+lint.ignore = ["ANN101", "ANN102"]
+
+[tool.ruff.lint.flake8-annotations]
+allow-star-arg-any = true
+
+[tool.pytest.ini_options]
+addopts = "--cov=alembic --cov=database --cov=config --cov=utils --cov=llm_eval --cov-report=term-missing"
+testpaths = "tests"
+env_override_existing_values = 1
+env_files = [".env", ".env.local"]
+
+[tool.pyright]
+typeCheckingMode = "basic"
+exclude = ["alembic/versions", ".cache", ".history", "frontend", "data"]
+
+[tool.coverage.run]
+omit = ["tests/*"]
