@@ -19,7 +19,7 @@ dependencies = [
     "langchain-ollama>=0.3.10",
     "langchain-aws>=1.4.6",
     "langchain-nvidia-ai-endpoints>=0.3.19",
-    "psycopg[binary]>=3.3.3",
+    "psycopg[binary]>=3.3.4",
     "fastapi[standard]==0.136.1",
     "azure-search-documents==11.6.0",
     "azure-identity==1.25.3",
