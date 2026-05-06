@@ -13,7 +13,7 @@ jobs:
   release-please:
     runs-on: ubuntu-latest
     steps:
-      - uses: googleapis/release-please-action@v4
+      - uses: googleapis/release-please-action@v5
         with:
           # we need a PAT, since we need to trigger other actions (to fulfill the required checks)
           token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
