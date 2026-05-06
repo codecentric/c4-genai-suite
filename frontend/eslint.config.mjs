@@ -24,7 +24,7 @@ const compat = new FlatCompat({
 
 export default defineConfig([globalIgnores([
     "**/.eslintrc.js",
-    "src/api/generated",
+    "src/api/generated*",
     "**/vite.config.ts",
     "**/vitest.setup.ts",
     "./mock/*.js",

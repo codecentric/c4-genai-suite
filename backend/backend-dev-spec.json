@@ -1147,6 +1147,27 @@
         "tags": ["extensions"]
       }
     },
+    "/api/eval/status": {
+      "get": {
+        "description": "Returns whether the evaluation service is enabled via the EVAL_SERVICE_ENABLED env var. Used by the frontend to conditionally render the evaluations UI.",
+        "operationId": "getEvalServiceStatus",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EvalServiceStatusDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Check if the eval service feature is enabled",
+        "tags": ["eval"]
+      }
+    },
     "/api/extensions/test": {
       "post": {
         "description": "Tests an extension.",
@@ -4261,6 +4282,17 @@
           }
         },
         "required": ["configuration", "warnings"]
+      },
+      "EvalServiceStatusDto": {
+        "type": "object",
+        "properties": {
+          "available": {
+            "type": "boolean",
+            "description": "Whether the evaluation service is enabled and available for use.",
+            "example": true
+          }
+        },
+        "required": ["available"]
       },
       "TestExtensionDto": {
         "type": "object",

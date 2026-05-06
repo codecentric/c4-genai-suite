@@ -10,6 +10,7 @@ import { AuditLogController } from './controllers/audit-log/audit-log.controller
 import { AuthController } from './controllers/auth/auth.controller';
 import { BlobsController } from './controllers/blobs/blobs.controller';
 import { ConversationsController } from './controllers/conversations/conversations.controller';
+import { EvalController } from './controllers/eval/eval.controller';
 import { ConfigurationsController } from './controllers/extensions/configurations.controller';
 import { ExtensionsController } from './controllers/extensions/extensions.controller';
 import { FilesController } from './controllers/files/files.controller';
@@ -91,6 +92,7 @@ import { PrometheusModule } from './metrics/prometheus.module';
     ApiResponsesController,
     ConversationsController,
     ConfigurationsController,
+    EvalController,
     ExtensionsController,
     FilesController,
     SettingsController,

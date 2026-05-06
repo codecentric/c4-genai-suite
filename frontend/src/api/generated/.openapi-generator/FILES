@@ -2,6 +2,7 @@
 apis/AuditLogsApi.ts
 apis/AuthApi.ts
 apis/ConversationApi.ts
+apis/EvalApi.ts
 apis/ExtensionsApi.ts
 apis/FilesApi.ts
 apis/SettingsApi.ts
@@ -33,6 +34,7 @@ models/ConversationsDto.ts
 models/CreateConversationDto.ts
 models/CreateExtensionDto.ts
 models/DocumentDto.ts
+models/EvalServiceStatusDto.ts
 models/ExportedConfigurationDto.ts
 models/ExportedExtensionDto.ts
 models/ExtensionArgumentArraySpecDto.ts

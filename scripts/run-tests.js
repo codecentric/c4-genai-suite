@@ -1,3 +1,7 @@
+import dotenv from 'dotenv';
+import fs from 'fs';
+import path from 'path';
+import url from 'url';
 import {
   execute,
   isPortAvailabe,
@@ -34,6 +38,15 @@ if (testFile) {
   withNormalTests = !process.argv.includes('--withoutNormalTests');
 }
 
+// Read EVAL_SERVICE_ENABLED from backend/.env to decide whether to start
+// the eval service, its Celery worker, and RabbitMQ.
+const scriptDir = path.dirname(url.fileURLToPath(import.meta.url));
+const backendEnvPath = path.resolve(scriptDir, '..', 'backend', '.env');
+const backendEnv = fs.existsSync(backendEnvPath)
+  ? dotenv.parse(fs.readFileSync(backendEnvPath, 'utf8'))
+  : {};
+const evalServiceEnabled = backendEnv.EVAL_SERVICE_ENABLED === 'true';
+
 let playwrightFlags = '--project="chromium" ';
 if (process.argv.includes('--ui')) playwrightFlags += '--ui ';
 if (process.argv.includes('--debug')) playwrightFlags += '--debug ';
@@ -45,6 +58,8 @@ const portForFrontend = '5173';
 const portForREIS = '3201';
 const portForMinio = devSetup ? '9000' : '9001';
 const portForMcpTool = '8000';
+const portForEval = '3202';
+const portForRabbitMQ = '5672';
 
 const dockerComposeDown = devSetup
   ? 'echo "Changes in development DB are kept"'
@@ -60,6 +75,8 @@ const waitForFrontend = `npx wait-on http://localhost:${portForFrontend}/login`;
 const waitForREIS = `npx wait-on tcp:localhost:${portForREIS}`;
 const waitForMinio = `npx wait-on tcp:localhost:${portForMinio}`;
 const waitForMcpTool = `npx wait-on tcp:localhost:${portForMcpTool}`;
+const waitForEval = `npx wait-on tcp:localhost:${portForEval}`;
+const waitForRabbitMQ = `npx wait-on tcp:localhost:${portForRabbitMQ}`;
 
 const waitForAll = [
   waitForPostgres,
@@ -68,6 +85,8 @@ const waitForAll = [
   waitForREIS,
   waitForMinio,
   waitForMcpTool,
+  waitForRabbitMQ,
+  waitForEval,
 ].join(' && ');
 
 const startPostgres = `cd ${
@@ -76,15 +95,26 @@ const startPostgres = `cd ${
 const startFrontend = `cd frontend && npm run dev > ../output/frontend.log 2>&1`;
 const startREIS = `cd services/reis && STORE_PGVECTOR_URL="postgresql+psycopg://admin:secret@localhost:${portForPostgres}/cccc" FILE_STORE_S3_ENDPOINT_URL=http://localhost:${portForMinio} uv run fastapi dev rei_s/app.py --host 0.0.0.0 --port "${portForREIS}" > ../../output/reis.log 2>&1`;
 const startBackend = `${waitForPostgres} && cd backend && DB_URL="postgres://admin:secret@localhost:${portForPostgres}/cccc" npm run start:dev > ../output/backend.log 2>&1`;
-const startMinio = `cd ${ devSetup ? 'dev' : 'e2e' }/minio && ${dockerComposeDown} && docker compose up > ../../output/e2e-minio-docker.log 2>&1`;
+const startMinio = `cd ${devSetup ? 'dev' : 'e2e'}/minio && ${dockerComposeDown} && docker compose up > ../../output/e2e-minio-docker.log 2>&1`;
 const startMcpTool = `echo "RUNNING-MCP:" && docker compose -f docker-compose-dev.yml up mcp-fetch > output/mcp-tool.log 2>&1`;
+const startRabbitMQ = `docker compose -f docker-compose-dev.yml up rabbitmq > output/rabbitmq.log 2>&1`;
+
+const evalEnv = [
+  `PG_PORT=${portForPostgres}`,
+  `CELERY_BROKER_PORT=${portForRabbitMQ}`,
+].join(' ');
+const startEval = `${waitForPostgres} && ${waitForRabbitMQ} && cd services/eval && ${evalEnv} uv run uvicorn llm_eval.main:app --host 0.0.0.0 --port ${portForEval} > ../../output/eval.log 2>&1`;
+const startCelery = `${waitForRabbitMQ} && cd services/eval && ${evalEnv} uv run celery -A llm_eval.tasks worker --loglevel=info --pool=solo > ../../output/celery.log 2>&1`;
 
 const statusCommands = [
   'mkdir -p output',
-  'printf "Starting backend, postgres, REIS, frontend, minio ..."',
+  `printf "Starting backend, postgres, REIS, frontend, minio${evalServiceEnabled ? ', eval, rabbitmq' : ''} ..."`,
   forceUsingRunningServices
     ? `echo "YOU ARE RUNNING IN FORCE MODE: THIS WILL USE WHATEVER YOU HAVE ALREADY RUNNING IF POSSIBLE!"`
     : `echo`,
+  evalServiceEnabled
+    ? `echo`
+    : `echo "(eval service disabled via EVAL_SERVICE_ENABLED)"`,
   `printf 'Tip: run "nvm i && npm i" before this script to fix setup issues.'`,
   'echo ""',
   `${waitForPostgres} && echo "==> localhost:${portForPostgres} <== postgres is up"`,
@@ -93,6 +123,12 @@ const statusCommands = [
   `${waitForREIS} && echo "==> localhost:${portForREIS} <== REIS is up"`,
   `${waitForMinio} && echo "==> localhost:${portForMinio} <== Minio is up"`,
   `${waitForMcpTool} && echo "==> localhost:${portForMcpTool} <== MCP-Tool is up"`,
+  evalServiceEnabled
+    ? `${waitForRabbitMQ} && echo "==> localhost:${portForRabbitMQ} <== RabbitMQ is up"`
+    : ':',
+  evalServiceEnabled
+    ? `${waitForEval} && echo "==> localhost:${portForEval} <== Eval is up"`
+    : ':',
 ];
 
 const installPlaywright =
@@ -114,6 +150,11 @@ const serverStartCommands = async () => [
   await serverStart('Backend', portForBackend, startBackend),
   await serverStart('Minio', portForMinio, startMinio),
   await serverStart('MCP-Tool', portForMcpTool, startMcpTool),
+  evalServiceEnabled
+    ? await serverStart('RabbitMQ', portForRabbitMQ, startRabbitMQ)
+    : ':',
+  evalServiceEnabled ? await serverStart('Eval', portForEval, startEval) : ':',
+  evalServiceEnabled ? startCelery : ':',
 ];
 
 const runTest = [
@@ -139,10 +180,14 @@ const mainScript = async () => {
       await isPortAvailabe(portForREIS, 'REIS', true),
       await isPortAvailabe(portForMinio, 'Minio', true),
       await isPortAvailabe(portForMcpTool, 'MCP-Tool', true),
+      await isPortAvailabe(portForRabbitMQ, 'RabbitMQ', evalServiceEnabled),
+      await isPortAvailabe(portForEval, 'Eval', evalServiceEnabled),
     ].includes(false);
     if (somePortNotAvailable) {
       console.log(' ==> kill running processes before restarting.');
-      console.log('     (or: with ":force" you can dangerously force using the running processes instead.');
+      console.log(
+        '     (or: with ":force" you can dangerously force using the running processes instead.'
+      );
       await dockerCleanups();
       process.exit(1);
     }
