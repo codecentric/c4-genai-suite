@@ -459,17 +459,19 @@ export default defineConfig({
 | A2 | Vite proxy requests to `/api-proxy` are treated as same-origin and unaffected by COEP: credentialless | Architecture Patterns | If proxy requests are treated as cross-origin, API calls would fail; mitigation per D-06 is to add CORP headers |
 | A3 | The `default` field value `'de'` is used when creating a new extension instance (not just as UI hint) | Code Examples | If it's UI-only, new extension configs might save without a defaultLanguage value |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Extension Sort Order (D-09 Tension)**
+1. **Extension Sort Order (D-09 Tension)** (RESOLVED)
    - What we know: ExplorerService sorts extensions alphabetically by title via `localeCompare()`. "Lokale Spracherkennung" / "Local Speech Recognition" sorts before the existing cloud options.
    - What's unclear: Whether the user accepts alphabetical ordering (which puts local first) or truly requires it after cloud options.
    - Recommendation: Implement with the decided titles. If ordering is critical, consider a title prefix like "Transkription: Lokal" / "Transcription: Local" to sort alongside "Transcription: Azure OpenAI". Flag for user confirmation.
+   - **Resolution:** Implementing with D-08 titles as specified. The alphabetical sort means the local extension appears before cloud options. Plan 01 Task 1 action text documents this tension and explains that changing the sort order would require changing the D-08 locked titles. Accepted as-is per D-08.
 
-2. **SVG Icon for Privacy Microphone (D-07)**
+2. **SVG Icon for Privacy Microphone (D-07)** (RESOLVED)
    - What we know: Existing extensions use inline SVG strings in the `logo` field. The user wants a microphone with lock/shield symbol.
    - What's unclear: Whether to create a custom SVG or use an existing icon from @tabler/icons-react (which has microphone and shield icons but would need combining).
    - Recommendation: Create a simple custom SVG combining microphone and shield elements, following the inline SVG pattern of existing extensions. The icon must be a self-contained SVG string (no external references).
+   - **Resolution:** Creating a custom inline SVG combining microphone and shield elements per D-07. Plan 01 Task 1 specifies: viewBox="0 0 24 24", microphone path fill="#4A90D9", shield overlay fill="#27AE60". Self-contained string, no external references.
 
 ## Environment Availability
 
