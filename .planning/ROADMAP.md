@@ -34,7 +34,11 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans:** 2 plans
 
 Plans:
+
+**Wave 1**
 - [ ] 01-01-PLAN.md -- Walking skeleton: backend extension + i18n + Vite config + Transformers.js install + frontend recognition
+
+**Wave 2** *(blocked on Wave 1 completion)*
 - [ ] 01-02-PLAN.md -- Regression verification: E2E tests + visual Admin UI checkpoint
 
 ### Phase 2: Core Transcription Pipeline
