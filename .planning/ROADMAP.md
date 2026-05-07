@@ -79,7 +79,7 @@ Plans:
 Plans:
 
 **Wave 1**
-- [ ] 03-01-PLAN.md -- Full vertical slice: hook cancelDownload + i18n keys + LocalTranscribeButton + DownloadProgressBanner + ChatInput wiring
+- [x] 03-01-PLAN.md -- Full vertical slice: hook cancelDownload + i18n keys + LocalTranscribeButton + DownloadProgressBanner + ChatInput wiring
 
 **Wave 2** *(blocked on Wave 1 completion)*
 - [ ] 03-02-PLAN.md -- Unit tests for LocalTranscribeButton and DownloadProgressBanner + human verification checkpoint
