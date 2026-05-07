@@ -31,11 +31,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. All existing app functionality works unchanged after COOP/COEP header changes (login, chat, existing transcription)
   4. The 'transcribe-local' extension appears in the Admin UI extension list and can be toggled on/off per assistant
   5. Activating 'transcribe-local' on an assistant automatically deactivates other speech-to-text extensions (mutual exclusivity)
-**Plans**: TBD
+**Plans:** 2 plans
 
 Plans:
-- [ ] 01-01: TBD
-- [ ] 01-02: TBD
+- [ ] 01-01-PLAN.md -- Walking skeleton: backend extension + i18n + Vite config + Transformers.js install + frontend recognition
+- [ ] 01-02-PLAN.md -- Regression verification: E2E tests + visual Admin UI checkpoint
 
 ### Phase 2: Core Transcription Pipeline
 **Goal**: Audio can be recorded, resampled, and transcribed via Whisper running entirely in the browser -- end-to-end pipeline works without any UI
