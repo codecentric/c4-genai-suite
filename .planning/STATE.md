@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: ready_to_execute
-stopped_at: Phase 1 planned (2 plans in 2 waves), ready for execution
-last_updated: "2026-05-07T15:45:00.000Z"
-last_activity: 2026-05-07 -- Phase 1 planned
+status: phase_complete
+stopped_at: Phase 1 complete, ready for Phase 2
+last_updated: "2026-05-07T18:00:00.000Z"
+last_activity: 2026-05-07 -- Phase 1 executed and verified
 progress:
   total_phases: 5
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 2
-  completed_plans: 0
-  percent: 0
+  completed_plans: 2
+  percent: 20
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-07)
 
 **Core value:** Spracherkennung ohne dass Audiodaten den Browser verlassen -- vollstaendige Datenschutzkonformitaet bei gleichzeitiger Beibehaltung der bestehenden Cloud-Optionen.
-**Current focus:** Phase 1: Infrastructure & Backend Extension
+**Current focus:** Phase 2: Core Transcription Pipeline
 
 ## Current Position
 
-Phase: 1 of 5 (Infrastructure & Backend Extension)
-Plan: 0 of 2 in current phase
-Status: Ready to execute
-Last activity: 2026-05-07 -- Phase 1 planned
+Phase: 2 of 5 (Core Transcription Pipeline)
+Plan: 0 of 3 in current phase
+Status: Ready to plan
+Last activity: 2026-05-07 -- Phase 1 executed and verified
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [██░░░░░░░░] 20%
 
 ## Performance Metrics
 
@@ -68,7 +68,7 @@ None yet.
 
 ### Blockers/Concerns
 
-- Phase 1: COOP/COEP headers (`credentialless` policy) must be tested against existing app resources (backend proxy, CDN assets) to ensure no regressions
+- Phase 1: RESOLVED — COOP/COEP `credentialless` verified, no regressions (225 backend tests pass, 30/33 E2E pass, human-verified)
 - Phase 2: ONNX Runtime WASM threading stability should be verified with the specific `onnxruntime-web` version bundled in Transformers.js v4.2
 
 ## Deferred Items
@@ -82,5 +82,5 @@ Items acknowledged and carried forward from previous milestone close:
 ## Session Continuity
 
 Last session: 2026-05-07
-Stopped at: Roadmap created, ready for Phase 1 planning
+Stopped at: Phase 1 complete, ready for Phase 2 planning
 Resume file: None

@@ -9,16 +9,16 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Infrastructure
 
-- [ ] **INFRA-01**: Vite-Konfiguration unterstützt ONNX-Runtime und Web Worker Bundling (optimizeDeps.exclude, assetsInclude)
-- [ ] **INFRA-02**: COOP/COEP Headers sind im Vite Dev Server konfiguriert für SharedArrayBuffer-Support (mit credentialless statt require-corp)
-- [ ] **INFRA-03**: @huggingface/transformers ist als npm-Dependency installiert
-- [ ] **INFRA-04**: Bestehende App-Funktionalität ist nach Header-Änderungen nicht beeinträchtigt (Regression)
+- [x] **INFRA-01**: Vite-Konfiguration unterstützt ONNX-Runtime und Web Worker Bundling (optimizeDeps.exclude, assetsInclude) — Phase 1
+- [x] **INFRA-02**: COOP/COEP Headers sind im Vite Dev Server konfiguriert für SharedArrayBuffer-Support (mit credentialless statt require-corp) — Phase 1
+- [x] **INFRA-03**: @huggingface/transformers ist als npm-Dependency installiert — Phase 1
+- [x] **INFRA-04**: Bestehende App-Funktionalität ist nach Header-Änderungen nicht beeinträchtigt (Regression) — Phase 1
 
 ### Backend Extension
 
-- [ ] **EXT-01**: Backend-Extension 'transcribe-local' ist im Extension-System registriert (group: speech-to-text, type: other)
-- [ ] **EXT-02**: Extension ist pro Assistant über die Admin-UI aktivierbar/deaktivierbar
-- [ ] **EXT-03**: Extension ist mutual exclusive mit bestehenden speech-to-text/transcribe-azure Extensions (gleiche Gruppe)
+- [x] **EXT-01**: Backend-Extension 'transcribe-local' ist im Extension-System registriert (group: speech-to-text, type: other) — Phase 1
+- [x] **EXT-02**: Extension ist pro Assistant über die Admin-UI aktivierbar/deaktivierbar — Phase 1
+- [x] **EXT-03**: Extension ist mutual exclusive mit bestehenden speech-to-text/transcribe-azure Extensions (gleiche Gruppe) — Phase 1
 
 ### Web Worker & Pipeline
 
