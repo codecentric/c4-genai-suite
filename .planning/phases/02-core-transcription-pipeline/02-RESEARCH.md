@@ -502,22 +502,22 @@ export async function resampleToMono16kHz(audioBlob: Blob): Promise<Float32Array
 | A3 | `progress_total` aggregate event is available in Transformers.js 4.2.0 (types verified, runtime behavior assumed from type definitions). | Code Examples | LOW -- if not available, per-file progress events can be manually aggregated. |
 | A4 | Whisper language parameter accepts `'german'` and `'english'` as full names. Confirmed via GitHub issue #725 and official examples for French. German specifically not verified with a running instance. | Common Pitfalls | MEDIUM -- if wrong, transcription still works but may use wrong language or auto-detect. |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **fp16 Decoder Viability**
+1. **fp16 Decoder Viability** — RESOLVED
    - What we know: fp16 decoder is reported broken in issues #894 and #1317 (tested with Transformers.js v3.x). The dtype types support per-module specification.
    - What's unclear: Whether Transformers.js v4.2.0 has fixed the fp16 decoder issue for onnx-community/whisper-base specifically.
-   - Recommendation: Test fp16 for both encoder and decoder as D-02 specifies. If output is garbled, immediately switch to `{ encoder_model: 'fp16', decoder_model_merged: 'q4' }`. Document the actual working configuration.
+   - Resolution: Implement as D-02 specifies (`dtype: 'fp16'`). If garbled output observed during testing, fall back to `{ encoder_model: 'fp16', decoder_model_merged: 'q4' }` per Plan 01 Task 1 NOTE. Document the actual working configuration in SUMMARY.
 
-2. **WebGPU Performance vs WASM for Whisper**
+2. **WebGPU Performance vs WASM for Whisper** — RESOLVED
    - What we know: Issue #894 shows WASM ~2x faster than WebGPU on M2 Mac for Whisper (fp32+q4 config).
    - What's unclear: Whether WebGPU is faster on discrete GPUs (e.g., NVIDIA in Windows).
-   - Recommendation: Implement WebGPU detection and auto-selection as D-03 area of discretion. Users with WebGPU hardware get it automatically; no explicit configuration needed.
+   - Resolution: Implement WebGPU detection with WASM fallback (Claude's Discretion area). WASM is the reliable default; WebGPU used when `navigator.gpu` is available. No explicit configuration needed.
 
-3. **Model Cache Detection on Mount**
+3. **Model Cache Detection on Mount** — RESOLVED
    - What we know: D-06 says "pre-load model from cache on hook mount." Transformers.js caches to Cache API.
-   - What's unclear: How to detect if model is already cached without triggering a download. The pipeline() call with `progress_callback` should fire `initiate` -> `done` quickly for cached files (no `download`/`progress` events).
-   - Recommendation: On mount, call `pipeline()` in the Worker. If model is cached, it loads from Cache API quickly (< 1s). The `progress_callback` will show `initiate` then `done` without `download` events, making it distinguishable from a fresh download. Set state to `loading` during this phase.
+   - What's unclear: How to detect if model is already cached without triggering a download.
+   - Resolution: On mount, send `{type:'load'}` to Worker. Distinguish cached vs fresh by observing `'download'` event arrivals before `'ready'`. Set state to `'loading'` during pre-load, transition to `'downloading'` only if download events arrive. Cached files load in <1s with `initiate` → `done` (no `download` events).
 
 ## Validation Architecture
 
