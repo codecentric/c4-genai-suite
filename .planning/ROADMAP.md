@@ -52,12 +52,15 @@ Plans:
   3. Audio is correctly resampled to 16kHz mono Float32Array and transferred to the Worker without copying (zero-copy via Transferable)
   4. Recording automatically stops after 2 minutes
   5. Transcription works in both German and English when the language parameter is set
-**Plans**: TBD
+**Plans:** 2 plans
 
 Plans:
-- [ ] 02-01: TBD
-- [ ] 02-02: TBD
-- [ ] 02-03: TBD
+
+**Wave 1**
+- [ ] 02-01-PLAN.md -- Whisper Web Worker (singleton pipeline, WebGPU/WASM detection, progress reporting, language mapping) + audio resampling utility
+
+**Wave 2** *(blocked on Wave 1 completion)*
+- [ ] 02-02-PLAN.md -- useLocalTranscribe hook (state machine, recording, Worker orchestration, model lifecycle) + i18n keys
 
 ### Phase 3: UI Integration
 **Goal**: Users can see and interact with the local transcription feature in the chat interface, including model download progress and language selection
@@ -115,7 +118,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Infrastructure & Backend Extension | 2/2 | Complete | 2026-05-07 |
-| 2. Core Transcription Pipeline | 0/3 | Not started | - |
+| 2. Core Transcription Pipeline | 0/2 | Planned | - |
 | 3. UI Integration | 0/3 | Not started | - |
 | 4. Error Handling | 0/1 | Not started | - |
 | 5. Polish & Refinement | 0/1 | Not started | - |
