@@ -57,10 +57,10 @@ Plans:
 Plans:
 
 **Wave 1**
-- [ ] 02-01-PLAN.md -- Whisper Web Worker (singleton pipeline, WebGPU/WASM detection, progress reporting, language mapping) + audio resampling utility
+- [x] 02-01-PLAN.md -- Whisper Web Worker (singleton pipeline, WebGPU/WASM detection, progress reporting, language mapping) + audio resampling utility
 
 **Wave 2** *(blocked on Wave 1 completion)*
-- [ ] 02-02-PLAN.md -- useLocalTranscribe hook (state machine, recording, Worker orchestration, model lifecycle) + i18n keys
+- [x] 02-02-PLAN.md -- useLocalTranscribe hook (state machine, recording, Worker orchestration, model lifecycle) + i18n keys
 
 ### Phase 3: UI Integration
 **Goal**: Users can see and interact with the local transcription feature in the chat interface, including model download progress and language selection
