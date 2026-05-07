@@ -205,6 +205,10 @@ export const de: typeof en = {
       startRecording: 'Lokale Aufnahme starten',
       stopRecording: 'Aufnahme stoppen und lokal transkribieren',
       transcribing: 'Lokale Transkription läuft...',
+      downloadProgress: 'Spracherkennungsmodell wird heruntergeladen',
+      downloadCancelLabel: 'Download abbrechen',
+      downloadReady: 'Bereit!',
+      downloadSize: '{{loaded}} MB / {{total}} MB',
     },
 
     thisMonth: 'Letzte 30 Tage',
