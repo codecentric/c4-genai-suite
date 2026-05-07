@@ -191,6 +191,21 @@ export const de: typeof en = {
       stopRecording: 'Aufnahme stoppen und transkribieren',
       transcribing: 'Transkription läuft...',
     },
+    localTranscribe: {
+      downloadingModel: 'Spracherkennungsmodell wird heruntergeladen...',
+      downloadFailed: 'Spracherkennungsmodell konnte nicht heruntergeladen werden. Bitte versuchen Sie es erneut.',
+      loadingModel: 'Spracherkennungsmodell wird geladen...',
+      loadFailed: 'Spracherkennungsmodell konnte nicht geladen werden.',
+      transcriptionFailed: 'Lokale Transkription fehlgeschlagen. Bitte versuchen Sie es erneut.',
+      maxDurationReached: 'Maximale Aufnahmedauer erreicht. Audio wird transkribiert...',
+      microphonePermissionDenied:
+        'Mikrofonberechtigung verweigert. Bitte erlauben Sie den Mikrofonzugriff in Ihren Browsereinstellungen.',
+      recordingStartFailed: 'Aufnahme konnte nicht gestartet werden. Bitte überprüfen Sie Ihr Mikrofon.',
+      noAudioRecorded: 'Es wurde kein Audio aufgenommen. Bitte versuchen Sie es erneut.',
+      startRecording: 'Lokale Aufnahme starten',
+      stopRecording: 'Aufnahme stoppen und lokal transkribieren',
+      transcribing: 'Lokale Transkription läuft...',
+    },
 
     thisMonth: 'Letzte 30 Tage',
     thisWeek: 'Letzte 7 Tage',
