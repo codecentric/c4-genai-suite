@@ -1,5 +1,7 @@
 import { act, renderHook } from '@testing-library/react';
+import { toast } from 'react-toastify';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { resampleToMono16kHz } from 'src/lib/audio-utils';
 
 // Mock audio-utils
 vi.mock('src/lib/audio-utils', () => ({
@@ -28,32 +30,16 @@ vi.mock('src/texts', () => ({
   },
 }));
 
-import { toast } from 'react-toastify';
-import { resampleToMono16kHz } from 'src/lib/audio-utils';
-
 // --- Worker mock infrastructure ---
-let mockWorkerInstance: {
+interface MockWorker {
   postMessage: ReturnType<typeof vi.fn>;
   addEventListener: ReturnType<typeof vi.fn>;
   removeEventListener: ReturnType<typeof vi.fn>;
   terminate: ReturnType<typeof vi.fn>;
   messageHandler: ((event: MessageEvent) => void) | null;
-};
-
-function createMockWorker() {
-  mockWorkerInstance = {
-    postMessage: vi.fn(),
-    addEventListener: vi.fn((event: string, handler: (event: MessageEvent) => void) => {
-      if (event === 'message') {
-        mockWorkerInstance.messageHandler = handler;
-      }
-    }),
-    removeEventListener: vi.fn(),
-    terminate: vi.fn(),
-    messageHandler: null,
-  };
-  return mockWorkerInstance;
 }
+
+let mockWorkerInstance: MockWorker;
 
 function simulateWorkerMessage(data: Record<string, unknown>) {
   if (mockWorkerInstance.messageHandler) {
@@ -61,54 +47,87 @@ function simulateWorkerMessage(data: Record<string, unknown>) {
   }
 }
 
+// Worker class mock -- each instance IS the mockWorkerInstance
+class MockWorkerClass {
+  postMessage: ReturnType<typeof vi.fn>;
+  addEventListener: ReturnType<typeof vi.fn>;
+  removeEventListener: ReturnType<typeof vi.fn>;
+  terminate: ReturnType<typeof vi.fn>;
+
+  constructor() {
+    this.postMessage = vi.fn();
+    this.terminate = vi.fn();
+    this.removeEventListener = vi.fn();
+    this.addEventListener = vi.fn((event: string, handler: (event: MessageEvent) => void) => {
+      if (event === 'message') {
+        mockWorkerInstance.messageHandler = handler;
+      }
+    });
+    // Point the global reference to this instance
+    mockWorkerInstance = {
+      postMessage: this.postMessage,
+      addEventListener: this.addEventListener,
+      removeEventListener: this.removeEventListener,
+      terminate: this.terminate,
+      messageHandler: null,
+    };
+  }
+}
+
+vi.stubGlobal('Worker', MockWorkerClass);
+
 // --- MediaRecorder mock infrastructure ---
-let mockMediaRecorderInstance: {
-  start: ReturnType<typeof vi.fn>;
-  stop: ReturnType<typeof vi.fn>;
-  requestData: ReturnType<typeof vi.fn>;
+interface MockMediaRecorder {
   state: string;
   ondataavailable: ((event: { data: Blob }) => void) | null;
   onstop: (() => void) | null;
   onerror: ((event: Event) => void) | null;
-};
+  start: ReturnType<typeof vi.fn>;
+  stop: ReturnType<typeof vi.fn>;
+  requestData: ReturnType<typeof vi.fn>;
+}
 
-function createMockMediaRecorder() {
-  mockMediaRecorderInstance = {
-    start: vi.fn(() => {
+let mockMediaRecorderInstance: MockMediaRecorder;
+
+class MockMediaRecorderClass {
+  state: string;
+  ondataavailable: ((event: { data: Blob }) => void) | null;
+  onstop: (() => void) | null;
+  onerror: ((event: Event) => void) | null;
+  start: ReturnType<typeof vi.fn>;
+  stop: ReturnType<typeof vi.fn>;
+  requestData: ReturnType<typeof vi.fn>;
+
+  constructor() {
+    this.state = 'inactive';
+    this.ondataavailable = null;
+    this.onstop = null;
+    this.onerror = null;
+
+    // Point global reference to this instance FIRST so mockImplementation closures capture it
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    mockMediaRecorderInstance = this;
+
+    this.start = vi.fn().mockImplementation(() => {
       mockMediaRecorderInstance.state = 'recording';
-    }),
-    stop: vi.fn(() => {
+    });
+    this.stop = vi.fn().mockImplementation(() => {
       mockMediaRecorderInstance.state = 'inactive';
       if (mockMediaRecorderInstance.onstop) {
         mockMediaRecorderInstance.onstop();
       }
-    }),
-    requestData: vi.fn(),
-    state: 'inactive',
-    ondataavailable: null,
-    onstop: null,
-    onerror: null,
-  };
-  return mockMediaRecorderInstance;
+    });
+    this.requestData = vi.fn();
+  }
 }
+
+vi.stubGlobal('MediaRecorder', MockMediaRecorderClass);
 
 // --- Mock stream ---
 const mockTrackStop = vi.fn();
 const mockStream = {
   getTracks: () => [{ stop: mockTrackStop }],
 };
-
-// Override Worker constructor globally
-vi.stubGlobal(
-  'Worker',
-  vi.fn(() => createMockWorker()),
-);
-
-// Override MediaRecorder constructor globally
-vi.stubGlobal(
-  'MediaRecorder',
-  vi.fn(() => createMockMediaRecorder()),
-);
 
 // Override navigator.mediaDevices.getUserMedia
 const mockGetUserMedia = vi.fn().mockResolvedValue(mockStream);
@@ -120,6 +139,13 @@ Object.defineProperty(navigator, 'mediaDevices', {
 
 // Import the hook after mocks are set up
 import { useLocalTranscribe } from './useLocalTranscribe';
+
+// Helper to simulate audio data arriving on the MediaRecorder
+function simulateAudioData() {
+  if (mockMediaRecorderInstance.ondataavailable) {
+    mockMediaRecorderInstance.ondataavailable({ data: new Blob(['audio'], { type: 'audio/webm' }) });
+  }
+}
 
 describe('useLocalTranscribe', () => {
   beforeEach(() => {
@@ -167,47 +193,29 @@ describe('useLocalTranscribe', () => {
   it('posts load to Worker on first click when model not loaded, auto-starts recording on ready', async () => {
     const { result } = renderHook(() => useLocalTranscribe(defaultProps));
 
-    // Model not yet loaded (still in loading state, no ready received)
-    // But we want to test the "not loaded" path: The hook is still 'loading'
-    // toggleRecording should not do anything during loading state
-    // Let's test the scenario where model load failed and is in error state
-    // Actually per D-04: first click triggers download. The model isn't loaded yet.
-
-    // Let the initial mount load proceed but simulate a case where the hook
-    // reaches idle without the model being loaded (e.g., an error occurred)
-    // Actually, the way this works: on mount, hook sends 'load'. If we don't send 'ready',
-    // state stays 'loading'. toggleRecording guards against 'loading' state (D-05).
-
-    // Reset mock and create a fresh scenario
-    vi.clearAllMocks();
-
-    // For this test we want to simulate: model NOT loaded, user clicks toggleRecording
-    // The hook starts in 'loading' on mount. Let's make the Worker fail initially.
-    const { result: result2 } = renderHook(() => useLocalTranscribe(defaultProps));
-
-    // Send error so hook goes to 'error' state
+    // Send error so hook goes to 'error' state (model not loaded)
     act(() => {
       simulateWorkerMessage({ status: 'error', error: 'Load failed' });
     });
 
-    expect(result2.current.state).toBe('error');
+    expect(result.current.state).toBe('error');
 
-    // Now click toggleRecording -- should attempt startRecording
-    // Model is not loaded, so it should set pending, post 'load' to Worker, and set state to 'downloading'
+    // Now click toggleRecording -- model is not loaded, should set pending and post 'load'
     await act(async () => {
-      await result2.current.toggleRecording();
+      await result.current.toggleRecording();
     });
 
-    expect(result2.current.state).toBe('downloading');
-    // postMessage called: once on mount ('load'), once on click ('load')
+    expect(result.current.state).toBe('downloading');
     expect(mockWorkerInstance.postMessage).toHaveBeenCalledWith({ type: 'load' });
 
-    // Simulate ready -- should auto-start recording
+    // Simulate ready -- should auto-start recording (beginRecording is async, needs async act)
     await act(async () => {
       simulateWorkerMessage({ status: 'ready' });
+      // Allow microtask (getUserMedia promise) to settle
+      await vi.waitFor(() => undefined);
     });
 
-    expect(result2.current.state).toBe('recording');
+    expect(result.current.state).toBe('recording');
     expect(mockGetUserMedia).toHaveBeenCalledWith({ audio: true });
   });
 
@@ -266,11 +274,9 @@ describe('useLocalTranscribe', () => {
       await result.current.toggleRecording();
     });
 
-    // Simulate audio data
+    // Simulate audio data via the hook's ondataavailable handler (set on the instance)
     act(() => {
-      if (mockMediaRecorderInstance.ondataavailable) {
-        mockMediaRecorderInstance.ondataavailable({ data: new Blob(['audio'], { type: 'audio/webm' }) });
-      }
+      simulateAudioData();
     });
 
     // Stop recording
@@ -310,9 +316,7 @@ describe('useLocalTranscribe', () => {
 
     // Simulate audio
     act(() => {
-      if (mockMediaRecorderInstance.ondataavailable) {
-        mockMediaRecorderInstance.ondataavailable({ data: new Blob(['audio'], { type: 'audio/webm' }) });
-      }
+      simulateAudioData();
     });
 
     // Stop recording
@@ -347,13 +351,11 @@ describe('useLocalTranscribe', () => {
 
     // Simulate audio data before auto-stop
     act(() => {
-      if (mockMediaRecorderInstance.ondataavailable) {
-        mockMediaRecorderInstance.ondataavailable({ data: new Blob(['audio'], { type: 'audio/webm' }) });
-      }
+      simulateAudioData();
     });
 
     // Advance time past 2 minutes
-    await act(async () => {
+    act(() => {
       vi.advanceTimersByTime(120100);
     });
 
@@ -379,9 +381,7 @@ describe('useLocalTranscribe', () => {
 
     // Simulate audio
     act(() => {
-      if (mockMediaRecorderInstance.ondataavailable) {
-        mockMediaRecorderInstance.ondataavailable({ data: new Blob(['audio'], { type: 'audio/webm' }) });
-      }
+      simulateAudioData();
     });
 
     // Stop recording
@@ -413,9 +413,7 @@ describe('useLocalTranscribe', () => {
     });
 
     act(() => {
-      if (mockMediaRecorderInstance.ondataavailable) {
-        mockMediaRecorderInstance.ondataavailable({ data: new Blob(['audio'], { type: 'audio/webm' }) });
-      }
+      simulateAudioData();
     });
 
     await act(async () => {
