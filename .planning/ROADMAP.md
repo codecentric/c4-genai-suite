@@ -36,7 +36,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 Plans:
 
 **Wave 1**
-- [ ] 01-01-PLAN.md -- Walking skeleton: backend extension + i18n + Vite config + Transformers.js install + frontend recognition
+- [x] 01-01-PLAN.md -- Walking skeleton: backend extension + i18n + Vite config + Transformers.js install + frontend recognition
 
 **Wave 2** *(blocked on Wave 1 completion)*
 - [ ] 01-02-PLAN.md -- Regression verification: E2E tests + visual Admin UI checkpoint
@@ -114,7 +114,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Infrastructure & Backend Extension | 0/2 | Not started | - |
+| 1. Infrastructure & Backend Extension | 1/2 | In progress | - |
 | 2. Core Transcription Pipeline | 0/3 | Not started | - |
 | 3. UI Integration | 0/3 | Not started | - |
 | 4. Error Handling | 0/1 | Not started | - |
