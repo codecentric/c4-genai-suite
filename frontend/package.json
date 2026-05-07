@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "@floating-ui/react-dom": "^2.1.8",
+    "@huggingface/transformers": "^4.2.0",
     "@mantine/colors-generator": "9.1.0",
     "@mantine/core": "9.1.0",
     "@mantine/dates": "^9.1.0",
