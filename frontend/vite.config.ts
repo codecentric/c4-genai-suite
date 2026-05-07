@@ -39,7 +39,17 @@ export default defineConfig({
     },
   },
   plugins: [react(), tailwindcss()],
+  optimizeDeps: {
+    exclude: ['@huggingface/transformers'],
+  },
+  worker: {
+    format: 'es',
+  },
   server: {
+    headers: {
+      'Cross-Origin-Opener-Policy': 'same-origin',
+      'Cross-Origin-Embedder-Policy': 'credentialless',
+    },
     proxy: {
       '/api-proxy': {
         target: 'http://localhost:3000',

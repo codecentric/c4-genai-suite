@@ -20,6 +20,7 @@ import { OpenAIModelExtension } from './models/open-ai';
 import { OpenAICompatibleModelExtension } from './models/open-ai-compatible';
 import { AzureTranscribeExtension } from './other/azure-transcribe';
 import { CustomPromptExtension } from './other/custom';
+import { LocalTranscribeExtension } from './other/local-transcribe';
 import { SpeechToTextExtension } from './other/speech-to-text';
 import { SummaryPromptExtension } from './other/summary';
 import { AzureAISearchExtension } from './tools/azure-ai-search';
@@ -123,6 +124,7 @@ export class ExtensionLibraryModule {
         GoogleGenAIModelExtension,
         GPTImage1Extension,
         GroundingWithBingSearchExtension,
+        LocalTranscribeExtension,
         MCPToolsExtension,
         MistralModelExtension,
         GeminiImageExtension,

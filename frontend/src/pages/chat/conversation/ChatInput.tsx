@@ -177,7 +177,9 @@ export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEm
   });
 
   const voiceExtensions =
-    configuration?.extensions?.filter((e) => e.name === 'speech-to-text' || e.name === 'transcribe-azure') ?? [];
+    configuration?.extensions?.filter(
+      (e) => e.name === 'speech-to-text' || e.name === 'transcribe-azure' || e.name === 'transcribe-local',
+    ) ?? [];
   const activeVoiceExtension = voiceExtensions[0];
   const showSpeechToText = activeVoiceExtension?.name === 'speech-to-text';
   const showTranscribe = activeVoiceExtension?.name === 'transcribe-azure';
