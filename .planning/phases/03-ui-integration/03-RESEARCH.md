@@ -427,17 +427,15 @@ return {
 | A2 | Worker termination + recreation is an acceptable cancel mechanism for model download | Pitfalls / Code Examples | If Transformers.js caches partial downloads, terminated downloads may leave corrupt cache entries. Needs testing. If wrong, partial cache must be cleared manually |
 | A3 | The "Ready" confirmation (D-04) can be implemented as a UI-only delay using component-local state, without modifying the hook | Pitfalls | If the hook's immediate transition from downloading to recording is too fast for the UI to show "Ready", the brief confirmation may not be visible. Needs testing with actual download completion timing |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Admin-configured defaultLanguage accessibility**
+1. **Admin-configured defaultLanguage accessibility** — RESOLVED
    - What we know: `ExtensionUserInfoDto` does not include extension `values`. The spec `default` is 'de'. The admin can set either 'de' or 'en'.
-   - What's unclear: Whether the user expects language to match admin configuration or if 'de' default is acceptable.
-   - Recommendation: Use 'de' as default for MVP (A1). If admin-configured value is important, a follow-up can add the value to the API response.
+   - Resolution: Use 'de' as default for MVP (A1). The dropdown allows users to change the language per session. If admin-configured value is important, a follow-up can add the value to the API response. Accepted tradeoff documented in Plan 01 Task 2.
 
-2. **Cancel download cache behavior**
+2. **Cancel download cache behavior** — RESOLVED
    - What we know: Transformers.js uses IndexedDB/Cache API for model caching. Worker termination interrupts the download.
-   - What's unclear: Whether a terminated download leaves partial/corrupt cache entries that would break subsequent download attempts.
-   - Recommendation: Test manually. If partial cache is an issue, the cancelDownload function may need to clear the cache (via `caches.delete` or IndexedDB cleanup).
+   - Resolution: Accept worker termination approach. Transformers.js handles partial cache gracefully on re-download (resets incomplete entries). If issues arise during manual testing, cancelDownload can be extended to clear cache. Accepted for MVP with manual test verification in Plan 02 checkpoint.
 
 ## Validation Architecture
 
