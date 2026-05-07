@@ -281,6 +281,29 @@ export function useLocalTranscribe({ language, onTranscriptReceived, maxDuration
     // Do nothing for 'downloading', 'loading', 'transcribing' (D-05)
   }, [startRecording, stopRecording]);
 
+  // Cancel an in-progress model download (D-03)
+  const cancelDownload = useCallback(() => {
+    if (stateRef.current !== 'downloading') return;
+
+    // Terminate current worker
+    if (workerRef.current) {
+      workerRef.current.removeEventListener('message', handleWorkerMessage);
+      workerRef.current.terminate();
+      workerRef.current = null;
+    }
+
+    // Reset state
+    pendingRecordRef.current = false;
+    modelLoadedRef.current = false;
+    setDownloadProgress(null);
+    setState('idle');
+
+    // Create fresh worker for future use
+    const worker = new Worker(new URL('../workers/whisper.worker.ts', import.meta.url), { type: 'module' });
+    workerRef.current = worker;
+    worker.addEventListener('message', handleWorkerMessage);
+  }, [handleWorkerMessage]);
+
   // Cleanup MediaRecorder on unmount
   useEffect(() => {
     return () => {
@@ -298,5 +321,6 @@ export function useLocalTranscribe({ language, onTranscriptReceived, maxDuration
     isTranscribing: state === 'transcribing',
     isDownloading: state === 'downloading',
     toggleRecording,
+    cancelDownload,
   };
 }
