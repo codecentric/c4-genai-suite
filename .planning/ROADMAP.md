@@ -73,13 +73,16 @@ Plans:
   3. A progress bar with percentage and MB downloaded appears during first-time model download, and is skipped when model is already cached
   4. A language dropdown (de/en) is available on the button, and switching language changes the transcription output language
   5. All UI text is available in both German and English, and all interactive elements have accessibility labels
-**Plans**: TBD
+**Plans:** 2 plans
 **UI hint**: yes
 
 Plans:
-- [ ] 03-01: TBD
-- [ ] 03-02: TBD
-- [ ] 03-03: TBD
+
+**Wave 1**
+- [ ] 03-01-PLAN.md -- Full vertical slice: hook cancelDownload + i18n keys + LocalTranscribeButton + DownloadProgressBanner + ChatInput wiring
+
+**Wave 2** *(blocked on Wave 1 completion)*
+- [ ] 03-02-PLAN.md -- Unit tests for LocalTranscribeButton and DownloadProgressBanner + human verification checkpoint
 
 ### Phase 4: Error Handling
 **Goal**: All failure modes produce clear, actionable feedback instead of silent failures or cryptic errors
@@ -119,6 +122,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 |-------|----------------|--------|-----------|
 | 1. Infrastructure & Backend Extension | 2/2 | Complete | 2026-05-07 |
 | 2. Core Transcription Pipeline | 0/2 | Planned | - |
-| 3. UI Integration | 0/3 | Not started | - |
+| 3. UI Integration | 0/2 | Planned | - |
 | 4. Error Handling | 0/1 | Not started | - |
 | 5. Polish & Refinement | 0/1 | Not started | - |
