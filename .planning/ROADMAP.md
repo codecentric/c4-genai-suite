@@ -13,7 +13,7 @@ This roadmap delivers browser-based Whisper speech recognition as a privacy-pres
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Infrastructure & Backend Extension** - Vite/COOP/COEP configuration and extension registration in the backend (completed 2026-05-07)
-- [ ] **Phase 2: Core Transcription Pipeline** - Web Worker with Whisper inference, audio capture/resampling, and model loading
+- [x] **Phase 2: Core Transcription Pipeline** - Web Worker with Whisper inference, audio capture/resampling, and model loading (completed 2026-05-07)
 - [ ] **Phase 3: UI Integration** - LocalTranscribeButton component, model download progress, language selection, and i18n
 - [ ] **Phase 4: Error Handling** - Graceful failure modes for mic denial, browser incompatibility, download failure, and empty results
 - [ ] **Phase 5: Polish & Refinement** - Recording timer, privacy badge, and silence detection for production readiness
