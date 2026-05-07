@@ -214,6 +214,11 @@
       "title": "Transcription: Azure OpenAI",
       "description": "Transcribe audio recordings to text using Azure OpenAI"
     },
+    "localTranscribe": {
+      "title": "Local Speech Recognition",
+      "description": "Transcribe audio locally in the browser - audio data never leaves your device",
+      "defaultLanguage": "Default Language"
+    },
     "filesInConversation": {
       "title": "Search Files in Chat",
       "description": "Enables the LLM to search files uploaded via the paperclip to a conversation.",
