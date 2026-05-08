@@ -58,7 +58,7 @@ function isHallucination(text: string): boolean {
   if (trimmed.length === 0) return true;
 
   // Exact match against known patterns (case-insensitive)
-  if (HALLUCINATION_PATTERNS.some(p => trimmed.toLowerCase() === p.toLowerCase())) {
+  if (HALLUCINATION_PATTERNS.some((p) => trimmed.toLowerCase() === p.toLowerCase())) {
     return true;
   }
 
@@ -67,7 +67,7 @@ function isHallucination(text: string): boolean {
 
   // Repetitive pattern: same word/phrase repeated 3+ times
   const words = trimmed.split(/\s+/);
-  if (words.length >= 3 && words.every(w => w === words[0])) return true;
+  if (words.length >= 3 && words.every((w) => w === words[0])) return true;
 
   return false;
 }
@@ -121,10 +121,7 @@ self.addEventListener('message', async (event: MessageEvent<WorkerMessageData>) 
 
       if (!navigator.onLine) {
         code = 'download_offline';
-      } else if (
-        error instanceof Error &&
-        error.message.toLowerCase().includes('timeout')
-      ) {
+      } else if (error instanceof Error && error.message.toLowerCase().includes('timeout')) {
         code = 'download_timeout';
       }
 
@@ -144,7 +141,7 @@ self.addEventListener('message', async (event: MessageEvent<WorkerMessageData>) 
         return;
       }
 
-      // Layer 1: RMS energy check (D-08)
+      // Layer 1: RMS energy check
       const rms = computeRMS(audio);
       if (rms < SILENCE_RMS_THRESHOLD) {
         self.postMessage({ status: 'silence' });
@@ -159,7 +156,7 @@ self.addEventListener('message', async (event: MessageEvent<WorkerMessageData>) 
       const output = Array.isArray(result) ? result[0] : result;
       const text = output.text.trim();
 
-      // Layer 2: Hallucination filter (D-09)
+      // Layer 2: Hallucination filter
       if (isHallucination(text)) {
         self.postMessage({ status: 'silence' });
         return;

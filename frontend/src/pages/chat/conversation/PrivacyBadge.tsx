@@ -10,9 +10,7 @@ export function PrivacyBadge() {
       tabIndex={0}
     >
       <IconShieldCheck size={14} className="text-green-700" />
-      <span className="text-sm text-green-700">
-        {texts.chat.localTranscribe.privacyBadge}
-      </span>
+      <span className="text-sm text-green-700">{texts.chat.localTranscribe.privacyBadge}</span>
     </span>
   );
 }
