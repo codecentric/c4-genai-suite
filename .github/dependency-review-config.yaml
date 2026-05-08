@@ -56,3 +56,4 @@ allow-dependencies-licenses:
   - 'pkg:pypi/gitdb' # Reported as BSD-2-Clause AND BSD-3-Clause AND GPL-1.0-or-later; actual LICENSE file is BSD-3-Clause only, only tests fixtures are gpl
   - 'pkg:pypi/mmh3' # CC-BY-4.0 AND public-domain AND MIT compound; CC-BY-4.0 is for the JOSS paper, code is MIT
   - 'pkg:pypi/wcwidth' # MIT AND HPND-Markus-Kuhn compound; HPND-Markus-Kuhn is a permissive license
+  - 'pkg:pypi/rapidfuzz' # GPL-1.0-or-later AND MIT compound; GPL applies only to bundled Levenshtein reference, library itself is MIT
