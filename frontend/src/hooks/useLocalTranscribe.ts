@@ -108,12 +108,10 @@ export function useLocalTranscribe({ language, onTranscriptReceived, maxDuration
         const elapsed = Date.now() - startTimeRef.current;
         setElapsedSeconds(Math.floor(elapsed / 1000));
         if (elapsed >= maxDurationMsRef.current) {
-          // Auto-stop: stop the recorder directly
-          if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
-            mediaRecorderRef.current.requestData();
-            mediaRecorderRef.current.stop();
-          }
+          clearInterval(timerRef.current!);
+          timerRef.current = null;
           toast.info(texts.chat.localTranscribe.maxDurationReached);
+          void stopRecordingRef.current();
         }
       }, 100);
     } catch (err) {
@@ -132,6 +130,9 @@ export function useLocalTranscribe({ language, onTranscriptReceived, maxDuration
   useEffect(() => {
     beginRecordingRef.current = beginRecording;
   }, [beginRecording]);
+
+  // Forward ref for stopRecording so the auto-stop interval can call it
+  const stopRecordingRef = useRef<() => Promise<void>>(() => Promise.resolve());
 
   // Worker message handler -- uses refs exclusively for stable identity
   const handleWorkerMessage = useCallback((event: MessageEvent) => {
@@ -292,6 +293,10 @@ export function useLocalTranscribe({ language, onTranscriptReceived, maxDuration
       }
     });
   }, [cleanup]);
+
+  useEffect(() => {
+    stopRecordingRef.current = stopRecording;
+  }, [stopRecording]);
 
   // Start recording
   const startRecording = useCallback(async () => {
