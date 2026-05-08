@@ -40,38 +40,38 @@ class AzureAISearchStoreAdapter(VectorStoreAdapter):
         fields = [
             SimpleField(
                 name="id",
-                type=SearchFieldDataType.String,
+                type=SearchFieldDataType.STRING,
                 key=True,
                 filterable=True,
             ),
             SearchableField(
                 name="content",
-                type=SearchFieldDataType.String,
+                type=SearchFieldDataType.STRING,
                 searchable=True,
             ),
             SearchField(
                 name="content_vector",
-                type=SearchFieldDataType.Collection(SearchFieldDataType.Single),
+                type=f"Collection({SearchFieldDataType.SINGLE.value})",
                 searchable=True,
                 vector_search_dimensions=len(embeddings.embed_query("Text")),
                 vector_search_profile_name="myHnswProfile",
             ),
             SearchableField(
                 name="metadata",
-                type=SearchFieldDataType.String,
+                type=SearchFieldDataType.STRING,
                 searchable=True,
             ),
             # Additional field for deleting by our id
             SearchableField(
                 name="doc_id",
-                type=SearchFieldDataType.String,
+                type=SearchFieldDataType.STRING,
                 searchable=True,
                 filterable=True,
             ),
             # Additional field for filtering on bucket
             SearchableField(
                 name="bucket",
-                type=SearchFieldDataType.String,
+                type=SearchFieldDataType.STRING,
                 searchable=True,
                 filterable=True,
             ),
