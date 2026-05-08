@@ -113,10 +113,15 @@ Plans:
   1. A recording timer shows elapsed time relative to the 2-minute maximum (e.g. "0:42 / 2:00") while recording
   2. A visual indicator communicates that audio is processed locally and never leaves the browser
   3. Recording silence (no speech signal) produces a "Keine Sprache erkannt" / "No speech detected" message instead of Whisper hallucination text
-**Plans**: TBD
+**Plans:** 2 plans
 
 Plans:
-- [ ] 05-01: TBD
+
+**Wave 1**
+- [ ] 05-01-PLAN.md -- Worker silence detection (RMS + hallucination filter) + hook elapsed time + RecordingTimer + PrivacyBadge + ChatInput integration + i18n keys
+
+**Wave 2** *(blocked on Wave 1 completion)*
+- [ ] 05-02-PLAN.md -- Component tests + Worker/hook test extensions + human verification checkpoint
 
 ## Progress
 
@@ -129,4 +134,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | 2. Core Transcription Pipeline | 0/2 | Planned | - |
 | 3. UI Integration | 0/2 | Planned | - |
 | 4. Error Handling | 2/2 | Complete | 2026-05-08 |
-| 5. Polish & Refinement | 0/1 | Not started | - |
+| 5. Polish & Refinement | 0/2 | Planned | - |
