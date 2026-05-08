@@ -57,7 +57,7 @@ Hover over assistant entries and click the icon for more options, which will bec
 
 ### Export
 
-Hover over assistant entries and click the icon for more options, which will become visible on their right. This menu will offer an "Export" option, which starts the download of a `{assitant name}.json` file. Note that secrets like API-Keys will be redacted.
+Hover over assistant entries and click the icon for more options, which will become visible on their right. This menu will offer an "Export" option, which starts the download of a `{assistant name}.json` file. Note that secrets like API-Keys will be redacted.
 
 ### Import
 

@@ -1,7 +1,7 @@
 # The Audit Log
 
 The "Audit Log" page offers a comprehensive overview of all changes admins did to the configuration.
-This is meant to be a way to identfy persons responsible for an assistant, which can be asked if problems arise.
+This is meant to be a way to identify persons responsible for an assistant, which can be asked if problems arise.
 Also it can be used to figure out what changes were performed before a broken behavior was detected and can be
 used to manually undo the change.
 
