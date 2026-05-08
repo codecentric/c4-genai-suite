@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Infrastructure & Backend Extension** - Vite/COOP/COEP configuration and extension registration in the backend (completed 2026-05-07)
 - [x] **Phase 2: Core Transcription Pipeline** - Web Worker with Whisper inference, audio capture/resampling, and model loading (completed 2026-05-07)
 - [ ] **Phase 3: UI Integration** - LocalTranscribeButton component, model download progress, language selection, and i18n
-- [ ] **Phase 4: Error Handling** - Graceful failure modes for mic denial, browser incompatibility, download failure, and empty results
+- [x] **Phase 4: Error Handling** - Graceful failure modes for mic denial, browser incompatibility, download failure, and empty results (completed 2026-05-08)
 - [ ] **Phase 5: Polish & Refinement** - Recording timer, privacy badge, and silence detection for production readiness
 
 ## Phase Details
@@ -102,7 +102,7 @@ Plans:
 - [x] 04-01-PLAN.md -- Worker error codes + hook isSupported/error mapping/empty check + ChatInput gating + i18n keys
 
 **Wave 2** *(blocked on Wave 1 completion)*
-- [ ] 04-02-PLAN.md -- Fix broken tests + new error handling tests + human verification checkpoint
+- [x] 04-02-PLAN.md -- Fix broken tests + new error handling tests + human verification checkpoint
 
 ### Phase 5: Polish & Refinement
 **Goal**: The feature feels production-ready with recording feedback, privacy communication, and edge-case handling
@@ -128,5 +128,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | 1. Infrastructure & Backend Extension | 2/2 | Complete | 2026-05-07 |
 | 2. Core Transcription Pipeline | 0/2 | Planned | - |
 | 3. UI Integration | 0/2 | Planned | - |
-| 4. Error Handling | 0/2 | Not started | - |
+| 4. Error Handling | 2/2 | Complete | 2026-05-08 |
 | 5. Polish & Refinement | 0/1 | Not started | - |
