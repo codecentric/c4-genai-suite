@@ -3,20 +3,30 @@ import { toast } from 'react-toastify';
 import { resampleToMono16kHz } from 'src/lib/audio-utils';
 import { texts } from 'src/texts';
 
+/** Represents the current state of the local transcription lifecycle. */
 export type LocalTranscribeState = 'idle' | 'downloading' | 'loading' | 'recording' | 'transcribing' | 'error';
 
+/** Tracks bytes loaded and total for the Whisper model download. */
 export interface DownloadProgress {
   loaded: number;
   total: number;
   percentage: number;
 }
 
+/** Configuration for the useLocalTranscribe hook. */
 interface UseLocalTranscribeProps {
+  /** BCP 47 language code ('de' or 'en') passed to the Whisper worker. */
   language: string;
+  /** Called with the transcribed text after successful transcription. */
   onTranscriptReceived: (transcript: string) => void;
+  /** Maximum recording duration in milliseconds. Defaults to 2 minutes. */
   maxDurationMs?: number;
 }
 
+/**
+ * Hook that manages browser-based Whisper speech recognition.
+ * Handles model download, audio recording, and Worker-based transcription.
+ */
 export function useLocalTranscribe({ language, onTranscriptReceived, maxDurationMs = 2 * 60 * 1000 }: UseLocalTranscribeProps) {
   const [state, setState] = useState<LocalTranscribeState>('idle');
   const [downloadProgress, setDownloadProgress] = useState<DownloadProgress | null>(null);
