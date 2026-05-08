@@ -136,8 +136,8 @@ Plans:
 Plans:
 
 **Wave 1**
-- [ ] 06-01-PLAN.md -- Code cleanup: planning reference removal, ESLint/Prettier fixes, JSDoc on exported types, dead code audit
-- [ ] 06-02-PLAN.md -- Documentation fix: update PROJECT.md and REQUIREMENTS.md model references from whisper-base to whisper-small q8
+- [x] 06-01-PLAN.md -- Code cleanup: planning reference removal, ESLint/Prettier fixes, JSDoc on exported types, dead code audit
+- [x] 06-02-PLAN.md -- Documentation fix: update PROJECT.md and REQUIREMENTS.md model references from whisper-base to whisper-small q8
 
 ## Progress
 
