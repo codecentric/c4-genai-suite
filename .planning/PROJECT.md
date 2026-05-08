@@ -2,7 +2,7 @@
 
 ## What This Is
 
-Eine lokale, datenschutzkonforme Spracherkennung im Frontend der c4 GenAI Suite, die Whisper (whisper-base) via Transformers.js direkt im Browser ausführt. Sie ergänzt die bestehenden cloudbasierten Optionen (Web Speech API, Azure Transcribe) als dritte konfigurierbare Variante im Extension-System.
+Eine lokale, datenschutzkonforme Spracherkennung im Frontend der c4 GenAI Suite, die Whisper (whisper-small, quantisiert q8) via Transformers.js direkt im Browser ausführt. Sie ergänzt die bestehenden cloudbasierten Optionen (Web Speech API, Azure Transcribe) als dritte konfigurierbare Variante im Extension-System.
 
 ## Core Value
 
@@ -16,10 +16,10 @@ Spracherkennung ohne dass Audiodaten den Browser verlassen — vollständige Dat
 
 ### Active
 
-- [ ] Lokale Whisper-Inferenz im Browser via Transformers.js (whisper-base Modell)
+- [ ] Lokale Whisper-Inferenz im Browser via Transformers.js (whisper-small q8 Modell)
 - [ ] Integration als Backend-Extension im bestehenden Extension-System (wie speech-to-text / transcribe-azure)
 - [ ] Aktivierbar pro Assistant über die Admin-UI
-- [ ] On-Demand-Download des Whisper-Modells (~140MB) mit Caching im Browser (IndexedDB/Cache API)
+- [ ] On-Demand-Download des Whisper-Modells (~240MB) mit Caching im Browser (IndexedDB/Cache API)
 - [ ] Fortschrittsanzeige (Progressbar) beim erstmaligen Modell-Download
 - [ ] Sprachauswahl (de/en) über Dropdown wie bei bestehender SpeechRecognition
 - [ ] Maximale Aufnahmedauer von 2 Minuten
@@ -30,7 +30,7 @@ Spracherkennung ohne dass Audiodaten den Browser verlassen — vollständige Dat
 ### Out of Scope
 
 - Echtzeit-Streaming-Transkription in v1 — architektonisch vorbereitet, aber nicht implementiert
-- Modell-Auswahl durch Endnutzer — fest auf whisper-base, ggf. später konfigurierbar
+- Modell-Auswahl durch Endnutzer — fest auf whisper-small q8, ggf. später konfigurierbar
 - Vorab-Bundling des Modells — wird on-demand geladen, nicht in das App-Bundle integriert
 - Offline-Fähigkeit — Erstdownload erfordert Internetverbindung
 
@@ -46,11 +46,11 @@ Beide werden über das Extension-System pro Assistant konfiguriert. Die Sichtbar
 
 Die neue lokale Variante folgt dem gleichen Muster: Backend registriert Extension, Frontend erkennt den Extension-Namen und zeigt den entsprechenden Button an. Die Inferenz läuft aber komplett im Browser (Web Worker + Transformers.js), ohne Backend-Roundtrip für die Transkription.
 
-**Transformers.js** ermöglicht die Ausführung von ONNX-optimierten Whisper-Modellen direkt im Browser via WebAssembly (und optional WebGPU). Das whisper-base Modell ist ca. 140MB groß und wird beim ersten Nutzen aus dem Hugging Face Hub geladen und im Browser gecacht.
+**Transformers.js** ermöglicht die Ausführung von ONNX-optimierten Whisper-Modellen direkt im Browser via WebAssembly (und optional WebGPU). Das whisper-small q8 Modell ist ca. 240MB groß und wird beim ersten Nutzen aus dem Hugging Face Hub geladen und im Browser gecacht.
 
 ## Constraints
 
-- **Modellgröße**: whisper-base ist ~140MB — erfordert einmaligen Download und sinnvolle UX dafür (Progressbar)
+- **Modellgröße**: whisper-small q8 ist ~240MB — erfordert einmaligen Download und sinnvolle UX dafür (Progressbar)
 - **Browser-Kompatibilität**: Transformers.js benötigt Web Worker Support und SharedArrayBuffer (COOP/COEP Headers)
 - **Inferenz-Performance**: Whisper-Inferenz im Browser ist langsamer als serverseitig — 2-Minuten-Aufnahmelimit hält das handhabbar
 - **Tech Stack**: Frontend ist React 19 + TypeScript + Vite — Transformers.js muss als npm-Dependency integriert werden
@@ -60,7 +60,7 @@ Die neue lokale Variante folgt dem gleichen Muster: Backend registriert Extensio
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| whisper-base statt whisper-tiny | Bessere Genauigkeit bei akzeptabler Modellgröße (~140MB vs ~75MB) | — Pending |
+| whisper-small q8 statt whisper-base | Bessere Genauigkeit bei akzeptabler Modellgröße (~240MB vs ~140MB), q8 Quantisierung für reduzierte Dateigröße | Implemented |
 | Record-then-Transcribe statt Echtzeit | Einfachere Erstimplementierung, Echtzeit architektonisch vorbereitet | — Pending |
 | On-Demand-Download statt Bundling | App-Bundle bleibt klein, Modell wird nur bei Bedarf geladen | — Pending |
 | 2 Minuten max. Aufnahmedauer | Praktikabel für lokale Inferenz, verhindert zu große Audiobuffer | — Pending |
