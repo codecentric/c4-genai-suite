@@ -20,6 +20,14 @@ interface UseLocalTranscribeProps {
 export function useLocalTranscribe({ language, onTranscriptReceived, maxDurationMs = 2 * 60 * 1000 }: UseLocalTranscribeProps) {
   const [state, setState] = useState<LocalTranscribeState>('idle');
   const [downloadProgress, setDownloadProgress] = useState<DownloadProgress | null>(null);
+  const [isSupported] = useState<boolean>(() => {
+    return (
+      typeof Worker !== 'undefined' &&
+      typeof WebAssembly !== 'undefined' &&
+      typeof navigator.mediaDevices?.getUserMedia === 'function' &&
+      self.crossOriginIsolated === true
+    );
+  });
 
   const workerRef = useRef<Worker | null>(null);
   const modelLoadedRef = useRef<boolean>(false);
@@ -173,20 +181,46 @@ export function useLocalTranscribe({ language, onTranscriptReceived, maxDuration
         }
         break;
 
-      case 'result':
-        onTranscriptReceivedRef.current(data.text as string);
+      case 'result': {
+        const text = (data.text as string) ?? '';
+        if (text.trim() === '') {
+          toast.info(texts.chat.localTranscribe.emptyTranscription);
+        } else {
+          onTranscriptReceivedRef.current(text);
+        }
         setState('idle');
         break;
+      }
 
-      case 'error':
-        toast.error(data.error as string);
-        setState('error');
+      case 'error': {
+        const code = data.code as string | undefined;
+        let message: string;
+
+        switch (code) {
+          case 'download_offline':
+            message = texts.chat.localTranscribe.downloadFailedOffline;
+            break;
+          case 'download_timeout':
+            message = texts.chat.localTranscribe.downloadFailedTimeout;
+            break;
+          case 'download_failed':
+            message = texts.chat.localTranscribe.downloadFailed;
+            break;
+          default:
+            message = (data.error as string) || texts.chat.localTranscribe.downloadFailed;
+        }
+
+        toast.error(message);
+        setState('idle');
         break;
+      }
     }
   }, []);
 
   // Worker initialization on mount -- model is loaded lazily on first record click
   useEffect(() => {
+    if (!isSupported) return;
+
     const worker = new Worker(new URL('../workers/whisper.worker.ts', import.meta.url), { type: 'module' });
     workerRef.current = worker;
 
@@ -197,7 +231,7 @@ export function useLocalTranscribe({ language, onTranscriptReceived, maxDuration
       worker.terminate();
       workerRef.current = null;
     };
-  }, [handleWorkerMessage]);
+  }, [handleWorkerMessage, isSupported]);
 
   // Stop recording and send to Worker for transcription
   const stopRecording = useCallback(async () => {
@@ -293,6 +327,7 @@ export function useLocalTranscribe({ language, onTranscriptReceived, maxDuration
     modelLoadedRef.current = false;
     setDownloadProgress(null);
     setState('idle');
+    toast.info(texts.chat.localTranscribe.downloadCancelled);
 
     // Create fresh worker for future use
     const worker = new Worker(new URL('../workers/whisper.worker.ts', import.meta.url), { type: 'module' });
@@ -313,6 +348,7 @@ export function useLocalTranscribe({ language, onTranscriptReceived, maxDuration
   return {
     state,
     downloadProgress,
+    isSupported,
     isRecording: state === 'recording',
     isTranscribing: state === 'transcribing',
     isDownloading: state === 'downloading',

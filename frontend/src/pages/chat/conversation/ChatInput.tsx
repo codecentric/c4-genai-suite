@@ -243,7 +243,7 @@ export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEm
         )}
         <form onSubmit={doSubmit}>
           <div className="box-border rounded-2xl border border-gray-200 p-4 pb-3 shadow-2xl shadow-gray-100 focus-within:ring-1 focus-within:ring-black">
-            {showLocalTranscribe && localTranscribeHook.isDownloading && localTranscribeHook.downloadProgress && (
+            {showLocalTranscribe && localTranscribeHook.isSupported && localTranscribeHook.isDownloading && localTranscribeHook.downloadProgress && (
               <DownloadProgressBanner
                 downloadProgress={localTranscribeHook.downloadProgress}
                 onCancel={localTranscribeHook.cancelDownload}
@@ -320,7 +320,7 @@ export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEm
                   />
                 ) : showTranscribe ? (
                   <TranscribeButton isRecording={isRecording} isTranscribing={isTranscribing} onToggle={toggleRecording} />
-                ) : showLocalTranscribe ? (
+                ) : showLocalTranscribe && localTranscribeHook.isSupported ? (
                   <LocalTranscribeButton
                     state={localTranscribeHook.state}
                     isRecording={localTranscribeHook.isRecording}
