@@ -191,6 +191,10 @@ export const en = {
     localTranscribe: {
       downloadingModel: 'Downloading speech recognition model...',
       downloadFailed: 'Failed to download speech recognition model. Please try again.',
+      downloadFailedOffline: 'No internet connection. Please check your network and try again.',
+      downloadFailedTimeout: 'Download timed out. Please check your connection and try again.',
+      downloadCancelled: 'Download cancelled.',
+      emptyTranscription: 'No speech could be recognized. Try speaking louder or closer to the microphone.',
       loadingModel: 'Loading speech recognition model...',
       loadFailed: 'Failed to load speech recognition model.',
       transcriptionFailed: 'Local transcription failed. Please try again.',

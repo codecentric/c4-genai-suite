@@ -54,10 +54,21 @@ self.addEventListener('message', async (event: MessageEvent<WorkerMessageData>) 
       });
       self.postMessage({ status: 'ready' });
     } catch (error: unknown) {
-      self.postMessage({
-        status: 'error',
-        error: error instanceof Error ? error.message : 'Failed to load model',
-      });
+      TranscriberPipeline.instance = null;
+
+      const message = error instanceof Error ? error.message : 'Failed to load model';
+      let code = 'download_failed';
+
+      if (!navigator.onLine) {
+        code = 'download_offline';
+      } else if (
+        error instanceof Error &&
+        error.message.toLowerCase().includes('timeout')
+      ) {
+        code = 'download_timeout';
+      }
+
+      self.postMessage({ status: 'error', error: message, code });
     }
   }
 
@@ -69,7 +80,7 @@ self.addEventListener('message', async (event: MessageEvent<WorkerMessageData>) 
       const whisperLanguage = LANGUAGE_MAP[language] ?? 'english';
 
       if (!audio) {
-        self.postMessage({ status: 'error', error: 'No audio data provided' });
+        self.postMessage({ status: 'error', error: 'No audio data provided', code: 'no_audio' });
         return;
       }
 
@@ -84,6 +95,7 @@ self.addEventListener('message', async (event: MessageEvent<WorkerMessageData>) 
       self.postMessage({
         status: 'error',
         error: error instanceof Error ? error.message : 'Transcription failed',
+        code: 'transcription_failed',
       });
     }
   }
