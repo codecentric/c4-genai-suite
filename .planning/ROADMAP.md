@@ -82,7 +82,7 @@ Plans:
 - [x] 03-01-PLAN.md -- Full vertical slice: hook cancelDownload + i18n keys + LocalTranscribeButton + DownloadProgressBanner + ChatInput wiring
 
 **Wave 2** *(blocked on Wave 1 completion)*
-- [ ] 03-02-PLAN.md -- Unit tests for LocalTranscribeButton and DownloadProgressBanner + human verification checkpoint
+- [x] 03-02-PLAN.md -- Unit tests for LocalTranscribeButton and DownloadProgressBanner + human verification checkpoint
 
 ### Phase 4: Error Handling
 **Goal**: All failure modes produce clear, actionable feedback instead of silent failures or cryptic errors
