@@ -307,6 +307,11 @@ export function useLocalTranscribe({ language, onTranscriptReceived, maxDuration
       if (recorder.state === 'recording') {
         recorder.requestData();
         recorder.stop();
+      } else {
+        // MediaRecorder is already inactive -- resolve immediately
+        cleanup();
+        setState('idle');
+        resolve();
       }
     });
   }, [cleanup]);
