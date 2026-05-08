@@ -6,7 +6,7 @@ tags: [testing, error-handling, vitest, hook-tests, worker-tests]
 dependency_graph:
   requires: [worker-error-codes, isSupported-flag, i18n-error-keys, empty-transcription-check]
   provides: [error-handling-test-coverage, broken-test-fixes]
-  affects: [frontend/src/hooks/useLocalTranscribe.ui-unit.spec.ts, frontend/src/workers/whisper.worker.ui-unit.spec.ts]
+  affects: [frontend/src/hooks/useLocalTranscribe.ui-unit.spec.ts, frontend/src/workers/whisper.worker.ui-unit.spec.ts, frontend/src/hooks/useLocalTranscribe.ts]
 tech_stack:
   added: []
   patterns: [worker-error-code-assertions, capability-detection-test-stubs, toast-notification-verification]
@@ -53,7 +53,8 @@ Added 10 new test cases:
 - Test 19: unknown error code falls back to raw error message (ERR-03)
 - Tests 20-21: empty and whitespace-only transcription shows toast.info, no text insertion (ERR-04)
 - Test 22: valid transcription still inserts text (regression guard)
-- Test 23: cancel download shows toast.info (D-06)
+- Test 23: mic denied prevents model download — verifies no `load` message posted when getUserMedia fails (fe59253)
+- Test 24: cancel download shows toast.info (D-06)
 
 **whisper.worker.ui-unit.spec.ts (19 tests total, 6 new):**
 
@@ -85,14 +86,18 @@ Added 6 new test cases:
 
 | Check | Result |
 |-------|--------|
-| useLocalTranscribe.ui-unit.spec.ts | 23/23 tests pass |
+| useLocalTranscribe.ui-unit.spec.ts | 24/24 tests pass |
 | whisper.worker.ui-unit.spec.ts | 19/19 tests pass |
-| Full frontend test suite | 150/150 tests pass (27 files, 0 regressions) |
+| Full frontend test suite | 151/151 tests pass (27 files, 0 regressions) |
 | TypeScript compilation | Passes (tsc --noEmit via pre-commit hook) |
 
 ## Known Stubs
 
 None -- all tests are fully wired to production code behaviors.
+
+### Human checkpoint fix: Mic check before model download (fe59253)
+
+During human verification, user identified that clicking the mic button started the model download even when microphone permission was denied. Fixed `startRecording` in `useLocalTranscribe.ts` to call `getUserMedia` BEFORE posting `{ type: 'load' }` to the Worker. If mic is denied, shows toast and stays idle without triggering download. Added test 23 to verify this behavior.
 
 ## Checkpoint: Human Verification Pending
 
