@@ -20,6 +20,7 @@ export function useGroupedResults(evaluationId?: string, page: number = 1, limit
 
 /**
  * Query hook to fetch a single evaluation result detail by ID
+ * @public
  */
 export function useEvaluationResultDetail(resultId?: string) {
   const evalApi = useEvalApi();
@@ -30,5 +31,3 @@ export function useEvaluationResultDetail(resultId?: string) {
     enabled: !!resultId,
   });
 }
-
-export { PAGE_SIZE };

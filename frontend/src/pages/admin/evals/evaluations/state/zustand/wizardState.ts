@@ -3,7 +3,7 @@ import type { RunEvaluationByTestCasesTestCase } from 'src/api/generated-eval';
 
 export type EvaluationMode = 'catalog' | 'manual';
 
-export type WizardStep = 'mode' | 'source' | 'metrics' | 'assistant' | 'review';
+type WizardStep = 'mode' | 'source' | 'metrics' | 'assistant' | 'review';
 
 interface WizardState {
   // Current step

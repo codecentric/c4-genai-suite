@@ -69,5 +69,3 @@ export function OpenAiEndpointFields({ form, isEdit }: OpenAiEndpointFieldsProps
     </>
   );
 }
-
-export { UNCHANGED_API_KEY };
