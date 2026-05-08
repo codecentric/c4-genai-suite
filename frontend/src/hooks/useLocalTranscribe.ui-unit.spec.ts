@@ -587,7 +587,22 @@ describe('useLocalTranscribe', () => {
     expect(toast.info).not.toHaveBeenCalled();
   });
 
-  // Test 23: cancel download shows toast.info (D-06)
+  // Test 23: mic denied prevents model download
+  it('does not start model download when mic permission is denied', async () => {
+    mockGetUserMedia.mockRejectedValueOnce(Object.assign(new Error('Permission denied'), { name: 'NotAllowedError' }));
+
+    const { result } = renderHook(() => useLocalTranscribe(defaultProps));
+
+    await act(async () => {
+      await result.current.toggleRecording();
+    });
+
+    expect(result.current.state).toBe('idle');
+    expect(toast.error).toHaveBeenCalledWith('Microphone permission denied.');
+    expect(mockWorkerInstance.postMessage).not.toHaveBeenCalledWith({ type: 'load' });
+  });
+
+  // Test 24: cancel download shows toast.info (D-06)
   it('shows toast.info when download is cancelled', async () => {
     const { result } = renderHook(() => useLocalTranscribe(defaultProps));
 
