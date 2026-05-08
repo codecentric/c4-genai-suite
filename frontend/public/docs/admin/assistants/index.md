@@ -53,6 +53,16 @@ Hover over assistant entries and click the icon for more options, which will bec
 
 **Tip: During the setup process you may hide new assistants from users via the "Enabled" setting or "User Groups". E.g. assign the assistant to the group "Admin".**
 
+## Import and Export of Assistants
+
+### Export
+
+Hover over assistant entries and click the icon for more options, which will become visible on their right. This menu will offer an "Export" option, which starts the download of a `{assistant name}.json` file. Note that secrets like API-Keys will be redacted.
+
+### Import
+
+Use the "arrow up" symbol next to the word Assistants at the top of the Assistants page to import a `*.json` file with the assistant configuration. Note that an unmodified export will have redacted secrets like API-Keys, such that some services might not work. However, if you upload a `*.json` with correct values for the secrets, they will be imported into the new Assistant and work as expected.
+
 #### Assistant Settings
 
 | Setting           | Description                       |
