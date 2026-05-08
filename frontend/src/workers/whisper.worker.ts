@@ -16,9 +16,10 @@ class TranscriberPipeline {
   static instance: Promise<AutomaticSpeechRecognitionPipeline> | null = null;
 
   static async getInstance(progress_callback?: (info: ProgressInfo) => void): Promise<AutomaticSpeechRecognitionPipeline> {
-    this.instance ??= pipeline('automatic-speech-recognition', 'onnx-community/whisper-base', {
-      dtype: 'fp16',
-      device: await detectDevice(),
+    const device = await detectDevice();
+    this.instance ??= pipeline('automatic-speech-recognition', 'onnx-community/whisper-small', {
+      dtype: 'q8',
+      device,
       progress_callback,
     });
     return this.instance;

@@ -89,7 +89,7 @@ describe('whisper.worker', () => {
 
       expect(mockPipeline).toHaveBeenCalledWith(
         'automatic-speech-recognition',
-        'onnx-community/whisper-base',
+        'onnx-community/whisper-small',
         expect.objectContaining({ device: 'webgpu' }),
       );
     });
@@ -100,7 +100,7 @@ describe('whisper.worker', () => {
 
       expect(mockPipeline).toHaveBeenCalledWith(
         'automatic-speech-recognition',
-        'onnx-community/whisper-base',
+        'onnx-community/whisper-small',
         expect.objectContaining({ device: 'wasm' }),
       );
     });
@@ -123,7 +123,7 @@ describe('whisper.worker', () => {
 
       expect(mockPipeline).toHaveBeenCalledWith(
         'automatic-speech-recognition',
-        'onnx-community/whisper-base',
+        'onnx-community/whisper-small',
         expect.objectContaining({ device: 'wasm' }),
       );
     });
