@@ -26,7 +26,7 @@ patterns_established:
 requirements_completed: [UI-01, UI-02, UI-03, UI-04, UI-07, MODEL-03, MODEL-04, I18N-02]
 duration: 2m 41s
 completed: 2026-05-07
-status: checkpoint-pending
+status: complete
 ---
 
 # Phase 03 Plan 02: UI Unit Tests and Human Verification Summary
@@ -37,8 +37,8 @@ status: checkpoint-pending
 
 - **Duration:** 2m 41s
 - **Started:** 2026-05-07T19:12:58Z
-- **Completed:** In progress (checkpoint pending)
-- **Tasks:** 1/2 complete (Task 2 is human-verify checkpoint)
+- **Completed:** 2026-05-08
+- **Tasks:** 2/2 complete
 - **Files created:** 2
 
 ## Accomplishments
@@ -66,17 +66,20 @@ None - plan executed exactly as written.
 ## Issues Encountered
 None.
 
-## Checkpoint Status
+## Human Verification
 
-**Task 2 (human-verify) is pending.** The human must verify the full local transcription UI flow in the browser: download, ready confirmation, recording, transcribing, language switching, and cached model behavior.
+**Task 2 (human-verify): APPROVED.** Full local transcription UI flow verified in browser.
+
+Issues found and fixed during verification:
+- **fp16 dtype produced garbage output** on WebGPU — fixed by switching to q8 quantization
+- **whisper-base quality too low** for conversational speech — upgraded to whisper-small
+- **Note:** whisper-small q8 downloads ~240MB — flagged for follow-up model size optimization
 
 ## Known Stubs
 None - test files are complete with all specified test cases.
 
-## Next Phase Readiness
-- Unit test coverage complete for both new components
-- Human verification checkpoint pending before plan can be marked complete
+## Self-Check: PASSED
 
 ---
 *Phase: 03-ui-integration*
-*Partial completion: 2026-05-07 (awaiting human checkpoint)*
+*Completed: 2026-05-08*
