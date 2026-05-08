@@ -12,6 +12,66 @@ const LANGUAGE_MAP: Record<string, string> = {
   en: 'english',
 };
 
+const SILENCE_RMS_THRESHOLD = 0.01;
+
+const HALLUCINATION_PATTERNS: string[] = [
+  // English
+  'Thank you.',
+  'Thank you for watching.',
+  'Thanks for watching.',
+  'Thank you for watching!',
+  'Thanks for watching!',
+  'Subtitles by',
+  'Subtitles made by',
+  'subtitles by the amara.org community',
+  'Amara.org',
+  '(music)',
+  '(Music)',
+  '(silence)',
+  '(Silence)',
+  'You',
+  'you',
+  'Bye.',
+  'Bye!',
+  'Goodbye.',
+  // German
+  'Untertitel',
+  'Untertitel im Auftrag des ZDF',
+  'Untertitel von',
+  'Vielen Dank.',
+  'Vielen Dank!',
+  'Tschüss.',
+  'SWR 2020',
+  'SWR 2021',
+];
+
+function computeRMS(samples: Float32Array): number {
+  let sumSquares = 0;
+  for (let i = 0; i < samples.length; i++) {
+    sumSquares += samples[i] * samples[i];
+  }
+  return Math.sqrt(sumSquares / samples.length);
+}
+
+function isHallucination(text: string): boolean {
+  const trimmed = text.trim();
+  if (trimmed.length === 0) return true;
+
+  // Exact match against known patterns (case-insensitive)
+  if (HALLUCINATION_PATTERNS.some(p => trimmed.toLowerCase() === p.toLowerCase())) {
+    return true;
+  }
+
+  // Single punctuation or ellipsis
+  if (/^[.!?,;:…]+$/.test(trimmed)) return true;
+
+  // Repetitive pattern: same word/phrase repeated 3+ times
+  const words = trimmed.split(/\s+/);
+  if (words.length >= 3 && words.every(w => w === words[0])) return true;
+
+  return false;
+}
+
 class TranscriberPipeline {
   static instance: Promise<AutomaticSpeechRecognitionPipeline> | null = null;
 
@@ -84,13 +144,28 @@ self.addEventListener('message', async (event: MessageEvent<WorkerMessageData>) 
         return;
       }
 
+      // Layer 1: RMS energy check (D-08)
+      const rms = computeRMS(audio);
+      if (rms < SILENCE_RMS_THRESHOLD) {
+        self.postMessage({ status: 'silence' });
+        return;
+      }
+
       const result = (await transcriber(audio, {
         language: whisperLanguage,
         task: 'transcribe',
       })) as AutomaticSpeechRecognitionOutput | AutomaticSpeechRecognitionOutput[];
 
       const output = Array.isArray(result) ? result[0] : result;
-      self.postMessage({ status: 'result', text: output.text.trim() });
+      const text = output.text.trim();
+
+      // Layer 2: Hallucination filter (D-09)
+      if (isHallucination(text)) {
+        self.postMessage({ status: 'silence' });
+        return;
+      }
+
+      self.postMessage({ status: 'result', text });
     } catch (error: unknown) {
       self.postMessage({
         status: 'error',

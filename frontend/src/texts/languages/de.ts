@@ -213,6 +213,10 @@ export const de: typeof en = {
       downloadCancelLabel: 'Download abbrechen',
       downloadReady: 'Bereit!',
       downloadSize: '{{loaded}} MB / {{total}} MB',
+      silenceDetected: 'Keine Sprache erkannt. Versuchen Sie, lauter oder näher am Mikrofon zu sprechen.',
+      privacyBadge: 'Lokal',
+      privacyTooltip: 'Audio wird lokal verarbeitet und verlässt niemals Ihren Browser',
+      timerLabel: 'Aufnahme-Timer',
     },
 
     thisMonth: 'Letzte 30 Tage',
