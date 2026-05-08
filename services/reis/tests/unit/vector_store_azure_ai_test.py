@@ -17,7 +17,7 @@ from ..data.response_get_index import index_get
 
 index_name = "test"
 endpoint = "https://example.search.windows.net"
-api_version = "2025-09-01"
+api_version = "2026-04-01"
 
 
 def get_config_override() -> Config:
