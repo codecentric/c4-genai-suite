@@ -20,6 +20,7 @@ interface UseLocalTranscribeProps {
 export function useLocalTranscribe({ language, onTranscriptReceived, maxDurationMs = 2 * 60 * 1000 }: UseLocalTranscribeProps) {
   const [state, setState] = useState<LocalTranscribeState>('idle');
   const [downloadProgress, setDownloadProgress] = useState<DownloadProgress | null>(null);
+  const [elapsedSeconds, setElapsedSeconds] = useState<number>(0);
   const [isSupported] = useState<boolean>(() => {
     return (
       typeof Worker !== 'undefined' &&
@@ -70,6 +71,7 @@ export function useLocalTranscribe({ language, onTranscriptReceived, maxDuration
       timerRef.current = null;
     }
     audioChunksRef.current = [];
+    setElapsedSeconds(0);
   }, []);
 
   // Internal function to actually begin recording (after model is confirmed loaded)
@@ -97,12 +99,14 @@ export function useLocalTranscribe({ language, onTranscriptReceived, maxDuration
       };
 
       mediaRecorder.start(100);
+      setElapsedSeconds(0);
       setState('recording');
       startTimeRef.current = Date.now();
 
       // Start duration timer for auto-stop
       timerRef.current = window.setInterval(() => {
         const elapsed = Date.now() - startTimeRef.current;
+        setElapsedSeconds(Math.floor(elapsed / 1000));
         if (elapsed >= maxDurationMsRef.current) {
           // Auto-stop: stop the recorder directly
           if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
@@ -188,6 +192,12 @@ export function useLocalTranscribe({ language, onTranscriptReceived, maxDuration
         } else {
           onTranscriptReceivedRef.current(text);
         }
+        setState('idle');
+        break;
+      }
+
+      case 'silence': {
+        toast.info(texts.chat.localTranscribe.silenceDetected);
         setState('idle');
         break;
       }
@@ -368,5 +378,6 @@ export function useLocalTranscribe({ language, onTranscriptReceived, maxDuration
     isDownloading: state === 'downloading',
     toggleRecording,
     cancelDownload,
+    elapsedSeconds,
   };
 }
