@@ -31,6 +31,7 @@ export function useMetric(id?: string) {
 
 /**
  * Query hook to fetch available metric types
+ * @public
  */
 export function useMetricTypes() {
   const evalApi = useEvalApi();

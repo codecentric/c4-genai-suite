@@ -19,6 +19,7 @@ export function useLlmEndpoints(page: number, query?: string, supportedFeatures?
 
 /**
  * Query hook to fetch a single LLM endpoint by ID
+ * @public
  */
 export function useLlmEndpoint(id?: string) {
   const evalApi = useEvalApi();
@@ -32,6 +33,7 @@ export function useLlmEndpoint(id?: string) {
 
 /**
  * Query hook to fetch available LLM endpoint types
+ * @public
  */
 export function useLlmEndpointTypes() {
   const evalApi = useEvalApi();

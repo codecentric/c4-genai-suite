@@ -65,14 +65,14 @@ type BaseMetricProps = {
   onClose: () => void;
 };
 
-export type UpdateMetricProps = {
+type UpdateMetricProps = {
   type: 'update';
   target: Metric;
   onUpdate: () => void;
   onDelete: () => void;
 } & BaseMetricProps;
 
-export type CreateMetricProps = {
+type CreateMetricProps = {
   type: 'create';
   onCreate: () => void;
 } & BaseMetricProps;
