@@ -296,12 +296,13 @@ describe('whisper.worker', () => {
   });
 
   describe('error handling', () => {
-    it('posts error status when pipeline load fails', async () => {
+    it('posts error status with download_failed code when pipeline load fails', async () => {
       mockPipeline.mockRejectedValue(new Error('Network error'));
 
       vi.resetModules();
       const addEventListenerSpy = vi.fn();
       vi.stubGlobal('addEventListener', addEventListenerSpy);
+      vi.stubGlobal('navigator', { onLine: true });
 
       const handler = await importWorkerAndGetHandler(addEventListenerSpy);
 
@@ -311,10 +312,11 @@ describe('whisper.worker', () => {
       expect(mockPostMessage).toHaveBeenCalledWith({
         status: 'error',
         error: 'Network error',
+        code: 'download_failed',
       });
     });
 
-    it('posts error status when transcription fails', async () => {
+    it('posts error status with transcription_failed code when transcription fails', async () => {
       // First load successfully
       const loadEvent = new MessageEvent('message', { data: { type: 'load' } });
       await messageHandler(loadEvent);
@@ -334,6 +336,112 @@ describe('whisper.worker', () => {
       expect(mockPostMessage).toHaveBeenCalledWith({
         status: 'error',
         error: 'Inference failed',
+        code: 'transcription_failed',
+      });
+    });
+
+    it('posts download_offline error code when navigator.onLine is false', async () => {
+      mockPipeline.mockRejectedValue(new Error('Failed to fetch'));
+
+      vi.resetModules();
+      const addEventListenerSpy = vi.fn();
+      vi.stubGlobal('addEventListener', addEventListenerSpy);
+      vi.stubGlobal('navigator', { onLine: false });
+
+      const handler = await importWorkerAndGetHandler(addEventListenerSpy);
+
+      const event = new MessageEvent('message', { data: { type: 'load' } });
+      await handler(event);
+
+      expect(mockPostMessage).toHaveBeenCalledWith({
+        status: 'error',
+        error: 'Failed to fetch',
+        code: 'download_offline',
+      });
+    });
+
+    it('posts download_timeout error code when error message contains timeout', async () => {
+      mockPipeline.mockRejectedValue(new Error('Request timeout exceeded'));
+
+      vi.resetModules();
+      const addEventListenerSpy = vi.fn();
+      vi.stubGlobal('addEventListener', addEventListenerSpy);
+      vi.stubGlobal('navigator', { onLine: true });
+
+      const handler = await importWorkerAndGetHandler(addEventListenerSpy);
+
+      const event = new MessageEvent('message', { data: { type: 'load' } });
+      await handler(event);
+
+      expect(mockPostMessage).toHaveBeenCalledWith({
+        status: 'error',
+        error: 'Request timeout exceeded',
+        code: 'download_timeout',
+      });
+    });
+
+    it('posts download_failed error code for generic errors when online', async () => {
+      mockPipeline.mockRejectedValue(new Error('Some other error'));
+
+      vi.resetModules();
+      const addEventListenerSpy = vi.fn();
+      vi.stubGlobal('addEventListener', addEventListenerSpy);
+      vi.stubGlobal('navigator', { onLine: true });
+
+      const handler = await importWorkerAndGetHandler(addEventListenerSpy);
+
+      const event = new MessageEvent('message', { data: { type: 'load' } });
+      await handler(event);
+
+      expect(mockPostMessage).toHaveBeenCalledWith({
+        status: 'error',
+        error: 'Some other error',
+        code: 'download_failed',
+      });
+    });
+
+    it('resets TranscriberPipeline.instance on load failure to allow retry', async () => {
+      // First attempt fails
+      mockPipeline.mockRejectedValueOnce(new Error('Network error'));
+
+      vi.resetModules();
+      const addEventListenerSpy = vi.fn();
+      vi.stubGlobal('addEventListener', addEventListenerSpy);
+      vi.stubGlobal('navigator', { onLine: true });
+
+      const handler = await importWorkerAndGetHandler(addEventListenerSpy);
+
+      const loadEvent = new MessageEvent('message', { data: { type: 'load' } });
+      await handler(loadEvent);
+
+      expect(mockPostMessage).toHaveBeenCalledWith(expect.objectContaining({ status: 'error', code: 'download_failed' }));
+
+      // Second attempt should succeed (pipeline called again, not returning cached rejected promise)
+      mockPipeline.mockResolvedValue(mockTranscriber);
+      mockPostMessage.mockClear();
+
+      await handler(loadEvent);
+
+      expect(mockPostMessage).toHaveBeenCalledWith({ status: 'ready' });
+    });
+
+    it('posts no_audio error code when audio data is missing', async () => {
+      // Load model first
+      const loadEvent = new MessageEvent('message', { data: { type: 'load' } });
+      await messageHandler(loadEvent);
+
+      mockPostMessage.mockClear();
+
+      // Send transcribe without audio
+      const event = new MessageEvent('message', {
+        data: { type: 'transcribe', language: 'en' },
+      });
+      await messageHandler(event);
+
+      expect(mockPostMessage).toHaveBeenCalledWith({
+        status: 'error',
+        error: 'No audio data provided',
+        code: 'no_audio',
       });
     });
   });
