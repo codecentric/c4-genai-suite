@@ -1,10 +1,10 @@
 ---
 gsd_state_version: 1.0
 milestone: v1.0
-milestone_name: milestone
-status: executing
-stopped_at: Phase 6 context gathered
-last_updated: "2026-05-08T19:44:59.431Z"
+milestone_name: Lokale Spracherkennung
+status: shipped
+stopped_at: Milestone v1.0 complete
+last_updated: "2026-05-08T22:00:00.000Z"
 last_activity: 2026-05-08
 progress:
   total_phases: 6
@@ -18,67 +18,61 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-05-07)
+See: .planning/PROJECT.md (updated 2026-05-08)
 
 **Core value:** Spracherkennung ohne dass Audiodaten den Browser verlassen -- vollstaendige Datenschutzkonformitaet bei gleichzeitiger Beibehaltung der bestehenden Cloud-Optionen.
-**Current focus:** Phase 06 — tech-debt-documentation-code-cleanup
+**Current focus:** Milestone v1.0 shipped. Planning next milestone.
 
 ## Current Position
 
-Phase: 06
-Plan: Not started
-Status: Executing Phase 06
+Phase: All complete
+Plan: All complete
+Status: v1.0 shipped
 Last activity: 2026-05-08
 
-Progress: [████████░░] 88%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 4
-- Average duration: -
-- Total execution time: 0 hours
+- Total plans completed: 12
+- Timeline: 2 days (2026-05-07 to 2026-05-08)
+- Production LOC: 856 (8 files)
 
 **By Phase:**
 
-| Phase | Plans | Total | Avg/Plan |
-|-------|-------|-------|----------|
-| 03 | 2 | - | - |
-| 06 | 2 | - | - |
-
-**Recent Trend:**
-
-- Last 5 plans: -
-- Trend: -
-
-*Updated after each plan completion*
+| Phase | Plans | Completed |
+|-------|-------|-----------|
+| 01 | 2 | 2026-05-07 |
+| 02 | 2 | 2026-05-07 |
+| 03 | 2 | 2026-05-07 |
+| 04 | 2 | 2026-05-08 |
+| 05 | 2 | 2026-05-08 |
+| 06 | 2 | 2026-05-08 |
 
 ## Accumulated Context
 
 ### Decisions
 
 Decisions are logged in PROJECT.md Key Decisions table.
-Recent decisions affecting current work:
-
-- None yet
+All 9 key decisions from v1.0 milestone rated Good.
 
 ### Pending Todos
 
-None yet.
+None.
 
 ### Roadmap Evolution
 
-- Phase 6 added: Address tech debt: documentation and code cleanup
+- v1.0 milestone completed and archived to .planning/milestones/
 
 ### Blockers/Concerns
 
-- Phase 1: RESOLVED — COOP/COEP `credentialless` verified, no regressions (225 backend tests pass, 30/33 E2E pass, human-verified)
-- Phase 2: ONNX Runtime WASM threading stability should be verified with the specific `onnxruntime-web` version bundled in Transformers.js v4.2
+None -- all blockers resolved during milestone execution.
 
 ## Deferred Items
 
-Items acknowledged and carried forward from previous milestone close:
+Items acknowledged and carried forward from milestone close:
 
 | Category | Item | Status | Deferred At |
 |----------|------|--------|-------------|
@@ -86,6 +80,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-05-08T21:00:00.000Z
-Stopped at: Phase 6 context gathered
-Resume file: .planning/phases/06-tech-debt-documentation-code-cleanup/06-CONTEXT.md
+Last session: 2026-05-08
+Stopped at: Milestone v1.0 complete
+Resume: /gsd-new-milestone for next version
