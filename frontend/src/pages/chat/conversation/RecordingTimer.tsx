@@ -6,7 +6,7 @@ interface RecordingTimerProps {
 }
 
 export function RecordingTimer({ elapsedSeconds, maxSeconds }: RecordingTimerProps) {
-  const WARNING_THRESHOLD = maxSeconds - 15;
+  const WARNING_THRESHOLD = Math.max(0, maxSeconds - 15);
   const isWarning = elapsedSeconds >= WARNING_THRESHOLD;
 
   const formatTime = (seconds: number): string => {
