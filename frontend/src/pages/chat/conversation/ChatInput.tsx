@@ -12,6 +12,8 @@ import { DownloadProgressBanner } from './DownloadProgressBanner';
 import { FileItemComponent } from 'src/pages/chat/conversation/FileItem';
 import { FilterModal } from 'src/pages/chat/conversation/FilterModal';
 import { LocalTranscribeButton } from './LocalTranscribeButton';
+import { PrivacyBadge } from './PrivacyBadge';
+import { RecordingTimer } from './RecordingTimer';
 import { Language, SpeechRecognitionButton } from 'src/pages/chat/conversation/SpeechRecognitionButton';
 import { TranscribeButton } from 'src/pages/chat/conversation/TranscribeButton';
 import { texts } from 'src/texts';
@@ -321,16 +323,25 @@ export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEm
                 ) : showTranscribe ? (
                   <TranscribeButton isRecording={isRecording} isTranscribing={isTranscribing} onToggle={toggleRecording} />
                 ) : showLocalTranscribe && localTranscribeHook.isSupported ? (
-                  <LocalTranscribeButton
-                    state={localTranscribeHook.state}
-                    isRecording={localTranscribeHook.isRecording}
-                    isTranscribing={localTranscribeHook.isTranscribing}
-                    isDownloading={localTranscribeHook.isDownloading}
-                    onToggle={localTranscribeHook.toggleRecording}
-                    language={localTranscribeLanguage}
-                    onLanguageChange={setLocalTranscribeLanguage}
-                    languages={['de', 'en']}
-                  />
+                  <>
+                    <PrivacyBadge />
+                    {localTranscribeHook.isRecording && (
+                      <RecordingTimer
+                        elapsedSeconds={localTranscribeHook.elapsedSeconds}
+                        maxSeconds={120}
+                      />
+                    )}
+                    <LocalTranscribeButton
+                      state={localTranscribeHook.state}
+                      isRecording={localTranscribeHook.isRecording}
+                      isTranscribing={localTranscribeHook.isTranscribing}
+                      isDownloading={localTranscribeHook.isDownloading}
+                      onToggle={localTranscribeHook.toggleRecording}
+                      language={localTranscribeLanguage}
+                      onLanguageChange={setLocalTranscribeLanguage}
+                      languages={['de', 'en']}
+                    />
+                  </>
                 ) : null}
                 <ActionIcon
                   type="submit"
