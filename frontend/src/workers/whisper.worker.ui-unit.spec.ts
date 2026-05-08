@@ -445,4 +445,104 @@ describe('whisper.worker', () => {
       });
     });
   });
+
+  describe('silence detection', () => {
+    it('should return silence status when audio RMS is below threshold', async () => {
+      // Load model first
+      const loadEvent = new MessageEvent('message', { data: { type: 'load' } });
+      await messageHandler(loadEvent);
+      mockPostMessage.mockClear();
+
+      // Create a Float32Array with very low values (silence)
+      const silentAudio = new Float32Array(16000).fill(0.0001);
+      await messageHandler(new MessageEvent('message', { data: { type: 'transcribe', audio: silentAudio, language: 'en' } }));
+      expect(mockPostMessage).toHaveBeenCalledWith({ status: 'silence' });
+    });
+
+    it('should proceed to transcription when audio RMS is above threshold', async () => {
+      // Load model first
+      const loadEvent = new MessageEvent('message', { data: { type: 'load' } });
+      await messageHandler(loadEvent);
+      mockPostMessage.mockClear();
+
+      // Create audio with sufficient energy
+      const loudAudio = new Float32Array(16000);
+      for (let i = 0; i < loudAudio.length; i++) {
+        loudAudio[i] = 0.5 * Math.sin((2 * Math.PI * 440 * i) / 16000);
+      }
+      mockTranscriber.mockResolvedValue({ text: 'Hello world' });
+      await messageHandler(new MessageEvent('message', { data: { type: 'transcribe', audio: loudAudio, language: 'en' } }));
+      expect(mockPostMessage).toHaveBeenCalledWith({ status: 'result', text: 'Hello world' });
+    });
+
+    it('should return silence status for known hallucination "Thank you."', async () => {
+      const loadEvent = new MessageEvent('message', { data: { type: 'load' } });
+      await messageHandler(loadEvent);
+      mockPostMessage.mockClear();
+
+      const loudAudio = new Float32Array(16000);
+      for (let i = 0; i < loudAudio.length; i++) {
+        loudAudio[i] = 0.5 * Math.sin((2 * Math.PI * 440 * i) / 16000);
+      }
+      mockTranscriber.mockResolvedValue({ text: 'Thank you.' });
+      await messageHandler(new MessageEvent('message', { data: { type: 'transcribe', audio: loudAudio, language: 'en' } }));
+      expect(mockPostMessage).toHaveBeenCalledWith({ status: 'silence' });
+    });
+
+    it('should return silence status for German hallucination "Untertitel"', async () => {
+      const loadEvent = new MessageEvent('message', { data: { type: 'load' } });
+      await messageHandler(loadEvent);
+      mockPostMessage.mockClear();
+
+      const loudAudio = new Float32Array(16000);
+      for (let i = 0; i < loudAudio.length; i++) {
+        loudAudio[i] = 0.5 * Math.sin((2 * Math.PI * 440 * i) / 16000);
+      }
+      mockTranscriber.mockResolvedValue({ text: 'Untertitel' });
+      await messageHandler(new MessageEvent('message', { data: { type: 'transcribe', audio: loudAudio, language: 'de' } }));
+      expect(mockPostMessage).toHaveBeenCalledWith({ status: 'silence' });
+    });
+
+    it('should return silence status for punctuation-only text', async () => {
+      const loadEvent = new MessageEvent('message', { data: { type: 'load' } });
+      await messageHandler(loadEvent);
+      mockPostMessage.mockClear();
+
+      const loudAudio = new Float32Array(16000);
+      for (let i = 0; i < loudAudio.length; i++) {
+        loudAudio[i] = 0.5 * Math.sin((2 * Math.PI * 440 * i) / 16000);
+      }
+      mockTranscriber.mockResolvedValue({ text: '...' });
+      await messageHandler(new MessageEvent('message', { data: { type: 'transcribe', audio: loudAudio, language: 'en' } }));
+      expect(mockPostMessage).toHaveBeenCalledWith({ status: 'silence' });
+    });
+
+    it('should return silence status for repetitive text', async () => {
+      const loadEvent = new MessageEvent('message', { data: { type: 'load' } });
+      await messageHandler(loadEvent);
+      mockPostMessage.mockClear();
+
+      const loudAudio = new Float32Array(16000);
+      for (let i = 0; i < loudAudio.length; i++) {
+        loudAudio[i] = 0.5 * Math.sin((2 * Math.PI * 440 * i) / 16000);
+      }
+      mockTranscriber.mockResolvedValue({ text: 'the the the' });
+      await messageHandler(new MessageEvent('message', { data: { type: 'transcribe', audio: loudAudio, language: 'en' } }));
+      expect(mockPostMessage).toHaveBeenCalledWith({ status: 'silence' });
+    });
+
+    it('should NOT filter legitimate short text like "Hello"', async () => {
+      const loadEvent = new MessageEvent('message', { data: { type: 'load' } });
+      await messageHandler(loadEvent);
+      mockPostMessage.mockClear();
+
+      const loudAudio = new Float32Array(16000);
+      for (let i = 0; i < loudAudio.length; i++) {
+        loudAudio[i] = 0.5 * Math.sin((2 * Math.PI * 440 * i) / 16000);
+      }
+      mockTranscriber.mockResolvedValue({ text: 'Hello' });
+      await messageHandler(new MessageEvent('message', { data: { type: 'transcribe', audio: loudAudio, language: 'en' } }));
+      expect(mockPostMessage).toHaveBeenCalledWith({ status: 'result', text: 'Hello' });
+    });
+  });
 });

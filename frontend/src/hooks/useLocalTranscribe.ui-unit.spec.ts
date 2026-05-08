@@ -29,6 +29,7 @@ vi.mock('src/texts', () => ({
         downloadFailedTimeout: 'Download timed out.',
         downloadCancelled: 'Download cancelled.',
         emptyTranscription: 'No speech could be recognized.',
+        silenceDetected: 'No speech detected.',
       },
     },
   },
@@ -619,5 +620,68 @@ describe('useLocalTranscribe', () => {
 
     expect(result.current.state).toBe('idle');
     expect(toast.info).toHaveBeenCalledWith('Download cancelled.');
+  });
+
+  describe('elapsed seconds', () => {
+    it('should expose elapsedSeconds initially as 0', () => {
+      const { result } = renderHook(() => useLocalTranscribe(defaultProps));
+      expect(result.current.elapsedSeconds).toBe(0);
+    });
+
+    it('should update elapsedSeconds during recording', async () => {
+      const { result } = renderHook(() => useLocalTranscribe(defaultProps));
+
+      // Model loaded
+      act(() => {
+        simulateWorkerMessage({ status: 'ready' });
+      });
+
+      // Start recording
+      await act(async () => {
+        await result.current.toggleRecording();
+      });
+
+      expect(result.current.state).toBe('recording');
+
+      // Advance timer by 3 seconds (3000ms)
+      act(() => {
+        vi.advanceTimersByTime(3000);
+      });
+
+      expect(result.current.elapsedSeconds).toBeGreaterThanOrEqual(2);
+    });
+  });
+
+  describe('silence status handling', () => {
+    it('should show toast.info on silence status', () => {
+      renderHook(() => useLocalTranscribe(defaultProps));
+
+      act(() => {
+        simulateWorkerMessage({ status: 'silence' });
+      });
+
+      expect(toast.info).toHaveBeenCalledWith(expect.stringContaining('No speech detected'));
+    });
+
+    it('should return to idle state on silence status', () => {
+      const { result } = renderHook(() => useLocalTranscribe(defaultProps));
+
+      act(() => {
+        simulateWorkerMessage({ status: 'silence' });
+      });
+
+      expect(result.current.state).toBe('idle');
+    });
+
+    it('should NOT call onTranscriptReceived on silence status', () => {
+      const onTranscriptReceived = vi.fn();
+      renderHook(() => useLocalTranscribe({ ...defaultProps, onTranscriptReceived }));
+
+      act(() => {
+        simulateWorkerMessage({ status: 'silence' });
+      });
+
+      expect(onTranscriptReceived).not.toHaveBeenCalled();
+    });
   });
 });
