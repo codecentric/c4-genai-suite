@@ -395,10 +395,11 @@ export function useLocalTranscribe({ language, onTranscriptReceived, maxDuration
   // Cleanup MediaRecorder on unmount
   useEffect(() => {
     return () => {
-      cleanup();
+      // Stop recorder BEFORE cleanup to preserve proper event ordering
       if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
         mediaRecorderRef.current.stop();
       }
+      cleanup();
     };
   }, [cleanup]);
 
