@@ -291,10 +291,7 @@ export function useLocalTranscribe({ language, onTranscriptReceived, maxDuration
             resolve();
             return;
           }
-          worker.postMessage(
-            { type: 'transcribe', audio: audioData, language: languageRef.current },
-            [audioData.buffer],
-          );
+          worker.postMessage({ type: 'transcribe', audio: audioData, language: languageRef.current }, [audioData.buffer]);
         } catch {
           toast.error(texts.chat.localTranscribe.transcriptionFailed);
           setState('error');
