@@ -1,0 +1,83 @@
+---
+phase: 5
+slug: polish-refinement
+status: draft
+nyquist_compliant: false
+wave_0_complete: false
+created: 2026-05-08
+---
+
+# Phase 5 — Validation Strategy
+
+> Per-phase validation contract for feedback sampling during execution.
+
+---
+
+## Test Infrastructure
+
+| Property | Value |
+|----------|-------|
+| **Framework** | vitest 4.1.4 |
+| **Config file** | `frontend/vite.config.ts` (test section, lines 18-38) |
+| **Quick run command** | `cd frontend && npx vitest run` |
+| **Full suite command** | `cd frontend && npx vitest run` |
+| **Estimated runtime** | ~30 seconds |
+
+---
+
+## Sampling Rate
+
+- **After every task commit:** Run `cd frontend && npx vitest run`
+- **After every plan wave:** Run `cd frontend && npx vitest run`
+- **Before `/gsd-verify-work`:** Full suite must be green
+- **Max feedback latency:** 30 seconds
+
+---
+
+## Per-Task Verification Map
+
+| Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
+|---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
+| 05-01-01 | 01 | 1 | UI-05 | — | N/A | unit | `cd frontend && npx vitest run src/hooks/useLocalTranscribe.ui-unit.spec.ts -t "elapsedSeconds"` | ✅ extends | ⬜ pending |
+| 05-01-02 | 01 | 1 | UI-05 | — | N/A | unit | `cd frontend && npx vitest run src/pages/chat/conversation/RecordingTimer.ui-unit.spec.tsx` | ❌ W0 | ⬜ pending |
+| 05-01-03 | 01 | 1 | UI-05 | — | N/A | unit | `cd frontend && npx vitest run src/pages/chat/conversation/RecordingTimer.ui-unit.spec.tsx -t "warning"` | ❌ W0 | ⬜ pending |
+| 05-01-04 | 01 | 1 | UI-06 | — | N/A | unit | `cd frontend && npx vitest run src/pages/chat/conversation/PrivacyBadge.ui-unit.spec.tsx` | ❌ W0 | ⬜ pending |
+| 05-01-05 | 01 | 1 | ERR-05 | — | Transcription text auto-escaped by React | unit | `cd frontend && npx vitest run src/workers/whisper.worker.ui-unit.spec.ts -t "silence"` | ✅ extends | ⬜ pending |
+| 05-01-06 | 01 | 1 | ERR-05 | — | Worker same-origin, type-safe messages | unit | `cd frontend && npx vitest run src/workers/whisper.worker.ui-unit.spec.ts -t "hallucination"` | ✅ extends | ⬜ pending |
+| 05-01-07 | 01 | 1 | ERR-05 | — | N/A | unit | `cd frontend && npx vitest run src/hooks/useLocalTranscribe.ui-unit.spec.ts -t "silence"` | ✅ extends | ⬜ pending |
+
+*Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
+
+---
+
+## Wave 0 Requirements
+
+- [ ] `frontend/src/pages/chat/conversation/RecordingTimer.ui-unit.spec.tsx` — stubs for UI-05 (timer rendering, format, warning color)
+- [ ] `frontend/src/pages/chat/conversation/PrivacyBadge.ui-unit.spec.tsx` — stubs for UI-06 (badge rendering, icon, tooltip)
+
+Existing test files that need extension (not Wave 0, extend during implementation):
+- `frontend/src/hooks/useLocalTranscribe.ui-unit.spec.ts` — add tests for `elapsedSeconds` state and `silence` status handling
+- `frontend/src/workers/whisper.worker.ui-unit.spec.ts` — add tests for RMS check, hallucination filter, `silence` status
+
+---
+
+## Manual-Only Verifications
+
+| Behavior | Requirement | Why Manual | Test Instructions |
+|----------|-------------|------------|-------------------|
+| Timer visual red color transition at 1:45 | UI-05 | CSS color rendering not verifiable in unit tests | 1. Start recording, 2. Wait until 1:45 elapsed, 3. Verify timer text turns red |
+| Privacy badge tooltip appears on hover | UI-06 | Tooltip hover interaction requires browser | 1. Hover over privacy badge, 2. Verify tooltip text appears |
+| Silence produces "No speech detected" toast | ERR-05 | Requires actual microphone silence + Whisper | 1. Start recording with mic muted, 2. Wait for auto-stop, 3. Verify toast shows |
+
+---
+
+## Validation Sign-Off
+
+- [ ] All tasks have `<automated>` verify or Wave 0 dependencies
+- [ ] Sampling continuity: no 3 consecutive tasks without automated verify
+- [ ] Wave 0 covers all MISSING references
+- [ ] No watch-mode flags
+- [ ] Feedback latency < 30s
+- [ ] `nyquist_compliant: true` set in frontmatter
+
+**Approval:** pending
