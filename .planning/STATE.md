@@ -26,9 +26,9 @@ See: .planning/PROJECT.md (updated 2026-05-07)
 ## Current Position
 
 Phase: 5
-Plan: —
-Status: Ready to execute
-Last activity: 2026-05-08 -- Phase 5 planning complete
+Plan: 05-01 complete, 05-02 pending
+Status: Executing Wave 2
+Last activity: 2026-05-08 -- Wave 1 complete (silence detection, timer, privacy badge)
 
 Progress: [████████░░] 88%
 
