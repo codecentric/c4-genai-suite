@@ -285,9 +285,16 @@ export function useLocalTranscribe({ language, onTranscriptReceived, maxDuration
           const audioData = await resampleToMono16kHz(audioBlob);
 
           // Transfer audio to Worker with Transferable (zero-copy)
-          workerRef.current!.postMessage({ type: 'transcribe', audio: audioData, language: languageRef.current }, [
-            audioData.buffer,
-          ]);
+          const worker = workerRef.current;
+          if (!worker) {
+            setState('idle');
+            resolve();
+            return;
+          }
+          worker.postMessage(
+            { type: 'transcribe', audio: audioData, language: languageRef.current },
+            [audioData.buffer],
+          );
         } catch {
           toast.error(texts.chat.localTranscribe.transcriptionFailed);
           setState('error');
