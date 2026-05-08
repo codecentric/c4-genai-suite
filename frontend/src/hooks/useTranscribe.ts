@@ -153,7 +153,7 @@ export function useTranscribe({ extensionId, onTranscriptReceived, maxDurationMs
       startTimeRef.current = Date.now();
 
       // Start duration timer
-      timerRef.current = setInterval(() => {
+      timerRef.current = window.setInterval(() => {
         const elapsed = Date.now() - startTimeRef.current;
 
         // Auto-stop if max duration reached

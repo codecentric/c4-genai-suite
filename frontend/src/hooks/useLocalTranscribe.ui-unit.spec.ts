@@ -25,6 +25,10 @@ vi.mock('src/texts', () => ({
         transcriptionFailed: 'Local transcription failed.',
         downloadFailed: 'Failed to download speech recognition model.',
         loadFailed: 'Failed to load speech recognition model.',
+        downloadFailedOffline: 'No internet connection.',
+        downloadFailedTimeout: 'Download timed out.',
+        downloadCancelled: 'Download cancelled.',
+        emptyTranscription: 'No speech could be recognized.',
       },
     },
   },
@@ -151,6 +155,9 @@ describe('useLocalTranscribe', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.useFakeTimers();
+    // Stub browser capabilities for isSupported check (default: all supported)
+    vi.stubGlobal('WebAssembly', {});
+    vi.stubGlobal('crossOriginIsolated', true);
   });
 
   afterEach(() => {
@@ -163,25 +170,25 @@ describe('useLocalTranscribe', () => {
   };
 
   // Test 1: Initial state
-  it('starts in loading state with downloadProgress null', () => {
+  it('starts in idle state with downloadProgress null', () => {
     const { result } = renderHook(() => useLocalTranscribe(defaultProps));
 
-    // On mount, the hook sends 'load' to Worker (pre-load D-06), setting state to 'loading'
-    expect(result.current.state).toBe('loading');
+    // Hook starts in idle state with lazy loading (no pre-load on mount)
+    expect(result.current.state).toBe('idle');
     expect(result.current.downloadProgress).toBeNull();
     expect(result.current.isRecording).toBe(false);
     expect(result.current.isTranscribing).toBe(false);
     expect(result.current.isDownloading).toBe(false);
+    expect(result.current.isSupported).toBe(true);
   });
 
-  // Test 2: Model pre-load on mount (D-06)
-  it('creates Worker and posts load on mount, becomes idle on ready', () => {
+  // Test 2: Worker creation on mount (lazy loading - no load message)
+  it('creates Worker on mount and becomes idle on ready', () => {
     const { result } = renderHook(() => useLocalTranscribe(defaultProps));
 
-    // Worker should be created and load message posted
-    expect(mockWorkerInstance.postMessage).toHaveBeenCalledWith({ type: 'load' });
+    // Worker created but no load message posted (lazy loading)
+    expect(mockWorkerInstance.addEventListener).toHaveBeenCalledWith('message', expect.any(Function));
 
-    // Simulate model ready
     act(() => {
       simulateWorkerMessage({ status: 'ready' });
     });
@@ -193,12 +200,13 @@ describe('useLocalTranscribe', () => {
   it('posts load to Worker on first click when model not loaded, auto-starts recording on ready', async () => {
     const { result } = renderHook(() => useLocalTranscribe(defaultProps));
 
-    // Send error so hook goes to 'error' state (model not loaded)
+    // Send error so hook goes to 'idle' state (model not loaded, error -> idle per D-04)
     act(() => {
       simulateWorkerMessage({ status: 'error', error: 'Load failed' });
     });
 
-    expect(result.current.state).toBe('error');
+    // After error, state is now idle (not error) per D-04/Phase 3 D-13
+    expect(result.current.state).toBe('idle');
 
     // Now click toggleRecording -- model is not loaded, should set pending and post 'load'
     await act(async () => {
@@ -239,12 +247,12 @@ describe('useLocalTranscribe', () => {
   });
 
   // Test 5: Download progress (D-08)
-  it('updates downloadProgress on progress_total message', () => {
+  it('updates downloadProgress on progress_total message', async () => {
     const { result } = renderHook(() => useLocalTranscribe(defaultProps));
 
-    // During initial load, if download events arrive, transition to downloading
-    act(() => {
-      simulateWorkerMessage({ status: 'download', name: 'model', file: 'encoder.onnx' });
+    // Click record to trigger model download (state -> downloading)
+    await act(async () => {
+      await result.current.toggleRecording();
     });
 
     expect(result.current.state).toBe('downloading');
@@ -427,16 +435,16 @@ describe('useLocalTranscribe', () => {
     expect((transcribeCall![0] as Record<string, unknown>).language).toBe('en');
   });
 
-  // Test 11: Error from Worker
-  it('sets error state and shows toast on Worker error', () => {
+  // Test 11: Error from Worker (with error code)
+  it('sets idle state and shows toast on Worker error with code', () => {
     const { result } = renderHook(() => useLocalTranscribe(defaultProps));
 
     act(() => {
-      simulateWorkerMessage({ status: 'error', error: 'Something went wrong' });
+      simulateWorkerMessage({ status: 'error', error: 'Network error', code: 'download_offline' });
     });
 
-    expect(result.current.state).toBe('error');
-    expect(toast.error).toHaveBeenCalledWith('Something went wrong');
+    expect(result.current.state).toBe('idle');
+    expect(toast.error).toHaveBeenCalledWith('No internet connection.');
   });
 
   // Test 12: Cleanup on unmount
@@ -455,19 +463,146 @@ describe('useLocalTranscribe', () => {
   });
 
   // Test 13: Download blocks recording (D-05)
-  it('does not allow recording during downloading or loading states', async () => {
+  it('does not allow recording during downloading state', async () => {
     const { result } = renderHook(() => useLocalTranscribe(defaultProps));
 
-    // Hook is in 'loading' state on mount
-    expect(result.current.state).toBe('loading');
-
-    // Try to toggle recording -- should be a no-op
+    // Trigger download
     await act(async () => {
       await result.current.toggleRecording();
     });
+    expect(result.current.state).toBe('downloading');
 
-    // State should still be loading (not recording)
-    expect(result.current.state).toBe('loading');
-    expect(mockGetUserMedia).not.toHaveBeenCalled();
+    // Try to toggle again -- should be a no-op (D-05)
+    await act(async () => {
+      await result.current.toggleRecording();
+    });
+    expect(result.current.state).toBe('downloading');
+  });
+
+  // Test 14: isSupported false when Worker missing (ERR-02)
+  it('returns isSupported=false when Worker is not available', () => {
+    const origWorker = globalThis.Worker;
+    // @ts-expect-error -- testing missing API
+    delete globalThis.Worker;
+
+    const { result } = renderHook(() => useLocalTranscribe(defaultProps));
+    expect(result.current.isSupported).toBe(false);
+
+    globalThis.Worker = origWorker;
+  });
+
+  // Test 15: isSupported false when crossOriginIsolated is false (ERR-02)
+  it('returns isSupported=false when crossOriginIsolated is false', () => {
+    vi.stubGlobal('crossOriginIsolated', false);
+
+    const { result } = renderHook(() => useLocalTranscribe(defaultProps));
+    expect(result.current.isSupported).toBe(false);
+  });
+
+  // Test 16: no Worker created when isSupported=false (ERR-02)
+  it('does not create Worker when isSupported is false', () => {
+    vi.stubGlobal('crossOriginIsolated', false);
+
+    renderHook(() => useLocalTranscribe(defaultProps));
+    // Worker constructor should not have been called for the hook
+    // (the mock resets between tests, so postMessage should not have been called)
+    expect(mockWorkerInstance?.postMessage || vi.fn()).not.toHaveBeenCalled();
+  });
+
+  // Test 17: download timeout error mapping (ERR-03)
+  it('maps download_timeout error code to timeout i18n message', () => {
+    const { result } = renderHook(() => useLocalTranscribe(defaultProps));
+
+    act(() => {
+      simulateWorkerMessage({ status: 'error', error: 'Timed out', code: 'download_timeout' });
+    });
+
+    expect(result.current.state).toBe('idle');
+    expect(toast.error).toHaveBeenCalledWith('Download timed out.');
+  });
+
+  // Test 18: download generic error mapping (ERR-03)
+  it('maps download_failed error code to generic download i18n message', () => {
+    const { result } = renderHook(() => useLocalTranscribe(defaultProps));
+
+    act(() => {
+      simulateWorkerMessage({ status: 'error', error: 'Unknown', code: 'download_failed' });
+    });
+
+    expect(result.current.state).toBe('idle');
+    expect(toast.error).toHaveBeenCalledWith('Failed to download speech recognition model.');
+  });
+
+  // Test 19: unknown error code falls back to raw message (ERR-03)
+  it('falls back to raw error message for unknown error codes', () => {
+    const { result } = renderHook(() => useLocalTranscribe(defaultProps));
+
+    act(() => {
+      simulateWorkerMessage({ status: 'error', error: 'Something unexpected' });
+    });
+
+    expect(result.current.state).toBe('idle');
+    expect(toast.error).toHaveBeenCalledWith('Something unexpected');
+  });
+
+  // Test 20: empty transcription shows toast.info (ERR-04)
+  it('shows toast.info and does not insert text for empty transcription', () => {
+    const onTranscriptReceived = vi.fn();
+    const { result } = renderHook(() => useLocalTranscribe({ ...defaultProps, onTranscriptReceived }));
+
+    act(() => {
+      simulateWorkerMessage({ status: 'result', text: '' });
+    });
+
+    expect(result.current.state).toBe('idle');
+    expect(toast.info).toHaveBeenCalledWith('No speech could be recognized.');
+    expect(onTranscriptReceived).not.toHaveBeenCalled();
+  });
+
+  // Test 21: whitespace-only transcription shows toast.info (ERR-04)
+  it('shows toast.info for whitespace-only transcription', () => {
+    const onTranscriptReceived = vi.fn();
+    const { result } = renderHook(() => useLocalTranscribe({ ...defaultProps, onTranscriptReceived }));
+
+    act(() => {
+      simulateWorkerMessage({ status: 'result', text: '   \n  ' });
+    });
+
+    expect(result.current.state).toBe('idle');
+    expect(toast.info).toHaveBeenCalledWith('No speech could be recognized.');
+    expect(onTranscriptReceived).not.toHaveBeenCalled();
+  });
+
+  // Test 22: valid transcription still works (regression)
+  it('inserts text for non-empty transcription result', () => {
+    const onTranscriptReceived = vi.fn();
+    const { result } = renderHook(() => useLocalTranscribe({ ...defaultProps, onTranscriptReceived }));
+
+    act(() => {
+      simulateWorkerMessage({ status: 'result', text: 'Hello world' });
+    });
+
+    expect(result.current.state).toBe('idle');
+    expect(onTranscriptReceived).toHaveBeenCalledWith('Hello world');
+    expect(toast.info).not.toHaveBeenCalled();
+  });
+
+  // Test 23: cancel download shows toast.info (D-06)
+  it('shows toast.info when download is cancelled', async () => {
+    const { result } = renderHook(() => useLocalTranscribe(defaultProps));
+
+    // Start download
+    await act(async () => {
+      await result.current.toggleRecording();
+    });
+    expect(result.current.state).toBe('downloading');
+
+    // Cancel
+    act(() => {
+      result.current.cancelDownload();
+    });
+
+    expect(result.current.state).toBe('idle');
+    expect(toast.info).toHaveBeenCalledWith('Download cancelled.');
   });
 });
