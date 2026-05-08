@@ -21,10 +21,10 @@ def get_embeddings(config: Config) -> Embeddings:
             raise ValueError("The env variable `EMBEDDINGS_OPENAI_MODEL_NAME` is missing.")
 
         return OpenAIEmbeddings(
-            openai_api_key=config.embeddings_openai_api_key,
+            openai_api_key=config.embeddings_openai_api_key,  # ty: ignore[unknown-argument]
             model=config.embeddings_openai_model_name,
             max_retries=max_retries,
-            openai_api_base=config.embeddings_openai_endpoint,
+            openai_api_base=config.embeddings_openai_endpoint,  # ty: ignore[unknown-argument]
         )
     if config.embeddings_type.lower() == "openai-compatible":
         # The only difference is that we send the plain text instead of a tokenized version.
@@ -35,10 +35,10 @@ def get_embeddings(config: Config) -> Embeddings:
             raise ValueError("The env variable `EMBEDDINGS_OPENAI_MODEL_NAME` is missing.")
 
         return OpenAIEmbeddings(
-            openai_api_key=config.embeddings_openai_compatible_api_key,
+            openai_api_key=config.embeddings_openai_compatible_api_key,  # ty: ignore[unknown-argument]
             model=config.embeddings_openai_compatible_model_name,
             max_retries=max_retries,
-            openai_api_base=config.embeddings_openai_compatible_endpoint,
+            openai_api_base=config.embeddings_openai_compatible_endpoint,  # ty: ignore[unknown-argument]
             check_embedding_ctx_length=False,
             # Explicitly request float encoding. Some providers do not
             # support the base64 encoding format that newer langchain_openai versions
@@ -62,11 +62,11 @@ def get_embeddings(config: Config) -> Embeddings:
             raise ValueError("The env variable `EMBEDDINGS_AZURE_OPENAI_MODEL_NAME` is missing.")
 
         return AzureOpenAIEmbeddings(
-            openai_api_key=config.embeddings_azure_openai_api_key,
+            openai_api_key=config.embeddings_azure_openai_api_key,  # ty: ignore[unknown-argument]
             model=config.embeddings_azure_openai_model_name,
-            deployment=config.embeddings_azure_openai_deployment_name,
+            deployment=config.embeddings_azure_openai_deployment_name,  # ty: ignore[unknown-argument]
             azure_endpoint=config.embeddings_azure_openai_endpoint,
-            openai_api_version=config.embeddings_azure_openai_api_version,
+            openai_api_version=config.embeddings_azure_openai_api_version,  # ty: ignore[unknown-argument]
             max_retries=max_retries,
         )
     elif config.embeddings_type.lower() == "bedrock":
