@@ -37,7 +37,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Modell-Management
 
-- [ ] **MODEL-01**: whisper-base Modell (~140MB) wird beim ersten Nutzen on-demand von Hugging Face Hub geladen
+- [ ] **MODEL-01**: whisper-small q8 Modell (~240MB) wird beim ersten Nutzen on-demand von Hugging Face Hub geladen
 - [ ] **MODEL-02**: Modell wird nach Download im Browser gecacht (IndexedDB/Cache API via Transformers.js)
 - [ ] **MODEL-03**: Fortschrittsanzeige (Progressbar mit Prozent/MB) wird beim Modell-Download angezeigt
 - [ ] **MODEL-04**: Bei gecachtem Modell wird Progressbar übersprungen und Modell direkt geladen
@@ -84,11 +84,11 @@ Deferred to future release. Tracked but not in current roadmap.
 | Feature | Reason |
 |---------|--------|
 | Echtzeit-Streaming-Transkription | Whisper ist ein Batch-Modell, Chunking fügt massive Komplexität hinzu. Web Speech API Extension deckt Echtzeit-Bedarf ab |
-| Modellauswahl durch Endnutzer | Erzeugt Verwirrung und Support-Aufwand, whisper-base ist der richtige Kompromiss |
+| Modellauswahl durch Endnutzer | Erzeugt Verwirrung und Support-Aufwand, whisper-small q8 ist der richtige Kompromiss |
 | Offline-First / PWA-Modus | Erstdownload braucht Internet, vollständige Offline-Fähigkeit ist separates Projekt |
 | Audio-Wiedergabe vor Transkription | Unnötige UI-Komplexität in einem Chat-Kontext |
 | Auto-Send nach Transkription | Nutzer muss Text vor dem Senden prüfen können |
-| Multi-Speaker Diarization | Whisper-base unterstützt das nicht, in Chat-Kontext irrelevant |
+| Multi-Speaker Diarization | Whisper-small unterstützt das nicht, in Chat-Kontext irrelevant |
 | Audio-Datei-Upload | Anderes UX-Paradigma, separates Feature |
 
 ## Traceability
