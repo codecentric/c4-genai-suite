@@ -103,14 +103,14 @@ type BaseLlmEndpointProps = {
   onClose: () => void;
 };
 
-export type UpdateLlmEndpointProps = {
+type UpdateLlmEndpointProps = {
   type: 'update';
   target: LLMEndpoint;
   onUpdate: () => void;
   onDelete: () => void;
 } & BaseLlmEndpointProps;
 
-export type CreateLlmEndpointProps = {
+type CreateLlmEndpointProps = {
   type: 'create';
   onCreate: () => void;
 } & BaseLlmEndpointProps;

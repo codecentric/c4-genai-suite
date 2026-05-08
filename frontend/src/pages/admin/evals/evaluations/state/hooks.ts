@@ -4,4 +4,3 @@
  */
 
 export { useWizardStore, useWizardStepIndex, useIsLastStep } from './zustand/wizardState';
-export type { EvaluationMode, WizardStep } from './zustand/wizardState';

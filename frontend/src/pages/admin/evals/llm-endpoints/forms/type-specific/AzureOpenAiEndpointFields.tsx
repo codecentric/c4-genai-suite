@@ -78,5 +78,3 @@ export function AzureOpenAiEndpointFields({ form, isEdit }: AzureOpenAiEndpointF
     </>
   );
 }
-
-export { UNCHANGED_API_KEY };
