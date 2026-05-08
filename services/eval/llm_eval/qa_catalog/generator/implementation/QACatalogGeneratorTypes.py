@@ -23,9 +23,16 @@ def get_catalog_generator_class(
     )
 
     if found_generator_type == get_args(RagasGeneratorType)[0]:
-        from llm_eval.qa_catalog.generator.implementation.ragas.generator import (  # noqa: E501
-            RagasQACatalogGenerator,
-        )
+        try:
+            from llm_eval.qa_catalog.generator.implementation.ragas.generator import (  # noqa: E501
+                RagasQACatalogGenerator,
+            )
+        except ImportError:
+            raise ImportError(
+                "The 'ragas' package is required for QA catalog generation "
+                "but is not installed. Install it with: "
+                "uv pip install 'rag-eval[ragas]'"
+            )
 
         return RagasQACatalogGenerator
 
