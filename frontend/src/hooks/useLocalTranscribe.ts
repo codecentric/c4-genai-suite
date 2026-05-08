@@ -342,9 +342,15 @@ export function useLocalTranscribe({ language, onTranscriptReceived, maxDuration
       }
 
       // Mic available -- trigger download and set pending
+      const worker = workerRef.current;
+      if (!worker) {
+        pendingRecordRef.current = false;
+        setState('idle');
+        return;
+      }
       pendingRecordRef.current = true;
       setState('downloading');
-      workerRef.current?.postMessage({ type: 'load' });
+      worker.postMessage({ type: 'load' });
       return;
     }
 
