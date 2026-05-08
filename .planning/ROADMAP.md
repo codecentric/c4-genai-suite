@@ -121,7 +121,7 @@ Plans:
 - [x] 05-01-PLAN.md -- Worker silence detection (RMS + hallucination filter) + hook elapsed time + RecordingTimer + PrivacyBadge + ChatInput integration + i18n keys
 
 **Wave 2** *(blocked on Wave 1 completion)*
-- [ ] 05-02-PLAN.md -- Component tests + Worker/hook test extensions + human verification checkpoint
+- [x] 05-02-PLAN.md -- Component tests + Worker/hook test extensions + human verification checkpoint
 
 ## Progress
 
@@ -134,4 +134,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | 2. Core Transcription Pipeline | 0/2 | Planned | - |
 | 3. UI Integration | 0/2 | Planned | - |
 | 4. Error Handling | 2/2 | Complete | 2026-05-08 |
-| 5. Polish & Refinement | 1/2 | Executing | - |
+| 5. Polish & Refinement | 2/2 | Executing | - |
