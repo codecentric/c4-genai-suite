@@ -3,6 +3,7 @@ import { IconChevronDown, IconMicrophone } from '@tabler/icons-react';
 import { LocalTranscribeState } from 'src/hooks/useLocalTranscribe';
 import { texts } from 'src/texts';
 
+/** Props for the local transcription microphone button with language selector. */
 interface LocalTranscribeButtonProps {
   state: LocalTranscribeState;
   isRecording: boolean;

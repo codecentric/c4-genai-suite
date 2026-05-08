@@ -1,3 +1,4 @@
+/** Resamples an audio Blob to 16kHz mono Float32Array for Whisper inference. */
 export async function resampleToMono16kHz(audioBlob: Blob): Promise<Float32Array> {
   const audioContext = new AudioContext();
 

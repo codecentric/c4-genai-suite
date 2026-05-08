@@ -98,6 +98,7 @@ async function detectDevice(): Promise<'webgpu' | 'wasm'> {
   return 'wasm';
 }
 
+/** Message types accepted by the Whisper Web Worker. */
 interface WorkerMessageData {
   type: 'load' | 'transcribe';
   audio?: Float32Array;

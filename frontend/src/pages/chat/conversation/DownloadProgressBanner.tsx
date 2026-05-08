@@ -1,43 +1,45 @@
 import { ActionIcon, Progress } from '@mantine/core';
 import { IconX } from '@tabler/icons-react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { DownloadProgress } from 'src/hooks/useLocalTranscribe';
 import { texts } from 'src/texts';
 
+/** Props for the model download progress banner shown during first-time Whisper model download. */
 interface DownloadProgressBannerProps {
   downloadProgress: DownloadProgress;
   onCancel: () => void;
   isDownloading: boolean;
 }
 
-type BannerPhase = 'downloading' | 'ready' | 'hidden';
-
 export function DownloadProgressBanner({ downloadProgress, onCancel, isDownloading }: DownloadProgressBannerProps) {
-  const wasDownloadingRef = useRef(isDownloading);
-  const [phase, setPhase] = useState<BannerPhase>('downloading');
+  const [prevIsDownloading, setPrevIsDownloading] = useState(isDownloading);
+  const [showReady, setShowReady] = useState(false);
+  const [visible, setVisible] = useState(true);
 
-  // When download completes (isDownloading transitions to false), show "Ready!" briefly
+  // Detect transition: derive new state from props change during render (React-recommended pattern)
+  if (prevIsDownloading && !isDownloading && !showReady) {
+    setPrevIsDownloading(isDownloading);
+    setShowReady(true);
+  } else if (prevIsDownloading !== isDownloading) {
+    setPrevIsDownloading(isDownloading);
+  }
+
+  // When download completes, auto-hide the banner after a brief "Ready!" display
   useEffect(() => {
-    if (wasDownloadingRef.current && !isDownloading) {
-      const readyTimer = setTimeout(() => setPhase('ready'), 0);
-      const hideTimer = setTimeout(() => setPhase('hidden'), 1500);
-      wasDownloadingRef.current = isDownloading;
-      return () => {
-        clearTimeout(readyTimer);
-        clearTimeout(hideTimer);
-      };
+    if (showReady) {
+      const timer = setTimeout(() => setVisible(false), 1500);
+      return () => clearTimeout(timer);
     }
-    wasDownloadingRef.current = isDownloading;
-  }, [isDownloading]);
+  }, [showReady]);
 
-  if (phase === 'hidden') return null;
+  if (!visible) return null;
 
   const loadedMB = (downloadProgress.loaded / (1024 * 1024)).toFixed(0);
   const totalMB = (downloadProgress.total / (1024 * 1024)).toFixed(0);
 
   return (
     <div className="mb-2 flex items-center gap-2 rounded-lg bg-gray-100 px-4 py-2" role="status" aria-live="polite">
-      {phase === 'ready' ? (
+      {showReady ? (
         <span className="text-sm font-semibold text-green-600">{texts.chat.localTranscribe.downloadReady}</span>
       ) : (
         <>
