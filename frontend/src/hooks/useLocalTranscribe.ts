@@ -3,20 +3,30 @@ import { toast } from 'react-toastify';
 import { resampleToMono16kHz } from 'src/lib/audio-utils';
 import { texts } from 'src/texts';
 
+/** Represents the current state of the local transcription lifecycle. */
 export type LocalTranscribeState = 'idle' | 'downloading' | 'loading' | 'recording' | 'transcribing' | 'error';
 
+/** Tracks bytes loaded and total for the Whisper model download. */
 export interface DownloadProgress {
   loaded: number;
   total: number;
   percentage: number;
 }
 
+/** Configuration for the useLocalTranscribe hook. */
 interface UseLocalTranscribeProps {
+  /** BCP 47 language code ('de' or 'en') passed to the Whisper worker. */
   language: string;
+  /** Called with the transcribed text after successful transcription. */
   onTranscriptReceived: (transcript: string) => void;
+  /** Maximum recording duration in milliseconds. Defaults to 2 minutes. */
   maxDurationMs?: number;
 }
 
+/**
+ * Hook that manages browser-based Whisper speech recognition.
+ * Handles model download, audio recording, and Worker-based transcription.
+ */
 export function useLocalTranscribe({ language, onTranscriptReceived, maxDurationMs = 2 * 60 * 1000 }: UseLocalTranscribeProps) {
   const [state, setState] = useState<LocalTranscribeState>('idle');
   const [downloadProgress, setDownloadProgress] = useState<DownloadProgress | null>(null);
@@ -156,7 +166,7 @@ export function useLocalTranscribe({ language, onTranscriptReceived, maxDuration
         break;
 
       case 'progress_total':
-        // Aggregate download progress (D-08)
+        // Aggregate download progress
         if (stateRef.current === 'downloading' || stateRef.current === 'loading') {
           if (stateRef.current === 'loading') {
             setState('downloading');
@@ -178,7 +188,7 @@ export function useLocalTranscribe({ language, onTranscriptReceived, maxDuration
         setDownloadProgress(null);
 
         if (pendingRecordRef.current) {
-          // User clicked record during download -- auto-start recording (D-04)
+          // User clicked record during download -- auto-start recording
           pendingRecordRef.current = false;
           void beginRecordingRef.current();
         } else {
@@ -274,7 +284,7 @@ export function useLocalTranscribe({ language, onTranscriptReceived, maxDuration
           const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
           const audioData = await resampleToMono16kHz(audioBlob);
 
-          // Transfer audio to Worker with Transferable (zero-copy) (AUDIO-03)
+          // Transfer audio to Worker with Transferable (zero-copy)
           workerRef.current!.postMessage({ type: 'transcribe', audio: audioData, language: languageRef.current }, [
             audioData.buffer,
           ]);
@@ -319,7 +329,7 @@ export function useLocalTranscribe({ language, onTranscriptReceived, maxDuration
         return;
       }
 
-      // Mic available -- trigger download and set pending (D-04)
+      // Mic available -- trigger download and set pending
       pendingRecordRef.current = true;
       setState('downloading');
       workerRef.current?.postMessage({ type: 'load' });
@@ -337,10 +347,10 @@ export function useLocalTranscribe({ language, onTranscriptReceived, maxDuration
     } else if (stateRef.current === 'recording') {
       await stopRecording();
     }
-    // Do nothing for 'downloading', 'loading', 'transcribing' (D-05)
+    // Do nothing for 'downloading', 'loading', 'transcribing'
   }, [startRecording, stopRecording]);
 
-  // Cancel an in-progress model download (D-03)
+  // Cancel an in-progress model download
   const cancelDownload = useCallback(() => {
     if (stateRef.current !== 'downloading') return;
 
