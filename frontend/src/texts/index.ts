@@ -221,6 +221,10 @@ function load() {
       localTranscribe: {
         downloadingModel: translate('chat.localTranscribe.downloadingModel'),
         downloadFailed: translate('chat.localTranscribe.downloadFailed'),
+        downloadFailedOffline: translate('chat.localTranscribe.downloadFailedOffline'),
+        downloadFailedTimeout: translate('chat.localTranscribe.downloadFailedTimeout'),
+        downloadCancelled: translate('chat.localTranscribe.downloadCancelled'),
+        emptyTranscription: translate('chat.localTranscribe.emptyTranscription'),
         loadingModel: translate('chat.localTranscribe.loadingModel'),
         loadFailed: translate('chat.localTranscribe.loadFailed'),
         transcriptionFailed: translate('chat.localTranscribe.transcriptionFailed'),
