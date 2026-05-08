@@ -48,8 +48,8 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **UI-02**: Button pulsiert rot während der Aufnahme (wie bestehender TranscribeButton)
 - [ ] **UI-03**: Button zeigt Loading-Spinner während der Transkription (wie bestehender TranscribeButton)
 - [ ] **UI-04**: Sprachauswahl-Dropdown (de/en) ist am Button verfügbar (wie bestehende SpeechRecognitionButton)
-- [ ] **UI-05**: Recording-Timer zeigt vergangene Zeit an (z.B. "0:42 / 2:00")
-- [ ] **UI-06**: Privacy-Badge/Indikator zeigt an, dass Audio lokal verarbeitet wird
+- [x] **UI-05**: Recording-Timer zeigt vergangene Zeit an (z.B. "0:42 / 2:00")
+- [x] **UI-06**: Privacy-Badge/Indikator zeigt an, dass Audio lokal verarbeitet wird
 - [ ] **UI-07**: ChatInput.tsx erkennt Extension-Name 'transcribe-local' und zeigt LocalTranscribeButton
 
 ### Fehlerbehandlung
@@ -58,7 +58,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **ERR-02**: Browser nicht kompatibel (kein Worker/WASM) → Toast und Button nicht angezeigt
 - [ ] **ERR-03**: Modell-Download fehlgeschlagen → Toast mit Retry-Hinweis
 - [ ] **ERR-04**: Transkription liefert leeren Text → Toast-Meldung
-- [ ] **ERR-05**: Stille erkannt (kein Sprachsignal) → "Keine Sprache erkannt" statt Whisper-Halluzination
+- [x] **ERR-05**: Stille erkannt (kein Sprachsignal) → "Keine Sprache erkannt" statt Whisper-Halluzination
 
 ### Internationalisierung
 
@@ -119,14 +119,14 @@ Deferred to future release. Tracked but not in current roadmap.
 | UI-02 | Phase 3 | Pending |
 | UI-03 | Phase 3 | Pending |
 | UI-04 | Phase 3 | Pending |
-| UI-05 | Phase 5 | Pending |
-| UI-06 | Phase 5 | Pending |
+| UI-05 | Phase 5 | Verified |
+| UI-06 | Phase 5 | Verified |
 | UI-07 | Phase 3 | Pending |
 | ERR-01 | Phase 4 | Pending |
 | ERR-02 | Phase 4 | Pending |
 | ERR-03 | Phase 4 | Pending |
 | ERR-04 | Phase 4 | Pending |
-| ERR-05 | Phase 5 | Pending |
+| ERR-05 | Phase 5 | Verified |
 | I18N-01 | Phase 3 | Pending |
 | I18N-02 | Phase 3 | Pending |
 
