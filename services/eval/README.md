@@ -36,7 +36,7 @@ Tables:
 ### Prerequisites
 
 - Python 3.12+
-- Poetry
+- [uv](https://docs.astral.sh/uv/)
 - PostgreSQL (use C4's dev postgres)
 - RabbitMQ (for Celery)
 
@@ -44,7 +44,7 @@ Tables:
 
 ```bash
 cd services/eval
-poetry install
+uv sync
 ```
 
 ### Environment Variables
@@ -64,10 +64,10 @@ Key variables:
 
 ```bash
 # Run the FastAPI server
-poetry run uvicorn llm_eval.main:app --reload --port 3202
+uv run uvicorn llm_eval.main:app --reload --port 3202
 
 # Run Celery worker (in another terminal)
-poetry run celery -A llm_eval.tasks worker --loglevel=info
+uv run celery -A llm_eval.tasks worker --loglevel=info
 ```
 
 ### API Documentation
