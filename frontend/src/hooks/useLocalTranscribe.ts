@@ -185,16 +185,12 @@ export function useLocalTranscribe({ language, onTranscriptReceived, maxDuration
     }
   }, []);
 
-  // Worker initialization on mount (D-06: pre-load model from cache)
+  // Worker initialization on mount -- model is loaded lazily on first record click
   useEffect(() => {
     const worker = new Worker(new URL('../workers/whisper.worker.ts', import.meta.url), { type: 'module' });
     workerRef.current = worker;
 
     worker.addEventListener('message', handleWorkerMessage);
-
-    // Pre-load model from cache on mount (D-06)
-    worker.postMessage({ type: 'load' });
-    setState('loading');
 
     return () => {
       worker.removeEventListener('message', handleWorkerMessage);
