@@ -7,6 +7,7 @@ The "Dashboard" page offers a comprehensive overview of the system's information
 - Total Tokens / Tokens per Model -- the total number of tokens involved in model transactions. Your LLM provider (e.g. Azure) provides more information on the price per token. (Notice: tokens used up by some extensions might not be included in this overview yet.)
 - Ratings -- the number of negative rated assistant responses according to user feedback.
 - Requests -- shows the number of user prompts.
+- Assistants  -- shows the number of user prompts grouped by assistant.
 - Users -- shows the number of active users.
 
 ---
