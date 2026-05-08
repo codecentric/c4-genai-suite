@@ -40,7 +40,7 @@ dependencies = [
     "rapidfuzz>=3.13.0,<4",
     "boto3>=1.35.0,<2",
     "boto3-stubs[s3]>=1.35.0,<2",
-    "python-multipart>=0.0.26,<1",
+    "python-multipart>=0.0.27,<1",
 ]
 
 [project.scripts]
