@@ -99,7 +99,7 @@ Plans:
 Plans:
 
 **Wave 1**
-- [ ] 04-01-PLAN.md -- Worker error codes + hook isSupported/error mapping/empty check + ChatInput gating + i18n keys
+- [x] 04-01-PLAN.md -- Worker error codes + hook isSupported/error mapping/empty check + ChatInput gating + i18n keys
 
 **Wave 2** *(blocked on Wave 1 completion)*
 - [ ] 04-02-PLAN.md -- Fix broken tests + new error handling tests + human verification checkpoint
