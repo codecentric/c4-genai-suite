@@ -17,6 +17,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 3: UI Integration** - LocalTranscribeButton component, model download progress, language selection, and i18n
 - [x] **Phase 4: Error Handling** - Graceful failure modes for mic denial, browser incompatibility, download failure, and empty results (completed 2026-05-08)
 - [x] **Phase 5: Polish & Refinement** - Recording timer, privacy badge, and silence detection for production readiness (completed 2026-05-08)
+- [ ] **Phase 6: Address Tech Debt: Documentation and Code Cleanup** - Documentation improvements and code cleanup across the local transcription feature
 
 ## Phase Details
 
@@ -123,10 +124,25 @@ Plans:
 **Wave 2** *(blocked on Wave 1 completion)*
 - [x] 05-02-PLAN.md -- Component tests + Worker/hook test extensions + human verification checkpoint
 
+### Phase 6: Address Tech Debt: Documentation and Code Cleanup
+**Goal**: Improve code quality and maintainability of the local transcription feature through documentation improvements and code cleanup
+**Depends on**: Phase 5
+**Success Criteria** (what must be TRUE):
+  1. All local transcription components, hooks, and utilities have clear, accurate documentation
+  2. Dead code, unused imports, and redundant abstractions are removed
+  3. Code follows consistent patterns across all local transcription modules
+**Plans:** 2 plans
+
+Plans:
+
+**Wave 1**
+- [ ] 06-01-PLAN.md -- Code cleanup: planning reference removal, ESLint/Prettier fixes, JSDoc on exported types, dead code audit
+- [ ] 06-02-PLAN.md -- Documentation fix: update PROJECT.md and REQUIREMENTS.md model references from whisper-base to whisper-small q8
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
+Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -135,3 +151,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | 3. UI Integration | 0/2 | Planned | - |
 | 4. Error Handling | 2/2 | Complete | 2026-05-08 |
 | 5. Polish & Refinement | 2/2 | Complete | 2026-05-08 |
+| 6. Address Tech Debt: Documentation and Code Cleanup | 0/2 | Planned | - |
