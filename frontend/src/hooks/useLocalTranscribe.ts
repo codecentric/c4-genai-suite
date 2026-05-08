@@ -290,7 +290,21 @@ export function useLocalTranscribe({ language, onTranscriptReceived, maxDuration
     }
 
     if (!modelLoadedRef.current) {
-      // Model not loaded -- trigger download and set pending (D-04)
+      // Check mic permission BEFORE starting model download
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        stream.getTracks().forEach((track) => track.stop());
+      } catch (err) {
+        if (err instanceof Error && err.name === 'NotAllowedError') {
+          toast.error(texts.chat.localTranscribe.microphonePermissionDenied);
+        } else {
+          toast.error(texts.chat.localTranscribe.recordingStartFailed);
+        }
+        setState('idle');
+        return;
+      }
+
+      // Mic available -- trigger download and set pending (D-04)
       pendingRecordRef.current = true;
       setState('downloading');
       workerRef.current?.postMessage({ type: 'load' });
