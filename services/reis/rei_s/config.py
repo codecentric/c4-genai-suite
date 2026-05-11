@@ -75,7 +75,7 @@ class Config(BaseSettings):
 
     workers: Annotated[int, Field(gt=0)] = 1
     metrics_port: Annotated[int, Field(ge=0)] = 9200
-    batch_size: Annotated[int, Field(gt=0)] | None = None
+    batch_size: Annotated[int, Field(ge=0)] = 200
     filesize_threshold: Annotated[int, Field(gt=0)] = 10**5
 
     embeddings_type: Literal[
