@@ -3159,6 +3159,7 @@ dependencies = [
     { name = "pypdf" },
     { name = "python-oxmsg" },
     { name = "pyyaml" },
+    { name = "tenacity" },
     { name = "weasyprint" },
 ]
 
@@ -3206,6 +3207,7 @@ requires-dist = [
     { name = "pypdf", specifier = ">=6.10.2" },
     { name = "python-oxmsg", specifier = ">=0.0.2" },
     { name = "pyyaml", specifier = ">=6.0" },
+    { name = "tenacity", specifier = ">=9.1.2" },
     { name = "weasyprint", specifier = ">=67.0" },
 ]
 

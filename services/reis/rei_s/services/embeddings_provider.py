@@ -8,12 +8,9 @@ from rei_s.config import Config
 
 
 def get_embeddings(config: Config) -> Embeddings:
-    # for low tier subscriptions, we will encounter rate limits when uploading larger files
-    # since we may have multiple workers using the same embedding endpoint, we will encounter
-    # multiple triggers of the rate limit error. However, we do not want to fail after
-    # the default 2 retries. Thus we use a ridiculous number of retries to insure slow but errorless
-    # uploads in instances with a too cheap subscription tier.
-    max_retries = 1337
+    # Use a low retry count for the SDK's built-in retries, which apply uniformly to all
+    # retryable errors (429, 500+, timeouts). This ensures 500 errors fail fast after 3 attempts.
+    max_retries = 3
 
     if config.embeddings_type.lower() == "openai":
         # this is ensured by the config validation, the following lines are there to help the ty typechecker
