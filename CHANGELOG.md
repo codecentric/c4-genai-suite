@@ -1,5 +1,13 @@
 # Changelog
 
+## [9.19.4](https://github.com/codecentric/c4-genai-suite/compare/v9.19.3...v9.19.4) (2026-05-11)
+
+
+### Bug Fixes
+
+* **frontend:** enhance online documentation with import/export features and ad… ([#1739](https://github.com/codecentric/c4-genai-suite/issues/1739)) ([d42360f](https://github.com/codecentric/c4-genai-suite/commit/d42360f92e3c03195fd4f7b2034e26e25404ad80))
+* **REIS:** perform more retries for rate limit errors than for other retryable errors ([#1752](https://github.com/codecentric/c4-genai-suite/issues/1752)) ([b8c7c71](https://github.com/codecentric/c4-genai-suite/commit/b8c7c71afa98f589743cc665b130bb957930d894))
+
 ## [9.19.3](https://github.com/codecentric/c4-genai-suite/compare/v9.19.2...v9.19.3) (2026-04-20)
 
 
