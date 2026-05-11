@@ -4,6 +4,8 @@ from math import ceil
 
 from fastapi import HTTPException
 from langchain_core.documents import Document
+from openai import RateLimitError
+from tenacity import RetryCallState, retry, retry_if_exception_type, stop_after_attempt, wait_exponential_jitter
 
 from rei_s import logger
 from rei_s.services.filestore_adapter import FileStoreAdapter
@@ -24,6 +26,35 @@ from rei_s.metrics.metrics import files_processed_counter
 def batched(iterable: List[Document], n: int) -> Generator[List[Document], None, None]:
     for i in range(0, len(iterable), n):
         yield iterable[i : i + n]
+
+
+def _log_rate_limit_retry(retry_state: RetryCallState) -> None:
+    wait = retry_state.next_action.sleep if retry_state.next_action else 0  # type: ignore[union-attr]
+    attempt = retry_state.attempt_number
+    # Extract doc_id and batch_size from the call args if available
+    doc_id = retry_state.kwargs.get("doc_id", "unknown")
+    batch_size = retry_state.kwargs.get("batch_size", "unknown")
+    logger.warning(
+        f"Rate limited while embedding doc_id {doc_id} (batch_size={batch_size}). "
+        f"Retry attempt {attempt}, sleeping {wait:.1f}s."
+    )
+
+
+# Rate limit (429) retries are handled here. Rate limits are retried
+# extensively to support low-tier embedding API subscriptions.
+# Other retryable errors (500, timeouts) are not retried here, but
+# instead rely on the SDK's built-in retries with a low retry count.
+@retry(
+    retry=retry_if_exception_type(RateLimitError),
+    stop=stop_after_attempt(30),
+    wait=wait_exponential_jitter(max=60, jitter=2),
+    before_sleep=_log_rate_limit_retry,
+    reraise=True,
+)
+def _add_documents_with_rate_limit_retry(
+    vector_store: VectorStoreAdapter, batch: list[Document], *, doc_id: str, batch_size: int
+) -> None:
+    vector_store.add_documents(batch)
 
 
 def get_vector_store(
@@ -232,7 +263,7 @@ def add_file(config: Config, file: SourceFile, bucket: str, doc_id: str, index_n
     vector_store = get_vector_store(config=config, index_name=index_name)
     for batch, index, num_batches in generate_batches(config, file, chunks, format_, bucket, doc_id):
         logger.info(f"add {len(batch)} chunks for doc_id {doc_id}: ({index + 1}/{num_batches})")
-        vector_store.add_documents(batch)
+        _add_documents_with_rate_limit_retry(vector_store, batch, doc_id=doc_id, batch_size=len(batch))
         logger.info(f"ready with {len(batch)} chunks for doc_id {doc_id}: ({index + 1}/{num_batches})")
 
 
