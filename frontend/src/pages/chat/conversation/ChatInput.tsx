@@ -5,19 +5,19 @@ import TextareaAutosize from 'react-textarea-autosize';
 import { ConfigurationDto, FileDto } from 'src/api';
 import { Markdown } from 'src/components';
 import { ExtensionContext, JSONObject, useEventCallback, useExtensionContext, usePersistentState, useTheme } from 'src/hooks';
-import { useSpeechRecognitionToggle } from 'src/hooks/useSpeechRecognitionToggle';
 import { useLocalTranscribe } from 'src/hooks/useLocalTranscribe';
+import { useSpeechRecognitionToggle } from 'src/hooks/useSpeechRecognitionToggle';
 import { useTranscribe } from 'src/hooks/useTranscribe';
-import { DownloadProgressBanner } from './DownloadProgressBanner';
 import { FileItemComponent } from 'src/pages/chat/conversation/FileItem';
 import { FilterModal } from 'src/pages/chat/conversation/FilterModal';
-import { LocalTranscribeButton } from './LocalTranscribeButton';
-import { PrivacyBadge } from './PrivacyBadge';
-import { RecordingTimer } from './RecordingTimer';
 import { Language, SpeechRecognitionButton } from 'src/pages/chat/conversation/SpeechRecognitionButton';
 import { TranscribeButton } from 'src/pages/chat/conversation/TranscribeButton';
 import { texts } from 'src/texts';
 import { useChatDropzone } from '../useChatDropzone';
+import { DownloadProgressBanner } from './DownloadProgressBanner';
+import { LocalTranscribeButton } from './LocalTranscribeButton';
+import { PrivacyBadge } from './PrivacyBadge';
+import { RecordingTimer } from './RecordingTimer';
 import { Suggestions } from './Suggestions';
 import {
   getDefault,
@@ -245,13 +245,16 @@ export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEm
         )}
         <form onSubmit={doSubmit}>
           <div className="box-border rounded-2xl border border-gray-200 p-4 pb-3 shadow-2xl shadow-gray-100 focus-within:ring-1 focus-within:ring-black">
-            {showLocalTranscribe && localTranscribeHook.isSupported && localTranscribeHook.isDownloading && localTranscribeHook.downloadProgress && (
-              <DownloadProgressBanner
-                downloadProgress={localTranscribeHook.downloadProgress}
-                onCancel={localTranscribeHook.cancelDownload}
-                isDownloading={localTranscribeHook.isDownloading}
-              />
-            )}
+            {showLocalTranscribe &&
+              localTranscribeHook.isSupported &&
+              localTranscribeHook.isDownloading &&
+              localTranscribeHook.downloadProgress && (
+                <DownloadProgressBanner
+                  downloadProgress={localTranscribeHook.downloadProgress}
+                  onCancel={localTranscribeHook.cancelDownload}
+                  isDownloading={localTranscribeHook.isDownloading}
+                />
+              )}
             <TextareaAutosize
               className={`w-full resize-none bg-transparent pb-4 outline-none`}
               maxRows={15}
@@ -326,10 +329,7 @@ export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEm
                   <>
                     <PrivacyBadge />
                     {localTranscribeHook.isRecording && (
-                      <RecordingTimer
-                        elapsedSeconds={localTranscribeHook.elapsedSeconds}
-                        maxSeconds={120}
-                      />
+                      <RecordingTimer elapsedSeconds={localTranscribeHook.elapsedSeconds} maxSeconds={120} />
                     )}
                     <LocalTranscribeButton
                       state={localTranscribeHook.state}
@@ -346,7 +346,14 @@ export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEm
                 <ActionIcon
                   type="submit"
                   size="lg"
-                  disabled={!input || isDisabled || uploadMutations.some((m) => m.status === 'pending') || listening || localTranscribeHook.isRecording || localTranscribeHook.isTranscribing}
+                  disabled={
+                    !input ||
+                    isDisabled ||
+                    uploadMutations.some((m) => m.status === 'pending') ||
+                    listening ||
+                    localTranscribeHook.isRecording ||
+                    localTranscribeHook.isTranscribing
+                  }
                   data-testid="chat-submit-button"
                   aria-label={texts.common.send}
                   data-tooltip-id="default"

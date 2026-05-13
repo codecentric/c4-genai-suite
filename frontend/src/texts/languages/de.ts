@@ -194,8 +194,10 @@ export const de: typeof en = {
     localTranscribe: {
       downloadingModel: 'Spracherkennungsmodell wird heruntergeladen...',
       downloadFailed: 'Spracherkennungsmodell konnte nicht heruntergeladen werden. Bitte versuchen Sie es erneut.',
-      downloadFailedOffline: 'Keine Internetverbindung. Bitte überprüfen Sie Ihre Netzwerkverbindung und versuchen Sie es erneut.',
-      downloadFailedTimeout: 'Download-Zeitlimit überschritten. Bitte überprüfen Sie Ihre Verbindung und versuchen Sie es erneut.',
+      downloadFailedOffline:
+        'Keine Internetverbindung. Bitte überprüfen Sie Ihre Netzwerkverbindung und versuchen Sie es erneut.',
+      downloadFailedTimeout:
+        'Download-Zeitlimit überschritten. Bitte überprüfen Sie Ihre Verbindung und versuchen Sie es erneut.',
       downloadCancelled: 'Download abgebrochen.',
       emptyTranscription: 'Es konnte keine Sprache erkannt werden. Versuchen Sie, lauter oder näher am Mikrofon zu sprechen.',
       loadingModel: 'Spracherkennungsmodell wird geladen...',
