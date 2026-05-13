@@ -67,6 +67,9 @@
     "zod": "^4.3.6",
     "zustand": "^5.0.12"
   },
+  "overrides": {
+    "sharp": "file:./stubs/sharp"
+  },
   "devDependencies": {
     "@eslint/compat": "2.0.2",
     "@eslint/eslintrc": "3.3.3",
