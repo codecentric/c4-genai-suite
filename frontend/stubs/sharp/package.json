@@ -1,0 +1,6 @@
+{
+  "name": "sharp",
+  "version": "0.34.5",
+  "description": "Stub for sharp — not needed in browser context",
+  "main": "index.js"
+}

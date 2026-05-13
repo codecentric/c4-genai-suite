@@ -5,6 +5,7 @@ import TextareaAutosize from 'react-textarea-autosize';
 import { ConfigurationDto, FileDto } from 'src/api';
 import { Markdown } from 'src/components';
 import { ExtensionContext, JSONObject, useEventCallback, useExtensionContext, usePersistentState, useTheme } from 'src/hooks';
+import { useLocalTranscribe } from 'src/hooks/useLocalTranscribe';
 import { useSpeechRecognitionToggle } from 'src/hooks/useSpeechRecognitionToggle';
 import { useTranscribe } from 'src/hooks/useTranscribe';
 import { FileItemComponent } from 'src/pages/chat/conversation/FileItem';
@@ -13,6 +14,10 @@ import { Language, SpeechRecognitionButton } from 'src/pages/chat/conversation/S
 import { TranscribeButton } from 'src/pages/chat/conversation/TranscribeButton';
 import { texts } from 'src/texts';
 import { useChatDropzone } from '../useChatDropzone';
+import { DownloadProgressBanner } from './DownloadProgressBanner';
+import { LocalTranscribeButton } from './LocalTranscribeButton';
+import { PrivacyBadge } from './PrivacyBadge';
+import { RecordingTimer } from './RecordingTimer';
 import { Suggestions } from './Suggestions';
 import {
   getDefault,
@@ -58,6 +63,8 @@ export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEm
     'speechRecognitionLanguage',
     speechRecognitionLanguages[0].code,
   );
+
+  const [localTranscribeLanguage, setLocalTranscribeLanguage] = useState<string>('de');
 
   useEffect(() => {
     const defaultValues = configuration?.extensions?.filter(isExtensionWithUserArgs).reduce(
@@ -177,10 +184,13 @@ export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEm
   });
 
   const voiceExtensions =
-    configuration?.extensions?.filter((e) => e.name === 'speech-to-text' || e.name === 'transcribe-azure') ?? [];
+    configuration?.extensions?.filter(
+      (e) => e.name === 'speech-to-text' || e.name === 'transcribe-azure' || e.name === 'transcribe-local',
+    ) ?? [];
   const activeVoiceExtension = voiceExtensions[0];
   const showSpeechToText = activeVoiceExtension?.name === 'speech-to-text';
   const showTranscribe = activeVoiceExtension?.name === 'transcribe-azure';
+  const showLocalTranscribe = activeVoiceExtension?.name === 'transcribe-local';
 
   // Transcribe extension setup
   const transcribeExtension = showTranscribe ? activeVoiceExtension : undefined;
@@ -189,6 +199,11 @@ export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEm
     onTranscriptReceived: setInput,
   });
   const { isRecording, isTranscribing, toggleRecording } = transcribeHook;
+
+  const localTranscribeHook = useLocalTranscribe({
+    language: localTranscribeLanguage,
+    onTranscriptReceived: setInput,
+  });
 
   return (
     <>
@@ -230,6 +245,16 @@ export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEm
         )}
         <form onSubmit={doSubmit}>
           <div className="box-border rounded-2xl border border-gray-200 p-4 pb-3 shadow-2xl shadow-gray-100 focus-within:ring-1 focus-within:ring-black">
+            {showLocalTranscribe &&
+              localTranscribeHook.isSupported &&
+              localTranscribeHook.isDownloading &&
+              localTranscribeHook.downloadProgress && (
+                <DownloadProgressBanner
+                  downloadProgress={localTranscribeHook.downloadProgress}
+                  onCancel={localTranscribeHook.cancelDownload}
+                  isDownloading={localTranscribeHook.isDownloading}
+                />
+              )}
             <TextareaAutosize
               className={`w-full resize-none bg-transparent pb-4 outline-none`}
               maxRows={15}
@@ -300,11 +325,35 @@ export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEm
                   />
                 ) : showTranscribe ? (
                   <TranscribeButton isRecording={isRecording} isTranscribing={isTranscribing} onToggle={toggleRecording} />
+                ) : showLocalTranscribe && localTranscribeHook.isSupported ? (
+                  <>
+                    <PrivacyBadge />
+                    {localTranscribeHook.isRecording && (
+                      <RecordingTimer elapsedSeconds={localTranscribeHook.elapsedSeconds} maxSeconds={120} />
+                    )}
+                    <LocalTranscribeButton
+                      state={localTranscribeHook.state}
+                      isRecording={localTranscribeHook.isRecording}
+                      isTranscribing={localTranscribeHook.isTranscribing}
+                      isDownloading={localTranscribeHook.isDownloading}
+                      onToggle={localTranscribeHook.toggleRecording}
+                      language={localTranscribeLanguage}
+                      onLanguageChange={setLocalTranscribeLanguage}
+                      languages={['de', 'en']}
+                    />
+                  </>
                 ) : null}
                 <ActionIcon
                   type="submit"
                   size="lg"
-                  disabled={!input || isDisabled || uploadMutations.some((m) => m.status === 'pending') || listening}
+                  disabled={
+                    !input ||
+                    isDisabled ||
+                    uploadMutations.some((m) => m.status === 'pending') ||
+                    listening ||
+                    localTranscribeHook.isRecording ||
+                    localTranscribeHook.isTranscribing
+                  }
                   data-testid="chat-submit-button"
                   aria-label={texts.common.send}
                   data-tooltip-id="default"

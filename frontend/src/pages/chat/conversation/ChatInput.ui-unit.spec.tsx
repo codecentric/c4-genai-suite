@@ -18,6 +18,18 @@ vi.mock('src/hooks/api/files', () => ({
   useConversationFiles: vi.fn(),
 }));
 
+vi.mock('src/hooks/useLocalTranscribe', () => ({
+  useLocalTranscribe: () => ({
+    state: 'idle',
+    downloadProgress: null,
+    isRecording: false,
+    isTranscribing: false,
+    isDownloading: false,
+    toggleRecording: vi.fn(),
+    cancelDownload: vi.fn(),
+  }),
+}));
+
 vi.mocked(useConversationBucketAvailabilities)
   // @ts-expect-error we just mock the needed fields of the query
   .mockImplementation(() => ({
