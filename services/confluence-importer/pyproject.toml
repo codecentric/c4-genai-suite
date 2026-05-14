@@ -9,7 +9,7 @@ dependencies = [
     "markdownify>=0.14.1",
     "pydantic-settings>=2.14.1",
     "pyyaml>=6.0.1",
-    "requests==2.34.1",
+    "requests==2.34.2",
     "structlog==25.5.0",
 ]
 
@@ -28,7 +28,7 @@ dev = [
     "pip>=26.1.1",
     "pytest>=9.0.2",
     "pytest-mock>=3.14.1",
-    "ruff>=0.15.12",
+    "ruff>=0.15.13",
 ]
 
 [tool.mypy]
