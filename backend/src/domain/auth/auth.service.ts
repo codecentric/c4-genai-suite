@@ -1,3 +1,4 @@
+import { createHash } from 'crypto';
 import { ForbiddenException, Injectable, Logger, OnModuleInit, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -137,6 +138,7 @@ export class AuthService implements OnModuleInit {
   async onModuleInit(): Promise<any> {
     await this.setupUserGroups();
     await this.setupAdmins();
+    await this.setupEvalServiceAccount();
   }
 
   private async setupAdmins() {
@@ -202,6 +204,43 @@ export class AuthService implements OnModuleInit {
         isBuiltIn: true,
       },
     ]);
+  }
+
+  private async setupEvalServiceAccount() {
+    const apiKey = this.configService.get<string>('EVAL_SERVICE_ACCOUNT_API_KEY');
+    const email = this.configService.get<string>('EVAL_SERVICE_ACCOUNT_EMAIL', 'eval-service@internal');
+
+    if (!apiKey) return;
+
+    // Hash the raw key the same way findApiKey() does:
+    // findApiKey() receives the raw value in x-api-key header and does SHA256(value)
+    // So we store SHA256(raw_key) in the DB
+    const hashedKey = createHash('sha256').update(apiKey).digest('hex');
+
+    let user = await this.users.findOne({
+      where: { email },
+      relations: ['userGroups'],
+    });
+
+    if (user) {
+      // Update API key if it changed
+      user.apiKey = hashedKey;
+      // Ensure admin group assignment
+      if (!user.userGroups?.some((g) => g.id === BUILTIN_USER_GROUP_ADMIN)) {
+        user.userGroups = [{ id: BUILTIN_USER_GROUP_ADMIN } as UserGroupEntity];
+      }
+    } else {
+      user = this.users.create({
+        id: uuid.v4(),
+        email,
+        name: 'Eval Service',
+        apiKey: hashedKey,
+        userGroups: [{ id: BUILTIN_USER_GROUP_ADMIN } as UserGroupEntity],
+      });
+    }
+
+    await this.users.save(user);
+    this.logger.log(`Eval service account '${email}' provisioned.`);
   }
 
   async logout(req: Request) {
