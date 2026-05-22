@@ -168,10 +168,6 @@ class Evaluation(Base, CreatedTrait, UpdatedTrait, DeletedTrait):
         back_populates="evaluation", cascade="all, delete-orphan"
     )
 
-    # User context for callbacks (stored when evaluation is created)
-    callback_user_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
-    callback_user_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
-
     # C4 assistant fields
     c4_assistant_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
     c4_assistant_name: Mapped[str | None] = mapped_column(String(255), nullable=True)

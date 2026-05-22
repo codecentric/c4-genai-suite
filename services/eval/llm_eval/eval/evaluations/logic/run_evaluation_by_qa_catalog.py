@@ -53,9 +53,6 @@ class StartRunEvaluationByQaCatalogLogic:
             catalog_id=dto.catalog_id,
             status=EvaluationStatus.PENDING,
             metrics=metrics,
-            # Store callback user context for service-to-service auth
-            callback_user_id=principal.id,
-            callback_user_name=principal.name,
             # Store C4 assistant info
             c4_assistant_id=dto.c4_assistant_id,
             c4_assistant_name=dto.c4_assistant_name,

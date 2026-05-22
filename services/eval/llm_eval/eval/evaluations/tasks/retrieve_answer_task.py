@@ -20,8 +20,6 @@ async def retrieve_answer_task(
     session: AsyncSession,
     test_case_id: str,
     c4_assistant_id: int,
-    callback_user_id: str,
-    callback_user_name: str,
 ) -> None:
     test_case = await find_test_case(session, test_case_id)
 
@@ -37,8 +35,6 @@ async def retrieve_answer_task(
 
     query = C4AssistantQuery(
         assistant_id=c4_assistant_id,
-        user_id=callback_user_id,
-        user_name=callback_user_name,
     )
 
     result = await query.query(
