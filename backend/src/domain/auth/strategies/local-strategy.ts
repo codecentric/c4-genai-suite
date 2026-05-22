@@ -1,6 +1,5 @@
-import { createHash, timingSafeEqual } from 'crypto';
+import { createHash } from 'crypto';
 import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { InjectRepository } from '@nestjs/typeorm';
 import { isString } from 'class-validator';
@@ -17,18 +16,11 @@ export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: UserRepository,
-    private readonly configService: ConfigService,
   ) {
     super();
   }
 
   async validate(request: Request): Promise<Partial<User> | null> {
-    // Try internal service authentication first (for service-to-service calls)
-    const internalUser = this.tryInternalServiceAuth(request);
-    if (internalUser) {
-      return internalUser;
-    }
-
     const key = this.findApiKey(request);
 
     if (key) {
@@ -38,28 +30,6 @@ export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
     }
 
     return null;
-  }
-
-  private tryInternalServiceAuth(request: Request): Partial<User> | null {
-    const serviceSecret = this.configService.get<string>('EVAL_SERVICE_SECRET');
-    if (!serviceSecret) return null;
-
-    const providedSecret = request.headers['x-internal-service-key'];
-    if (!isString(providedSecret)) return null;
-
-    // Timing-safe comparison to prevent timing attacks
-    const provided = Buffer.from(providedSecret);
-    const expected = Buffer.from(serviceSecret);
-    if (provided.length !== expected.length || !timingSafeEqual(provided, expected)) {
-      return null;
-    }
-
-    // Extract user context from headers
-    const userId = request.headers['x-user-id'];
-    const userName = request.headers['x-user-name'];
-    if (!isString(userId) || !isString(userName)) return null;
-
-    return { id: userId, name: userName };
   }
 
   private findApiKey(request: Request) {
