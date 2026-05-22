@@ -37,7 +37,7 @@ const SCHEME = z
     apiKey: z.string().optional(),
 
     // OpenAI-specific fields
-    baseUrl: z.string().url().optional().nullable(),
+    baseUrl: z.union([z.string().url(), z.literal(''), z.null()]).optional(),
     model: z.string().optional(),
     temperature: z.number().min(0).max(2).optional().nullable(),
     language: z.nativeEnum(Language).optional().nullable(),
