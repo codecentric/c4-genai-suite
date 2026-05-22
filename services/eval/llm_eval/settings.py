@@ -79,7 +79,7 @@ class C4BackendSettings(BaseSettings, prefix="C4_BACKEND_"):
     """Settings for connecting back to C4 backend for assistant queries."""
 
     url: str = Field(default="http://localhost:3000/api")
-    internal_service_secret: str | None = Field(default=None)
+    api_key: str | None = Field(default=None)
 
 
 class Settings(BaseSettings):

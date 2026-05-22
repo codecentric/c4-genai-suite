@@ -18,23 +18,19 @@ from llm_eval.utils.json_types import JSONObject
 
 class C4AssistantQuery(LLMQuery):
     """
-    Query class for C4 assistants using internal service-to-service auth.
+    Query class for C4 assistants using API key service account auth.
 
-    Authenticates with C4 backend using shared secret (X-Internal-Service-Key)
-    and passes user context (X-User-Id, X-User-Name) for authorization.
+    Authenticates with C4 backend using the eval service account's API key
+    sent via the standard x-api-key header.
     """
 
     assistant_id: int
-    user_id: str
-    user_name: str
     max_retries: int
     timeout: int
 
     def __init__(
         self,
         assistant_id: int,
-        user_id: str,
-        user_name: str,
         max_retries: int = 3,
         parallel_queries: int = 1,
         timeout: int = 60,
@@ -42,8 +38,6 @@ class C4AssistantQuery(LLMQuery):
         super().__init__(parallel_queries)
 
         self.assistant_id = assistant_id
-        self.user_id = user_id
-        self.user_name = user_name
         self.max_retries = max_retries
         self.timeout = timeout
 
@@ -56,13 +50,9 @@ class C4AssistantQuery(LLMQuery):
         headers = {
             "Content-Type": "application/json",
             "Accept": "application/json",
-            "X-User-Id": self.user_id,
-            "X-User-Name": self.user_name,
         }
-        if SETTINGS.c4_backend.internal_service_secret:
-            headers["x-internal-service-key"] = (
-                SETTINGS.c4_backend.internal_service_secret
-            )
+        if SETTINGS.c4_backend.api_key:
+            headers["x-api-key"] = SETTINGS.c4_backend.api_key
         return headers
 
     async def query(self, prompt: str, meta_data: JSONObject) -> LLMQueryResult:
