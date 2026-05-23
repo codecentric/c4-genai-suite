@@ -53,6 +53,9 @@ jobs:
           - name: confluence-importer
             containerfile: services/confluence-importer/Dockerfile
             context: services/confluence-importer/
+          - name: eval
+            containerfile: services/eval/Dockerfile
+            context: services/eval/
     steps:
       - uses: actions/checkout@v6
       - uses: docker/login-action@b45d80f862d83dbcd57f89517bcf500b2ab88fb2 # v3
