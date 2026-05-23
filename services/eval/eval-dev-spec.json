@@ -2542,8 +2542,8 @@
         "properties": {
           "file": {
             "type": "string",
-            "format": "binary",
-            "title": "File"
+            "title": "File",
+            "format": "binary"
           }
         },
         "type": "object",
@@ -2556,8 +2556,8 @@
         "properties": {
           "file": {
             "type": "string",
-            "format": "binary",
-            "title": "File"
+            "title": "File",
+            "format": "binary"
           },
           "name": {
             "type": "string",
@@ -3140,7 +3140,7 @@
           },
           "evaluationParams": {
             "items": {
-              "$ref": "#/components/schemas/LLMTestCaseParams"
+              "$ref": "#/components/schemas/SingleTurnParams"
             },
             "type": "array",
             "title": "Evaluationparams"
@@ -3190,7 +3190,7 @@
           },
           "evaluationParams": {
             "items": {
-              "$ref": "#/components/schemas/LLMTestCaseParams"
+              "$ref": "#/components/schemas/SingleTurnParams"
             },
             "type": "array",
             "title": "Evaluationparams"
@@ -3256,7 +3256,7 @@
             "anyOf": [
               {
                 "items": {
-                  "$ref": "#/components/schemas/LLMTestCaseParams"
+                  "$ref": "#/components/schemas/SingleTurnParams"
                 },
                 "type": "array"
               },
@@ -3935,19 +3935,6 @@
           "version"
         ],
         "title": "LLMEndpointUpdate"
-      },
-      "LLMTestCaseParams": {
-        "type": "string",
-        "enum": [
-          "input",
-          "actual_output",
-          "expected_output",
-          "context",
-          "retrieval_context",
-          "tools_called",
-          "expected_tools"
-        ],
-        "title": "LLMTestCaseParams"
       },
       "Language": {
         "type": "string",
@@ -5211,6 +5198,25 @@
         ],
         "title": "RunEvaluationByTestCasesTestCase"
       },
+      "SingleTurnParams": {
+        "type": "string",
+        "enum": [
+          "input",
+          "actual_output",
+          "expected_output",
+          "context",
+          "retrieval_context",
+          "metadata",
+          "tags",
+          "tools_called",
+          "expected_tools",
+          "mcp_servers",
+          "mcp_tools_called",
+          "mcp_resources_called",
+          "mcp_prompts_called"
+        ],
+        "title": "SingleTurnParams"
+      },
       "SupportedQACatalogDownloadFormat": {
         "type": "string",
         "enum": [
@@ -5272,6 +5278,13 @@
           "type": {
             "type": "string",
             "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
           }
         },
         "type": "object",

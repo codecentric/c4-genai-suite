@@ -384,7 +384,7 @@ export const en = {
       evaluationParamsLabel: 'Evaluation Parameters',
       evaluationParamsHint: 'Select which test case parameters are required for this metric',
       evaluationParamsRequired: 'At least one evaluation parameter is required',
-      // Evaluation Parameters (LLMTestCaseParams)
+      // Evaluation Parameters (SingleTurnParams)
       paramInput: 'Input',
       paramActualOutput: 'Actual Output',
       paramExpectedOutput: 'Expected Output',

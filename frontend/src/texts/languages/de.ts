@@ -375,7 +375,7 @@ export const de: typeof en = {
       evaluationParamsLabel: 'Bewertungsparameter',
       evaluationParamsHint: 'Wählen Sie aus, welche Testfallparameter für diese Metrik erforderlich sind',
       evaluationParamsRequired: 'Mindestens ein Bewertungsparameter ist erforderlich',
-      // Evaluation Parameters (LLMTestCaseParams)
+      // Evaluation Parameters (SingleTurnParams)
       paramInput: 'Eingabe',
       paramActualOutput: 'Tatsächliche Ausgabe',
       paramExpectedOutput: 'Erwartete Ausgabe',

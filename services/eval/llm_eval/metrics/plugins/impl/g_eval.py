@@ -1,7 +1,7 @@
 from typing import Literal, get_args
 
 from deepeval.metrics import BaseMetric, GEval
-from deepeval.test_case import LLMTestCaseParams
+from deepeval.test_case import SingleTurnParams
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from llm_eval.metrics.plugins.interface import (
@@ -22,7 +22,7 @@ METRIC_TYPE: MetricType = get_args(MetricType)[0]
 
 class GEvalMetricConfiguration(BaseConfiguration[MetricType]):
     evaluation_steps: list[str]
-    evaluation_params: list[LLMTestCaseParams]
+    evaluation_params: list[SingleTurnParams]
     chat_model_id: str
     strict_mode: bool = False
     threshold: float = 0.5
@@ -38,7 +38,7 @@ class GEvalMetricConfiguration(BaseConfiguration[MetricType]):
 
 class GEvalMetricConfigurationRead(BaseConfigurationRead[MetricType]):
     evaluation_steps: list[str]
-    evaluation_params: list[LLMTestCaseParams]
+    evaluation_params: list[SingleTurnParams]
     chat_model_id: str
     strict_mode: bool
     threshold: float
@@ -46,7 +46,7 @@ class GEvalMetricConfigurationRead(BaseConfigurationRead[MetricType]):
 
 class GEvalMetricConfigurationCreate(BaseConfigurationCreate[MetricType]):
     evaluation_steps: list[str]
-    evaluation_params: list[LLMTestCaseParams]
+    evaluation_params: list[SingleTurnParams]
     chat_model_id: str
     strict_mode: bool
     threshold: float
@@ -54,7 +54,7 @@ class GEvalMetricConfigurationCreate(BaseConfigurationCreate[MetricType]):
 
 class GEvalMetricConfigurationUpdate(BaseConfigurationUpdate[MetricType]):
     evaluation_steps: list[str] | None = None
-    evaluation_params: list[LLMTestCaseParams] | None = None
+    evaluation_params: list[SingleTurnParams] | None = None
     chat_model_id: str | None = None
     strict_mode: bool | None = None
     threshold: float | None = None

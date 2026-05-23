@@ -1,63 +1,47 @@
-# `python-base` sets up all our shared environment variables
-FROM python:3.12.5-slim AS python-base
+FROM python:3.12-slim AS builder
 
-# python
-ENV PYTHONUNBUFFERED=1 \
-    # prevents python creating .pyc files
-    PYTHONDONTWRITEBYTECODE=1 \
-    \
-    # pip
-    PIP_NO_CACHE_DIR=off \
-    PIP_DISABLE_PIP_VERSION_CHECK=on \
-    PIP_DEFAULT_TIMEOUT=100 \
-    \
-    # poetry
-    # https://python-poetry.org/docs/configuration/#using-environment-variables
-    POETRY_VERSION=2.1.1 \
-    # make poetry install to this location
-    POETRY_HOME="/opt/poetry" \
-    # do not ask any interactive question
-    POETRY_NO_INTERACTION=1 \
-    \
-    # paths
-    # this is where our requirements + virtual environment will live
-    PYSETUP_PATH="/opt/pysetup/"
+WORKDIR /eval
 
-# prepend poetry and venv to path
-ENV PATH="$POETRY_HOME/bin:$PATH"
+RUN apt-get update && \
+    apt-get install --no-install-recommends -y \
+    build-essential && \
+    rm -rf /var/lib/apt/lists/*
 
+# Install uv
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
-# `builder-base` stage is used to create the virtual environment
-FROM python-base AS builder-base
+ENV UV_COMPILE_BYTECODE=1 \
+    UV_LINK_MODE=copy
 
-RUN apt-get update \
-    && apt-get install --no-install-recommends -y \
-    # deps for installing poetry
-    curl \
-    # deps for building python deps
-    build-essential
+# Copy dependency files first for caching
+COPY pyproject.toml uv.lock ./
 
-# install poetry - respects $POETRY_VERSION & $POETRY_HOME
-RUN curl -sSL https://install.python-poetry.org | python3 -
-# install poetry bundle plugin
-RUN poetry self add poetry-plugin-bundle@1.7.0
+# Install dependencies (no dev, no project itself yet)
+RUN uv sync --frozen --no-install-project --no-dev
 
-WORKDIR $PYSETUP_PATH
-
-COPY . .
-
-# bundle project
-RUN poetry bundle venv --only=main /venv
-
-
-FROM python-base AS runtime
+#
+# RUNTIME
+#
+FROM python:3.12-slim AS production
 
 ARG VERSION
 
-ENV RUN_IN_CONTAINER=true
+ENV RUN_IN_CONTAINER=true \
+    APP_VERSION=${VERSION} \
+    VIRTUAL_ENV=/eval/.venv \
+    PATH="/eval/.venv/bin:$PATH"
 
-ENV APP_VERSION=${VERSION}
+WORKDIR /eval
 
-WORKDIR $PYSETUP_PATH
+COPY --from=builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
 
-COPY --from=builder-base /venv /venv
+# Copy application code
+COPY llm_eval ./llm_eval
+
+EXPOSE 3202
+
+HEALTHCHECK CMD python3 -c "import urllib.request, sys; sys.exit(0) if urllib.request.urlopen('http://localhost:3202/health').status == 200 else sys.exit(1)" || exit 1
+
+ENV HOST=0.0.0.0
+
+CMD ["sh", "-c", "HOST=${HOST:-0.0.0.0}; uvicorn llm_eval.main:app --proxy-headers --port 3202 --host \"$HOST\""]
