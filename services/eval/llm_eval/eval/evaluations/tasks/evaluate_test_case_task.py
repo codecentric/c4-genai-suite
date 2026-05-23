@@ -1,8 +1,9 @@
 from datetime import datetime
 from uuid import uuid4
 
-from deepeval.evaluate import TestResult as EvalTestResult
 from deepeval.evaluate import evaluate
+from deepeval.evaluate.configs import AsyncConfig, CacheConfig, DisplayConfig
+from deepeval.evaluate.types import EvaluationResult, TestResult as EvalTestResult
 from deepeval.test_case import LLMTestCase
 from loguru import logger
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -53,17 +54,23 @@ async def evaluate_test_case_task(
             expected_output=test_case.expected_output,
             context=test_case.context or [],
             retrieval_context=test_case.retrieval_context or [],
-            additional_metadata=test_case.meta_data,
+            metadata=test_case.meta_data,
         )
         evaluate_result = evaluate(
             test_cases=[llm_test_case],
             metrics=metrics,
-            print_results=False,
-            run_async=False,
-            show_indicator=SETTINGS.evaluation.show_indicator,
-            write_cache=False,
-            use_cache=False,
-            max_concurrent=1,
+            async_config=AsyncConfig(
+                run_async=SETTINGS.evaluation.run_async,
+                max_concurrent=SETTINGS.evaluation.parallel_test_cases,
+            ),
+            display_config=DisplayConfig(
+                print_results=False,
+                show_indicator=SETTINGS.evaluation.show_indicator,
+            ),
+            cache_config=CacheConfig(
+                write_cache=False,
+                use_cache=False,
+            ),
         )
 
         evaluation_results = _build_evaluation_results(

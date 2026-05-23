@@ -1,4 +1,4 @@
-import type { LLMTestCaseParams } from 'src/api/generated-eval';
+import type { SingleTurnParams } from 'src/api/generated-eval';
 
 /**
  * Combined form type that includes all possible fields across metric types.
@@ -18,5 +18,5 @@ export interface MetricFormValues {
 
   // G-Eval-specific
   evaluationSteps?: string[];
-  evaluationParams?: LLMTestCaseParams[];
+  evaluationParams?: SingleTurnParams[];
 }
