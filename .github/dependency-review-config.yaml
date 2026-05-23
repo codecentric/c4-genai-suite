@@ -57,3 +57,4 @@ allow-dependencies-licenses:
   - 'pkg:pypi/mmh3' # CC-BY-4.0 AND public-domain AND MIT compound; CC-BY-4.0 is for the JOSS paper, code is MIT
   - 'pkg:pypi/wcwidth' # MIT AND HPND-Markus-Kuhn compound; HPND-Markus-Kuhn is a permissive license
   - 'pkg:pypi/rapidfuzz' # GPL-1.0-or-later AND MIT compound; GPL applies only to bundled Levenshtein reference, library itself is MIT
+  - 'pkg:pypi/pyfiglet' # LicenseRef-scancode-public-domain AND MIT compound; bundled FIGlet fonts are public domain, Python code is MIT
