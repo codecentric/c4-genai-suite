@@ -26,11 +26,16 @@ jobs:
         with:
           python-version: "3.12"
       - run: uv sync
+      - name: Generate encryption key
+        id: gen-key
+        run: echo "key=$(uv run python -c 'from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())')" >> "$GITHUB_OUTPUT"
       - run: |
           uv run generate-api-spec --no-dev
           uv run ruff format eval-spec.json
           uv run ruff format eval-dev-spec.json
           diff eval-dev-spec.json eval-spec.json
+        env:
+          LLM_EVAL_ENCRYPTION_KEY: ${{ steps.gen-key.outputs.key }}
 
   eval-lint:
     runs-on: ubuntu-latest

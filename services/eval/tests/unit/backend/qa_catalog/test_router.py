@@ -1,8 +1,8 @@
 from datetime import datetime
-from unittest.mock import ANY, AsyncMock, MagicMock, patch
+from unittest.mock import ANY, MagicMock, patch
 
 import pytest
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
 from llm_eval.database.model import QACatalogStatus
