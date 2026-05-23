@@ -73,6 +73,7 @@ jobs:
           - backend
           - reis
           - confluence-importer
+          - eval
     needs:
       - upstream-workflows
     steps:
