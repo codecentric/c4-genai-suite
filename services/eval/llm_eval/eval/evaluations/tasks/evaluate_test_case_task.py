@@ -3,7 +3,7 @@ from uuid import uuid4
 
 from deepeval.evaluate import evaluate
 from deepeval.evaluate.configs import AsyncConfig, CacheConfig, DisplayConfig
-from deepeval.evaluate.types import EvaluationResult, TestResult as EvalTestResult
+from deepeval.evaluate.types import TestResult as EvalTestResult
 from deepeval.test_case import LLMTestCase
 from loguru import logger
 from sqlalchemy.ext.asyncio import AsyncSession
