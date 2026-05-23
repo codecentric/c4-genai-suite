@@ -1,3 +1,4 @@
+.openapi-generator-ignore
 apis/DashboardApi.ts
 apis/EvaluationResultsApi.ts
 apis/EvaluationsApi.ts
@@ -57,7 +58,6 @@ models/LLMEndpointDelete.ts
 models/LLMEndpointType.ts
 models/LLMEndpointTypesResponse.ts
 models/LLMEndpointUpdate.ts
-models/LLMTestCaseParams.ts
 models/Language.ts
 models/Language1.ts
 models/LlmEvalEvalEvaluateResultsRouterEvaluationResult.ts
@@ -95,6 +95,7 @@ models/RagasQACatalogQuerySynthesizer.ts
 models/RunEvaluationByQaCatalog.ts
 models/RunEvaluationByTestCases.ts
 models/RunEvaluationByTestCasesTestCase.ts
+models/SingleTurnParams.ts
 models/SupportedQACatalogDownloadFormat.ts
 models/Temperature.ts
 models/TestCaseProgress.ts

@@ -1,7 +1,7 @@
 import { ActionIcon, Button, MultiSelect, TextInput } from '@mantine/core';
 import type { UseFormReturnType } from '@mantine/form';
 import { IconPlus, IconTrash } from '@tabler/icons-react';
-import { LLMTestCaseParams } from 'src/api/generated-eval';
+import { SingleTurnParams } from 'src/api/generated-eval';
 import { texts } from 'src/texts';
 import { BaseMetricFields } from './BaseMetricFields';
 import type { MetricFormValues } from './types';
@@ -11,15 +11,15 @@ interface GEvalMetricFieldsProps {
 }
 
 export function GEvalMetricFields({ form }: GEvalMetricFieldsProps) {
-  // Options for evaluation parameters (LLMTestCaseParams)
+  // Options for evaluation parameters (SingleTurnParams)
   const evaluationParamsOptions = [
-    { value: LLMTestCaseParams.Input, label: texts.evals.metric.paramInput },
-    { value: LLMTestCaseParams.ActualOutput, label: texts.evals.metric.paramActualOutput },
-    { value: LLMTestCaseParams.ExpectedOutput, label: texts.evals.metric.paramExpectedOutput },
-    { value: LLMTestCaseParams.Context, label: texts.evals.metric.paramContext },
-    { value: LLMTestCaseParams.RetrievalContext, label: texts.evals.metric.paramRetrievalContext },
-    { value: LLMTestCaseParams.ToolsCalled, label: texts.evals.metric.paramToolsCalled },
-    { value: LLMTestCaseParams.ExpectedTools, label: texts.evals.metric.paramExpectedTools },
+    { value: SingleTurnParams.Input, label: texts.evals.metric.paramInput },
+    { value: SingleTurnParams.ActualOutput, label: texts.evals.metric.paramActualOutput },
+    { value: SingleTurnParams.ExpectedOutput, label: texts.evals.metric.paramExpectedOutput },
+    { value: SingleTurnParams.Context, label: texts.evals.metric.paramContext },
+    { value: SingleTurnParams.RetrievalContext, label: texts.evals.metric.paramRetrievalContext },
+    { value: SingleTurnParams.ToolsCalled, label: texts.evals.metric.paramToolsCalled },
+    { value: SingleTurnParams.ExpectedTools, label: texts.evals.metric.paramExpectedTools },
   ];
 
   return (

@@ -500,7 +500,7 @@ function load() {
         evaluationParamsLabel: translate('evals.metric.evaluationParamsLabel'),
         evaluationParamsHint: translate('evals.metric.evaluationParamsHint'),
         evaluationParamsRequired: translate('evals.metric.evaluationParamsRequired'),
-        // Evaluation Parameters (LLMTestCaseParams)
+        // Evaluation Parameters (SingleTurnParams)
         paramInput: translate('evals.metric.paramInput'),
         paramActualOutput: translate('evals.metric.paramActualOutput'),
         paramExpectedOutput: translate('evals.metric.paramExpectedOutput'),
