@@ -1,8 +1,8 @@
 from datetime import datetime
-from unittest.mock import ANY, MagicMock, patch
+from unittest.mock import ANY, AsyncMock, MagicMock, patch
 
 import pytest
-from fastapi import HTTPException
+from fastapi import FastAPI, HTTPException
 from fastapi.testclient import TestClient
 
 from llm_eval.database.model import QACatalogStatus
@@ -20,11 +20,18 @@ from llm_eval.qa_catalog.models import (
 from llm_eval.qa_catalog.router import router
 
 
+def _create_test_app() -> FastAPI:
+    """Create a minimal FastAPI app wrapping the qa-catalog router for testing."""
+    test_app = FastAPI()
+    test_app.include_router(router)
+    return test_app
+
+
 class TestQACatalogRouter:
     client: TestClient
 
     def setup_class(self) -> None:
-        self.client = TestClient(router)
+        self.client = TestClient(_create_test_app())
 
     def teardown_class(self) -> None:
         self.client.close()
@@ -357,17 +364,16 @@ class TestQACatalogRouter:
     ) -> None:
         mock_handle_catalog_download.return_value = None
 
-        with pytest.raises(HTTPException) as context:
-            self.client.post(
-                url="/qa-catalog/download",
-                json={
-                    "format": "csv",
-                    "parent_catalog_id": "1.0",
-                    "version_ids": ["1.0"],
-                    "include_all": "false",
-                },
-            )
-        assert context.value.status_code == 404
+        response = self.client.post(
+            url="/qa-catalog/download",
+            json={
+                "format": "csv",
+                "parent_catalog_id": "1.0",
+                "version_ids": ["1.0"],
+                "include_all": "false",
+            },
+        )
+        assert response.status_code == 404
 
     @pytest.mark.asyncio
     @patch("llm_eval.qa_catalog.router.create_qa_catalog_revision_history")
@@ -432,9 +438,8 @@ class TestQACatalogRouter:
         mock_find_qa_catalog.return_value = None
         mock_create_qa_catalog_revision_history.return_value = None
 
-        with pytest.raises(HTTPException) as context:
-            self.client.get(
-                url="/qa-catalog/123/history",
-            )
+        response = self.client.get(
+            url="/qa-catalog/123/history",
+        )
 
-        assert context.value.status_code == 404
+        assert response.status_code == 404
