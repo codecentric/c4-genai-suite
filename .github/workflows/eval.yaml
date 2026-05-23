@@ -1,0 +1,99 @@
+name: Eval Service
+permissions:
+  contents: read
+
+on:
+  pull_request:
+    paths:
+      - .github/workflows/eval.yaml
+      - services/eval/**
+  workflow_call:
+
+defaults:
+  run:
+    working-directory: services/eval
+
+jobs:
+  eval-check-generated-specs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+          cache-dependency-glob: services/eval/uv.lock
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: uv sync
+      - run: |
+          uv run generate-api-spec --no-dev
+          uv run ruff format eval-spec.json
+          uv run ruff format eval-dev-spec.json
+          diff eval-dev-spec.json eval-spec.json
+
+  eval-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+          cache-dependency-glob: services/eval/uv.lock
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: uv sync
+      - name: Lint
+        run: uv run ruff check .
+
+  eval-test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17.5
+        env:
+          POSTGRES_USER: admin
+          POSTGRES_PASSWORD: secret
+          POSTGRES_DB: cccc
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    steps:
+      - uses: actions/checkout@v6
+      - uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+          cache-dependency-glob: services/eval/uv.lock
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: uv sync
+      - name: Generate encryption key
+        id: gen-key
+        run: echo "key=$(uv run python -c 'from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())')" >> "$GITHUB_OUTPUT"
+      - name: Test
+        env:
+          PG_HOST: localhost
+          PG_USER: admin
+          PG_PASSWORD: secret
+          PG_DB: cccc
+          PG_PORT: 5432
+          PG_SCHEMA: llm_eval
+          LLM_EVAL_ENCRYPTION_KEY: ${{ steps.gen-key.outputs.key }}
+          CELERY_BROKER_HOST: localhost
+          CELERY_BROKER_USER: rabbit
+          CELERY_BROKER_PASSWORD: rabbit
+        run: uv run pytest --cov-report=xml --cov-report=term-missing
+      - uses: irongut/CodeCoverageSummary@51cc3a756ddcd398d447c044c02cb6aa83fdae95 # v1.3.0
+        with:
+          badge: true
+          filename: services/eval/coverage.xml
+          format: markdown
+          output: both
+      - run: cp code-coverage-results.md $GITHUB_STEP_SUMMARY
+        working-directory: .

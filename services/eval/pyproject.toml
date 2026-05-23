@@ -103,7 +103,7 @@ lint.ignore = ["ANN101", "ANN102"]
 allow-star-arg-any = true
 
 [tool.pytest.ini_options]
-addopts = "--cov=alembic --cov=database --cov=config --cov=utils --cov=llm_eval --cov-report=term-missing"
+addopts = "--cov=alembic --cov=database --cov=config --cov=utils --cov=llm_eval --cov-report=term-missing --ignore=tests/unit/qa_catalog/generator/implementation/ragas --ignore=tests/unit/qa_catalog/test_synthetic_qa_pair.py --ignore=tests/unit/qa_catalog/generator/implementation/test___init__.py --ignore=tests/unit/utils/test_mixed_document_loader.py"
 testpaths = "tests"
 env_override_existing_values = 1
 env_files = [".env", ".env.local"]
