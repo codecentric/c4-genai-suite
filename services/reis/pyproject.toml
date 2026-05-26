@@ -20,7 +20,7 @@ dependencies = [
     "langchain-aws>=1.5.0",
     "langchain-nvidia-ai-endpoints>=1.4.0",
     "psycopg[binary]>=3.3.4",
-    "fastapi[standard]==0.136.1",
+    "fastapi[standard]==0.136.3",
     "azure-search-documents==11.6.0",
     "azure-identity==1.25.3",
     "pdfminer-six>=20260107",
@@ -43,7 +43,7 @@ dependencies = [
 [dependency-groups]
 dev = [
     "ruff==0.15.14",
-    "ty>=0.0.38",
+    "ty>=0.0.39",
     "pip==26.1.1",
     "pre-commit==4.6.0",
     "pytest==9.0.3",
