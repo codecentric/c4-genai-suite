@@ -304,15 +304,15 @@ wheels = [
 
 [[package]]
 name = "boto3-stubs"
-version = "1.43.15"
+version = "1.43.16"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "botocore-stubs" },
     { name = "types-s3transfer" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/99/1f/97908e31bc34d2a55bb3f54ab567b807210190a3e96cce3d3cc81c9ad7ab/boto3_stubs-1.43.15.tar.gz", hash = "sha256:1feaa38f13d536b79402a5bc4a8c6cce7893483aa31c65c9db5817c4c5faa30a", size = 102676, upload-time = "2026-05-26T21:15:07.682Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/64/f9/ca125c335ef0803837c70fd58b7a271e46ef75cf2af422f09833416358c9/boto3_stubs-1.43.16.tar.gz", hash = "sha256:33e8d6e0e28c4596c5ea9afa484370f8b84cf02bcf211a3c082fdad7edb4aa54", size = 102671, upload-time = "2026-05-27T19:38:22.35Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/ab/8c/3855f3b0feb444482ed56b501e6fd20632d6819f605bebd65dd953734865/boto3_stubs-1.43.15-py3-none-any.whl", hash = "sha256:f0d5a7dfc31e18abaf5384b3f5441c217bc8167acf2c6c6385a81f11b8716fdf", size = 70668, upload-time = "2026-05-26T21:15:00.966Z" },
+    { url = "https://files.pythonhosted.org/packages/2b/7b/e611ba7e90804794f57ba6f3325679ea650056e4d800cc0fcb67522557bc/boto3_stubs-1.43.16-py3-none-any.whl", hash = "sha256:3d58c43bc59e32de9952ff51e7e8326941bd484b626277cec6e34aadde058356", size = 70669, upload-time = "2026-05-27T19:38:18.468Z" },
 ]
 
 [package.optional-dependencies]
@@ -3177,7 +3177,7 @@ requires-dist = [
     { name = "azure-identity", specifier = "==1.25.3" },
     { name = "azure-search-documents", specifier = "==11.6.0" },
     { name = "boto3", specifier = ">=1.43.15" },
-    { name = "boto3-stubs", extras = ["s3"], specifier = ">=1.43.15" },
+    { name = "boto3-stubs", extras = ["s3"], specifier = ">=1.43.16" },
     { name = "fastapi", extras = ["standard"], specifier = "==0.136.3" },
     { name = "fastmcp", specifier = ">=3.3.1" },
     { name = "ffmpeg-python", specifier = ">=0.2.0" },
