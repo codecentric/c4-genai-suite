@@ -28,7 +28,7 @@ dev = [
     "pip>=26.1.1",
     "pytest>=9.0.2",
     "pytest-mock>=3.14.1",
-    "ruff>=0.15.14",
+    "ruff>=0.15.15",
 ]
 
 [tool.mypy]
