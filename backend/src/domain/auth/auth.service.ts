@@ -212,6 +212,8 @@ export class AuthService implements OnModuleInit {
 
     if (!apiKey) return;
 
+    this.validateEvalApiKeyStrength(apiKey);
+
     // Hash the raw key the same way findApiKey() does:
     // findApiKey() receives the raw value in x-api-key header and does SHA256(value)
     // So we store SHA256(raw_key) in the DB
@@ -241,6 +243,23 @@ export class AuthService implements OnModuleInit {
 
     await this.users.save(user);
     this.logger.log(`Eval service account '${email}' provisioned.`);
+  }
+
+  /**
+   * Validates that the eval service API key meets minimum security requirements.
+   * Must be a hex string of at least 64 characters (256-bit key minimum).
+   */
+  private validateEvalApiKeyStrength(apiKey: string) {
+    if (!/^[0-9a-fA-F]+$/.test(apiKey)) {
+      throw new Error(`EVAL_SERVICE_ACCOUNT_API_KEY must be a hex string. ` + `Generate one with: openssl rand -hex 32`);
+    }
+    if (apiKey.length < 64) {
+      throw new Error(
+        `EVAL_SERVICE_ACCOUNT_API_KEY must be at least 64 hex characters (256-bit key). ` +
+          `Generate one with: openssl rand -hex 32. ` +
+          `Received a ${apiKey.length}-character value.`,
+      );
+    }
   }
 
   async logout(req: Request) {
