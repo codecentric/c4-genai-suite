@@ -8,3 +8,9 @@ a2e0e4301d99c0f847583b949953b009475b4169:frontend/src/pages/admin/evals/llm-endp
 a2e0e4301d99c0f847583b949953b009475b4169:frontend/src/pages/admin/evals/llm-endpoints/forms/type-specific/C4EndpointFields.tsx:generic-api-key:5
 a2e0e4301d99c0f847583b949953b009475b4169:frontend/src/pages/admin/evals/llm-endpoints/forms/type-specific/OpenAiEndpointFields.tsx:generic-api-key:6
 a2e0e4301d99c0f847583b949953b009475b4169:frontend/src/pages/admin/evals/llm-endpoints/hooks/useLlmEndpointMutations.ts:generic-api-key:8
+
+# Test hex strings in auth.service.spec.ts — fake API keys used for unit testing key validation logic.
+8b372d8a53f4fecff79500547374166c3fb18c51:backend/src/domain/auth/auth.service.spec.ts:generic-api-key:85
+8b372d8a53f4fecff79500547374166c3fb18c51:backend/src/domain/auth/auth.service.spec.ts:generic-api-key:93
+8b372d8a53f4fecff79500547374166c3fb18c51:backend/src/domain/auth/auth.service.spec.ts:generic-api-key:107
+8b372d8a53f4fecff79500547374166c3fb18c51:backend/src/domain/auth/auth.service.spec.ts:generic-api-key:147
