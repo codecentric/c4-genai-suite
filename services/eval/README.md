@@ -31,6 +31,7 @@ See [Authentication Setup](#authentication-setup) below.
 The service uses the same PostgreSQL database as C4, but with a separate schema: `llm_eval`.
 
 Tables:
+
 - `llm_eval.qa_catalog_group`
 - `llm_eval.qa_catalog`
 - `llm_eval.qa_pair`
@@ -65,6 +66,7 @@ cp .env.example .env
 ```
 
 Key variables:
+
 - `PG_HOST`, `PG_USER`, `PG_PASSWORD`, `PG_DB`, `PG_PORT` - PostgreSQL connection
 - `CELERY_BROKER_HOST`, `CELERY_BROKER_USER`, `CELERY_BROKER_PASSWORD` - RabbitMQ
 - `LLM_EVAL_ENCRYPTION_KEY` - For encrypting sensitive config data
@@ -79,15 +81,15 @@ Both services must be configured with the **same raw key value**.
 **1. Generate a key:**
 
 ```bash
-openssl rand -hex 32
+openssl rand -hex 64
 ```
 
 **2. Configure both services with the generated key:**
 
-| Service | Environment Variable | Value |
-|---------|---------------------|-------|
-| C4 Backend (`backend/.env`) | `EVAL_SERVICE_ACCOUNT_API_KEY` | raw key |
-| Eval Service (`services/eval/.env`) | `C4_BACKEND_API_KEY` | raw key (same value) |
+| Service                             | Environment Variable           | Value                |
+| ----------------------------------- | ------------------------------ | -------------------- |
+| C4 Backend (`backend/.env`)         | `EVAL_SERVICE_ACCOUNT_API_KEY` | raw key              |
+| Eval Service (`services/eval/.env`) | `C4_BACKEND_API_KEY`           | raw key (same value) |
 
 **3. How it works:**
 
@@ -113,12 +115,14 @@ uv run celery -A llm_eval.tasks worker --loglevel=info
 ### API Documentation
 
 When running, OpenAPI docs are available at:
+
 - http://localhost:3202/docs (Swagger UI)
 - http://localhost:3202/redoc (ReDoc)
 
 ## User Context
 
 The C4 backend passes user context via HTTP headers when proxying requests:
+
 - `X-User-Id`: User ID
 - `X-User-Name`: Username
 - `X-User-Email`: User email
