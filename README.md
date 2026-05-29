@@ -148,3 +148,18 @@ The REI-S (**R**etrieval **E**xtraction **I**ngestion **S**erver) is a Python-ba
 The REI-S supports Azure AI Search and pgvector for vector storage, allowing for flexible and scalable data retrieval options. The service can be configured using environment variables to specify the type of vector store and connection details.
 
 > Sources: `/services/reis`
+
+### Eval Service
+
+The Eval service provides LLM evaluation capabilities for measuring and comparing assistant quality. It supports QA catalog management, automated evaluation execution, and a reporting dashboard.
+
+The service is **disabled by default**. To enable it, set the following in `backend/.env`:
+
+```bash
+EVAL_SERVICE_ENABLED=true
+EVAL_SERVICE_URL=http://localhost:3202
+```
+
+For full setup instructions, see the [Eval service README](services/eval/README.md).
+
+> Sources: `/services/eval`
