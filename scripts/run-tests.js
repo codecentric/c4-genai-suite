@@ -69,14 +69,16 @@ const dockerComposeDown = devSetup
 // -- Setup and Test Scripts for the Shell ----------------------------------------
 // --------------------------------------------------------------------------------
 //
-const waitForPostgres = `npx wait-on tcp:localhost:${portForPostgres}`;
-const waitForBackend = `npx wait-on tcp:localhost:${portForBackend}`;
-const waitForFrontend = `npx wait-on http://localhost:${portForFrontend}/login`;
-const waitForREIS = `npx wait-on tcp:localhost:${portForREIS}`;
-const waitForMinio = `npx wait-on tcp:localhost:${portForMinio}`;
-const waitForMcpTool = `npx wait-on tcp:localhost:${portForMcpTool}`;
-const waitForEval = `npx wait-on tcp:localhost:${portForEval}`;
-const waitForRabbitMQ = `npx wait-on tcp:localhost:${portForRabbitMQ}`;
+const waitOnTimeout = 120_000; // 2 minutes
+
+const waitForPostgres = `npx wait-on -t ${waitOnTimeout} tcp:localhost:${portForPostgres}`;
+const waitForBackend = `npx wait-on -t ${waitOnTimeout} tcp:localhost:${portForBackend}`;
+const waitForFrontend = `npx wait-on -t ${waitOnTimeout} http://localhost:${portForFrontend}/login`;
+const waitForREIS = `npx wait-on -t ${waitOnTimeout} tcp:localhost:${portForREIS}`;
+const waitForMinio = `npx wait-on -t ${waitOnTimeout} tcp:localhost:${portForMinio}`;
+const waitForMcpTool = `npx wait-on -t ${waitOnTimeout} tcp:localhost:${portForMcpTool}`;
+const waitForEval = `npx wait-on -t ${waitOnTimeout} tcp:localhost:${portForEval}`;
+const waitForRabbitMQ = `npx wait-on -t ${waitOnTimeout} tcp:localhost:${portForRabbitMQ}`;
 
 const waitForAll = [
   waitForPostgres,
@@ -117,17 +119,17 @@ const statusCommands = [
     : `echo "(eval service disabled via EVAL_SERVICE_ENABLED)"`,
   `printf 'Tip: run "nvm i && npm i" before this script to fix setup issues.'`,
   'echo ""',
-  `${waitForPostgres} && echo "==> localhost:${portForPostgres} <== postgres is up"`,
-  `${waitForBackend}  && echo "==> localhost:${portForBackend} <== backend is up"`,
-  `${waitForFrontend} && echo "==> localhost:${portForFrontend} <== frontend is up"`,
-  `${waitForREIS} && echo "==> localhost:${portForREIS} <== REIS is up"`,
-  `${waitForMinio} && echo "==> localhost:${portForMinio} <== Minio is up"`,
-  `${waitForMcpTool} && echo "==> localhost:${portForMcpTool} <== MCP-Tool is up"`,
+  `${waitForPostgres} && echo "==> localhost:${portForPostgres} <== postgres is up" || echo "==> TIMEOUT waiting for postgres! Check output/e2e-postgres-docker.log"`,
+  `${waitForBackend}  && echo "==> localhost:${portForBackend} <== backend is up" || echo "==> TIMEOUT waiting for backend! Check output/backend.log"`,
+  `${waitForFrontend} && echo "==> localhost:${portForFrontend} <== frontend is up" || echo "==> TIMEOUT waiting for frontend! Check output/frontend.log"`,
+  `${waitForREIS} && echo "==> localhost:${portForREIS} <== REIS is up" || echo "==> TIMEOUT waiting for REIS! Check output/reis.log"`,
+  `${waitForMinio} && echo "==> localhost:${portForMinio} <== Minio is up" || echo "==> TIMEOUT waiting for Minio! Check output/e2e-minio-docker.log"`,
+  `${waitForMcpTool} && echo "==> localhost:${portForMcpTool} <== MCP-Tool is up" || echo "==> TIMEOUT waiting for MCP-Tool! Check output/mcp-tool.log"`,
   evalServiceEnabled
-    ? `${waitForRabbitMQ} && echo "==> localhost:${portForRabbitMQ} <== RabbitMQ is up"`
+    ? `${waitForRabbitMQ} && echo "==> localhost:${portForRabbitMQ} <== RabbitMQ is up" || echo "==> TIMEOUT waiting for RabbitMQ! Check output/rabbitmq.log"`
     : ':',
   evalServiceEnabled
-    ? `${waitForEval} && echo "==> localhost:${portForEval} <== Eval is up"`
+    ? `${waitForEval} && echo "==> localhost:${portForEval} <== Eval is up" || echo "==> TIMEOUT waiting for Eval! Check output/eval.log"`
     : ':',
 ];
 
