@@ -9,3 +9,11 @@ regexTarget = "match"
 regexes = [
   '''secret''',
 ]
+paths = [
+  # UNCHANGED_API_KEY is a sentinel UUID, not a real secret.
+  # It signals the backend that the API key was not changed during an edit.
+  '''frontend/src/pages/admin/evals/llm-endpoints/forms/type-specific/.*EndpointFields\.tsx''',
+  '''frontend/src/pages/admin/evals/llm-endpoints/hooks/useLlmEndpointMutations\.ts''',
+  # Test hex strings used for unit testing API key validation logic — not real keys.
+  '''backend/src/domain/auth/auth\.service\.spec\.ts''',
+]

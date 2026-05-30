@@ -1,12 +1,2 @@
-# UNCHANGED_API_KEY is a sentinel/placeholder UUID, not a real secret.
-# It signals the backend that the API key was not changed during an edit operation.
-400dd9267fb59a291b4a000329a1d16cb0a93194:frontend/src/pages/admin/evals/llm-endpoints/forms/type-specific/OpenAiEndpointFields.tsx:generic-api-key:6
-400dd9267fb59a291b4a000329a1d16cb0a93194:frontend/src/pages/admin/evals/llm-endpoints/forms/type-specific/C4EndpointFields.tsx:generic-api-key:5
-400dd9267fb59a291b4a000329a1d16cb0a93194:frontend/src/pages/admin/evals/llm-endpoints/forms/type-specific/AzureOpenAiEndpointFields.tsx:generic-api-key:6
-400dd9267fb59a291b4a000329a1d16cb0a93194:frontend/src/pages/admin/evals/llm-endpoints/hooks/useLlmEndpointMutations.ts:generic-api-key:8
-
-# Test hex strings in auth.service.spec.ts — fake API keys used for unit testing key validation logic.
-f229f120b808c5eb82b5d3276ed37f310d1a15a4:backend/src/domain/auth/auth.service.spec.ts:generic-api-key:85
-f229f120b808c5eb82b5d3276ed37f310d1a15a4:backend/src/domain/auth/auth.service.spec.ts:generic-api-key:93
-f229f120b808c5eb82b5d3276ed37f310d1a15a4:backend/src/domain/auth/auth.service.spec.ts:generic-api-key:107
-f229f120b808c5eb82b5d3276ed37f310d1a15a4:backend/src/domain/auth/auth.service.spec.ts:generic-api-key:147
+# Path-based allowlisting is now handled in .gitleaks.toml
+# No fingerprint entries needed — they break on rebase/squash-merge
