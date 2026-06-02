@@ -22,12 +22,14 @@ allow_licenses:
   - 'LGPL-2.1'
   - 'LGPL-2.1-or-later'
   - 'LGPL-2.1-only'
+  - 'Unicode-DFS-2016'
   - 'Unlicense'
   - 'CC0-1.0'
   - 'OFL-1.1'
   - 'Zlib'
   - 'ZPL-2.1'
   - 'LicenseRef-scancode-protobuf'
+  - 'LicenseRef-scancode-unicode'
 allow-dependencies-licenses:
   - 'pkg:pypi/structlog' # This package is a false-positive because of a Contributor License Agreement, which is not a software license.
   - 'pkg:pypi/azure-core' # This package is a false-positive because of a Contributor License Agreement, which is not a software license.
