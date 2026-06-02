@@ -30,7 +30,7 @@ dependencies = [
     "aiofiles>=25.1.0",
     "prometheus-fastapi-instrumentator>=7.0.0",
     "fastmcp>=3.3.1",
-    "boto3>=1.43.15",
+    "boto3>=1.43.19",
     "boto3-stubs[s3]>=1.43.19",
     "weasyprint>=67.0",
     "markdown>=3.10",
@@ -42,9 +42,9 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-    "ruff==0.15.14",
-    "ty>=0.0.39",
-    "pip==26.1.1",
+    "ruff==0.15.15",
+    "ty>=0.0.42",
+    "pip==26.1.2",
     "pre-commit==4.6.0",
     "pytest==9.0.3",
     "pytest-cov==7.1.0",
