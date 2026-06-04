@@ -115,7 +115,7 @@ services:
       retries: 20
 
   rabbitmq:
-    image: rabbitmq:4.0-management
+    image: rabbitmq:4.3-management
     hostname: rabbitmq
     ports:
       - "5672:5672"
