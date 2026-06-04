@@ -18,7 +18,7 @@ dependencies = [
     "langchain-postgres>=0.0.16",
     "langchain-ollama>=0.3.10",
     "langchain-aws>=1.5.0",
-    "langchain-nvidia-ai-endpoints>=1.4.0",
+    "langchain-nvidia-ai-endpoints>=1.4.1",
     "psycopg[binary]>=3.3.4",
     "fastapi[standard]==0.136.3",
     "azure-search-documents==11.6.0",
