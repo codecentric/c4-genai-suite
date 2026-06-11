@@ -122,11 +122,22 @@ function LoginForm() {
       )}
 
       <div className="mb-3">
-        <TextInput placeholder={texts.common.email} autoFocus key={form.key('email')} {...form.getInputProps('email')} />
+        <TextInput
+          placeholder={texts.common.email}
+          autoFocus
+          key={form.key('email')}
+          label="username"
+          {...form.getInputProps('email')}
+        />
       </div>
 
       <div className="mb-3">
-        <PasswordInput placeholder={texts.common.password} key={form.key('password')} {...form.getInputProps('password')} />
+        <PasswordInput
+          placeholder={texts.common.password}
+          key={form.key('password')}
+          label="password"
+          {...form.getInputProps('password')}
+        />
       </div>
 
       <Button type="submit" className="w-full">
