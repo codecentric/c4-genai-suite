@@ -1646,7 +1646,7 @@ wheels = [
 
 [[package]]
 name = "langchain-aws"
-version = "1.5.1"
+version = "1.6.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "boto3" },
@@ -1654,9 +1654,9 @@ dependencies = [
     { name = "numpy" },
     { name = "pydantic" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/49/4d/19e8029bbdb6934f9ae3b3da405ef8e4d5839ca1b5387de53b6eb8366988/langchain_aws-1.5.1.tar.gz", hash = "sha256:fac5d68d7a99513352639be0011c3cf1c13d52ce5d77412e1f3ab31e577eac24", size = 529809, upload-time = "2026-06-08T11:33:53.219Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/f5/fb/ba7c5a987ddf58740cd587db002b231e58ca1f0b9d9947d3753e722b662b/langchain_aws-1.6.0.tar.gz", hash = "sha256:e68779e08887eed13168aa2bcdf494b13abe94350ce151f7d0d5948276f1679f", size = 531634, upload-time = "2026-06-18T18:26:04.415Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/a2/ba/841f0c1da29f742c8e9a78c04b1dfa0ec6421b3468348ae98dee042c610b/langchain_aws-1.5.1-py3-none-any.whl", hash = "sha256:9b812ee92768359b01653bb17760312d4c2674e5f19bd27c446500b817634838", size = 203039, upload-time = "2026-06-08T11:33:52.207Z" },
+    { url = "https://files.pythonhosted.org/packages/91/8b/47dca8525ba28ca100d309dcbb8360b52d0a87c8b1dc9f16daaac09d3505/langchain_aws-1.6.0-py3-none-any.whl", hash = "sha256:31cf2097038b39411690ab267692ed84c43ad2fad8d14d84c6eb90dc7feb5bd6", size = 204471, upload-time = "2026-06-18T18:26:03.403Z" },
 ]
 
 [[package]]
@@ -3211,7 +3211,7 @@ requires-dist = [
     { name = "fastapi", extras = ["standard"], specifier = "==0.136.3" },
     { name = "fastmcp", specifier = ">=3.4.2" },
     { name = "ffmpeg-python", specifier = ">=0.2.0" },
-    { name = "langchain-aws", specifier = ">=1.5.1" },
+    { name = "langchain-aws", specifier = ">=1.6.0" },
     { name = "langchain-community", specifier = ">=0.4.2" },
     { name = "langchain-core", specifier = ">=1.4.7" },
     { name = "langchain-nvidia-ai-endpoints", specifier = ">=1.4.1" },
