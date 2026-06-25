@@ -65,7 +65,7 @@
     "class-transformer": "^0.5.1",
     "class-validator": "^0.15.1",
     "cookie-parser": "^1.4.7",
-    "date-fns": "^4.1.0",
+    "date-fns": "^4.4.0",
     "dotenv": "^17.4.2",
     "duck-duck-scrape": "^2.2.7",
     "expr-eval-fork": "^3.0.3",
