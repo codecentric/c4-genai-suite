@@ -57,7 +57,7 @@ services:
       retries: 20
 
   ollama:
-    image: ollama/ollama:0.30.10
+    image: ollama/ollama:0.31.1
     restart: unless-stopped
     volumes:
       - ollama-data:/root/.ollama
