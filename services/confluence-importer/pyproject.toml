@@ -6,7 +6,7 @@ readme = "README.md"
 requires-python = ">=3.13.2"
 dependencies = [
     "atlassian-python-api==4.0.7",
-    "markdownify>=0.14.1",
+    "markdownify>=1.2.3",
     "pydantic-settings>=2.14.2",
     "pyyaml>=6.0.1",
     "requests==2.34.2",
@@ -28,7 +28,7 @@ dev = [
     "pip>=26.1.2",
     "pytest>=9.1.1",
     "pytest-mock>=3.14.1",
-    "ruff>=0.15.19",
+    "ruff>=0.15.20",
 ]
 
 [tool.mypy]

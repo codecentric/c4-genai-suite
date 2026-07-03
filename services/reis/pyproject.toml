@@ -30,7 +30,7 @@ dependencies = [
     "aiofiles>=25.1.0",
     "prometheus-fastapi-instrumentator>=8.0.2",
     "fastmcp>=3.4.2",
-    "boto3>=1.43.36",
+    "boto3>=1.43.40",
     "boto3-stubs[s3]>=1.43.32",
     "weasyprint>=67.0",
     "markdown>=3.10",
@@ -42,8 +42,8 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-    "ruff==0.15.19",
-    "ty>=0.0.53",
+    "ruff==0.15.20",
+    "ty>=0.0.56",
     "pip==26.1.2",
     "pre-commit==4.6.0",
     "pytest==9.1.1",
@@ -53,7 +53,7 @@ dev = [
     "pytest-github-report==0.0.1",
     "pytest-error-for-skips==2.0.2",
     "faker==40.21.0",
-    "responses==0.26.1",
+    "responses==0.26.2",
 ]
 
 [project.scripts]
