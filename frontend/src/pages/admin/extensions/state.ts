@@ -102,6 +102,8 @@ const useConfigurationStore_ = create<ConfigurationState & ConfigurationActions>
         configurations.push(configuration);
       }
 
+      configurations.sort((a, b) => a.name.localeCompare(b.name));
+
       return { configurations: configurations };
     });
   },
