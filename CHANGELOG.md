@@ -1,5 +1,55 @@
 # Changelog
 
+## [10.0.0](https://github.com/codecentric/c4-genai-suite/compare/v9.19.4...v10.0.0) (2026-06-16)
+
+
+### Features
+
+* integrate llm-eval into the c4 codebase ([9b45f1f](https://github.com/codecentric/c4-genai-suite/commit/9b45f1f6c8681c052ccf7c0386082b547a4f5ce0))
+* integrate llm-eval into the c4 codebase ([52498f0](https://github.com/codecentric/c4-genai-suite/commit/52498f00a6d2af05fce2a40b21b906c206a9e503))
+* integrate llm-eval into the c4 codebase ([fa44278](https://github.com/codecentric/c4-genai-suite/commit/fa4427873bb2a60ad4d89f9cfd8aa596c851933d))
+* integrate llm-eval into the c4 codebase ([e912503](https://github.com/codecentric/c4-genai-suite/commit/e9125035e6ea965ca2c731e9d6354fe33279e8aa))
+* integrate llm-eval into the c4 codebase ([d74cee2](https://github.com/codecentric/c4-genai-suite/commit/d74cee2d330e12f2725e21d18d1e3e4369822ab3))
+* integrate llm-eval into the c4 codebase ([06ae29b](https://github.com/codecentric/c4-genai-suite/commit/06ae29b0022020ef590f6442cc4b19affddde7ed))
+* integrate llm-eval into the c4 codebase ([fba9460](https://github.com/codecentric/c4-genai-suite/commit/fba9460b91b6f5248a5cb21ed532029245f5070d))
+* integrate llm-eval into the c4 codebase ([fa256ad](https://github.com/codecentric/c4-genai-suite/commit/fa256ad455b305e02357706ea83ab87d5a761ebc))
+* integrate llm-eval into the c4 codebase ([1940ed4](https://github.com/codecentric/c4-genai-suite/commit/1940ed4dbdf1068a156e99293cd628f6e22ad7ec))
+* integrate llm-eval into the c4 codebase ([dbe9e3c](https://github.com/codecentric/c4-genai-suite/commit/dbe9e3c54636ad442e9f1a38b4bda031d34bd7e0))
+* integrate llm-eval into the c4 codebase ([9c6d8a7](https://github.com/codecentric/c4-genai-suite/commit/9c6d8a77b6a61b4994841331b1c2dddcea43e2c4))
+* integrate llm-eval into the c4 codebase ([df9b516](https://github.com/codecentric/c4-genai-suite/commit/df9b516e4ff12be810c638107eba4075869564e6))
+* integrate llm-eval into the c4 codebase ([94bed32](https://github.com/codecentric/c4-genai-suite/commit/94bed32e8d575326d0609f95baff4bb2fa0468dd))
+* integrate llm-eval into the c4 codebase ([ebe43ad](https://github.com/codecentric/c4-genai-suite/commit/ebe43ad844c472d9fc80e687b365818e60564307))
+* integrate llm-eval into the c4 codebase ([217d64c](https://github.com/codecentric/c4-genai-suite/commit/217d64caea0b8108497e7e491630184ea82e9873))
+* integrate llm-eval into the c4 codebase ([f5c0822](https://github.com/codecentric/c4-genai-suite/commit/f5c0822273e2997ebb2f17eccbad3fc16966c843))
+* integrate llm-eval into the c4 codebase ([a768419](https://github.com/codecentric/c4-genai-suite/commit/a768419c9e959595efbaf323ba6b5ec4f261ce21))
+* integrate llm-eval into the c4 codebase ([5c51421](https://github.com/codecentric/c4-genai-suite/commit/5c514210ad57b3923e424db574882ea88044fa53))
+* integrate llm-eval into the c4 codebase ([c202bb8](https://github.com/codecentric/c4-genai-suite/commit/c202bb88ccc0fda468ea63e0b89ff7253d598a94))
+* integrate llm-eval into the c4 codebase ([94584cc](https://github.com/codecentric/c4-genai-suite/commit/94584cc6803d83b6510ad9f470fdaff72a1c0bc2))
+* integrate llm-eval into the c4 codebase ([547a442](https://github.com/codecentric/c4-genai-suite/commit/547a44202cad8574b932648439db34c7bf93f45b))
+* integrate llm-eval into the c4 codebase ([50788d8](https://github.com/codecentric/c4-genai-suite/commit/50788d8c8b13a204842eba8f1141a92aba091334))
+* integrate llm-eval into the c4 codebase ([0847972](https://github.com/codecentric/c4-genai-suite/commit/08479720a96aeaf37aa9cb3a01fa0fb925a99d7d))
+* integrate llm-eval into the c4 codebase ([8627018](https://github.com/codecentric/c4-genai-suite/commit/8627018c383b238a54f7f7c6175471193074c8a8))
+* integrate llm-eval into the c4 codebase ([2b11d7b](https://github.com/codecentric/c4-genai-suite/commit/2b11d7bf1900c2acd121293762b0dc5842bf7c08))
+* integrate llm-eval into the c4 codebase ([3adac1b](https://github.com/codecentric/c4-genai-suite/commit/3adac1b414b7666e5113366c2d05431be26bf944))
+* integrate llm-eval into the c4 codebase ([cf3d8b0](https://github.com/codecentric/c4-genai-suite/commit/cf3d8b0fd44cda858e8b30a72b201aa4be88e17d))
+* integrate llm-eval into the c4 codebase ([2cbeba3](https://github.com/codecentric/c4-genai-suite/commit/2cbeba31ae3a1194c00dddbcafd40109db6019cb))
+* integrate llm-eval into the c4 codebase ([89e471c](https://github.com/codecentric/c4-genai-suite/commit/89e471cd3f94f3325785e5d4cc61f5f88119c979))
+* integrate llm-eval into the c4 codebase ([069678b](https://github.com/codecentric/c4-genai-suite/commit/069678b415439bd09583d5acded11059d2465caf))
+* integrate llm-eval into the c4 codebase ([7e4d530](https://github.com/codecentric/c4-genai-suite/commit/7e4d530ea00c57bdc6aaa9276f7a465d01d9af54))
+* integrate llm-eval into the c4 codebase ([8b8a94c](https://github.com/codecentric/c4-genai-suite/commit/8b8a94c13c639d5e7c79434a330a7c7aa5ec8c4b))
+* integrate llm-eval into the c4 codebase ([bf3dc90](https://github.com/codecentric/c4-genai-suite/commit/bf3dc901541a8313b0c962baea5f24fa99cf6a26))
+* integrate llm-eval into the c4 codebase ([3281b8d](https://github.com/codecentric/c4-genai-suite/commit/3281b8d011c307f9c312afe3297aac49f18a3995))
+* integrate llm-eval into the c4 codebase ([79e9070](https://github.com/codecentric/c4-genai-suite/commit/79e9070d5c76886ce787b982e46db46582818825))
+* integrate llm-eval into the c4 codebase ([735d307](https://github.com/codecentric/c4-genai-suite/commit/735d307e51dfacf1831e15f743d96dafdb724988))
+* integrate llm-eval into the c4 codebase ([ee91791](https://github.com/codecentric/c4-genai-suite/commit/ee917915d8dbdf283ff9feb26cce10fd13e27ff1))
+* integrate llm-eval into the c4 codebase ([4650721](https://github.com/codecentric/c4-genai-suite/commit/4650721ef463ecdbc3ea60e7f8b04f5427d39ec2))
+
+
+### Bug Fixes
+
+* use path-based gitleaks allowlisting instead of fingerprints ([c3587c4](https://github.com/codecentric/c4-genai-suite/commit/c3587c4eb9ff3db5387a797590eee51ce2c557c1))
+* whitelist Unicode-DFS-2016 and scancode-unicode ([ac00594](https://github.com/codecentric/c4-genai-suite/commit/ac005940b1875a7fc74b55b74c8c5f913bba0a1a))
+
 ## [9.19.4](https://github.com/codecentric/c4-genai-suite/compare/v9.19.3...v9.19.4) (2026-05-11)
 
 
