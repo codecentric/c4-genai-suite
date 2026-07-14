@@ -59,7 +59,7 @@
     "@opentelemetry/auto-instrumentations-node": "^0.77.0",
     "@opentelemetry/sdk-node": "^0.219.0",
     "@types/mime-types": "^3.0.1",
-    "@willsoto/nestjs-prometheus": "^6.0.2",
+    "@willsoto/nestjs-prometheus": "^6.1.0",
     "ai": "^6.0.209",
     "bcrypt": "^6.0.0",
     "class-transformer": "^0.5.1",
