@@ -270,10 +270,7 @@ export const useStateOfMessages = () => {
 };
 
 export const useStateOfIsAiWriting = () => {
-  const currentChatId = useChatStore((s) => s.currentChatId);
-  const chatDataMap = useChatStore((s) => s.chatDataMap);
-  const chatData = chatDataMap.get(currentChatId);
-  return chatData?.isAiWriting || false;
+  return useChatStore((state) => state.chatDataMap.get(state.currentChatId)?.isAiWriting || false);
 };
 
 export const useStateOfSelectedDocument = () => {
