@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { FileDto, MessageDtoRatingEnum } from 'src/api';
 import { ChatMessage } from '../../state/types';
 import { AIChatItem } from './AIChatItem';
@@ -10,10 +11,10 @@ export interface ChatItemProps {
   isBeforeLast: boolean;
   rating?: MessageDtoRatingEnum;
   llmLogo?: string;
-  selectDocument: (documentUri: string) => void;
+  selectDocument: (messageId: number, documentUri: string) => void;
   editMessage: (input: string, files?: FileDto[], editMessageId?: number) => void;
 }
 
-export const ChatItem = (props: ChatItemProps) => {
+export const ChatItem = memo((props: ChatItemProps) => {
   return props.message.type === 'ai' ? <AIChatItem {...props} /> : <HumanChatItem {...props} />;
-};
+});

@@ -49,6 +49,11 @@
   overflow-anchor: none;
 }
 
+.chat-history-deferred {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 320px;
+}
+
 @keyframes loading-dot {
   50% {
     opacity: 0.5;
