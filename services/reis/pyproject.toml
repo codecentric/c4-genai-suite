@@ -20,7 +20,7 @@ dependencies = [
     "langchain-aws>=1.6.2",
     "langchain-nvidia-ai-endpoints>=1.4.3",
     "psycopg[binary]>=3.3.4",
-    "fastapi[standard]==0.139.0",
+    "fastapi[standard]==0.139.2",
     "azure-search-documents==11.6.0",
     "azure-identity==1.25.3",
     "pdfminer-six>=20260107",
@@ -30,7 +30,7 @@ dependencies = [
     "aiofiles>=25.1.0",
     "prometheus-fastapi-instrumentator>=8.0.2",
     "fastmcp>=3.4.4",
-    "boto3>=1.43.45",
+    "boto3>=1.43.53",
     "boto3-stubs[s3]>=1.43.42",
     "weasyprint>=67.0",
     "markdown>=3.10",
@@ -42,8 +42,8 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-    "ruff==0.15.20",
-    "ty>=0.0.57",
+    "ruff==0.15.22",
+    "ty>=0.0.61",
     "pip==26.1.2",
     "pre-commit==4.6.0",
     "pytest==9.1.1",
