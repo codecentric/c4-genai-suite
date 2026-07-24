@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 import { FileDto } from 'src/api';
 import { useSidebarState } from 'src/hooks/stored';
 import { useStateOfMessages, useStateOfSelectedChatId, useStateOfSelectedDocument } from '../state/chat';
@@ -18,23 +19,28 @@ export function ChatHistory({ agentName, editMessage }: ChatHistoryProps) {
   const [_, setSidebarRight] = useSidebarState('sidebar-right');
 
   const { setSelectedDocument } = useStateOfSelectedDocument();
+  const selectDocument = useCallback(
+    (messageId: number, documentUri: string) => {
+      setSelectedDocument({ conversationId: chatId, messageId, documentUri });
+      setSidebarRight(true);
+    },
+    [chatId, setSelectedDocument, setSidebarRight],
+  );
 
   return (
     <>
       <div className={'grid'}>
         {allMessagesButLastTwo.map((message, i) => (
-          <ChatItem
-            key={`${i}_${chatId}`}
-            agentName={agentName}
-            isLast={i === messages.length - 1}
-            isBeforeLast={i === messages.length - 2}
-            message={message}
-            selectDocument={(documentUri) => {
-              setSelectedDocument({ conversationId: chatId, messageId: message.id, documentUri });
-              setSidebarRight(true);
-            }}
-            editMessage={editMessage}
-          />
+          <div className="chat-history-deferred grid" data-testid="deferred-chat-item" key={`${i}_${chatId}`}>
+            <ChatItem
+              agentName={agentName}
+              isLast={false}
+              isBeforeLast={false}
+              message={message}
+              selectDocument={selectDocument}
+              editMessage={editMessage}
+            />
+          </div>
         ))}
       </div>
       <div className={autoScrollContainerForLastMessageExchange}>
@@ -45,10 +51,7 @@ export function ChatHistory({ agentName, editMessage }: ChatHistoryProps) {
             isLast={i === 1}
             isBeforeLast={i === 0}
             message={message}
-            selectDocument={(documentUri) => {
-              setSelectedDocument({ conversationId: chatId, messageId: message.id, documentUri });
-              setSidebarRight(true);
-            }}
+            selectDocument={selectDocument}
             editMessage={editMessage}
           />
         ))}
