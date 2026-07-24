@@ -25,7 +25,7 @@ jobs:
             containerfile: dev/oauth-mock/Dockerfile
             context: dev/oauth-mock/
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - uses: docker/login-action@b45d80f862d83dbcd57f89517bcf500b2ab88fb2 # v3
         with:
