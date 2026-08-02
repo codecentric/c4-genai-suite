@@ -67,7 +67,7 @@
     "cookie-parser": "^1.4.7",
     "date-fns": "^4.4.0",
     "dotenv": "^17.4.2",
-    "duck-duck-scrape": "^2.2.7",
+    "duck-duck-scrape": "npm:ddg-kit@0.1.0",
     "expr-eval-fork": "^3.0.3",
     "express-session": "^1.19.0",
     "json-diff-ts": "^4.10.4",
