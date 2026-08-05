@@ -58,7 +58,7 @@ jobs:
             context: services/eval/
     steps:
       - uses: actions/checkout@v6
-      - uses: docker/login-action@b45d80f862d83dbcd57f89517bcf500b2ab88fb2 # v3
+      - uses: docker/login-action@371161bbe7024a29a25c5e19bfcbc0804fe9ad2c # v3
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
