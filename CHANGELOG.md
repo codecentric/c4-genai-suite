@@ -1,5 +1,12 @@
 # Changelog
 
+## [10.0.1](https://github.com/codecentric/c4-genai-suite/compare/v10.0.0...v10.0.1) (2026-08-20)
+
+
+### Performance Improvements
+
+* **frontend:** reduce long chat rerenders ([#1996](https://github.com/codecentric/c4-genai-suite/issues/1996)) ([0d71abe](https://github.com/codecentric/c4-genai-suite/commit/0d71abe1c4f7cddbf20c92ce85002dfb2a97d7d7))
+
 ## [10.0.0](https://github.com/codecentric/c4-genai-suite/compare/v9.19.4...v10.0.0) (2026-06-16)
 
 
