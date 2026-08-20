@@ -119,8 +119,8 @@ export class ConversationsController {
     type: Number,
   })
   @ApiOkResponse({ type: ConversationDto })
-  async duplicateConversation(@Param('id') id: number) {
-    const result: DuplicateConversationResponse = await this.commandBus.execute(new DuplicateConversation(id));
+  async duplicateConversation(@Req() req: Request, @Param('id') id: number) {
+    const result: DuplicateConversationResponse = await this.commandBus.execute(new DuplicateConversation(id, req.user));
     return ConversationDto.fromDomain(result.conversation);
   }
 

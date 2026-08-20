@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Like } from 'typeorm';
 import { ConversationEntity, ConversationRepository, MessageEntity, MessageRepository } from '../../database';
 import { ConversationFileEntity, ConversationFileRepository } from '../../database/entities/conversation-file';
+import { User } from 'src/domain/users';
 import { Conversation } from '../interfaces';
 
 export class DuplicateConversationResponse {
@@ -11,7 +12,10 @@ export class DuplicateConversationResponse {
 }
 
 export class DuplicateConversation {
-  constructor(public readonly id: number) {}
+  constructor(
+    public readonly id: number,
+    public readonly user: User,
+  ) {}
 }
 
 @CommandHandler(DuplicateConversation)
@@ -26,10 +30,12 @@ export class DuplicateConversationHandler implements ICommandHandler<DuplicateCo
   ) {}
 
   async execute(command: DuplicateConversation): Promise<DuplicateConversationResponse> {
-    const { id } = command;
+    const { id, user } = command;
 
+    // Scope the lookup to the requesting user so a conversation owned by
+    // someone else is not found (no cross-user read/duplicate via a guessable id).
     const conversationEntity = await this.conversationRepository.findOne({
-      where: { id },
+      where: { id, userId: user.id },
       relations: { messages: true, files: {} },
     });
 

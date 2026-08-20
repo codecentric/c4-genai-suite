@@ -85,6 +85,11 @@ export class FilesController {
   })
   @ApiOperation({ operationId: 'getFileTypes', description: 'Gets the file types.' })
   @ApiOkResponse({ type: FileTypesDto })
+  // Restricted to admins: this fetches a caller-supplied bucket `endpoint`
+  // (a server-side request), just like `testBucket` above. Without the role
+  // check any authenticated user could point it at arbitrary internal hosts.
+  @Role(BUILTIN_USER_GROUP_ADMIN)
+  @UseGuards(RoleGuard)
   async getFileTypes(@Query('endpoint') endpoint: string, @Query('headers') headers?: string) {
     const result: GetFileTypesResponse = await this.queryBus.execute(new GetFileTypes(endpoint, headers));
     return FileTypesDto.fromDomain(result.fileTypes);

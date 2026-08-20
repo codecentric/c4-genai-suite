@@ -62,7 +62,10 @@ export const AIChatItem = ({ agentName, message, isLast, selectDocument }: ChatI
         {textContent}
       </Markdown>
       {message.sources && message.sources?.length > 0 ? (
-        <ChatItemSources sources={message.sources || []} selectDocument={selectDocument} />
+        <ChatItemSources
+          sources={message.sources || []}
+          selectDocument={(documentUri) => selectDocument(message.id, documentUri)}
+        />
       ) : (
         <ChatItemDebug debug={message.debug || []} />
       )}

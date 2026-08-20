@@ -12,9 +12,9 @@ requires-python = ">=3.12.0,<4.0"
 dependencies = [
     "pydantic==2.13.4",
     "pydantic-settings>=2.14.2",
-    "langchain-core>=1.4.8",
+    "langchain-core>=1.5.0",
     "langchain-community>=0.4.2",
-    "langchain-openai>=1.3.3",
+    "langchain-openai>=1.4.0",
     "langchain-postgres>=0.0.16",
     "langchain-ollama>=0.3.10",
     "langchain-aws>=1.6.2",
@@ -29,9 +29,9 @@ dependencies = [
     "python-oxmsg>=0.0.2",
     "aiofiles>=25.1.0",
     "prometheus-fastapi-instrumentator>=8.0.2",
-    "fastmcp>=3.4.3",
-    "boto3>=1.43.40",
-    "boto3-stubs[s3]>=1.43.32",
+    "fastmcp>=3.4.4",
+    "boto3>=1.43.45",
+    "boto3-stubs[s3]>=1.43.42",
     "weasyprint>=67.0",
     "markdown>=3.10",
     "pygments>=2.19.2",
@@ -43,7 +43,7 @@ dependencies = [
 [dependency-groups]
 dev = [
     "ruff==0.15.20",
-    "ty>=0.0.56",
+    "ty>=0.0.57",
     "pip==26.1.2",
     "pre-commit==4.6.0",
     "pytest==9.1.1",
