@@ -22,7 +22,7 @@ jobs:
         with:
           enable-cache: true
           cache-dependency-glob: services/reis/uv.lock
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v7
         with:
           python-version: '3.13'
       - run: uv sync
@@ -42,7 +42,7 @@ jobs:
         with:
           enable-cache: true
           cache-dependency-glob: services/reis/uv.lock
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v7
         with:
           python-version: '3.13'
       - run: uv sync
@@ -83,7 +83,7 @@ jobs:
         with:
           enable-cache: true
           cache-dependency-glob: services/reis/uv.lock
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v7
         with:
           python-version: '3.13'
       - run: uv sync
