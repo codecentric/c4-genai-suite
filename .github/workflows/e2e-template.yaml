@@ -35,7 +35,7 @@ jobs:
       # Mock LLM server runs on host, backend in Docker needs host.docker.internal to reach it
       MOCK_LLM_HOST: host.docker.internal
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: docker/setup-buildx-action@v4
       - run: docker network create test-network
       - name: start database
