@@ -1,5 +1,12 @@
 # Changelog
 
+## [10.0.2](https://github.com/codecentric/c4-genai-suite/compare/v10.0.1...v10.0.2) (2026-08-20)
+
+
+### Bug Fixes
+
+* **frontend:** sort configurations alphabetically after duplicate ([#1965](https://github.com/codecentric/c4-genai-suite/issues/1965)) ([28ae003](https://github.com/codecentric/c4-genai-suite/commit/28ae0039623a5898c2adb22f5d9ea83aae0770ae))
+
 ## [10.0.1](https://github.com/codecentric/c4-genai-suite/compare/v10.0.0...v10.0.1) (2026-08-20)
 
 
