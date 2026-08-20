@@ -90,7 +90,9 @@ export class GetFilesHandler implements IQueryHandler<GetFiles, GetFilesResponse
 
     // apply filters
     if (searchQuery && searchQuery != '') {
-      where.fileName = Raw((alias) => `LOWER(${alias}) Like '%${searchQuery}%'`);
+      where.fileName = Raw((alias) => `LOWER(${alias}) LIKE :fileNameQuery`, {
+        fileNameQuery: `%${searchQuery.toLowerCase()}%`,
+      });
     }
     if (fileFilter.enabled) {
       where.id = In(fileFilter.ids);

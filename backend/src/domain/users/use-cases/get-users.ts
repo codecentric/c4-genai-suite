@@ -34,7 +34,9 @@ export class GetUsersHandler implements IQueryHandler<GetUsers, GetUsersResponse
 
     if (searchQuery && searchQuery != '') {
       options.where = {
-        name: Raw((alias) => `LOWER(${alias}) Like '%${searchQuery.toLowerCase()}%'`),
+        name: Raw((alias) => `LOWER(${alias}) LIKE :userNameQuery`, {
+          userNameQuery: `%${searchQuery.toLowerCase()}%`,
+        }),
       };
     }
 
