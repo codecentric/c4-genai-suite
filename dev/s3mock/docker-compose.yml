@@ -1,0 +1,7 @@
+
+services:
+  s3mock:
+    image: adobe/s3mock:5.2.3
+    container_name: c4-dev-s3mock
+    ports:
+      - 9000:9090
