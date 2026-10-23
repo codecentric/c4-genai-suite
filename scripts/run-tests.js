@@ -56,7 +56,7 @@ const portForPostgres = devSetup ? '5432' : '5433';
 const portForBackend = '3000';
 const portForFrontend = '5173';
 const portForREIS = '3201';
-const portForMinio = devSetup ? '9000' : '9001';
+const portForS3Mock = devSetup ? '9000' : '9001';
 const portForMcpTool = '8000';
 const portForEval = '3202';
 const portForRabbitMQ = '5672';
@@ -75,7 +75,7 @@ const waitForPostgres = `npx wait-on -t ${waitOnTimeout} tcp:localhost:${portFor
 const waitForBackend = `npx wait-on -t ${waitOnTimeout} tcp:localhost:${portForBackend}`;
 const waitForFrontend = `npx wait-on -t ${waitOnTimeout} http://localhost:${portForFrontend}/login`;
 const waitForREIS = `npx wait-on -t ${waitOnTimeout} tcp:localhost:${portForREIS}`;
-const waitForMinio = `npx wait-on -t ${waitOnTimeout} tcp:localhost:${portForMinio}`;
+const waitForS3Mock = `npx wait-on -t ${waitOnTimeout} tcp:localhost:${portForS3Mock}`;
 const waitForMcpTool = `npx wait-on -t ${waitOnTimeout} tcp:localhost:${portForMcpTool}`;
 const waitForEval = `npx wait-on -t ${waitOnTimeout} tcp:localhost:${portForEval}`;
 const waitForRabbitMQ = `npx wait-on -t ${waitOnTimeout} tcp:localhost:${portForRabbitMQ}`;
@@ -85,7 +85,7 @@ const waitForAll = [
   waitForBackend,
   waitForFrontend,
   waitForREIS,
-  waitForMinio,
+  waitForS3Mock,
   waitForMcpTool,
   waitForRabbitMQ,
   waitForEval,
@@ -95,9 +95,9 @@ const startPostgres = `cd ${
   devSetup ? 'dev' : 'e2e'
 }/postgres && ${dockerComposeDown} && docker compose up > ../../output/e2e-postgres-docker.log 2>&1`;
 const startFrontend = `cd frontend && npm run dev > ../output/frontend.log 2>&1`;
-const startREIS = `cd services/reis && STORE_PGVECTOR_URL="postgresql+psycopg://admin:secret@localhost:${portForPostgres}/cccc" FILE_STORE_S3_ENDPOINT_URL=http://localhost:${portForMinio} uv run fastapi dev rei_s/app.py --host 0.0.0.0 --port "${portForREIS}" > ../../output/reis.log 2>&1`;
+const startREIS = `cd services/reis && STORE_PGVECTOR_URL="postgresql+psycopg://admin:secret@localhost:${portForPostgres}/cccc" FILE_STORE_S3_ENDPOINT_URL=http://localhost:${portForS3Mock} uv run fastapi dev rei_s/app.py --host 0.0.0.0 --port "${portForREIS}" > ../../output/reis.log 2>&1`;
 const startBackend = `${waitForPostgres} && cd backend && DB_URL="postgres://admin:secret@localhost:${portForPostgres}/cccc" npm run start:dev > ../output/backend.log 2>&1`;
-const startMinio = `cd ${devSetup ? 'dev' : 'e2e'}/minio && ${dockerComposeDown} && docker compose up > ../../output/e2e-minio-docker.log 2>&1`;
+const startS3Mock = `cd ${devSetup ? 'dev' : 'e2e'}/s3mock && ${dockerComposeDown} && docker compose up > ../../output/e2e-s3mock-docker.log 2>&1`;
 const startMcpTool = `echo "RUNNING-MCP:" && docker compose -f docker-compose-dev.yml up mcp-fetch > output/mcp-tool.log 2>&1`;
 const startRabbitMQ = `docker compose -f docker-compose-dev.yml up rabbitmq > output/rabbitmq.log 2>&1`;
 
@@ -110,7 +110,7 @@ const startCelery = `${waitForRabbitMQ} && cd services/eval && ${evalEnv} uv run
 
 const statusCommands = [
   'mkdir -p output',
-  `printf "Starting backend, postgres, REIS, frontend, minio${evalServiceEnabled ? ', eval, rabbitmq' : ''} ..."`,
+  `printf "Starting backend, postgres, REIS, frontend, s3mock${evalServiceEnabled ? ', eval, rabbitmq' : ''} ..."`,
   forceUsingRunningServices
     ? `echo "YOU ARE RUNNING IN FORCE MODE: THIS WILL USE WHATEVER YOU HAVE ALREADY RUNNING IF POSSIBLE!"`
     : `echo`,
@@ -123,7 +123,7 @@ const statusCommands = [
   `${waitForBackend}  && echo "==> localhost:${portForBackend} <== backend is up" || echo "==> TIMEOUT waiting for backend! Check output/backend.log"`,
   `${waitForFrontend} && echo "==> localhost:${portForFrontend} <== frontend is up" || echo "==> TIMEOUT waiting for frontend! Check output/frontend.log"`,
   `${waitForREIS} && echo "==> localhost:${portForREIS} <== REIS is up" || echo "==> TIMEOUT waiting for REIS! Check output/reis.log"`,
-  `${waitForMinio} && echo "==> localhost:${portForMinio} <== Minio is up" || echo "==> TIMEOUT waiting for Minio! Check output/e2e-minio-docker.log"`,
+  `${waitForS3Mock} && echo "==> localhost:${portForS3Mock} <== S3Mock is up" || echo "==> TIMEOUT waiting for S3Mock! Check output/e2e-s3mock-docker.log"`,
   `${waitForMcpTool} && echo "==> localhost:${portForMcpTool} <== MCP-Tool is up" || echo "==> TIMEOUT waiting for MCP-Tool! Check output/mcp-tool.log"`,
   evalServiceEnabled
     ? `${waitForRabbitMQ} && echo "==> localhost:${portForRabbitMQ} <== RabbitMQ is up" || echo "==> TIMEOUT waiting for RabbitMQ! Check output/rabbitmq.log"`
@@ -150,7 +150,7 @@ const serverStartCommands = async () => [
   await serverStart('Frontend', portForFrontend, startFrontend),
   await serverStart('REIS', portForREIS, startREIS),
   await serverStart('Backend', portForBackend, startBackend),
-  await serverStart('Minio', portForMinio, startMinio),
+  await serverStart('S3Mock', portForS3Mock, startS3Mock),
   await serverStart('MCP-Tool', portForMcpTool, startMcpTool),
   evalServiceEnabled
     ? await serverStart('RabbitMQ', portForRabbitMQ, startRabbitMQ)
@@ -180,7 +180,7 @@ const mainScript = async () => {
       await isPortAvailabe(portForBackend, 'Backend', true),
       await isPortAvailabe(portForFrontend, 'Frontend', true),
       await isPortAvailabe(portForREIS, 'REIS', true),
-      await isPortAvailabe(portForMinio, 'Minio', true),
+      await isPortAvailabe(portForS3Mock, 'S3Mock', true),
       await isPortAvailabe(portForMcpTool, 'MCP-Tool', true),
       await isPortAvailabe(portForRabbitMQ, 'RabbitMQ', evalServiceEnabled),
       await isPortAvailabe(portForEval, 'Eval', evalServiceEnabled),

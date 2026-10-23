@@ -60,7 +60,7 @@ services:
       STORE_PGVECTOR_URL: postgresql+psycopg://admin:secret@postgres:5432/cccc
       STORE_PGVECTOR_INDEX_NAME: basisreistest
       FILE_STORE_TYPE: s3
-      FILE_STORE_S3_ENDPOINT_URL: http://minio:9000
+      FILE_STORE_S3_ENDPOINT_URL: http://s3mock:9090
       FILE_STORE_S3_ACCESS_KEY_ID: admin
       FILE_STORE_S3_SECRET_ACCESS_KEY: secretsecret
       FILE_STORE_S3_BUCKET_NAME: reisbucket
@@ -174,15 +174,14 @@ services:
           }
         }
 
-  minio:
-    hostname: minio
+  s3mock:
+    hostname: s3mock
     extends:
-      file: ./dev/minio/docker-compose.yml
-      service: minio
+      file: ./dev/s3mock/docker-compose.yml
+      service: s3mock
 
 volumes:
   extension-volume:
   ollama-data:
   postgres-dev-data:
   rabbitmq-dev-data:
-  minio-dev-data:

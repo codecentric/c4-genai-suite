@@ -1,0 +1,12 @@
+networks:
+  e2eNet:
+    name: c4-e2e-net
+
+services:
+  e2eS3Mock:
+    image: adobe/s3mock:5.2.3
+    container_name: c4-e2e-s3mock
+    ports:
+      - 9001:9090
+    networks:
+      - e2eNet
