@@ -1,5 +1,12 @@
 # Changelog
 
+## [10.0.3](https://github.com/codecentric/c4-genai-suite/compare/v10.0.2...v10.0.3) (2026-10-23)
+
+
+### Bug Fixes
+
+* **docker:** update node images to 24.22.1 (Node2Shell, CVE-2026-111497) ([#2075](https://github.com/codecentric/c4-genai-suite/issues/2075)) ([0705276](https://github.com/codecentric/c4-genai-suite/commit/070527600c2ac5df5aeec0e32c7bb1f0223877ec))
+
 ## [10.0.2](https://github.com/codecentric/c4-genai-suite/compare/v10.0.1...v10.0.2) (2026-08-20)
 
 
