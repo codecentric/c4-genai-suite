@@ -1,7 +1,7 @@
 #
 # Base image for all modules
 #
-FROM node:24.5.0-alpine3.21 AS base
+FROM node:24.22.1-alpine3.23 AS base
 
 #
 # MCP SERVER
@@ -36,7 +36,7 @@ RUN npm ci --omit=dev
 #
 FROM base AS production
 
-RUN apk add git python3=3.12.12-r0 uv=0.5.31-r0
+RUN apk add git python3=3.12.15-r0 uv=0.10.2-r0
 
 WORKDIR /mcp-server
 
