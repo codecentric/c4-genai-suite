@@ -1,4 +1,4 @@
-FROM docker.io/caddy:2.11.4
+FROM docker.io/caddy:2.11.6
 
 COPY Caddyfile /etc/caddy/Caddyfile
 
