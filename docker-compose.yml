@@ -40,7 +40,7 @@ services:
       STORE_PGVECTOR_URL: postgresql+psycopg://admin:secret@postgres:5432/cccc
       STORE_PGVECTOR_INDEX_NAME: basisreistest
       FILE_STORE_TYPE: s3
-      FILE_STORE_S3_ENDPOINT_URL: http://minio:9000
+      FILE_STORE_S3_ENDPOINT_URL: http://s3mock:9090
       FILE_STORE_S3_ACCESS_KEY_ID: admin
       FILE_STORE_S3_SECRET_ACCESS_KEY: secretsecret
       FILE_STORE_S3_BUCKET_NAME: reisbucket
@@ -93,17 +93,17 @@ services:
       timeout: 1s
       retries: 20
 
-  minio:
-    image: minio/minio:RELEASE.2025-09-07T16-13-09Z
-    hostname: minio
+  s3mock:
+    image: adobe/s3mock:5.2.3
+    hostname: s3mock
     environment:
-      - MINIO_ROOT_USER=admin
-      - MINIO_ROOT_PASSWORD=secretsecret
+      - COM_ADOBE_TESTING_S3MOCK_STORE_ROOT=/home/cnb/data
+      - COM_ADOBE_TESTING_S3MOCK_STORE_RETAIN_FILES_ON_EXIT=true
     volumes:
-      - minio-data:/data
-    command: server /data --console-address ":9001"
+      # mounted on the (cnb-owned) home directory so the non-root container user can write to it
+      - s3mock-data:/home/cnb
 
 volumes:
   ollama-data:
   postgres-data:
-  minio-data:
+  s3mock-data:
